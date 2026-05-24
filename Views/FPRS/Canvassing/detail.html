@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detail Canvassing – Falcon FPRS</title>
+
+    <!-- Kalbe Geometric Font from wwwroot -->
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 400; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 600; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 700; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2');
+        }
+    </style>
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Falcon Layout & Module CSS -->
+    <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing.css" />
+</head>
+<body class="sidebar-light">
+
+<!-- Preloader -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+</div>
+
+<div class="container-scroller">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../index.html">
+                <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler" aria-label="Toggle sidebar">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div>
+                    <div class="nav-profile-name">Falcon Admin</div>
+                    <div class="nav-profile-sub">PT Kalbe Nutritionals</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+
+        <!-- ===== SIDEBAR ===== -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="true">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">FPRS</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Canvassing</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../CanvassingV2/index.html">Canvassing V2</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CVS-260500194</li>
+                    </ol>
+                </nav>
+
+                <!-- Detail Header Card -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <!-- Title row -->
+                        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+                            <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i></a>
+                            <h2 class="cvs-header-title mb-0">CVS-260500194</h2>
+                            <span class="badge-status badge-ongoing">Ongoing</span>
+                            
+                            <!-- Action Buttons on the Right -->
+                            <div class="ms-auto d-flex gap-2 align-items-center">
+                                <button class="btn btn-outline-success" id="btnTambahStok">
+                                    <i class="fa fa-plus me-1"></i> Tambah Stok
+                                </button>
+                                <div class="dropdown dropdown-selesaikan">
+                                    <button class="btn btn-selesaikan dropdown-toggle" id="btnSelesaikan"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        Selesaikan Stok
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" id="mnuSelesaikanStok">
+                                            <i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok
+                                        </a></li>
+                                        <li><a class="dropdown-item text-danger" href="#" id="mnuBatalkanKanvas">
+                                            <i class="fa fa-times-circle me-2"></i>Batalkan Canvassing
+                                        </a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Grid (3 columns) -->
+                        <div class="cvs-info-grid">
+                            <!-- Driver & Helper -->
+                            <div class="cvs-info-card">
+                                <div class="info-label"><i class="fa fa-user"></i> Driver</div>
+                                <div class="info-value"><a href="#">EMP-260500040 - JAMBI</a></div>
+                                <div class="info-label mt-2"><i class="fa fa-user-friends"></i> Helper</div>
+                                <div class="info-value text-muted">-</div>
+                            </div>
+                            <!-- Jadwal -->
+                            <div class="cvs-info-card">
+                                <div class="info-label"><i class="fa fa-calendar-alt"></i> Mulai Kanvas</div>
+                                <div class="info-value">11 Mei 2026 | 02:33 PM</div>
+                                <div class="info-label mt-2"><i class="fa fa-calendar-check"></i> Selesai Kanvas</div>
+                                <div class="info-value">01 Januari 2027 | 08:00 AM</div>
+                                <div class="mt-1">
+                                    <span class="periode-chip"><i class="fa fa-clock me-1"></i>Total periode adalah <strong>235 hari</strong></span>
+                                </div>
+                            </div>
+                            <!-- Gudang -->
+                            <div class="cvs-info-card">
+                                <div class="info-label"><i class="fa fa-warehouse"></i> Gudang Kanvas</div>
+                                <div class="info-value"><a href="#">JAMBI</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs: Stok Produk & Pelanggan -->
+                <div class="cvs-tabs">
+                    <ul class="nav nav-tabs" id="cvsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-stok" data-bs-toggle="tab"
+                                    data-bs-target="#panelStok" type="button" role="tab">
+                                Stok Produk
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-pelanggan" data-bs-toggle="tab"
+                                    data-bs-target="#panelPelanggan" type="button" role="tab">
+                                Pelanggan
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="cvsTabsContent">
+
+                        <!-- ========== TAB STOK PRODUK ========== -->
+                        <div class="tab-pane fade show active" id="panelStok" role="tabpanel">
+                            <div class="tab-search-bar mb-2">
+                                <div class="input-group input-group-sm" style="max-width:280px;">
+                                    <input type="text" class="form-control" id="searchProduk"
+                                           placeholder="Cari nama atau kode produk">
+                                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                </div>
+                            </div>
+                            <div class="text-muted mb-2" style="font-size:0.72rem; text-align:right;">Maks 2 kata</div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover stok-table" id="tblStokProduk" aria-describedby="Tabel Stok Produk">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="width:50px; vertical-align:middle;">No</th>
+                                            <th rowspan="2" style="vertical-align:middle;">Produk</th>
+                                            <th colspan="3" class="stok-group">Stok Awal</th>
+                                            <th colspan="3" class="stok-group">Terjual</th>
+                                            <th colspan="3" class="stok-group">Dikembalikan</th>
+                                            <th colspan="3" class="stok-group">Stok Hilang</th>
+                                            <th colspan="3" class="stok-group">Sisa Stok</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center" style="font-size:0.72rem;">KARTON</th>
+                                            <th class="text-center" style="font-size:0.72rem;">BOX</th>
+                                            <th class="text-center" style="font-size:0.72rem;">PCS</th>
+                                            <th class="text-center" style="font-size:0.72rem;">KARTON</th>
+                                            <th class="text-center" style="font-size:0.72rem;">BOX</th>
+                                            <th class="text-center" style="font-size:0.72rem;">PCS</th>
+                                            <th class="text-center" style="font-size:0.72rem;">KARTON</th>
+                                            <th class="text-center" style="font-size:0.72rem;">BOX</th>
+                                            <th class="text-center" style="font-size:0.72rem;">PCS</th>
+                                            <th class="text-center" style="font-size:0.72rem;">KARTON</th>
+                                            <th class="text-center" style="font-size:0.72rem;">BOX</th>
+                                            <th class="text-center" style="font-size:0.72rem;">PCS</th>
+                                            <th class="text-center" style="font-size:0.72rem;">KARTON</th>
+                                            <th class="text-center" style="font-size:0.72rem;">BOX</th>
+                                            <th class="text-center" style="font-size:0.72rem;">PCS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>
+                                                <div class="fw-semibold">BENECOL STRAW 100ML</div>
+                                                <small class="text-muted">NBE14</small>
+                                            </td>
+                                            <td class="text-center"><span class="qty-badge qty-karton">99999</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-box">0</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-pcs">0</span></td>
+                                            <td class="text-center text-success fw-semibold">0</td>
+                                            <td class="text-center text-success fw-semibold">0</td>
+                                            <td class="text-center text-success fw-semibold">0</td>
+                                            <td class="text-center text-warning fw-semibold">0</td>
+                                            <td class="text-center text-warning fw-semibold">0</td>
+                                            <td class="text-center text-warning fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center"><span class="qty-badge qty-karton">99999</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-box">0</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-pcs">0</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>
+                                                <div class="fw-semibold">FITBAR CHOCOLATE</div>
+                                                <small class="text-muted">FIT01</small>
+                                            </td>
+                                            <td class="text-center"><span class="qty-badge qty-karton">500</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-box">12</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-pcs">0</span></td>
+                                            <td class="text-center text-success fw-semibold">45</td>
+                                            <td class="text-center text-success fw-semibold">3</td>
+                                            <td class="text-center text-success fw-semibold">0</td>
+                                            <td class="text-center text-warning fw-semibold">2</td>
+                                            <td class="text-center text-warning fw-semibold">0</td>
+                                            <td class="text-center text-warning fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center text-danger fw-semibold">0</td>
+                                            <td class="text-center"><span class="qty-badge qty-karton">453</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-box">9</span></td>
+                                            <td class="text-center"><span class="qty-badge qty-pcs">0</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /TAB STOK PRODUK -->
+
+                        <!-- ========== TAB PELANGGAN ========== -->
+                        <div class="tab-pane fade" id="panelPelanggan" role="tabpanel">
+                            <div class="tab-search-bar mb-2">
+                                <div class="input-group input-group-sm" style="max-width:280px;">
+                                    <input type="text" class="form-control" id="searchPelanggan"
+                                           placeholder="Cari nama atau kode pelanggan">
+                                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                </div>
+                            </div>
+                            <div class="text-muted mb-3" style="font-size:0.72rem; text-align:right;">Maks 2 kata</div>
+
+                            <!-- Summary Stats -->
+                            <div class="pelanggan-stats mb-3">
+                                <div class="stat-cell">
+                                    <div class="stat-label">Kunjungan Efektif</div>
+                                    <div class="stat-value">0</div>
+                                </div>
+                                <div class="stat-cell">
+                                    <div class="stat-label">Kunjungan</div>
+                                    <div class="stat-value">0</div>
+                                </div>
+                                <div class="stat-cell">
+                                    <div class="stat-label">Pelanggan</div>
+                                    <div class="stat-value">0</div>
+                                </div>
+                                <div class="stat-cell money">
+                                    <div class="stat-label">Jumlah Diterima</div>
+                                    <div class="stat-value">Rp0,00</div>
+                                </div>
+                                <div class="stat-cell money">
+                                    <div class="stat-label">Sisa</div>
+                                    <div class="stat-value">Rp0,00</div>
+                                </div>
+                                <div class="stat-cell money">
+                                    <div class="stat-label">Total Penjualan</div>
+                                    <div class="stat-value">Rp0,00</div>
+                                </div>
+                            </div>
+
+                            <!-- Pelanggan table -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tblPelanggan" aria-describedby="Tabel Pelanggan">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:50px;">No</th>
+                                            <th>Pelanggan</th>
+                                            <th>Tanggal Faktur</th>
+                                            <th>No Faktur</th>
+                                            <th>Metode Pembayaran</th>
+                                            <th>Total Pembayaran</th>
+                                            <th>Tanggal Pembayaran</th>
+                                            <th>Status Faktur</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="8" class="text-center py-5 text-muted">
+                                                <i class="fa fa-inbox fa-3x d-block mb-3" style="color:#C8E099;"></i>
+                                                Tidak ada pelanggan yang ditemukan.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- /TAB PELANGGAN -->
+
+                    </div>
+                </div>
+                <!-- /Tabs -->
+
+                <!-- Footer Info -->
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                    <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i> Kembali ke list</a>
+                    <div class="text-muted" style="font-size:0.78rem;">
+                        <i class="fa fa-calendar me-1"></i> 11-05-2026
+                        &nbsp;<i class="fa fa-clock me-1"></i> 11-05-2026 14:34
+                        &nbsp;<i class="fa fa-user me-1"></i> sarahnurainim@gmail.com
+                    </div>
+                </div>
+
+            </div><!-- /content-wrapper -->
+
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div><!-- /main-panel -->
+    </div>
+</div>
+
+<!-- Modal Tambah Stok -->
+<div class="modal fade" id="modalTambahStok" tabindex="-1" aria-labelledby="modalTambahStokLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTambahStokLabel">Tambah Stok Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted" style="font-size:0.85rem;">Tambahkan stok produk tambahan ke rute canvassing yang sedang berjalan.</p>
+                <div class="gudang-bar mb-3">
+                    <label for="modalGudang">Gudang</label>
+                    <select class="form-select form-select-sm" id="modalGudang" style="max-width:200px;">
+                        <option>JAMBI</option>
+                        <option>JAKARTA PUSAT</option>
+                    </select>
+                    <div class="jumlah-barang">Jumlah barang <strong>0</strong></div>
+                </div>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th></th><th>No</th><th>Produk</th>
+                            <th class="text-center">KARTON</th><th class="text-center">BOX</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>1</td>
+                            <td>
+                                <select class="form-select form-select-sm" style="min-width:200px;">
+                                    <option value="">Tambah barang</option>
+                                    <option>WRP DIET SHAKE VANILLA (WRP01)</option>
+                                    <option>WRP DIET SHAKE CHOCOLATE (WRP02)</option>
+                                </select>
+                            </td>
+                            <td><input type="number" class="form-control form-control-sm qty-input" placeholder="Qty" style="width:80px;"></td>
+                            <td><input type="number" class="form-control form-control-sm qty-input" placeholder="Qty" style="width:80px;"></td>
+                            <td><button class="btn-remove-row" type="button"><i class="fa fa-times"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="btn btn-sm btn-outline-success btn-add-row mt-1">
+                    <i class="fa fa-plus me-1"></i> Tambah barang lain
+                </button>
+            </div>
+            <div class="modal-footer">
+                <div class="total-produk me-auto">Total Produk <span>0</span></div>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="btnSimpanTambahStok">
+                    <i class="fa fa-save me-1"></i> Simpan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Konfirmasi Selesaikan -->
+<div class="modal fade" id="modalSelesaikan" tabindex="-1" aria-labelledby="modalSelesaikanLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSelesaikanLabel">Konfirmasi Selesai</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin <strong>menyelesaikan stok</strong> canvassing <strong>CVS-260500194</strong>?</p>
+                <p class="text-muted" style="font-size:0.82rem;">Tindakan ini akan mengubah status menjadi <strong>Completed</strong> dan rekonsiliasi stok akan dilakukan.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary btn-mdl" data-bs-dismiss="modal">Tidak</button>
+                <button type="button" class="btn btn-success btn-mdl" id="btnKonfirmasiSelesai">Ya, Selesaikan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Layout JS -->
+<script src="../../../wwwroot/js/layout.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#tblStokProduk').DataTable({
+        paging: false, searching: false, info: false,
+        language: { emptyTable: 'Tidak ada data stok' }
+    });
+
+    $('#searchProduk').on('keyup', function () {
+        var val = $(this).val().toLowerCase();
+        $('#tblStokProduk tbody tr').each(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(val) > -1);
+        });
+    });
+
+    $('#btnTambahStok').on('click', function () {
+        new bootstrap.Modal(document.getElementById('modalTambahStok')).show();
+    });
+
+    $('#mnuSelesaikanStok').on('click', function (e) {
+        e.preventDefault();
+        new bootstrap.Modal(document.getElementById('modalSelesaikan')).show();
+    });
+
+    $('#btnKonfirmasiSelesai').on('click', function () {
+        bootstrap.Modal.getInstance(document.getElementById('modalSelesaikan')).hide();
+        setTimeout(function () { window.location.href = 'index.html'; }, 400);
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detail Canvassing V2 – Falcon FPRS</title>
+
+    <style>
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css" />
+</head>
+<body class="sidebar-light">
+
+<div id="loader-wrapper"><div id="loader"></div></div>
+
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../index.html">
+                <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="true">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">FPRS</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../Canvassing/index.html">Canvassing</a></li>
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Canvassing V2</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing V2</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">CVS-260500194</li>
+                    </ol>
+                </nav>
+
+                <!-- COMPACT HEADER V2 -->
+                <div class="detail-header-compact">
+                    <div class="detail-header-top">
+                        <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i></a>
+                        <h2 class="detail-header-title">CVS-260500194</h2>
+                        <span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>
+                        
+                        <div class="ms-auto d-flex gap-2">
+                            <button class="btn btn-outline-success"><i class="fa fa-plus me-1"></i> Tambah Stok</button>
+                            <div class="dropdown dropdown-selesaikan">
+                                <button class="btn btn-selesaikan dropdown-toggle" data-bs-toggle="dropdown">Selesaikan Stok</button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#"><i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok</a></li>
+                                    <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-times-circle me-2"></i>Batalkan Canvassing</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-header-info">
+                        <div class="info-item" title="Driver"><i class="fa fa-user"></i> <strong>EMP-260500040</strong> (JAMBI)</div>
+                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 – 01 Jan 2027</div>
+                        <div class="info-item" title="Gudang"><i class="fa fa-warehouse"></i> <strong>JAMBI</strong></div>
+                        <div class="info-item" title="Durasi"><i class="fa fa-clock"></i> 235 Hari</div>
+                        <div class="info-item" style="flex:1; min-width:200px;">
+                            <div class="periode-progress-container w-100">
+                                <div class="periode-progress-text"><span>Progress Waktu</span><span>45%</span></div>
+                                <div class="periode-progress"><div class="periode-progress-bar" style="width: 45%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="cvs-tabs">
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#panelStok">Stok Produk</button></li>
+                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#panelPelanggan">Pelanggan</button></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- TAB STOK PRODUK V2 -->
+                        <div class="tab-pane fade show active" id="panelStok">
+                            <div class="d-flex justify-content-end mb-3">
+                                <div class="input-group input-group-sm" style="max-width:300px;">
+                                    <input type="text" class="form-control" placeholder="Cari nama atau kode produk...">
+                                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+                                </div>
+                            </div>
+
+                            <!-- Product Cards Grid instead of Table -->
+                            <div class="product-cards-grid">
+                                
+                                <!-- Card 1 -->
+                                <div class="product-card">
+                                    <div class="product-card-header">
+                                        <div>
+                                            <div class="product-card-title">BENECOL STRAW 100ML</div>
+                                            <div class="product-card-code">NBE14</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-light" title="Riwayat" data-bs-toggle="modal" data-bs-target="#modalRiwayat" onclick="$('#riwayatProdName').text('BENECOL STRAW 100ML'); $('#riwayatProdCode').text('NBE14');"><i class="fa fa-history"></i></button>
+                                    </div>
+                                    <div class="product-card-body">
+                                        <div class="stock-grid">
+                                            <div class="stock-item">
+                                                <span class="stock-label">Awal</span>
+                                                <span class="stock-val-main">99999</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Terjual</span>
+                                                <span class="stock-val-main text-success">0</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Kembali</span>
+                                                <span class="stock-val-main text-warning">0</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Hilang</span>
+                                                <span class="stock-val-main text-danger">0</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item highlight">
+                                                <span class="stock-label">Sisa</span>
+                                                <span class="stock-val-main">99999</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2 -->
+                                <div class="product-card">
+                                    <div class="product-card-header">
+                                        <div>
+                                            <div class="product-card-title">FITBAR CHOCOLATE</div>
+                                            <div class="product-card-code">FIT01</div>
+                                        </div>
+                                        <button class="btn btn-sm btn-light" title="Riwayat" data-bs-toggle="modal" data-bs-target="#modalRiwayat" onclick="$('#riwayatProdName').text('FITBAR CHOCOLATE'); $('#riwayatProdCode').text('FIT01');"><i class="fa fa-history"></i></button>
+                                    </div>
+                                    <div class="product-card-body">
+                                        <div class="stock-grid">
+                                            <div class="stock-item">
+                                                <span class="stock-label">Awal</span>
+                                                <span class="stock-val-main">500</span>
+                                                <span class="stock-val-sub">12 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Terjual</span>
+                                                <span class="stock-val-main text-success">45</span>
+                                                <span class="stock-val-sub">3 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Kembali</span>
+                                                <span class="stock-val-main text-warning">2</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item">
+                                                <span class="stock-label">Hilang</span>
+                                                <span class="stock-val-main text-danger">0</span>
+                                                <span class="stock-val-sub">0 B | 0 P</span>
+                                            </div>
+                                            <div class="stock-item highlight">
+                                                <span class="stock-label">Sisa</span>
+                                                <span class="stock-val-main">453</span>
+                                                <span class="stock-val-sub">9 B | 0 P</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- TAB PELANGGAN -->
+                        <div class="tab-pane fade" id="panelPelanggan">
+                            <!-- ... existing simplified customer tab ... -->
+                            <div class="text-center py-5 text-muted">
+                                <i class="fa fa-users fa-3x d-block mb-3" style="color:#C8E099;"></i>
+                                Belum ada kunjungan pelanggan.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Riwayat -->
+<div class="modal fade" id="modalRiwayat" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Riwayat Stok Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <strong id="riwayatProdName">Nama Produk</strong>
+                    <span class="text-muted" id="riwayatProdCode">KODE</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Aksi</th>
+                                <th class="text-center">Karton</th>
+                                <th class="text-center">Box</th>
+                                <th class="text-center">Pcs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>11 Mei 2026 14:00</td>
+                                <td>Stok Awal</td>
+                                <td class="text-end">99999</td>
+                                <td class="text-end">0</td>
+                                <td class="text-end">0</td>
+                            </tr>
+                            <tr>
+                                <td>12 Mei 2026 09:30</td>
+                                <td><span class="text-success">Penjualan</span></td>
+                                <td class="text-end">-5</td>
+                                <td class="text-end">-2</td>
+                                <td class="text-end">0</td>
+                            </tr>
+                            <tr>
+                                <td>13 Mei 2026 15:15</td>
+                                <td><span class="text-warning">Pengembalian</span></td>
+                                <td class="text-end">+1</td>
+                                <td class="text-end">0</td>
+                                <td class="text-end">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../../wwwroot/js/layout.js"></script>
+
+</body>
+</html>

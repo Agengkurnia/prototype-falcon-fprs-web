@@ -1,0 +1,495 @@
+/* ======================================================
+   FALCON PROTOTYPE - CANVASSING MODULE CSS
+   Module: FPRS > Canvassing
+   ====================================================== */
+
+/* ---- STATUS BADGES ---- */
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-block;
+    letter-spacing: 0.02em;
+}
+
+.badge-ongoing {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+.badge-completed {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #A5D6A7;
+}
+
+.badge-cancelled {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #EF9A9A;
+}
+
+.badge-draft {
+    background-color: #FFF8E1;
+    color: #F57F17;
+    border: 1px solid #FFE082;
+}
+
+/* ---- KODE KANVAS LINK ---- */
+a.kode-link {
+    color: #005d41;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+a.kode-link:hover {
+    color: #003d2b;
+    text-decoration: underline;
+}
+
+/* ---- CANVASSING LIST PAGE ---- */
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box input {
+    width: 240px;
+    padding-right: 2rem;
+    font-size: 0.85rem;
+}
+
+.search-box .search-hint {
+    font-size: 0.72rem;
+    color: #6c757d;
+    margin-top: 2px;
+    display: block;
+}
+
+/* ---- CANVASSING DETAIL PAGE ---- */
+/* Header info cards */
+.cvs-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.cvs-header-title {
+    font-size: 1.45rem;
+    font-weight: 700;
+    font-family: 'Kalbe Geometric', sans-serif;
+    margin: 0;
+    color: #005d41;
+}
+
+.cvs-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .cvs-info-grid { grid-template-columns: 1fr; }
+}
+
+.cvs-info-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 1.15rem 1.35rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-left: 3px solid #C8E099;
+}
+
+.cvs-info-card .info-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+
+.cvs-info-card .info-label i { color: #005d41; }
+
+.cvs-info-card .info-value {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.cvs-info-card .info-value a {
+    color: #005d41;
+    font-weight: 600;
+}
+
+.cvs-info-card .info-sub {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.35rem;
+}
+
+.periode-chip {
+    display: inline-block;
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+/* ---- OVERRIDE FOR SELSAIKAN & TAMBAH STOK BUTTONS ---- */
+.btn-selesaikan {
+    background-color: #005d41 !important;
+    border-color: #005d41 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.85rem !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    border-radius: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.25rem !important;
+    box-shadow: 0 2px 4px rgba(0,93,65,0.15) !important;
+}
+
+.btn-selesaikan:hover {
+    background-color: #004f37 !important;
+    border-color: #004f37 !important;
+}
+
+#btnTambahStok {
+    padding: 0.45rem 1rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+    height: auto !important;
+    border-radius: 4px !important;
+}
+
+/* Ensure the dropdown container is robust */
+.dropdown-selesaikan {
+    display: inline-block;
+}
+
+.dropdown-selesaikan .dropdown-menu {
+    min-width: 180px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-selesaikan .dropdown-item {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.dropdown-selesaikan .dropdown-item:hover {
+    background: #F1F7E5;
+    color: #005d41;
+}
+
+/* ---- TABS (Stok Produk & Pelanggan) ---- */
+.cvs-tabs {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+.cvs-tabs .nav-tabs {
+    border-bottom: 2px solid #e8e8e8;
+    padding: 0 1.25rem;
+    background: #fff;
+}
+
+.cvs-tabs .nav-tabs .nav-item .nav-link {
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 0.85rem 1.25rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.cvs-tabs .nav-tabs .nav-item .nav-link:hover {
+    color: #005d41;
+    border-bottom-color: #C8E099;
+}
+
+.cvs-tabs .nav-tabs .nav-item .nav-link.active {
+    color: #005d41;
+    border-bottom-color: #005d41;
+    font-weight: 700;
+    background: transparent;
+}
+
+.cvs-tabs .tab-content {
+    padding: 1.25rem;
+}
+
+/* Stok Produk tab search */
+.tab-search-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.tab-search-bar .input-group {
+    max-width: 280px;
+}
+
+/* Summary stats row (Pelanggan tab) */
+.pelanggan-stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+    .pelanggan-stats { grid-template-columns: repeat(3, 1fr); }
+}
+
+.stat-cell {
+    padding: 1rem;
+    text-align: center;
+    border-right: 1px solid #dee2e6;
+    background: #fff;
+}
+
+.stat-cell:last-child { border-right: none; }
+
+.stat-cell .stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.stat-cell .stat-value {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.stat-cell.money .stat-value { color: #005d41; }
+
+/* ---- STOK PRODUK TABLE ---- */
+.stok-table th.stok-group {
+    text-align: center;
+    background: #B7D98A;
+    font-size: 0.78rem;
+    border: 1px solid #9dbf73;
+}
+
+.stok-table td { vertical-align: middle; }
+
+.qty-group {
+    display: flex;
+    gap: 4px;
+}
+
+.qty-badge {
+    display: inline-block;
+    min-width: 44px;
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.qty-karton { background: #E3F2FD; color: #1565C0; }
+.qty-box    { background: #FFF3E0; color: #E65100; }
+.qty-pcs    { background: #F3E5F5; color: #6A1B9A; }
+
+.qty-unit {
+    font-size: 0.65rem;
+    display: block;
+    color: #6c757d;
+    text-align: center;
+    margin-top: 1px;
+}
+
+/* ---- ADD FORM PAGE ---- */
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #6c757d;
+    font-size: 0.85rem;
+    padding: 0.4rem 0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s;
+}
+.btn-back:hover { color: #005d41; text-decoration: none; }
+
+/* Stok produk form table */
+.tbl-stok-form {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.tbl-stok-form table {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.tbl-stok-form .stok-header th {
+    background: #C8E099;
+    text-align: center;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    border: 1px solid #b5cc85;
+}
+
+.tbl-stok-form .stok-header-sub th {
+    background: #DDE8C1;
+    font-size: 0.72rem;
+    text-align: center;
+    padding: 0.4rem 0.5rem;
+    border: 1px solid #c8d9a0;
+    color: #555;
+}
+
+.tbl-stok-form td {
+    padding: 0.4rem 0.5rem;
+    vertical-align: middle;
+    border: 1px solid #dee2e6;
+}
+
+.tbl-stok-form .qty-input {
+    width: 80px;
+    text-align: right;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-remove-row {
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: background 0.15s;
+}
+.btn-remove-row:hover { background: #FFEBEE; }
+
+.btn-add-row {
+    color: #005d41;
+    border-color: #005d41;
+    font-size: 0.82rem;
+    padding: 0.4rem 1rem;
+}
+.btn-add-row:hover { background: #005d41; color: #fff; }
+
+/* Gudang header in form */
+.gudang-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: #F8FBF2;
+    border: 1px solid #C8E099;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.gudang-bar label { margin: 0; font-weight: 600; font-size: 0.875rem; }
+
+.jumlah-barang {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.jumlah-barang strong { color: #005d41; }
+
+/* Form actions bar */
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+    margin-top: 1rem;
+    border-radius: 0 0 6px 6px;
+}
+
+.total-produk {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.total-produk span { color: #005d41; }
+
+/* Validation message */
+.validation-msg {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+.validation-msg.show { display: block; }
+
+/* ---- FILTER MODAL ---- */
+.filter-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 0.35rem;
+}
+
+/* ---- EMPTY STATE ---- */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    color: #C8E099;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p { margin: 0; font-size: 0.9rem; }

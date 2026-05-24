@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home – Falcon FPRS</title>
+
+    <!-- Kalbe Geometric Font from wwwroot -->
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 400; font-display: swap;
+            src: url('./wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 600; font-display: swap;
+            src: url('./wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 700; font-display: swap;
+            src: url('./wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2');
+        }
+    </style>
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <!-- Falcon Layout & Module CSS -->
+    <link rel="stylesheet" href="./wwwroot/css/layout.css" />
+    
+    <style>
+        /* Specific requirements card style */
+        .req-card {
+            background: #fff;
+            border-radius: 6px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+            padding: 2rem 2.5rem;
+            border: 1px solid #eef1f6;
+            margin-top: 1rem;
+        }
+
+        .req-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #3f51b5; /* enterprise blue from Kalbe systems */
+            margin-bottom: 1rem;
+            font-family: 'Kalbe Geometric', sans-serif;
+            letter-spacing: 0.01em;
+        }
+
+        .req-subtitle {
+            font-size: 0.9rem;
+            color: #607d8b;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .req-list {
+            padding-left: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .req-list li {
+            font-size: 0.88rem;
+            color: #546e7a;
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .req-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .req-list strong {
+            color: #263238;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="sidebar-light">
+
+<!-- Preloader -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+</div>
+
+<div class="container-scroller">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="index.html">
+                <img src="./wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler" aria-label="Toggle sidebar">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="nav-profile">
+                <div class="avatar" id="avatar">FA</div>
+                <div>
+                    <div class="nav-profile-name" id="nameavatar">Falcon Admin</div>
+                    <div class="nav-profile-sub">PT Kalbe Nutritionals</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- /NAVBAR -->
+
+    <div class="container-fluid page-body-wrapper">
+
+        <!-- ===== SIDEBAR ===== -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <!-- FPRS (Parent with children) -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu"
+                       aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">FPRS</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li>
+                                <a class="nav-link child-link text-submenu" href="./Views/FPRS/Canvassing/index.html">
+                                    Canvassing
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link child-link text-submenu" href="./Views/FPRS/CanvassingV2/index.html">
+                                    Canvassing V2
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- /SIDEBAR -->
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <!-- Page Header -->
+                <div class="mb-3">
+                    <h2 class="title-page mb-1">Dashboard</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active" aria-current="page">Home</li>
+                        </ol>
+                    </nav>
+                </div>
+
+                <!-- Main System Requirements Card inside dashboard content -->
+                <div class="req-card">
+                    <h1 class="req-title">System Requirements</h1>
+                    <p class="req-subtitle">In order to use this application comfortably, you can do the following suggestions:</p>
+
+                    <ul class="req-list">
+                        <li>Please use the monitor with the minimal resolution <strong>1280 x 768</strong> (You can set it via Control Panel &gt; Display &gt; Settings).</li>
+                        <li>Please use <strong>Firefox Mozilla, Google Chrome latest version</strong> browsers. Some features will run better at <strong>Firefox Mozilla, Google Chrome latest version</strong>.</li>
+                        <li>Please make sure that javascript on your browser is still active. By default, the Javascript on browsers is active.</li>
+                    </ul>
+                </div>
+
+            </div>
+            <!-- /content-wrapper -->
+
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div>
+        <!-- /main-panel -->
+
+    </div>
+    <!-- /page-body-wrapper -->
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Layout JS -->
+<script src="./wwwroot/js/layout.js"></script>
+
+</body>
+</html>

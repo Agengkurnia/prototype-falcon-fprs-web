@@ -1,0 +1,549 @@
+/* ======================================================
+   FALCON PROTOTYPE - CANVASSING MODULE V2 CSS
+   Module: FPRS > Canvassing V2
+   Focus: Improved UI/UX, Information Density, Interactivity
+   ====================================================== */
+
+/* ---- STATUS BADGES ---- */
+.badge-status {
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.02em;
+}
+
+.badge-ongoing {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+.badge-completed {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+    border: 1px solid #A5D6A7;
+}
+
+.badge-cancelled {
+    background-color: #FFEBEE;
+    color: #C62828;
+    border: 1px solid #EF9A9A;
+}
+
+.badge-draft {
+    background-color: #FFF8E1;
+    color: #F57F17;
+    border: 1px solid #FFE082;
+}
+
+/* ---- SUMMARY CARDS (DASHBOARD) ---- */
+.summary-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .summary-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 576px) {
+    .summary-cards-grid { grid-template-columns: 1fr; }
+}
+
+.summary-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #eef1f6;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+
+.summary-card:hover, .summary-card.active-filter {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.summary-card.active-filter {
+    border: 2px solid #005d41;
+}
+
+.summary-card-icon {
+    position: absolute;
+    right: 1.25rem;
+    top: 1.25rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.summary-card.total .summary-card-icon {
+    background-color: rgba(0, 93, 65, 0.1);
+    color: #005d41;
+}
+
+.summary-card.ongoing .summary-card-icon {
+    background-color: rgba(21, 101, 192, 0.1);
+    color: #1565C0;
+}
+
+.summary-card.completed .summary-card-icon {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: #2E7D32;
+}
+
+.summary-card.cancelled .summary-card-icon {
+    background-color: rgba(198, 40, 40, 0.1);
+    color: #C62828;
+}
+
+.summary-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+}
+
+.summary-card.total::before { background: linear-gradient(90deg, #005d41, #32856c); }
+.summary-card.ongoing::before { background: linear-gradient(90deg, #1565C0, #42a5f5); }
+.summary-card.completed::before { background: linear-gradient(90deg, #2E7D32, #66bb6a); }
+.summary-card.cancelled::before { background: linear-gradient(90deg, #C62828, #ef5350); }
+
+.summary-card .stat-title {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    padding-right: 50px; /* space for icon */
+}
+
+.summary-card .stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #343a40;
+    font-family: 'Kalbe Geometric', sans-serif;
+    margin-bottom: 0.2rem;
+    line-height: 1.2;
+}
+
+.summary-card .stat-desc {
+    font-size: 0.8rem;
+    color: #87939f;
+    font-weight: 500;
+}
+
+/* ---- INLINE COLUMN FILTERS ---- */
+.filter-row th {
+    padding: 0.4rem 0.5rem;
+    background-color: #F8FBF2;
+    border-bottom: 2px solid #C8E099;
+}
+
+.filter-row input, .filter-row select {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+}
+
+/* ---- PERIODE PROGRESS BAR ---- */
+.periode-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.periode-progress-text {
+    font-size: 0.75rem;
+    color: #495057;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+}
+
+.periode-progress {
+    height: 6px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.periode-progress-bar {
+    height: 100%;
+    background-color: #005d41;
+    border-radius: 4px;
+}
+
+/* ---- ROW ACTIONS ---- */
+.row-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.btn-action {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.btn-action:hover {
+    background-color: #F1F7E5;
+    color: #005d41;
+}
+
+/* ---- DETAIL PAGE V2 ---- */
+.detail-header-compact {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #eef1f6;
+    margin-bottom: 1.5rem;
+}
+
+.detail-header-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eef1f6;
+    flex-wrap: wrap;
+}
+
+.detail-header-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #005d41;
+    font-family: 'Kalbe Geometric', sans-serif;
+    margin: 0;
+}
+
+.detail-header-info {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+.info-item i {
+    color: #005d41;
+    width: 16px;
+    text-align: center;
+}
+
+.info-item strong {
+    color: #212529;
+}
+
+/* ---- PRODUCT CARDS (Replacing 15-col table) ---- */
+.product-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #eef1f6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.product-card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eef1f6;
+    background-color: #F8FBF2;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.product-card-title {
+    font-weight: 600;
+    color: #212529;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.product-card-code {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.product-card-body {
+    padding: 1.25rem;
+}
+
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.stock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-radius: 4px;
+}
+
+.stock-item.highlight {
+    background-color: #F1F7E5;
+    border: 1px solid #DDE8C1;
+}
+
+.stock-label {
+    font-size: 0.7rem;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.stock-val-main {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #343a40;
+}
+
+.stock-item.highlight .stock-val-main {
+    color: #005d41;
+}
+
+.stock-val-sub {
+    font-size: 0.65rem;
+    color: #adb5bd;
+    margin-top: 0.1rem;
+}
+
+.stock-item .text-success { color: #2E7D32 !important; }
+.stock-item .text-warning { color: #F57F17 !important; }
+.stock-item .text-danger { color: #C62828 !important; }
+
+/* ---- TWO-PANE LAYOUT (ADD V2) ---- */
+.two-pane-container {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+@media (max-width: 992px) {
+    .two-pane-container { flex-direction: column; }
+}
+
+.pane-left {
+    flex: 1;
+    min-width: 0; /* prevent flex blowout */
+}
+
+.pane-right {
+    width: 380px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+}
+
+@media (max-width: 992px) {
+    .pane-right { width: 100%; position: static; }
+}
+
+/* Form Styling Add V2 */
+.form-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #eef1f6;
+    margin-bottom: 1.5rem;
+}
+
+.form-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #005d41;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #F1F7E5;
+}
+
+.form-label-v2 {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #495057;
+    margin-bottom: 0.4rem;
+}
+
+/* Summary Panel Add V2 */
+.summary-panel {
+    background: #F8FBF2;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #C8E099;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.85rem;
+}
+
+.summary-item .label { color: #6c757d; }
+.summary-item .val { font-weight: 600; color: #212529; text-align: right; }
+
+.summary-divider {
+    height: 1px;
+    background-color: #DDE8C1;
+    margin: 1rem 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #005d41;
+}
+
+/* Stepper QTY Add V2 */
+.stepper-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.stepper-btn {
+    background: #f8f9fa;
+    border: none;
+    padding: 0.35rem 0.6rem;
+    color: #495057;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.stepper-btn:hover { background: #e9ecef; }
+.stepper-btn:active { background: #dee2e6; }
+
+.stepper-input {
+    border: none;
+    text-align: center;
+    width: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 0;
+}
+
+.stepper-input:focus { outline: none; }
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.stepper-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Stok Item in Add V2 */
+.stok-add-item {
+    background: #fff;
+    border: 1px solid #eef1f6;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.stok-add-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.stok-add-qty-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.stok-add-qty-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stok-add-qty-label {
+    font-size: 0.7rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.btn-remove-stok-v2 {
+    color: #adb5bd;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-remove-stok-v2:hover { color: #C62828; }
+
+.stok-available {
+    font-size: 0.75rem;
+    color: #2E7D32;
+    margin-top: 0.5rem;
+    background: #E8F5E9;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.stok-error {
+    color: #C62828;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: none;
+}

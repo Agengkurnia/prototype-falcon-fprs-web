@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvassing – Falcon FPRS</title>
+
+    <!-- Kalbe Geometric Font from wwwroot -->
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 400; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 600; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal; font-weight: 700; font-display: swap;
+            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2');
+        }
+    </style>
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+
+    <!-- Falcon Layout & Module CSS -->
+    <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing.css" />
+</head>
+<body class="sidebar-light">
+
+<!-- Preloader -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+</div>
+
+<div class="container-scroller">
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../index.html">
+                <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler" aria-label="Toggle sidebar">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div class="nav-profile">
+                <div class="avatar" id="avatar">FA</div>
+                <div>
+                    <div class="nav-profile-name" id="nameavatar">Falcon Admin</div>
+                    <div class="nav-profile-sub">PT Kalbe Nutritionals</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- /NAVBAR -->
+
+    <div class="container-fluid page-body-wrapper">
+
+        <!-- ===== SIDEBAR ===== -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <!-- FPRS (Parent with children) -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu"
+                       aria-expanded="true" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">FPRS</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li>
+                                <a class="nav-link child-link text-submenu active" href="index.html">
+                                    Canvassing
+                                </a>
+                            </li>
+                            <li>
+                                <a class="nav-link child-link text-submenu" href="../CanvassingV2/index.html">
+                                    Canvassing V2
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        <!-- /SIDEBAR -->
+
+        <!-- ===== MAIN PANEL ===== -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+
+                <!-- Page Header -->
+                <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap; gap:0.75rem;">
+                    <div>
+                        <h2 class="title-page mb-1">Canvassing</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Canvassing</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div>
+                        <a href="add.html" class="btn btn-success" id="btnTambahCanvassing">
+                            <i class="fa fa-plus me-1"></i> Tambah Canvassing
+                        </a>
+                    </div>
+                </div>
+
+                <!-- List Card -->
+                <div class="card">
+                    <div class="card-body">
+
+                        <!-- Toolbar: Search + Filter + Settings -->
+                        <div class="d-flex align-items-center justify-content-end mb-3" style="flex-wrap:wrap; gap:0.5rem;">
+                            <div class="position-relative">
+                                <input type="text" id="searchKanvas" class="form-control form-control-sm"
+                                       placeholder="Cari dengan kode kanvas" style="width:240px; padding-right:2rem;">
+                                <i class="fa fa-search" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); color:#aaa; font-size:0.8rem;"></i>
+                            </div>
+                            <div class="text-muted" style="font-size:0.72rem; width:100%; text-align:right; margin-top:-4px;">
+                                Maks 2 kata
+                            </div>
+                            <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#filterModal" id="btnFilter">
+                                <i class="fa fa-filter me-1"></i> Filter
+                            </button>
+                            <button class="btn btn-light btn-sm" id="btnPengaturan" title="Pengaturan kolom">
+                                <i class="fa fa-gear me-1"></i> Pengaturan
+                            </button>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tblCanvassing" aria-describedby="Tabel List Canvassing">
+                                <thead>
+                                    <tr>
+                                        <th style="width:50px;">NO</th>
+                                        <th>KODE KANVAS</th>
+                                        <th>DRIVER</th>
+                                        <th>GUDANG KANVAS</th>
+                                        <th>MULAI KANVAS</th>
+                                        <th>SELESAI KANVAS</th>
+                                        <th>PERIODE</th>
+                                        <th>STATUS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><a href="detail.html" class="kode-link" id="linkCVS001">CVS-260500194</a></td>
+                                        <td>JAMBI<br><small class="text-muted">EMP-260500040</small></td>
+                                        <td>JAMBI</td>
+                                        <td>11 Mei 2026</td>
+                                        <td>01 Januari 2027</td>
+                                        <td>235 hari</td>
+                                        <td><span class="badge-status badge-ongoing">Ongoing</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td><a href="detail.html" class="kode-link" id="linkCVS002">CVS-260400182</a></td>
+                                        <td>JAKARTA PUSAT<br><small class="text-muted">EMP-260400021</small></td>
+                                        <td>JAKARTA PUSAT</td>
+                                        <td>05 Apr 2026</td>
+                                        <td>31 Des 2026</td>
+                                        <td>270 hari</td>
+                                        <td><span class="badge-status badge-ongoing">Ongoing</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td><a href="detail.html" class="kode-link" id="linkCVS003">CVS-260300155</a></td>
+                                        <td>SURABAYA<br><small class="text-muted">EMP-260300011</small></td>
+                                        <td>SURABAYA</td>
+                                        <td>01 Mar 2026</td>
+                                        <td>30 Sep 2026</td>
+                                        <td>213 hari</td>
+                                        <td><span class="badge-status badge-completed">Completed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /List Card -->
+
+            </div>
+            <!-- /content-wrapper -->
+
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div>
+        <!-- /main-panel -->
+
+    </div>
+    <!-- /page-body-wrapper -->
+</div>
+
+<!-- ===== FILTER MODAL ===== -->
+<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Canvassing</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="filter-label">Status</label>
+                    <div class="d-flex gap-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterOngoing" value="ongoing" checked>
+                            <label class="form-check-label" for="filterOngoing">Ongoing</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterCompleted" value="completed">
+                            <label class="form-check-label" for="filterCompleted">Completed</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="filterDraft" value="draft">
+                            <label class="form-check-label" for="filterDraft">Draft</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="filter-label" for="filterDriver">Driver</label>
+                    <input type="text" class="form-control form-control-sm" id="filterDriver" placeholder="Nama atau kode driver">
+                </div>
+                <div class="mb-3">
+                    <label class="filter-label" for="filterGudang">Gudang Kanvas</label>
+                    <select class="form-select form-select-sm" id="filterGudang">
+                        <option value="">-- Semua Gudang --</option>
+                        <option>JAMBI</option>
+                        <option>JAKARTA PUSAT</option>
+                        <option>SURABAYA</option>
+                        <option>BANDUNG</option>
+                        <option>MEDAN</option>
+                    </select>
+                </div>
+                <div class="row g-2">
+                    <div class="col-6">
+                        <label class="filter-label" for="filterMulai">Mulai Kanvas</label>
+                        <input type="date" class="form-control form-control-sm" id="filterMulai">
+                    </div>
+                    <div class="col-6">
+                        <label class="filter-label" for="filterSelesai">Selesai Kanvas</label>
+                        <input type="date" class="form-control form-control-sm" id="filterSelesai">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-success btn-mdl" id="btnResetFilter">Reset</button>
+                <button type="button" class="btn btn-success btn-mdl" id="btnApplyFilter">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Layout JS -->
+<script src="../../../wwwroot/js/layout.js"></script>
+
+<script>
+$(document).ready(function () {
+    var table = $('#tblCanvassing').DataTable({
+        language: {
+            search: '',
+            searchPlaceholder: 'Cari...',
+            lengthMenu: 'Tampilkan _MENU_ entri',
+            info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ entri',
+            paginate: { first: 'Pertama', last: 'Terakhir', next: 'Selanjutnya', previous: 'Sebelumnya' },
+            zeroRecords: 'Tidak ada data yang ditemukan',
+            emptyTable: 'Tidak ada data tersedia'
+        },
+        pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [7] }]
+    });
+
+    $('#searchKanvas').on('keyup', function () {
+        table.search(this.value).draw();
+    });
+
+    $('#btnResetFilter').on('click', function () {
+        $('#filterDriver').val('');
+        $('#filterGudang').val('');
+        $('#filterMulai').val('');
+        $('#filterSelesai').val('');
+        $('#filterOngoing, #filterCompleted, #filterDraft').prop('checked', false);
+        $('#filterOngoing').prop('checked', true);
+    });
+
+    $('#btnApplyFilter').on('click', function () {
+        $('#filterModal').modal('hide');
+    });
+});
+</script>
+</body>
+</html>

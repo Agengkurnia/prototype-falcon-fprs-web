@@ -1,0 +1,41 @@
+﻿.btn {
+    padding: 0.575rem 0.75rem !important;
+}
+
+    .btn.btn-add {
+        padding: 0.125rem 0.7rem !important;
+    }
+
+.slideon.slideon-xs {
+    margin-top: 11px;
+    margin-left: 6px;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+    .select2-container .select2-selection--single .select2-selection__rendered {
+        overflow: visible;
+        padding-left: 0px;
+    }
+
+.select2-container--default .select2-selection--single {
+    border: 1px solid #e8eff9;
+}
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 10px;
+    }
+
+.select2-container .select2-selection--single {
+    height: 37px;
+}
+
+.select2-container--default .select2-selection--single, .select2-container--default .select2-selection--single .select2-search__field, .typeahead, .tt-query, .tt-hint {
+    padding: 0.875rem;
+}
+
+.select2-container--default.select2-container--disabled .select2-selection--single {
+    background-color: #e9ecef;
+}

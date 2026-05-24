@@ -1,0 +1,157 @@
+﻿body {
+    margin-bottom: 15px;
+    margin-top: 5px;
+}
+
+body,
+html {
+    background-color: #F1F7E5;
+}
+
+p {
+    margin-bottom: 0;
+}
+
+.mycontainer {
+    background-color: white;
+    padding: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    display: block;
+    margin-block-start: 0.83em;
+    margin-block-end: 0.83em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+@media only screen and (max-width : 500px) {
+    .mycontainer {
+        width: 94%;
+    }
+
+    .content {
+        width: 100%;
+    }
+
+
+    .signfirstparty {
+        width: 100%;
+    }
+
+    .signsecondparty {
+        width: 100%;
+    }
+
+    .transaksi .itemppn {
+        margin-top: 20px !important;
+    }
+
+    .transaksi .itempph {
+        margin-top: 16px !important;
+    }
+
+    h2{
+        font-size: 1.4rem !important;
+    }
+
+    span{
+        font-size: 11px;
+    }
+
+    strong {
+        font-size: 11px;
+    }
+
+    p{
+        font-size: 12px;
+    }
+}
+
+@media only screen and (min-width: 500px) and (max-width : 780px) {
+    .mycontainer {
+        width: 90%;
+    }
+
+    .content {
+        width: 90%;
+    }
+
+
+    .signfirstparty {
+        width: 85%;
+    }
+
+    .signsecondparty {
+        width: 85%;
+    }
+}
+
+@media only screen and (min-width : 780px) {
+    .mycontainer {
+        width: 70%;
+    }
+
+    .content {
+        width: 65%;
+    }
+
+
+    .signfirstparty {
+        width: 75%;
+    }
+
+    .signsecondparty {
+        width: 75%;
+    }
+}
+
+
+.frame-generate {
+    display: block;
+    padding: 7px 10px;
+    width: 85%;
+    font-size: 12px;
+    border-radius: 5px;
+    background-color: #e8eeee;
+}
+
+.lbl-otp {
+    color: green;
+    font: 700 16px "Calibri", sans-serif;
+}
+
+.text-otp {
+    background-color: #e8eeee;
+    font-weight: 600;
+    border: 3px solid #005d41;
+    border-radius: 7px;
+}
+
+.ctsecond {
+    width: 75%;
+}
+
+.btnsubmit {
+    width: 100%;
+    background-color: #005d41;
+    border-color: #005d41;
+}
+
+.spsystem {
+    color: #005d41;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.sptext {
+    color: grey;
+    font-weight: 500;
+}
+
+.listactivity {
+    width: 100%;
+}

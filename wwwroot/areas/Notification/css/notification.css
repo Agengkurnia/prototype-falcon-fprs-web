@@ -1,0 +1,37 @@
+﻿table.dataTable {
+    width: 100% !important;
+}
+
+.content-wrapper {
+    padding: 0 !important;
+}
+
+.content-wrapper-head {
+    padding: 1.18rem;
+}
+
+.card {
+    margin-top: 0 !important;
+    border-style: none;
+}
+
+    .card .card-body {
+        padding: 0;
+        margin: 25px;
+        border-color: grey;
+        border-style: solid;
+        border-width: 1px;
+    }
+
+.nav-tabs .nav-link {
+    background: transparent;
+    border: none;
+}
+
+.tab-content {
+    padding: 0;
+}
+
+.btn {
+    padding: 0.125rem 0.7rem !important;
+}
