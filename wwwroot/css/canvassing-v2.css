@@ -547,3 +547,167 @@
     margin-top: 0.25rem;
     display: none;
 }
+
+/* ======================================================
+   RESPONSIVE MOBILE STYLES FOR CANVASSING V2
+   ====================================================== */
+@media (max-width: 768px) {
+    /* No-More-Tables table transformation for V2 */
+    #tblCanvassingV2, #tblCanvassingV2 tbody, #tblCanvassingV2 tr, #tblCanvassingV2 td {
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    #tblCanvassingV2 thead {
+        display: none !important;
+    }
+    
+    #tblCanvassingV2 tr {
+        background: #fff;
+        border: 1px solid #eef1f6 !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    
+    #tblCanvassingV2 td {
+        border: none !important;
+        padding: 0.5rem 0 !important;
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+    }
+    
+    #tblCanvassingV2 td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        text-align: left;
+        margin-right: 1rem;
+    }
+
+    /* Hide inline column filter inputs on mobile */
+    .filter-row {
+        display: none !important;
+    }
+}
+
+@media (max-width: 992px) {
+    /* Natural bottom summary card on mobile/tablet for V2 add form */
+    .pane-right {
+        width: 100% !important;
+        position: static !important;
+        margin-top: 1.5rem !important;
+        display: block !important;
+    }
+    
+    .pane-right .summary-panel {
+        background: #F8FBF2 !important;
+        border: 1px solid #C8E099 !important;
+        padding: 1.5rem !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Ensure all summary items are cleanly displayed on mobile card */
+    .pane-right .summary-panel .summary-item {
+        display: flex !important;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pane-right .summary-panel .summary-divider {
+        display: block !important;
+        height: 1px;
+        background: #C8E099;
+        margin: 1rem 0;
+        opacity: 0.5;
+    }
+    
+    .pane-right .summary-panel .form-section-title {
+        display: block !important;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #005d41;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #F1F7E5;
+    }
+    
+    /* Stack buttons beautifully at the bottom of the card */
+    .pane-right .summary-panel .d-flex.flex-column.gap-2.mt-4 {
+        flex-direction: column !important;
+        margin-top: 1.5rem !important;
+        gap: 0.5rem !important;
+        width: 100% !important;
+    }
+    
+    .pane-right #btnSimpanV2 {
+        width: 100% !important;
+        padding: 0.6rem 1rem !important;
+        margin: 0 !important;
+        height: auto !important;
+        font-size: 0.95rem;
+    }
+    
+    .pane-right .btn-outline-secondary, .pane-right a.btn-outline-secondary {
+        width: 100% !important;
+        padding: 0.6rem 1rem !important;
+        margin: 0 !important;
+        height: auto !important;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Reset main panel padding */
+    .main-panel {
+        padding-bottom: 20px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Horizontal swipeable tabs on mobile */
+    .cvs-tabs .nav-tabs {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid #dee2e6;
+        gap: 0.5rem;
+    }
+    
+    .cvs-tabs .nav-tabs .nav-item {
+        flex: 0 0 auto !important;
+    }
+
+    /* Stack header details action buttons on mobile detail page */
+    .detail-header-top {
+        flex-direction: row !important;
+        align-items: center !important;
+    }
+    
+    .detail-header-top .ms-auto {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-top: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .detail-header-top .ms-auto button,
+    .detail-header-top .ms-auto .dropdown,
+    .detail-header-top .ms-auto .btn-selesaikan {
+        width: 100% !important;
+    }
+
+    .dropdown-selesaikan .dropdown-menu {
+        width: 100% !important;
+        position: absolute !important;
+    }
+}

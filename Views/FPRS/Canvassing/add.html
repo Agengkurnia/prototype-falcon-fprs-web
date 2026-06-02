@@ -260,9 +260,9 @@
                                 </thead>
                                 <tbody id="stokBody">
                                     <tr class="stok-row" id="stokRow1">
-                                        <td><input type="checkbox" class="chk-row"></td>
-                                        <td class="row-num">1</td>
-                                        <td>
+                                        <td data-label="Pilih"><input type="checkbox" class="chk-row"></td>
+                                        <td data-label="No" class="row-num">1</td>
+                                        <td data-label="Produk">
                                             <select class="form-select form-select-sm select2-produk produk-select" style="min-width:220px;" id="frmProduk1">
                                                 <option value="">Tambah barang</option>
                                                 <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
@@ -273,20 +273,20 @@
                                                 <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td data-label="Stok">
                                             <span class="stok-info text-muted" style="font-size:0.78rem;">Stok: -</span>
                                         </td>
-                                        <td>
+                                        <td data-label="Karton">
                                             <input type="number" class="form-control form-control-sm qty-input qty-karton-input"
                                                    placeholder="Qty" min="0" id="qtyKarton1">
                                             <small class="text-muted" style="font-size:0.7rem;">KARTON</small>
                                         </td>
-                                        <td>
+                                        <td data-label="Box">
                                             <input type="number" class="form-control form-control-sm qty-input qty-box-input"
                                                    placeholder="Qty" min="0" id="qtyBox1">
                                             <small class="text-muted" style="font-size:0.7rem;">BOX</small>
                                         </td>
-                                        <td>
+                                        <td data-label="Hapus">
                                             <button class="btn-remove-row" type="button" data-row="1" title="Hapus baris">
                                                 <i class="fa fa-times"></i>
                                             </button>
@@ -452,9 +452,9 @@ $(document).ready(function () {
         rowCounter++;
         var newRow = `
             <tr class="stok-row" id="stokRow${rowCounter}">
-                <td><input type="checkbox" class="chk-row"></td>
-                <td class="row-num">${rowCounter}</td>
-                <td>
+                <td data-label="Pilih"><input type="checkbox" class="chk-row"></td>
+                <td data-label="No" class="row-num">${rowCounter}</td>
+                <td data-label="Produk">
                     <select class="form-select form-select-sm produk-select" style="min-width:220px;" id="frmProduk${rowCounter}">
                         <option value="">Tambah barang</option>
                         <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
@@ -465,18 +465,18 @@ $(document).ready(function () {
                         <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
                     </select>
                 </td>
-                <td><span class="stok-info text-muted" style="font-size:0.78rem;">Stok: -</span></td>
-                <td>
+                <td data-label="Stok"><span class="stok-info text-muted" style="font-size:0.78rem;">Stok: -</span></td>
+                <td data-label="Karton">
                     <input type="number" class="form-control form-control-sm qty-input qty-karton-input"
                            placeholder="Qty" min="0" id="qtyKarton${rowCounter}">
                     <small class="text-muted" style="font-size:0.7rem;">KARTON</small>
                 </td>
-                <td>
+                <td data-label="Box">
                     <input type="number" class="form-control form-control-sm qty-input qty-box-input"
                            placeholder="Qty" min="0" id="qtyBox${rowCounter}">
                     <small class="text-muted" style="font-size:0.7rem;">BOX</small>
                 </td>
-                <td>
+                <td data-label="Hapus">
                     <button class="btn-remove-row" type="button" data-row="${rowCounter}" title="Hapus baris">
                         <i class="fa fa-times"></i>
                     </button>

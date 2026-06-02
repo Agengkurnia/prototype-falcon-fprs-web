@@ -44,8 +44,19 @@ document.addEventListener('DOMContentLoaded', function () {
     var toggler = document.getElementById('sidebarToggler');
     var sidebar = document.querySelector('.sidebar');
     if (toggler && sidebar) {
-        toggler.addEventListener('click', function () {
+        toggler.addEventListener('click', function (e) {
+            e.stopPropagation();
             sidebar.classList.toggle('open');
+        });
+    }
+
+    // Close sidebar on click of main panel (mobile)
+    var mainPanel = document.querySelector('.main-panel');
+    if (mainPanel && sidebar) {
+        mainPanel.addEventListener('click', function () {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
         });
     }
 

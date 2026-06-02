@@ -493,3 +493,163 @@ a.kode-link:hover {
 }
 
 .empty-state p { margin: 0; font-size: 0.9rem; }
+
+/* ======================================================
+   RESPONSIVE MOBILE STYLES FOR CANVASSING V1
+   ====================================================== */
+@media (max-width: 768px) {
+    /* No-More-Tables table transformation */
+    #tblCanvassing, #tblCanvassing tbody, #tblCanvassing tr, #tblCanvassing td,
+    .tbl-stok-form table, .tbl-stok-form tbody, .tbl-stok-form tr, .tbl-stok-form td {
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    #tblCanvassing thead, .tbl-stok-form thead {
+        display: none !important;
+    }
+    
+    #tblCanvassing tr, .tbl-stok-form tr.stok-row {
+        background: #fff;
+        border: 1px solid #eef1f6 !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    
+    #tblCanvassing td, .tbl-stok-form td {
+        border: none !important;
+        padding: 0.5rem 0 !important;
+        display: flex !important;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+    }
+    
+    #tblCanvassing td::before, .tbl-stok-form td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        text-align: left;
+        margin-right: 1rem;
+    }
+
+    .tbl-stok-form select.produk-select {
+        min-width: unset !important;
+        width: 100% !important;
+        max-width: 180px;
+    }
+    
+    .tbl-stok-form select.produk-select + .select2-container {
+        width: 100% !important;
+        max-width: 180px;
+    }
+
+    .tbl-stok-form .qty-input {
+        max-width: 80px;
+    }
+
+    /* Mobile accordion for detail page */
+    .stok-mobile-card {
+        background: #fff;
+        border: 1px solid #eef1f6;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        overflow: hidden;
+    }
+    
+    .stok-mobile-card-header {
+        padding: 0.9rem 1rem;
+        background: #fff;
+        transition: background 0.15s;
+    }
+    
+    .stok-mobile-card-header:hover {
+        background: #fdfdfd;
+    }
+    
+    .stok-mobile-card-header[aria-expanded="true"] .mobile-collapse-arrow {
+        transform: rotate(180deg);
+    }
+    
+    /* Pelanggan stats mobile view spacing */
+    .pelanggan-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        border-radius: 6px;
+    }
+    
+    .stat-cell {
+        border-right: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .stat-cell:nth-child(2n) {
+        border-right: none;
+    }
+    
+    .stat-cell:nth-child(5), .stat-cell:nth-child(6) {
+        border-bottom: none;
+    }
+
+    /* Toolbar wrap and button sizes */
+    #searchKanvas {
+        width: 100% !important;
+    }
+    .position-relative {
+        width: 100%;
+    }
+    
+    .btn-add-row, .btn-remove-row {
+        width: auto !important;
+    }
+
+    /* Stack list filter row and action buttons */
+    .content-wrapper .card-body .d-flex {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    
+    .content-wrapper .card-body .d-flex > * {
+        width: 100%;
+        margin-bottom: 0.25rem;
+    }
+    
+    .content-wrapper .card-body .d-flex .text-muted {
+        text-align: left !important;
+        margin-top: -2px;
+        margin-bottom: 6px;
+    }
+
+    /* Stack detail main header buttons */
+    .cvs-header-title {
+        width: 100%;
+    }
+    
+    .card-body .d-flex.align-items-center.gap-3.mb-3.flex-wrap {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+    
+    .card-body .d-flex.align-items-center.gap-3.mb-3.flex-wrap .ms-auto {
+        width: 100%;
+        margin-left: 0 !important;
+        margin-top: 0.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .card-body .d-flex.align-items-center.gap-3.mb-3.flex-wrap .ms-auto button,
+    .card-body .d-flex.align-items-center.gap-3.mb-3.flex-wrap .ms-auto .dropdown,
+    .card-body .d-flex.align-items-center.gap-3.mb-3.flex-wrap .ms-auto .btn-selesaikan {
+        width: 100% !important;
+    }
+    
+    /* Breadcrumb breading adjustment */
+    .breadcrumb {
+        font-size: 0.72rem;
+    }
+}

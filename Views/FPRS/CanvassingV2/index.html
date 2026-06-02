@@ -185,13 +185,13 @@ $(document).ready(function () {
         var act = '<div class="row-actions"><a href="detail.html" class="btn-action" title="Lihat Detail"><i class="fa fa-eye"></i></a>' + (statusIdx==0 ? '<button class="btn-action" title="Edit"><i class="fa fa-pen"></i></button>' : '') + '</div>';
         
         var tr = '<tr>' +
-            '<td>'+i+'</td>' +
-            '<td><a href="detail.html" class="kode-link fw-bold">'+id+'</a></td>' +
-            '<td>'+gudang+'<br><small class="text-muted">EMP-260'+i+'00040</small></td>' +
-            '<td>'+gudang+'</td>' +
-            '<td><div class="periode-progress-container"><div class="periode-progress-text"><span>01 Jan - 31 Des</span><span>'+pct+'%</span></div><div class="periode-progress"><div class="periode-progress-bar '+(pct==100?'bg-success':'')+'" style="width: '+pct+'%;"></div></div><small class="text-muted" style="font-size:0.65rem;">'+Math.floor(pct/100*days)+' dari '+days+' hari</small></div></td>' +
-            '<td>'+stat+'</td>' +
-            '<td>'+act+'</td>' +
+            '<td data-label="No">'+i+'</td>' +
+            '<td data-label="Kode"><a href="detail.html" class="kode-link fw-bold">'+id+'</a></td>' +
+            '<td data-label="Driver">'+gudang+'<br><small class="text-muted">EMP-260'+i+'00040</small></td>' +
+            '<td data-label="Gudang">'+gudang+'</td>' +
+            '<td data-label="Periode"><div class="periode-progress-container"><div class="periode-progress-text"><span>01 Jan - 31 Des</span><span>'+pct+'%</span></div><div class="periode-progress"><div class="periode-progress-bar '+(pct==100?'bg-success':'')+'" style="width: '+pct+'%;"></div></div><small class="text-muted" style="font-size:0.65rem;">'+Math.floor(pct/100*days)+' dari '+days+' hari</small></div></td>' +
+            '<td data-label="Status">'+stat+'</td>' +
+            '<td data-label="Aksi">'+act+'</td>' +
             '</tr>';
         tbody.append(tr);
     }
