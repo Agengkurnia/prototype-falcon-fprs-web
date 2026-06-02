@@ -224,9 +224,22 @@ $(document).ready(function () {
     $('#inpGudang').change(function() { $('#sumGudang').text($(this).val() || '-'); });
     
     $('#inpMulai, #inpSelesai').change(function() {
-        var start = new Date($('#inpMulai').val());
-        var end = new Date($('#inpSelesai').val());
-        if(start && end && end > start) {
+        var startVal = $('#inpMulai').val();
+        var endVal = $('#inpSelesai').val();
+        if(startVal && endVal) {
+            var start = new Date(startVal);
+            var end = new Date(endVal);
+            if(end < start) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Periode Tidak Valid',
+                    text: 'Tanggal Selesai tidak boleh mendahului Tanggal Mulai!',
+                    confirmButtonColor: '#005d41'
+                });
+                $('#inpSelesai').val('');
+                $('#sumPeriode').text('- hari');
+                return;
+            }
             var diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
             $('#sumPeriode').text(diff + ' hari');
         } else {
@@ -318,8 +331,28 @@ function initSelect2Produk() {
 }
 
 function removeStokItem(btn) {
-    $(btn).closest('.stok-add-item').remove();
-    updateSummary();
+    Swal.fire({
+        title: 'Hapus produk ini?',
+        text: 'Produk akan dihapus dari daftar canvassing.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $(btn).closest('.stok-add-item').remove();
+            updateSummary();
+            Swal.fire({
+                icon: 'success',
+                title: 'Dihapus!',
+                text: 'Produk telah dihapus.',
+                timer: 1000,
+                showConfirmButton: false
+            });
+        }
+    });
 }
 
 function stepQty(btn, step) {

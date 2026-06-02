@@ -652,4 +652,164 @@ a.kode-link:hover {
     .breadcrumb {
         font-size: 0.72rem;
     }
+
+    /* Modal Tambah Stok Mobile Table Transformation */
+    #modalTambahStok .modal-dialog {
+        margin: 0.5rem !important;
+        max-width: calc(100% - 1rem) !important;
+    }
+    
+    #modalTambahStok .modal-body {
+        padding: 0.75rem !important;
+    }
+    
+    #modalTambahStok .table, 
+    #modalTambahStok .table tbody, 
+    #modalTambahStok .table tr, 
+    #modalTambahStok .table td {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    #modalTambahStok .table thead {
+        display: none !important;
+    }
+    
+    #modalTambahStok .table tr {
+        background: #fdfdfd !important;
+        border: 1px solid #eef1f6 !important;
+        border-radius: 8px !important;
+        margin-bottom: 0.75rem !important;
+        padding: 0.75rem !important;
+        position: relative !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+    }
+    
+    #modalTambahStok .table td {
+        border: none !important;
+        padding: 0.35rem 0 !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between !important;
+        text-align: left !important;
+    }
+    
+    /* Layout checkbox & row index side-by-side */
+    #modalTambahStok .table td:nth-child(1) {
+        display: inline-flex !important;
+        width: auto !important;
+        padding-right: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    #modalTambahStok .table td:input[type="checkbox"] {
+        margin: 0 !important;
+    }
+    
+    #modalTambahStok .table td:nth-child(2) {
+        display: inline-flex !important;
+        width: auto !important;
+        font-weight: 700 !important;
+        color: #005d41 !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    /* Product select full-width */
+    #modalTambahStok .table td:nth-child(3) {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    #modalTambahStok .table td:nth-child(3) select {
+        width: 100% !important;
+        min-width: unset !important;
+        max-width: 100% !important;
+    }
+    
+    /* Karton Qty input */
+    #modalTambahStok .table td:nth-child(4) {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    #modalTambahStok .table td:nth-child(4)::before {
+        content: "KARTON";
+        font-weight: 600 !important;
+        font-size: 0.75rem !important;
+        color: #6c757d !important;
+    }
+    
+    /* Box Qty input */
+    #modalTambahStok .table td:nth-child(5) {
+        display: flex !important;
+        width: 100% !important;
+        justify-content: space-between !important;
+        margin-bottom: 0.25rem !important;
+    }
+    
+    #modalTambahStok .table td:nth-child(5)::before {
+        content: "BOX";
+        font-weight: 600 !important;
+        font-size: 0.75rem !important;
+        color: #6c757d !important;
+    }
+    
+    /* Remove row button absolute positioned at top-right */
+    #modalTambahStok .table td:nth-child(6) {
+        position: absolute !important;
+        top: 0.5rem !important;
+        right: 0.5rem !important;
+        width: auto !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+    
+    #modalTambahStok .btn-remove-row {
+        background: #fbe9e7 !important;
+        color: #d84315 !important;
+        border-radius: 4px !important;
+        width: 28px !important;
+        height: 28px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border: none !important;
+        margin: 0 !important;
+    }
+
+    #modalTambahStok .gudang-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 0.5rem !important;
+    }
+
+    #modalTambahStok #modalGudang {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    #modalTambahStok .jumlah-barang {
+        margin-left: 0 !important;
+        margin-top: 0.25rem !important;
+    }
+
+    #modalTambahStok .modal-footer {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        align-items: stretch !important;
+    }
+    
+    #modalTambahStok .modal-footer > * {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    #modalTambahStok .total-produk {
+        text-align: left !important;
+        margin-bottom: 0.25rem !important;
+    }
 }

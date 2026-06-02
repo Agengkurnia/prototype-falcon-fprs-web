@@ -538,10 +538,12 @@
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bundle.min.js"></script>
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Layout JS -->
 <script src="../../../wwwroot/js/layout.js"></script>
@@ -563,10 +565,142 @@ $(document).ready(function () {
         });
     });
 
+    // --- MODAL TAMBAH STOK ACTIONS ---
     $('#btnTambahStok').on('click', function () {
+        // Reset modal state
+        resetModalTambahStok();
         new bootstrap.Modal(document.getElementById('modalTambahStok')).show();
     });
 
+    // Add new row inside modal
+    $('.btn-add-row').on('click', function() {
+        var tbody = $('#modalTambahStok tbody');
+        var rowCount = tbody.find('tr').length + 1;
+        var newRow = `
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>${rowCount}</td>
+                <td>
+                    <select class="form-select form-select-sm select-produk" style="min-width:200px;">
+                        <option value="">Tambah barang</option>
+                        <option value="WRP01">WRP DIET SHAKE VANILLA (WRP01)</option>
+                        <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
+                        <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
+                        <option value="FIT01">FITBAR CHOCOLATE (FIT01)</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control form-control-sm qty-input qty-karton" placeholder="Qty" style="width:80px;" min="0"></td>
+                <td><input type="number" class="form-control form-control-sm qty-input qty-box" placeholder="Qty" style="width:80px;" min="0"></td>
+                <td><button class="btn-remove-row" type="button"><i class="fa fa-times"></i></button></td>
+            </tr>
+        `;
+        tbody.append(newRow);
+        updateModalSummary();
+    });
+
+    // Remove row inside modal (delegated event)
+    $('#modalTambahStok').on('click', '.btn-remove-row', function() {
+        var row = $(this).closest('tr');
+        Swal.fire({
+            title: 'Hapus barang ini?',
+            text: 'Baris ini akan dihapus dari daftar input.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                row.remove();
+                reindexModalRows();
+                updateModalSummary();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Baris barang telah dihapus.',
+                    timer: 1000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    });
+
+    // Checkbox and Input change delegation inside modal
+    $('#modalTambahStok').on('change keyup', '.row-checkbox, .select-produk, .qty-karton, .qty-box', function() {
+        updateModalSummary();
+    });
+
+    // Save Stok
+    $('#btnSimpanTambahStok').on('click', function() {
+        var checkedRows = $('#modalTambahStok tbody tr').filter(function() {
+            return $(this).find('.row-checkbox').is(':checked');
+        });
+
+        if (checkedRows.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum ada pilihan',
+                text: 'Silakan centang setidaknya satu produk yang ingin ditambahkan!'
+            });
+            return;
+        }
+
+        // Validate selected products & quantities
+        var isValid = true;
+        checkedRows.each(function() {
+            var produk = $(this).find('.select-produk').val();
+            var karton = parseInt($(this).find('.qty-karton').val()) || 0;
+            var box = parseInt($(this).find('.qty-box').val()) || 0;
+
+            if (!produk) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Produk belum dipilih',
+                    text: 'Harap pilih nama produk pada baris yang dicentang!'
+                });
+                isValid = false;
+                return false;
+            }
+
+            if (karton <= 0 && box <= 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Jumlah barang kosong',
+                    text: 'Silakan isi jumlah Karton atau Box minimal 1 unit untuk baris yang dicentang!'
+                });
+                isValid = false;
+                return false;
+            }
+        });
+
+        if (!isValid) return;
+
+        Swal.fire({
+            title: 'Simpan Tambah Stok?',
+            text: 'Data stok tambahan akan ditambahkan ke rute canvassing ini.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#005d41',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Stok produk berhasil diperbarui.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('modalTambahStok')).hide();
+                });
+            }
+        });
+    });
+
+    // --- FINISH CANVASSING ACTIONS ---
     $('#mnuSelesaikanStok').on('click', function (e) {
         e.preventDefault();
         new bootstrap.Modal(document.getElementById('modalSelesaikan')).show();
@@ -574,8 +708,66 @@ $(document).ready(function () {
 
     $('#btnKonfirmasiSelesai').on('click', function () {
         bootstrap.Modal.getInstance(document.getElementById('modalSelesaikan')).hide();
-        setTimeout(function () { window.location.href = 'index.html'; }, 400);
+        Swal.fire({
+            icon: 'success',
+            title: 'Canvassing Diselesaikan!',
+            text: 'Status canvassing CVS-260500194 telah berhasil diubah menjadi Completed.',
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
     });
+
+    // Helper functions
+    function reindexModalRows() {
+        $('#modalTambahStok tbody tr').each(function(index) {
+            $(this).find('td:nth-child(2)').text(index + 1);
+        });
+    }
+
+    function updateModalSummary() {
+        var totalProduk = 0;
+        var checkedCount = 0;
+        $('#modalTambahStok tbody tr').each(function() {
+            var isChecked = $(this).find('.row-checkbox').is(':checked');
+            var selectVal = $(this).find('.select-produk').val();
+            var karton = parseInt($(this).find('.qty-karton').val()) || 0;
+            var box = parseInt($(this).find('.qty-box').val()) || 0;
+
+            if (isChecked) {
+                checkedCount++;
+                if (selectVal && (karton > 0 || box > 0)) {
+                    totalProduk++;
+                }
+            }
+        });
+        $('.jumlah-barang strong').text(checkedCount);
+        $('.total-produk span').text(totalProduk);
+    }
+
+    function resetModalTambahStok() {
+        var tbody = $('#modalTambahStok tbody');
+        tbody.html(`
+            <tr>
+                <td><input type="checkbox" class="row-checkbox"></td>
+                <td>1</td>
+                <td>
+                    <select class="form-select form-select-sm select-produk" style="min-width:200px;">
+                        <option value="">Tambah barang</option>
+                        <option value="WRP01">WRP DIET SHAKE VANILLA (WRP01)</option>
+                        <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
+                        <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
+                        <option value="FIT01">FITBAR CHOCOLATE (FIT01)</option>
+                    </select>
+                </td>
+                <td><input type="number" class="form-control form-control-sm qty-input qty-karton" placeholder="Qty" style="width:80px;" min="0"></td>
+                <td><input type="number" class="form-control form-control-sm qty-input qty-box" placeholder="Qty" style="width:80px;" min="0"></td>
+                <td><button class="btn-remove-row" type="button"><i class="fa fa-times"></i></button></td>
+            </tr>
+        `);
+        updateModalSummary();
+    }
 });
 </script>
 </body>

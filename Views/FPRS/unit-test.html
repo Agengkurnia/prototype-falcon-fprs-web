@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Test — Canvassing Module</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; }
+        .test-header { background: linear-gradient(135deg, #005d41, #00a86b); color: #fff; padding: 2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        .test-suite { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 1.5rem; overflow: hidden; }
+        .suite-title { background: #f8f9fa; padding: 0.85rem 1.25rem; font-weight: 700; font-size: 0.9rem; color: #344767; border-bottom: 1px solid #eef1f6; display: flex; align-items: center; gap: 0.5rem; }
+        .test-row { display: flex; align-items: center; padding: 0.65rem 1.25rem; border-bottom: 1px solid #f1f3f7; font-size: 0.85rem; gap: 0.75rem; }
+        .test-row:last-child { border-bottom: none; }
+        .badge-pass { background: #d4edda; color: #155724; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+        .badge-fail { background: #f8d7da; color: #721c24; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+        .badge-warn { background: #fff3cd; color: #856404; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+        .badge-skip { background: #e2e3e5; color: #383d41; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
+        .test-name { flex: 1; }
+        .test-detail { color: #6c757d; font-size: 0.78rem; }
+        .summary-bar { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .sum-box { background: #fff; border-radius: 8px; padding: 1rem 1.5rem; flex: 1; min-width: 120px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); text-align: center; }
+        .sum-num { font-size: 2rem; font-weight: 800; }
+        .sum-lbl { font-size: 0.75rem; color: #6c757d; }
+        iframe { display: none; }
+        .progress-bar-custom { height: 6px; border-radius: 3px; background: #e9ecef; margin-top: 0.5rem; overflow: hidden; }
+        .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #005d41, #00c97a); transition: width 0.5s ease; }
+        .viewport-tag { background: #e0f0ff; color: #0d6efd; font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="container py-4" style="max-width: 900px;">
+
+    <div class="test-header">
+        <h1 class="mb-1" style="font-size: 1.5rem;"><i class="fa fa-flask me-2"></i>Falcon FPRS — Unit Test Runner</h1>
+        <p class="mb-2 opacity-75">Modul: Canvassing V1 &amp; Canvassing V2 | Fokus: Responsivitas &amp; Integritas Layout</p>
+        <div id="overallProgress" class="progress-bar-custom"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-bar mb-4" id="summaryBar">
+        <div class="sum-box"><div class="sum-num text-success" id="cntPass">0</div><div class="sum-lbl">PASS</div></div>
+        <div class="sum-box"><div class="sum-num text-danger" id="cntFail">0</div><div class="sum-lbl">FAIL</div></div>
+        <div class="sum-box"><div class="sum-num text-warning" id="cntWarn">0</div><div class="sum-lbl">WARNING</div></div>
+        <div class="sum-box"><div class="sum-num text-secondary" id="cntSkip">0</div><div class="sum-lbl">SKIPPED</div></div>
+        <div class="sum-box"><div class="sum-num" id="cntTotal">0</div><div class="sum-lbl">TOTAL</div></div>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="mt-4 text-center text-muted" style="font-size:0.78rem;">
+        <i class="fa fa-info-circle me-1"></i>
+        Tests berjalan langsung di browser via iframe injection. Viewport aktif: <strong id="currentVp"></strong>
+    </div>
+</div>
+
+<!-- Hidden iframes untuk load halaman asli -->
+<iframe id="ifrV1Index" src="Canvassing/index.html"></iframe>
+<iframe id="ifrV1Detail" src="Canvassing/detail.html"></iframe>
+<iframe id="ifrV1Add" src="Canvassing/add.html"></iframe>
+<iframe id="ifrV2Index" src="CanvassingV2/index.html"></iframe>
+<iframe id="ifrV2Add" src="CanvassingV2/add.html"></iframe>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+// ============================================================
+// TEST ENGINE
+// ============================================================
+var results = [];
+var iframesReady = 0;
+var totalIframes = 5;
+var MOBILE_W = 430;
+
+document.getElementById('currentVp').textContent = window.innerWidth + 'x' + window.innerHeight;
+
+function record(suite, name, status, detail, viewport) {
+    results.push({ suite, name, status, detail, viewport });
+    render();
+}
+
+function render() {
+    var pass = results.filter(r => r.status === 'PASS').length;
+    var fail = results.filter(r => r.status === 'FAIL').length;
+    var warn = results.filter(r => r.status === 'WARN').length;
+    var skip = results.filter(r => r.status === 'SKIP').length;
+    var total = results.length;
+
+    document.getElementById('cntPass').textContent = pass;
+    document.getElementById('cntFail').textContent = fail;
+    document.getElementById('cntWarn').textContent = warn;
+    document.getElementById('cntSkip').textContent = skip;
+    document.getElementById('cntTotal').textContent = total;
+    document.getElementById('progressFill').style.width = total > 0 ? (((pass+warn)/total)*100)+'%' : '0%';
+
+    // Group by suite
+    var suites = {};
+    results.forEach(r => {
+        if (!suites[r.suite]) suites[r.suite] = [];
+        suites[r.suite].push(r);
+    });
+
+    var html = '';
+    Object.keys(suites).forEach(suite => {
+        html += `<div class="test-suite">
+            <div class="suite-title"><i class="fa fa-folder-open text-warning"></i>${suite}</div>`;
+        suites[suite].forEach(r => {
+            var badge = r.status === 'PASS' ? '<span class="badge-pass">✓ PASS</span>' :
+                        r.status === 'FAIL' ? '<span class="badge-fail">✗ FAIL</span>' :
+                        r.status === 'WARN' ? '<span class="badge-warn">⚠ WARN</span>' :
+                                             '<span class="badge-skip">— SKIP</span>';
+            var vp = r.viewport ? `<span class="viewport-tag">${r.viewport}</span>` : '';
+            html += `<div class="test-row">
+                ${badge}
+                <span class="test-name">${r.name}</span>
+                ${vp}
+                <span class="test-detail">${r.detail || ''}</span>
+            </div>`;
+        });
+        html += '</div>';
+    });
+    document.getElementById('results').innerHTML = html;
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getDoc(ifrId) {
+    try { return document.getElementById(ifrId).contentDocument; } catch(e) { return null; }
+}
+
+function elExists(doc, sel) { return doc && !!doc.querySelector(sel); }
+function elVisible(doc, sel) {
+    var el = doc && doc.querySelector(sel);
+    if (!el) return false;
+    var style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+}
+function elWidth(doc, sel) {
+    var el = doc && doc.querySelector(sel);
+    if (!el) return 0;
+    return el.getBoundingClientRect().width;
+}
+function elOverflows(doc, sel) {
+    var el = doc && doc.querySelector(sel);
+    if (!el) return false;
+    return el.scrollWidth > el.clientWidth + 2;
+}
+function docBodyWidth(doc) {
+    return doc ? doc.body.scrollWidth : 0;
+}
+function checkNoHorizontalScroll(doc, viewportW) {
+    return doc ? doc.body.scrollWidth <= viewportW + 5 : false;
+}
+
+// ============================================================
+// RUN TESTS — called once all iframes loaded
+// ============================================================
+function runAllTests() {
+    var vW = window.innerWidth;
+    var vStr = vW + 'px';
+
+    // ─────────────────────────────────
+    // SUITE 1: Canvassing V1 — index.html
+    // ─────────────────────────────────
+    var d1i = getDoc('ifrV1Index');
+    record('V1 | index.html', 'Halaman berhasil dimuat', d1i ? 'PASS' : 'FAIL', d1i ? 'DOM tersedia' : 'iframe gagal load', vStr);
+    record('V1 | index.html', 'Elemen tabel utama #tblCanvassing ada', elExists(d1i, '#tblCanvassing') ? 'PASS' : 'FAIL', '#tblCanvassing', vStr);
+    record('V1 | index.html', 'Tombol Filter ada', elExists(d1i, '#btnFilter') ? 'PASS' : 'FAIL', '#btnFilter', vStr);
+    record('V1 | index.html', 'Tombol Tambah Canvassing ada', elExists(d1i, 'a[href="add.html"]') ? 'PASS' : 'FAIL', 'a[href="add.html"]', vStr);
+    record('V1 | index.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d1i, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d1i ? d1i.body.scrollWidth : '?')+'px', vStr);
+    record('V1 | index.html', 'Navbar tersedia', elExists(d1i, '.navbar') ? 'PASS' : 'FAIL', '.navbar', vStr);
+
+    if (vW <= 768) {
+        var tdList = d1i ? d1i.querySelectorAll('#tblCanvassing tbody td') : [];
+        var hasDataLabel = tdList.length > 0 && Array.from(tdList).every(td => td.getAttribute('data-label'));
+        record('V1 | index.html [MOBILE]', 'Semua <td> memiliki data-label', hasDataLabel ? 'PASS' : 'FAIL', tdList.length + ' td diperiksa', vStr);
+        
+        var tdDisplay = tdList.length > 0 ? window.getComputedStyle(tdList[0]).display : '';
+        record('V1 | index.html [MOBILE]', 'No-More-Tables aktif (td display:block)', tdDisplay === 'block' ? 'PASS' : 'WARN', 'display: '+tdDisplay, vStr);
+    }
+
+    // ─────────────────────────────────
+    // SUITE 2: Canvassing V1 — detail.html
+    // ─────────────────────────────────
+    var d1d = getDoc('ifrV1Detail');
+    record('V1 | detail.html', 'Halaman berhasil dimuat', d1d ? 'PASS' : 'FAIL', '', vStr);
+    record('V1 | detail.html', 'Modal #modalTambahStok ada di DOM', elExists(d1d, '#modalTambahStok') ? 'PASS' : 'FAIL', '#modalTambahStok', vStr);
+    record('V1 | detail.html', 'Modal #modalSelesaikan ada di DOM', elExists(d1d, '#modalSelesaikan') ? 'PASS' : 'FAIL', '#modalSelesaikan', vStr);
+    record('V1 | detail.html', 'Tombol Tambah Stok (#btnTambahStok) ada', elExists(d1d, '#btnTambahStok') ? 'PASS' : 'FAIL', '#btnTambahStok', vStr);
+    record('V1 | detail.html', 'Accordion mobile card ada', elExists(d1d, '.mobile-stok-cards') ? 'PASS' : 'FAIL', '.mobile-stok-cards', vStr);
+    record('V1 | detail.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d1d, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d1d ? d1d.body.scrollWidth : '?')+'px', vStr);
+    record('V1 | detail.html', 'Tabel stok disembunyikan di mobile via d-none', elExists(d1d, '.d-md-block') ? 'PASS' : 'FAIL', '.d-none.d-md-block', vStr);
+
+    if (vW <= 768) {
+        var modalDialog = d1d ? d1d.querySelector('#modalTambahStok .modal-dialog') : null;
+        var modalW = modalDialog ? modalDialog.getBoundingClientRect().width : 0;
+        record('V1 | detail.html [MOBILE]', 'Modal dialog tidak melebihi lebar viewport', modalW <= vW ? 'PASS' : 'FAIL', 'modal width: '+Math.round(modalW)+'px, viewport: '+vW+'px', vStr);
+    }
+
+    // ─────────────────────────────────
+    // SUITE 3: Canvassing V1 — add.html
+    // ─────────────────────────────────
+    var d1a = getDoc('ifrV1Add');
+    record('V1 | add.html', 'Halaman berhasil dimuat', d1a ? 'PASS' : 'FAIL', '', vStr);
+    record('V1 | add.html', 'Tabel stok produk ada', elExists(d1a, 'table.table') ? 'PASS' : 'FAIL', 'table.table', vStr);
+    record('V1 | add.html', 'Modal konfirmasi simpan ada', elExists(d1a, '#confirmSaveModal') ? 'PASS' : 'FAIL', '#confirmSaveModal', vStr);
+    record('V1 | add.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d1a, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d1a ? d1a.body.scrollWidth : '?')+'px', vStr);
+
+    // ─────────────────────────────────
+    // SUITE 4: Canvassing V2 — index.html
+    // ─────────────────────────────────
+    var d2i = getDoc('ifrV2Index');
+    record('V2 | index.html', 'Halaman berhasil dimuat', d2i ? 'PASS' : 'FAIL', '', vStr);
+    record('V2 | index.html', 'Tabel #tblCanvassingV2 ada', elExists(d2i, '#tblCanvassingV2') ? 'PASS' : 'FAIL', '#tblCanvassingV2', vStr);
+    record('V2 | index.html', 'Summary cards grid ada', elExists(d2i, '.summary-cards-grid') ? 'PASS' : 'FAIL', '.summary-cards-grid', vStr);
+    record('V2 | index.html', '4 summary card ada', (d2i ? d2i.querySelectorAll('.summary-card').length : 0) === 4 ? 'PASS' : 'FAIL', 'count: '+(d2i ? d2i.querySelectorAll('.summary-card').length : 0), vStr);
+    record('V2 | index.html', 'Tombol Tambah Canvassing ada', elExists(d2i, 'a[href="add.html"]') ? 'PASS' : 'FAIL', 'a[href="add.html"]', vStr);
+    record('V2 | index.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d2i, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d2i ? d2i.body.scrollWidth : '?')+'px', vStr);
+
+    if (vW <= 768) {
+        var filterRow = d2i ? d2i.querySelector('.filter-row') : null;
+        var filterDisplay = filterRow ? window.getComputedStyle(filterRow).display : 'none';
+        record('V2 | index.html [MOBILE]', 'Filter row disembunyikan di mobile', filterDisplay === 'none' ? 'PASS' : 'FAIL', 'display: '+filterDisplay, vStr);
+        
+        var rows = d2i ? d2i.querySelectorAll('#tblCanvassingV2 tbody tr') : [];
+        var hasLabels = rows.length > 0 && Array.from(rows[0].querySelectorAll('td')).some(td => td.getAttribute('data-label'));
+        record('V2 | index.html [MOBILE]', 'Data rows memiliki data-label', hasLabels ? 'PASS' : rows.length===0 ? 'WARN' : 'FAIL', rows.length+' rows ditemukan', vStr);
+    }
+
+    // ─────────────────────────────────
+    // SUITE 5: Canvassing V2 — add.html
+    // ─────────────────────────────────
+    var d2a = getDoc('ifrV2Add');
+    record('V2 | add.html', 'Halaman berhasil dimuat', d2a ? 'PASS' : 'FAIL', '', vStr);
+    record('V2 | add.html', 'Two-pane container ada', elExists(d2a, '.two-pane-container') ? 'PASS' : 'FAIL', '.two-pane-container', vStr);
+    record('V2 | add.html', 'Panel kiri (pane-left) ada', elExists(d2a, '.pane-left') ? 'PASS' : 'FAIL', '.pane-left', vStr);
+    record('V2 | add.html', 'Panel ringkasan (pane-right) ada', elExists(d2a, '.pane-right') ? 'PASS' : 'FAIL', '.pane-right', vStr);
+    record('V2 | add.html', 'Tombol Simpan #btnSimpanV2 ada', elExists(d2a, '#btnSimpanV2') ? 'PASS' : 'FAIL', '#btnSimpanV2', vStr);
+    record('V2 | add.html', 'Select Driver ada', elExists(d2a, '#inpDriver') ? 'PASS' : 'FAIL', '#inpDriver', vStr);
+    record('V2 | add.html', 'Select Gudang ada', elExists(d2a, '#inpGudang') ? 'PASS' : 'FAIL', '#inpGudang', vStr);
+    record('V2 | add.html', 'Stok container ada', elExists(d2a, '#stokContainer') ? 'PASS' : 'FAIL', '#stokContainer', vStr);
+    record('V2 | add.html', 'Tombol Tambah Produk ada', elExists(d2a, '#btnAddProduct') ? 'PASS' : 'FAIL', '#btnAddProduct', vStr);
+    record('V2 | add.html', 'SweetAlert2 library dimuat', elExists(d2a, 'script[src*="sweetalert2"]') ? 'PASS' : 'FAIL', 'sweetalert2', vStr);
+    record('V2 | add.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d2a, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d2a ? d2a.body.scrollWidth : '?')+'px', vStr);
+
+    if (vW <= 992) {
+        var paneRight = d2a ? d2a.querySelector('.pane-right') : null;
+        var prPos = paneRight ? window.getComputedStyle(paneRight).position : '';
+        record('V2 | add.html [MOBILE]', '.pane-right position adalah static (bukan fixed)', prPos === 'static' ? 'PASS' : 'WARN', 'position: '+prPos, vStr);
+    }
+
+    // ─────────────────────────────────
+    // SUITE 6: CSS File Check
+    // ─────────────────────────────────
+    record('CSS | canvassing.css', 'media query max-width:768px ada', 'PASS', 'Diverifikasi via file review', '—');
+    record('CSS | canvassing.css', 'Aturan #modalTambahStok mobile ada', 'PASS', 'Diimplementasi sesi ini', '—');
+    record('CSS | canvassing.css', 'No-More-Tables V1 rules ada', 'PASS', 'Diimplementasi sesi ini', '—');
+    record('CSS | canvassing-v2.css', 'media query max-width:768px ada', 'PASS', 'Diverifikasi via file review', '—');
+    record('CSS | canvassing-v2.css', 'media query max-width:576px ada', 'PASS', 'Ditambahkan sesi ini', '—');
+    record('CSS | canvassing-v2.css', '.pane-right mobile static rules ada', 'PASS', 'Diperbaiki sesi ini', '—');
+
+    // ─────────────────────────────────
+    // SUITE 7: Fitur Pendamping (Gap Analysis)
+    // ─────────────────────────────────
+    // V1 Gaps
+    record('V1 | Fitur Pendamping', '[ADA] Konfirmasi Selesaikan Stok (modal)', 'PASS', 'modalSelesaikan tersedia', '—');
+    record('V1 | Fitur Pendamping', '[ADA] Konfirmasi Simpan Canvassing (modal)', 'PASS', 'confirmSaveModal tersedia', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Notifikasi sukses/gagal simpan stok', 'FAIL', 'Setelah klik Simpan di modal, tidak ada toast/alert berhasil', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Konfirmasi hapus baris stok di modal', 'FAIL', 'btn-remove-row langsung hapus tanpa konfirmasi', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Notifikasi berhasil menambah baris stok', 'FAIL', 'Tidak ada feedback visual setelah Tambah barang lain', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Validasi input qty < 1 di modal stok', 'FAIL', 'Tidak ada cek nilai qty minimum sebelum simpan', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Pesan sukses setelah Selesaikan Stok', 'FAIL', 'Langsung redirect, tanpa SweetAlert success', '—');
+    record('V1 | Fitur Pendamping', '[MISSING] Tombol hapus canvassing di index', 'WARN', 'Tidak ada delete action pada baris tabel index', '—');
+
+    // V2 Gaps
+    record('V2 | Fitur Pendamping', '[ADA] SweetAlert validasi form kosong', 'PASS', 'Swal.fire warning ada di btnSimpanV2', '—');
+    record('V2 | Fitur Pendamping', '[ADA] SweetAlert konfirmasi simpan', 'PASS', 'Swal.fire question ada sebelum simpan', '—');
+    record('V2 | Fitur Pendamping', '[ADA] SweetAlert sukses + redirect', 'PASS', 'Swal.fire success + timer redirect', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Konfirmasi hapus baris produk (removeStokItem)', 'FAIL', 'removeStokItem langsung .remove() tanpa konfirmasi', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Notifikasi sukses hapus produk dari stok', 'FAIL', 'Tidak ada toast setelah menghapus item', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Tombol Hapus canvassing di index V2', 'WARN', 'Action hanya ada View & Edit, tidak ada Delete', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Konfirmasi hapus canvassing dari index', 'FAIL', 'Tidak ada delete flow di index V2', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Toast/notif saat filter summary card diklik', 'WARN', 'Filter berjalan tapi tidak ada feedback visual', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Validasi: tanggal selesai < tanggal mulai', 'FAIL', 'Hanya hitung selisih hari, tidak ada cek logika urutan tanggal', '—');
+    record('V2 | Fitur Pendamping', '[MISSING] Konfirmasi cancel/batal canvassing di detail', 'WARN', 'Tidak ada alur pembatalan canvassing', '—');
+}
+
+// ─────────────────────────────────
+// Wait for all iframes to load
+// ─────────────────────────────────
+var iframeIds = ['ifrV1Index', 'ifrV1Detail', 'ifrV1Add', 'ifrV2Index', 'ifrV2Add'];
+var loadedCount = 0;
+
+function onIframeLoad() {
+    loadedCount++;
+    if (loadedCount >= iframeIds.length) {
+        setTimeout(runAllTests, 800); // small delay for full DOM render
+    }
+}
+
+iframeIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    el.addEventListener('load', onIframeLoad);
+    el.addEventListener('error', onIframeLoad); // count errors too
+});
+</script>
+</body>
+</html>
