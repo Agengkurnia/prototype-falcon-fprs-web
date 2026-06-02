@@ -644,6 +644,32 @@
 }
 
 @media (max-width: 992px) {
+    /* Reset main layout wrapping and stop horizontal overflow */
+    .main-panel {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        min-width: 0 !important;
+    }
+    .content-wrapper {
+        width: 100% !important;
+        overflow-x: hidden !important;
+        padding: 1rem !important; /* compact spacing to prevent horizontal clipping */
+    }
+
+    /* Prevent Select2 and steppers from forcing overflow */
+    .select2-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .stok-add-header .select2-container {
+        width: 80% !important;
+        max-width: 80% !important;
+    }
+    .stok-add-qty-row {
+        flex-wrap: wrap !important;
+        gap: 0.75rem !important;
+    }
+
     /* Natural bottom summary card on mobile/tablet for V2 add form */
     .pane-right {
         width: 100% !important;
@@ -655,15 +681,30 @@
     .pane-right .summary-panel {
         background: #F8FBF2 !important;
         border: 1px solid #C8E099 !important;
-        padding: 1.5rem !important;
+        padding: 1rem !important; /* compact premium padding */
         border-radius: 8px !important;
     }
     
-    /* Ensure all summary items are cleanly displayed on mobile card */
+    /* Ensure all summary items are cleanly displayed on mobile card without clipping */
     .pane-right .summary-panel .summary-item {
         display: flex !important;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .pane-right .summary-panel .summary-item .label {
+        color: #6c757d;
+        flex-shrink: 0;
+    }
+
+    .pane-right .summary-panel .summary-item .val {
+        font-weight: 600;
+        color: #212529;
+        text-align: right;
+        word-break: break-word !important; /* prevents long values from pushing off screen */
+        max-width: 65% !important;
     }
     
     .pane-right .summary-panel .summary-divider {
