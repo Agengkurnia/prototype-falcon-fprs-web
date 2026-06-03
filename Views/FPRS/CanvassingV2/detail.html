@@ -82,8 +82,8 @@
                             <div class="dropdown dropdown-selesaikan">
                                 <button class="btn btn-selesaikan dropdown-toggle" data-bs-toggle="dropdown">Selesaikan Stok</button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#"><i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok</a></li>
-                                    <li><a class="dropdown-item text-danger" href="#"><i class="fa fa-times-circle me-2"></i>Batalkan Canvassing</a></li>
+                                    <li><a class="dropdown-item btn-status-complete" href="#"><i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok</a></li>
+                                    <li><a class="dropdown-item text-danger btn-status-cancel" href="#"><i class="fa fa-times-circle me-2"></i>Batalkan Canvassing</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -281,7 +281,275 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../wwwroot/js/canvassing-store.js"></script>
 <script src="../../../wwwroot/js/layout.js"></script>
 
+<script>
+$(document).ready(function () {
+    var id = new URLSearchParams(window.location.search).get('id');
+    if (!id) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'ID Canvassing tidak ditemukan di URL.'
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
+        return;
+    }
+
+    var item = CanvassingStore.getById(id);
+    if (!item) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Data canvassing tidak ditemukan.'
+        }).then(() => {
+            window.location.href = 'index.html';
+        });
+        return;
+    }
+
+    // Helper functions
+    function formatDate(isoStr) {
+        if (!isoStr) return '-';
+        var date = new Date(isoStr);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+        return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+    }
+
+    // Populate Breadcrumb
+    $('.breadcrumb-item.active').text(item.id);
+    
+    // Populate Title
+    $('.detail-header-title').text(item.id);
+    
+    // Populate Status Badge
+    var statuses = {
+        'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>',
+        'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
+        'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
+        'Draft': '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'
+    };
+    $('.badge-status').replaceWith(statuses[item.status] || '<span class="badge-status badge-draft">' + item.status + '</span>');
+
+    // Populate Header Info Block
+    var driverInfo = `<i class="fa fa-user"></i> <strong>${item.driverCode || '-'}</strong> (${item.driverName || '-'})`;
+    $('div.info-item[title="Driver"]').html(driverInfo);
+
+    var periodInfo = `<i class="fa fa-calendar-alt"></i> ${formatDate(item.tanggalMulai)} – ${formatDate(item.tanggalSelesai)}`;
+    $('div.info-item[title="Jadwal"]').html(periodInfo);
+
+    var warehouseInfo = `<i class="fa fa-warehouse"></i> <strong>${item.gudang || '-'}</strong>`;
+    $('div.info-item[title="Gudang"]').html(warehouseInfo);
+
+    var durationInfo = `<i class="fa fa-clock"></i> ${item.durationDays || 0} Hari`;
+    $('div.info-item[title="Durasi"]').html(durationInfo);
+
+    // Populate Progress Bar
+    var pct = item.progressPct || 0;
+    $('.periode-progress-text span:last-child').text(pct + '%');
+    $('.periode-progress-bar').css('width', pct + '%');
+    if (pct === 100) {
+        $('.periode-progress-bar').addClass('bg-success');
+    }
+
+    // Check status to hide/show buttons
+    if (item.status === 'Completed' || item.status === 'Cancelled') {
+        $('.btn-outline-success').hide(); // hide "Tambah Stok" button
+        $('.dropdown-selesaikan').hide(); // hide status dropdown
+    } else {
+        $('.btn-outline-success').attr('onclick', "window.location.href='add.html?id=" + item.id + "'");
+    }
+
+    // Render Product Cards
+    renderProductCards(item.items);
+
+    function renderProductCards(items) {
+        var grid = $('.product-cards-grid');
+        grid.empty();
+        if (!items || items.length === 0) {
+            grid.html('<div class="text-center w-100 py-5 text-muted"><i class="fa fa-boxes fa-3x d-block mb-3"></i>Belum ada stok produk terdaftar.</div>');
+            return;
+        }
+        
+        items.forEach(function(pItem) {
+            var awalKarton = pItem.karton || 0;
+            var awalBox = pItem.box || 0;
+            var awalPcs = pItem.pcs || 0;
+            
+            var soldKarton = pItem.soldKarton || 0;
+            var soldBox = pItem.soldBox || 0;
+            var soldPcs = pItem.soldPcs || 0;
+            
+            var retKarton = pItem.retKarton || 0;
+            var retBox = pItem.retBox || 0;
+            var retPcs = pItem.retPcs || 0;
+            
+            var lostKarton = pItem.lostKarton || 0;
+            var lostBox = pItem.lostBox || 0;
+            var lostPcs = pItem.lostPcs || 0;
+            
+            var sisaKarton = awalKarton - soldKarton + retKarton - lostKarton;
+            var sisaBox = awalBox - soldBox + retBox - lostBox;
+            var sisaPcs = awalPcs - soldPcs + retPcs - lostPcs;
+            
+            var cardHtml = `
+                <div class="product-card">
+                    <div class="product-card-header">
+                        <div>
+                            <div class="product-card-title">${pItem.produkName}</div>
+                            <div class="product-card-code">${pItem.produkCode}</div>
+                        </div>
+                        <button class="btn btn-sm btn-light btn-riwayat-stok" title="Riwayat" data-bs-toggle="modal" data-bs-target="#modalRiwayat" data-name="${pItem.produkName}" data-code="${pItem.produkCode}"><i class="fa fa-history"></i></button>
+                    </div>
+                    <div class="product-card-body">
+                         <div class="stock-grid">
+                             <div class="stock-item">
+                                 <span class="stock-label">Awal</span>
+                                 <span class="stock-val-main">${awalKarton}</span>
+                                 <span class="stock-val-sub">${awalBox} B | ${awalPcs} P</span>
+                             </div>
+                             <div class="stock-item">
+                                 <span class="stock-label">Terjual</span>
+                                 <span class="stock-val-main text-success">${soldKarton}</span>
+                                 <span class="stock-val-sub">${soldBox} B | ${soldPcs} P</span>
+                             </div>
+                             <div class="stock-item">
+                                 <span class="stock-label">Kembali</span>
+                                 <span class="stock-val-main text-warning">${retKarton}</span>
+                                 <span class="stock-val-sub">${retBox} B | ${retPcs} P</span>
+                             </div>
+                             <div class="stock-item">
+                                 <span class="stock-label">Hilang</span>
+                                 <span class="stock-val-main text-danger">${lostKarton}</span>
+                                 <span class="stock-val-sub">${lostBox} B | ${lostPcs} P</span>
+                             </div>
+                             <div class="stock-item highlight">
+                                 <span class="stock-label">Sisa</span>
+                                 <span class="stock-val-main">${sisaKarton}</span>
+                                 <span class="stock-val-sub">${sisaBox} B | ${sisaPcs} P</span>
+                             </div>
+                         </div>
+                    </div>
+                </div>`;
+            grid.append(cardHtml);
+        });
+    }
+
+    // Modal Riwayat click handler
+    $(document).on('click', '.btn-riwayat-stok', function() {
+        var name = $(this).data('name');
+        var code = $(this).data('code');
+        $('#riwayatProdName').text(name);
+        $('#riwayatProdCode').text(code);
+        
+        var tbody = $('#modalRiwayat tbody');
+        tbody.empty();
+        
+        var prod = item.items.find(i => i.produkCode === code);
+        if (prod) {
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            var startDateStr = '11 Mei 2026 14:00';
+            if (item.tanggalMulai) {
+                var dStart = new Date(item.tanggalMulai);
+                startDateStr = dStart.getDate() + ' ' + months[dStart.getMonth()] + ' ' + dStart.getFullYear() + ' 08:00';
+            }
+            
+            tbody.append(`
+                <tr>
+                    <td>${startDateStr}</td>
+                    <td>Stok Awal</td>
+                    <td class="text-end">${prod.karton}</td>
+                    <td class="text-end">${prod.box}</td>
+                    <td class="text-end">${prod.pcs}</td>
+                </tr>
+            `);
+            
+            if (prod.soldKarton > 0 || prod.soldBox > 0 || prod.soldPcs > 0) {
+                tbody.append(`
+                    <tr>
+                        <td>${new Date().toLocaleDateString('id-ID')} 09:30</td>
+                        <td><span class="text-success">Penjualan</span></td>
+                        <td class="text-end">-${prod.soldKarton}</td>
+                        <td class="text-end">-${prod.soldBox}</td>
+                        <td class="text-end">-${prod.soldPcs}</td>
+                    </tr>
+                `);
+            }
+            
+            if (prod.retKarton > 0 || prod.retBox > 0 || prod.retPcs > 0) {
+                tbody.append(`
+                    <tr>
+                        <td>${new Date().toLocaleDateString('id-ID')} 15:15</td>
+                        <td><span class="text-warning">Pengembalian</span></td>
+                        <td class="text-end">+${prod.retKarton}</td>
+                        <td class="text-end">+${prod.retBox}</td>
+                        <td class="text-end">+${prod.retPcs}</td>
+                    </tr>
+                `);
+            }
+        }
+    });
+
+    // Selesaikan Stok Action
+    $('.btn-status-complete').on('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Selesaikan Canvassing?',
+            text: 'Status canvassing akan diubah menjadi Completed dan stok dikunci.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#005d41',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Selesaikan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                CanvassingStore.updateStatus(id, 'Completed');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Status canvassing berhasil diubah menjadi Completed.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        });
+    });
+
+    // Batalkan Canvassing Action
+    $('.btn-status-cancel').on('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: 'Batalkan Canvassing?',
+            text: 'Status canvassing akan diubah menjadi Cancelled.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Batalkan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                CanvassingStore.updateStatus(id, 'Cancelled');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Canvassing telah dibatalkan.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>

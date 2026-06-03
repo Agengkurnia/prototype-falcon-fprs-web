@@ -212,6 +212,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../wwwroot/js/canvassing-store.js"></script>
 <script src="../../../wwwroot/js/layout.js"></script>
 
 <script>
@@ -220,7 +221,10 @@ $(document).ready(function () {
     initSelect2Produk();
 
     // Summary bindings
-    $('#inpDriver').change(function() { $('#sumDriver').text($(this).find('option:selected').text().split('-')[1] || '-'); });
+    $('#inpDriver').change(function() { 
+        var text = $(this).find('option:selected').text();
+        $('#sumDriver').text(text.indexOf('-') !== -1 ? text.split('-')[1].trim() : text || '-'); 
+    });
     $('#inpGudang').change(function() { $('#sumGudang').text($(this).val() || '-'); });
     
     $('#inpMulai, #inpSelesai').change(function() {
@@ -247,8 +251,76 @@ $(document).ready(function () {
         }
     });
 
+    // Detect Edit mode
+    var editId = new URLSearchParams(window.location.search).get('id');
+    var existingItem = null;
+    if (editId) {
+        existingItem = CanvassingStore.getById(editId);
+        if (existingItem) {
+            // Change title
+            $('.title-add').text('Edit Canvassing V2');
+            document.title = 'Edit Canvassing V2 – Falcon FPRS';
+            
+            // Populate fields
+            $('#inpDriver').val(existingItem.driverCode).trigger('change');
+            $('#inpHelper').val(existingItem.helperCode).trigger('change');
+            $('#inpGudang').val(existingItem.gudang).trigger('change');
+            $('#inpMulai').val(existingItem.tanggalMulai).trigger('change');
+            $('#inpSelesai').val(existingItem.tanggalSelesai).trigger('change');
+
+            // Render existing items
+            if (existingItem.items && existingItem.items.length > 0) {
+                $('#stokContainer').empty();
+                existingItem.items.forEach(function(stokItem, idx) {
+                    var currentProdId = idx + 1;
+                    var html = `
+                        <div class="stok-add-item">
+                            <div class="stok-add-header">
+                                <select class="form-select select2-produk w-75" data-id="${currentProdId}">
+                                    <option value="">Pilih Produk</option>
+                                    <option value="NBE14" data-stok="99999" ${stokItem.produkCode === 'NBE14' ? 'selected' : ''}>BENECOL STRAW 100ML (NBE14)</option>
+                                    <option value="FIT01" data-stok="500" ${stokItem.produkCode === 'FIT01' ? 'selected' : ''}>FITBAR CHOCOLATE (FIT01)</option>
+                                </select>
+                                <button class="btn-remove-stok-v2" onclick="removeStokItem(this)"><i class="fa fa-trash"></i></button>
+                            </div>
+                            <div class="stok-available" id="stokAvail${currentProdId}">Tersedia: -</div>
+                            <div class="stok-add-qty-row mt-3">
+                                <div class="stok-add-qty-group">
+                                    <label class="stok-add-qty-label">Karton</label>
+                                    <div class="stepper-control">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                        <input type="number" class="stepper-input qty-karton" value="${stokItem.karton || 0}" min="0" onchange="updateSummary()">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="stok-add-qty-group">
+                                    <label class="stok-add-qty-label">Box</label>
+                                    <div class="stepper-control">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                        <input type="number" class="stepper-input qty-box" value="${stokItem.box || 0}" min="0" onchange="updateSummary()">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    $('#stokContainer').append(html);
+                });
+                prodCount = existingItem.items.length;
+                initSelect2Produk();
+                
+                // Update available labels
+                $('.select2-produk').each(function() {
+                    var id = $(this).data('id');
+                    var stok = $(this).find(':selected').data('stok');
+                    $('#stokAvail' + id).text(stok ? 'Tersedia: ' + stok + ' Karton' : 'Tersedia: -');
+                });
+                updateSummary();
+            }
+        }
+    }
+
     // Add product row
-    var prodCount = 1;
+    var prodCount = editId && existingItem && existingItem.items ? existingItem.items.length : 1;
     $('#btnAddProduct').click(function() {
         prodCount++;
         var html = `
@@ -297,8 +369,8 @@ $(document).ready(function () {
         }
 
         Swal.fire({
-            title: 'Simpan Canvassing?',
-            text: "Data akan disimpan dan status menjadi Ongoing",
+            title: editId ? 'Simpan Perubahan?' : 'Simpan Canvassing?',
+            text: editId ? "Data canvassing akan diperbarui." : "Data akan disimpan dan status menjadi Ongoing",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#005d41',
@@ -307,10 +379,53 @@ $(document).ready(function () {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Collect values and save
+                var driverSelect = $('#inpDriver');
+                var helperSelect = $('#inpHelper');
+                var selectedDriverText = driverSelect.find('option:selected').text();
+                var selectedHelperText = helperSelect.find('option:selected').text();
+                
+                var items = [];
+                $('.stok-add-item').each(function() {
+                    var select = $(this).find('.select2-produk');
+                    var prodCode = select.val();
+                    if(prodCode) {
+                        var prodText = select.find('option:selected').text();
+                        var prodName = prodText.split('(')[0].trim();
+                        var karton = parseInt($(this).find('.qty-karton').val()) || 0;
+                        var box = parseInt($(this).find('.qty-box').val()) || 0;
+                        items.push({
+                            produkCode: prodCode,
+                            produkName: prodName,
+                            karton: karton,
+                            box: box,
+                            pcs: 0
+                        });
+                    }
+                });
+
+                var saveObj = {
+                    id: editId || undefined,
+                    driverCode: driverSelect.val(),
+                    driverName: selectedDriverText.indexOf('-') !== -1 ? selectedDriverText.split('-')[1].trim() : selectedDriverText,
+                    helperCode: helperSelect.val(),
+                    helperName: selectedHelperText.indexOf('-') !== -1 ? selectedHelperText.split('-')[1].trim() : (selectedHelperText || ''),
+                    gudang: $('#inpGudang').val(),
+                    tanggalMulai: $('#inpMulai').val(),
+                    tanggalSelesai: $('#inpSelesai').val(),
+                    items: items
+                };
+                
+                if (editId && existingItem) {
+                    saveObj.status = existingItem.status;
+                }
+
+                CanvassingStore.save(saveObj);
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil!',
-                    text: 'Canvassing berhasil disimpan.',
+                    text: editId ? 'Perubahan berhasil disimpan.' : 'Canvassing berhasil disimpan.',
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {

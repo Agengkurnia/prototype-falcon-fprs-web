@@ -165,60 +165,114 @@
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../wwwroot/js/canvassing-store.js"></script>
 <script src="../../../wwwroot/js/layout.js"></script>
 <script>
 $(document).ready(function () {
-    // Generate dummy data
-    var tbody = $('#tblBody');
-    var gudangs = ['JAMBI', 'JAKARTA PUSAT', 'SURABAYA', 'BANDUNG', 'MEDAN'];
-    var statuses = [
-        '<span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>',
-        '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
-        '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
-        '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'
-    ];
-    for(var i=1; i<=20; i++) {
-        var id = 'CVS-26' + String(Math.floor(Math.random() * 900000) + 100000);
-        var gudang = gudangs[Math.floor(Math.random() * gudangs.length)];
-        var statusIdx = (i <= 12) ? 0 : ((i <= 18) ? 1 : ((i==19) ? 2 : 3));
-        var stat = statuses[statusIdx];
-        var pct = Math.floor(Math.random() * 100);
-        var days = Math.floor(Math.random() * 100) + 50;
-        
-        // Add delete button alongside details/edit actions
-        var act = '<div class="row-actions">' +
-            '<a href="detail.html" class="btn-action" title="Lihat Detail"><i class="fa fa-eye"></i></a>' +
-            (statusIdx==0 ? '<button class="btn-action" title="Edit"><i class="fa fa-pen"></i></button>' : '') +
-            '<button class="btn-action text-danger btn-delete-canvassing" title="Hapus"><i class="fa fa-trash"></i></button>' +
-            '</div>';
-        
-        var tr = '<tr>' +
-            '<td data-label="No">'+i+'</td>' +
-            '<td data-label="Kode"><a href="detail.html" class="kode-link fw-bold">'+id+'</a></td>' +
-            '<td data-label="Driver">'+gudang+'<br><small class="text-muted">EMP-260'+i+'00040</small></td>' +
-            '<td data-label="Gudang">'+gudang+'</td>' +
-            '<td data-label="Periode"><div class="periode-progress-container"><div class="periode-progress-text"><span>01 Jan - 31 Des</span><span>'+pct+'%</span></div><div class="periode-progress"><div class="periode-progress-bar '+(pct==100?'bg-success':'')+'" style="width: '+pct+'%;"></div></div><small class="text-muted" style="font-size:0.65rem;">'+Math.floor(pct/100*days)+' dari '+days+' hari</small></div></td>' +
-            '<td data-label="Status">'+stat+'</td>' +
-            '<td data-label="Aksi">'+act+'</td>' +
-            '</tr>';
-        tbody.append(tr);
+    var table;
+
+    function updateSummaryCards() {
+        var summary = CanvassingStore.getSummary();
+        $('.summary-card.total .stat-value').text(summary.total);
+        $('.summary-card.ongoing .stat-value').text(summary.ongoing);
+        $('.summary-card.completed .stat-value').text(summary.completed);
+        $('.summary-card.cancelled .stat-value').text(summary.cancelled);
     }
 
-    var table = $('#tblCanvassingV2').DataTable({
-        language: { search: '', searchPlaceholder: 'Cari global...', lengthMenu: '_MENU_ entri per halaman', info: 'Menampilkan _START_ - _END_ dari _TOTAL_', paginate: { previous: '‹', next: '›' }, zeroRecords: 'Tidak ada data' },
-        pageLength: 10,
-        columnDefs: [{ orderable: false, targets: [6] }],
-        dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
-    });
+    function renderTable() {
+        var tbody = $('#tblBody');
+        tbody.empty();
+        var list = CanvassingStore.getAll();
+        
+        var statuses = {
+            'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>',
+            'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
+            'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
+            'Draft': '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'
+        };
+        
+        list.forEach(function (item, idx) {
+            var i = idx + 1;
+            var stat = statuses[item.status] || '<span class="badge-status badge-draft">' + item.status + '</span>';
+            var pct = item.progressPct || 0;
+            var days = item.durationDays || 0;
+            
+            // Format dates for display, e.g. "01 Jan - 31 Des"
+            var startDateStr = '-';
+            var endDateStr = '-';
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            
+            if (item.tanggalMulai) {
+                var dStart = new Date(item.tanggalMulai);
+                startDateStr = dStart.getDate() + ' ' + months[dStart.getMonth()];
+            }
+            if (item.tanggalSelesai) {
+                var dEnd = new Date(item.tanggalSelesai);
+                endDateStr = dEnd.getDate() + ' ' + months[dEnd.getMonth()];
+            }
+            var dateRangeStr = startDateStr + (endDateStr ? ' - ' + endDateStr : '');
+            
+            // Calculate elapsed days
+            var elapsedDays = Math.floor(pct / 100 * days);
+            
+            var act = '<div class="row-actions">' +
+                '<a href="detail.html?id=' + item.id + '" class="btn-action" title="Lihat Detail"><i class="fa fa-eye"></i></a>' +
+                (item.status === 'Ongoing' || item.status === 'Draft' ? '<a href="add.html?id=' + item.id + '" class="btn-action" title="Edit"><i class="fa fa-pen"></i></a>' : '') +
+                '<button class="btn-action text-danger btn-delete-canvassing" data-id="' + item.id + '" title="Hapus"><i class="fa fa-trash"></i></button>' +
+                '</div>';
+                
+            var driverDisplay = item.driverName || 'Driver';
+            if (item.driverCode) {
+                driverDisplay = driverDisplay + '<br><small class="text-muted">' + item.driverCode + '</small>';
+            } else {
+                driverDisplay = '<span class="text-muted">-</span>';
+            }
+            
+            var tr = '<tr>' +
+                '<td data-label="No">' + i + '</td>' +
+                '<td data-label="Kode"><a href="detail.html?id=' + item.id + '" class="kode-link fw-bold">' + item.id + '</a></td>' +
+                '<td data-label="Driver">' + driverDisplay + '</td>' +
+                '<td data-label="Gudang">' + (item.gudang || '-') + '</td>' +
+                '<td data-label="Periode"><div class="periode-progress-container"><div class="periode-progress-text"><span>' + dateRangeStr + '</span><span>' + pct + '%</span></div><div class="periode-progress"><div class="periode-progress-bar ' + (pct === 100 ? 'bg-success' : '') + '" style="width: ' + pct + '%;"></div></div><small class="text-muted" style="font-size:0.65rem;">' + elapsedDays + ' dari ' + days + ' hari</small></div></td>' +
+                '<td data-label="Status">' + stat + '</td>' +
+                '<td data-label="Aksi">' + act + '</td>' +
+                '</tr>';
+            tbody.append(tr);
+        });
+    }
+
+    function initDataTable() {
+        if ($.fn.DataTable.isDataTable('#tblCanvassingV2')) {
+            $('#tblCanvassingV2').DataTable().destroy();
+        }
+        
+        table = $('#tblCanvassingV2').DataTable({
+            language: { 
+                search: '', 
+                searchPlaceholder: 'Cari global...', 
+                lengthMenu: '_MENU_ entri per halaman', 
+                info: 'Menampilkan _START_ - _END_ dari _TOTAL_', 
+                paginate: { previous: '‹', next: '›' }, 
+                zeroRecords: 'Tidak ada data' 
+            },
+            pageLength: 10,
+            columnDefs: [{ orderable: false, targets: [6] }],
+            dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
+        });
+    }
+
+    // Initial render
+    updateSummaryCards();
+    renderTable();
+    initDataTable();
 
     // Delete row event handler
     $('#tblCanvassingV2').on('click', '.btn-delete-canvassing', function() {
-        var tr = $(this).closest('tr');
-        var code = tr.find('.kode-link').text();
+        var id = $(this).data('id');
         
         Swal.fire({
             title: 'Hapus Canvassing?',
-            text: 'Apakah Anda yakin ingin menghapus data canvassing ' + code + '? Tindakan ini tidak dapat dibatalkan.',
+            text: 'Apakah Anda yakin ingin menghapus data canvassing ' + id + '? Tindakan ini tidak dapat dibatalkan.',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -227,30 +281,24 @@ $(document).ready(function () {
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Smoothly remove from DataTable
-                table.row(tr).remove().draw(false);
+                // Delete from localStorage
+                CanvassingStore.delete(id);
                 
-                // Recalculate row indexes
-                reindexRows();
+                // Re-render, re-init DataTable, update summary cards
+                renderTable();
+                initDataTable();
+                updateSummaryCards();
                 
                 Swal.fire({
                     icon: 'success',
                     title: 'Dihapus!',
-                    text: 'Data Canvassing ' + code + ' telah berhasil dihapus.',
+                    text: 'Data Canvassing ' + id + ' telah berhasil dihapus.',
                     timer: 1500,
                     showConfirmButton: false
                 });
             }
         });
     });
-
-    function reindexRows() {
-        var i = 1;
-        table.rows().every(function() {
-            var node = $(this.node());
-            node.find('td:first-child').text(i++);
-        });
-    }
 
     // Prevent sort on filter click
     $('.filter-row input, .filter-row select').on('click', function(e) {
