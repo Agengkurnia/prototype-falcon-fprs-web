@@ -36,27 +36,30 @@ const CanvassingStore = {
             const start = new Date(obj.tanggalMulai);
             const end = new Date(obj.tanggalSelesai);
             const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) || 1;
             obj.durationDays = diffDays;
-            
-            if (obj.status === 'Completed') {
-                obj.progressPct = 100;
-            } else if (obj.status === 'Cancelled') {
-                obj.progressPct = 0;
-            } else {
-                // Calculate ongoing progress based on current date
-                const now = new Date();
-                if (now < start) {
-                    obj.progressPct = 0;
-                } else if (now > end) {
-                    obj.progressPct = 100;
-                } else {
-                    const elapsed = Math.abs(now - start);
-                    obj.progressPct = Math.min(100, Math.round((elapsed / diffTime) * 100));
-                }
-            }
         } else {
             obj.durationDays = 0;
+        }
+
+        if (obj.status === 'Completed') {
+            obj.progressPct = 100;
+        } else if (obj.status === 'Cancelled') {
+            obj.progressPct = 0;
+        } else if (obj.tanggalMulai && obj.tanggalSelesai) {
+            const start = new Date(obj.tanggalMulai);
+            const end = new Date(obj.tanggalSelesai);
+            const diffTime = Math.abs(end - start);
+            const now = new Date();
+            if (now < start) {
+                obj.progressPct = 0;
+            } else if (now > end) {
+                obj.progressPct = 100;
+            } else {
+                const elapsed = Math.abs(now - start);
+                obj.progressPct = Math.min(100, Math.round((elapsed / diffTime) * 100));
+            }
+        } else {
             obj.progressPct = 0;
         }
 
