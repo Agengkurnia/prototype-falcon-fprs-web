@@ -68,18 +68,104 @@
     <div class="container-fluid page-body-wrapper">
 
         <!-- ===== SIDEBAR ===== -->
+                <!-- SIDEBAR -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
-                <li class="nav-item nav-parent active">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="true">
+                <!-- FPRS (Parent with children) -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
                         <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
                         <span class="menu-title">FPRS</span>
                         <i class="fa fa-chevron-right menu-arrow"></i>
                     </a>
-                    <div class="collapse show" id="fprs-menu">
+                    <div class="collapse" id="fprs-menu">
                         <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu active" href="index.html">Canvassing</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Canvassing/index.html">Canvassing</a></li>
                             <li><a class="nav-link child-link text-submenu" href="../CanvassingV2/index.html">Canvassing V2</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </li>

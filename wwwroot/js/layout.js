@@ -15,27 +15,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 600);
 
     // ---- ACTIVE MENU HIGHLIGHT ----
-    var currentPath = window.location.pathname.toLowerCase();
+    function getDirPath(path) {
+        var parts = path.split('/');
+        parts.pop();
+        return parts.join('/') + '/';
+    }
+    var currentPath = window.location.pathname.toLowerCase().replace(/\\/g, '/').replace(/\/+/g, '/');
     var allLinks = document.querySelectorAll('.sidebar .nav-link');
     allLinks.forEach(function (link) {
         var href = link.getAttribute('href');
-        if (href && href !== '#') {
-            var cleanHref = href.split('/').pop().toLowerCase();
-            if (currentPath.indexOf(cleanHref) !== -1) {
-                link.classList.add('active');
-                var navItem = link.closest('.nav-item');
-                if (navItem) navItem.classList.add('active');
-                // Open parent collapse if in submenu
-                var collapse = link.closest('.collapse');
-                if (collapse) {
-                    collapse.classList.add('show');
-                    var parentLink = document.querySelector('[data-bs-target="#' + collapse.id + '"], [href="#' + collapse.id + '"]');
-                    if (parentLink) {
-                        parentLink.setAttribute('aria-expanded', 'true');
-                        var parentItem = parentLink.closest('.nav-item');
-                        if (parentItem) parentItem.classList.add('active');
+        if (href && href !== '#' && !href.startsWith('#') && !href.startsWith('javascript:')) {
+            try {
+                var linkUrl = new URL(href, window.location.href);
+                var cleanLinkPath = linkUrl.pathname.toLowerCase().replace(/\\/g, '/').replace(/\/+/g, '/');
+                var currentDir = getDirPath(currentPath);
+                var linkDir = getDirPath(cleanLinkPath);
+                
+                if (currentPath === cleanLinkPath || (linkDir.length > 15 && currentDir === linkDir)) {
+                    link.classList.add('active');
+                    var navItem = link.closest('.nav-item');
+                    if (navItem) navItem.classList.add('active');
+                    
+                    // Open parent collapses if in submenu (including nested subgroup collapses)
+                    var parentCollapse = link.closest('.collapse');
+                    while (parentCollapse) {
+                        parentCollapse.classList.add('show');
+                        var toggleSelector = '[data-bs-target="#' + parentCollapse.id + '"], [href="#' + parentCollapse.id + '"]';
+                        var parentLink = document.querySelector(toggleSelector);
+                        if (parentLink) {
+                            parentLink.setAttribute('aria-expanded', 'true');
+                            var parentItem = parentLink.closest('.nav-item');
+                            if (parentItem) parentItem.classList.add('active');
+                        }
+                        // Traverse up to next ancestor collapse
+                        var parentNavItem = parentCollapse.closest('.nav-item');
+                        parentCollapse = parentNavItem && parentNavItem.parentElement ? parentNavItem.parentElement.closest('.collapse') : null;
                     }
                 }
+            } catch (e) {
+                console.error("Error matching active link:", e);
             }
         }
     });

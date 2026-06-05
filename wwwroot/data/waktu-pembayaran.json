@@ -1,0 +1,7 @@
+[
+  { "id": 1, "nama": "Cash", "partnerId": "", "hari": 1, "deskripsi": "Pembayaran tunai saat transaksi", "isDefault": false },
+  { "id": 2, "nama": "Net 7", "partnerId": "", "hari": 7, "deskripsi": "Pembayaran 7 hari setelah transaksi", "isDefault": false },
+  { "id": 3, "nama": "Net 14", "partnerId": "", "hari": 14, "deskripsi": "Pembayaran 14 hari setelah transaksi", "isDefault": false },
+  { "id": 4, "nama": "Net 30", "partnerId": "", "hari": 30, "deskripsi": "Pembayaran 30 hari setelah transaksi", "isDefault": true },
+  { "id": 5, "nama": "Net 45", "partnerId": "", "hari": 45, "deskripsi": "Pembayaran 45 hari setelah transaksi", "isDefault": false }
+]

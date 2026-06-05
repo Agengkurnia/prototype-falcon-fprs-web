@@ -233,13 +233,58 @@ a:hover { text-decoration: none; }
     background: #F1F7E5;
 }
 
-.sidebar-light .sidebar .nav.sub-menu .nav-link.child-link.active {
-    background: linear-gradient(to right, #DDE8C1 97%, #A2C458 3%);
-    color: #000;
-    font-weight: 600;
+.sidebar-light .sidebar .nav.sub-menu .nav-link.child-link.active,
+.sidebar-light .sidebar .nav.sub-menu .sub-sub-menu .nav-link.child-link.active {
+    background: linear-gradient(to right, #DDE8C1 96%, #005d41 4%) !important;
+    color: #000 !important;
+    font-weight: 600 !important;
 }
 
 .text-submenu {
+    font-weight: 500;
+}
+
+/* --- Sub-grouping for Data Master --- */
+.sidebar .nav.sub-menu .nav-item.nav-subgroup {
+    list-style: none;
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup > .nav-link {
+    padding: 6px 15px 6px 35px !important;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    background: none !important;
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup > .nav-link:hover {
+    color: #000;
+    background: #f8f9fa !important;
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup > .nav-link .sub-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+    margin-left: auto;
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup > .nav-link[aria-expanded="true"] .sub-arrow {
+    transform: rotate(90deg);
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup .sub-sub-menu {
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.sidebar .nav.sub-menu .nav-item.nav-subgroup .sub-sub-menu .nav-link {
+    padding: 4px 0 4px 50px !important;
+    font-size: 0.8rem !important;
     font-weight: 500;
 }
 

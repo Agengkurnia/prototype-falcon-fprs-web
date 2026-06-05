@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Posisi – Master Data | Falcon FPRS</title>
+<style>@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"/>
+<link rel="stylesheet" href="../../../../wwwroot/css/layout.css"/><link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+</head><body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+<nav class="navbar"><div class="navbar-brand-wrapper"><a class="navbar-brand" href="../../../../index.html"><img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon"></a></div><div class="navbar-menu-wrapper"><button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button><div class="nav-profile"><div class="avatar">FA</div><div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div></div></div></nav>
+<div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+                <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <!-- FPRS (Parent with children) -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">FPRS</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../CanvassingV2/index.html">Canvassing V2</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Data Master -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="true">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+<div class="main-panel"><div class="content-wrapper">
+<div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+<div><h2 class="title-page mb-1">Posisi</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Posisi</li></ol></nav></div>
+<button class="btn btn-success" onclick="openModal()"><i class="fa fa-plus me-1"></i> Tambah Posisi</button>
+</div>
+<div class="card"><div class="card-body"><div class="table-responsive">
+<table class="table table-hover" id="tbl">
+<thead><tr><th style="width:50px;">NO</th><th>NAMA</th><th>LEVEL</th><th style="text-align:center;">JUMLAH</th><th style="text-align:center;">ANGGOTA</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
+<tbody id="tblBody"></tbody>
+</table></div></div></div>
+</div><footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer></div>
+</div></div>
+<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+<div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Posisi</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-body">
+<input type="hidden" id="editId"/>
+<div class="mb-3"><label class="form-label">Nama <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama posisi..."/></div>
+<div class="mb-3"><label class="form-label">Level</label><select class="form-select" id="inputLevel"><option value="">-- Pilih Level --</option><option>Level 1</option><option>Level 2</option><option>Level 3</option><option>Level 4</option></select></div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
+</div></div></div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+const KEY='md_posisi';
+function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
+function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function loadData(){if(!localStorage.getItem(KEY)){fetch('../../../../wwwroot/data/posisi.json').then(r=>r.json()).then(d=>{saveData(d);render();});}else{render();}}
+function render(){
+if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();$('#tblBody').empty();
+getData().forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td>${item.level||'-'}</td><td class="text-center">${item.jumlah}</td><td class="text-center">${item.anggota}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem(${item.id})" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.nama}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
+$('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[3,4,5]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
+}
+function openModal(item=null){document.getElementById('editId').value=item?item.id:'';document.getElementById('inputNama').value=item?item.nama:'';document.getElementById('inputLevel').value=item?item.level:'';document.getElementById('modalTitle').textContent=item?'Ubah Posisi':'Tambah Posisi';new bootstrap.Modal(document.getElementById('modalForm')).show();}
+function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
+function saveItem(){const nama=document.getElementById('inputNama').value.trim();if(!nama){Swal.fire('Peringatan','Nama posisi wajib diisi.','warning');return;}const data=getData();const id=document.getElementById('editId').value;const obj={id:id?parseInt(id):Date.now(),nama,level:document.getElementById('inputLevel').value,jumlah:0,anggota:0};if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}saveData(data);bootstrap.Modal.getInstance(document.getElementById('modalForm')).hide();render();Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false});}
+function del(id,nama){Swal.fire({title:`Hapus Posisi "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
+$(document).ready(loadData);
+</script></body></html>
