@@ -5,84 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tambah Canvassing – Falcon FPRS</title>
 
-    <!-- Kalbe Geometric Font from wwwroot -->
     <style>
-        @font-face {
-            font-family: 'Kalbe Geometric';
-            font-style: normal; font-weight: 400; font-display: swap;
-            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Kalbe Geometric';
-            font-style: normal; font-weight: 600; font-display: swap;
-            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Kalbe Geometric';
-            font-style: normal; font-weight: 700; font-display: swap;
-            src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2');
-        }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
     </style>
 
-    <!-- Bootstrap 5 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-    <!-- Select2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
-    <!-- Falcon Layout & Module CSS -->
     <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
     <link rel="stylesheet" href="../../../wwwroot/css/canvassing.css" />
 </head>
 <body class="sidebar-light">
 
-<!-- Preloader -->
-<div id="loader-wrapper">
-    <div id="loader"></div>
-</div>
+<div id="loader-wrapper"><div id="loader"></div></div>
 
 <div class="container-scroller">
-
-    <!-- ===== NAVBAR ===== -->
+    <!-- NAVBAR -->
     <nav class="navbar" aria-label="falcon-navbar">
         <div class="navbar-brand-wrapper">
-            <a class="navbar-brand" href="../../index.html">
+            <a class="navbar-brand" href="../../../index.html">
                 <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
             </a>
         </div>
         <div class="navbar-menu-wrapper">
-            <button class="navbar-toggler d-md-none" id="sidebarToggler" aria-label="Toggle sidebar">
-                <i class="fa fa-bars"></i>
-            </button>
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
             <div class="nav-profile">
                 <div class="avatar">FA</div>
-                <div>
-                    <div class="nav-profile-name">Falcon Admin</div>
-                    <div class="nav-profile-sub">PT Kalbe Nutritionals</div>
-                </div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid page-body-wrapper">
-
-        <!-- ===== SIDEBAR ===== -->
+        <!-- SIDEBAR -->
                 <!-- SIDEBAR -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
             <ul class="nav">
-                <!-- FPRS (Parent with children) -->
+                <!-- Penjualan (Parent with children) -->
                 <li class="nav-item nav-parent">
                     <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
                         <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
-                        <span class="menu-title">FPRS</span>
+                        <span class="menu-title">Penjualan</span>
                         <i class="fa fa-chevron-right menu-arrow"></i>
                     </a>
                     <div class="collapse" id="fprs-menu">
                         <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
                             <li><a class="nav-link child-link text-submenu" href="../Canvassing/index.html">Canvassing</a></li>
-                            <li><a class="nav-link child-link text-submenu" href="../CanvassingV2/index.html">Canvassing V2</a></li>
                         </ul>
                     </div>
                 </li>
@@ -173,448 +146,438 @@
             </ul>
         </nav>
 
-        <!-- ===== MAIN PANEL ===== -->
+        <!-- MAIN PANEL -->
         <div class="main-panel">
             <div class="content-wrapper">
-
-                <!-- Page Header -->
+                
                 <div class="container-title-add mb-3">
                     <div class="title-box">
-                        <a href="index.html" class="btn-back" id="btnKembali">
-                            <i class="fa fa-arrow-left"></i> Kembali ke list
-                        </a>
+                        <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i> Kembali ke list</a>
                         <h2 class="title-add mb-1">Tambah Canvassing</h2>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="../../index.html" class="a-breadcrumb">Home</a></li>
-                                <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">Tambah</li>
-                            </ol>
-                        </nav>
                     </div>
                 </div>
 
-                <!-- ---- FORM HEADER INFO ---- -->
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <span class="title-card d-block mb-3">Informasi Canvassing</span>
-
-                        <div class="row g-3">
-                            <!-- Driver -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmDriver">
-                                        Driver <span class="spn-required">*</span>
-                                    </label>
-                                    <div class="col-md-8">
-                                        <select class="form-select form-select-sm select2-driver" id="frmDriver" name="frmDriver">
-                                            <option value="">-- Pilih Driver --</option>
-                                            <option value="EMP-260500040">EMP-260500040 - JAMBI</option>
-                                            <option value="EMP-260400021">EMP-260400021 - JAKARTA PUSAT</option>
-                                            <option value="EMP-260300011">EMP-260300011 - SURABAYA</option>
-                                            <option value="EMP-260200033">EMP-260200033 - BANDUNG</option>
-                                            <option value="EMP-260100055">EMP-260100055 - MEDAN</option>
-                                        </select>
-                                    </div>
+                <!-- TWO PANE LAYOUT -->
+                <div class="two-pane-container">
+                    
+                    <!-- LEFT PANE: Form Info -->
+                    <div class="pane-left">
+                        <div class="form-card">
+                            <h3 class="form-section-title"><i class="fa fa-info-circle me-2"></i>Informasi Canvassing</h3>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label-v2">Driver <span class="text-danger">*</span></label>
+                                    <select class="form-select select2-basic" id="inpDriver">
+                                        <option value="">Pilih Driver</option>
+                                        <option value="EMP-260500040">EMP-260500040 - JAMBI</option>
+                                        <option value="EMP-260400021">EMP-260400021 - JAKARTA PUSAT</option>
+                                    </select>
                                 </div>
-                            </div>
-
-                            <!-- Helper -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmHelper">Helper</label>
-                                    <div class="col-md-8">
-                                        <select class="form-select form-select-sm select2-helper" id="frmHelper" name="frmHelper">
-                                            <option value="">-- Tidak Ada --</option>
-                                            <option value="EMP-260500041">EMP-260500041 - BUDI SANTOSO</option>
-                                            <option value="EMP-260500042">EMP-260500042 - RUDI HARTONO</option>
-                                            <option value="EMP-260500043">EMP-260500043 - AGUS WIJAYA</option>
-                                        </select>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-v2">Helper</label>
+                                    <select class="form-select select2-basic" id="inpHelper">
+                                        <option value="">Pilih Helper</option>
+                                        <option value="EMP-260500041">EMP-260500041 - BUDI</option>
+                                    </select>
                                 </div>
-                            </div>
-
-                            <!-- Gudang Kanvas -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmGudang">
-                                        Gudang Kanvas <span class="spn-required">*</span>
-                                    </label>
-                                    <div class="col-md-8">
-                                        <select class="form-select form-select-sm select2-gudang" id="frmGudang" name="frmGudang">
-                                            <option value="">-- Pilih Gudang Kanvas --</option>
-                                            <option value="JAMBI">JAMBI</option>
-                                            <option value="JAKARTA PUSAT">JAKARTA PUSAT</option>
-                                            <option value="SURABAYA">SURABAYA</option>
-                                            <option value="BANDUNG">BANDUNG</option>
-                                            <option value="MEDAN">MEDAN</option>
-                                        </select>
-                                    </div>
+                                <div class="col-md-12">
+                                    <label class="form-label-v2">Gudang Kanvas <span class="text-danger">*</span></label>
+                                    <select class="form-select select2-basic" id="inpGudang">
+                                        <option value="">Pilih Gudang</option>
+                                        <option value="JAMBI">JAMBI</option>
+                                        <option value="JAKARTA PUSAT">JAKARTA PUSAT</option>
+                                    </select>
                                 </div>
-                            </div>
-
-                            <!-- Periode (ReadOnly/Calculated) -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmPeriode">Periode</label>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control form-control-sm bg-light" id="frmPeriode" name="frmPeriode"
-                                               placeholder="Otomatis dihitung dari rute jadwal" readonly>
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-v2">Mulai Kanvas <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="inpMulai">
                                 </div>
-                            </div>
-
-                            <!-- Mulai Kanvas -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmMulai">
-                                        Mulai Kanvas <span class="spn-required">*</span>
-                                    </label>
-                                    <div class="col-md-8">
-                                        <input type="datetime-local" class="form-control form-control-sm" id="frmMulai" name="frmMulai">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Selesai Kanvas -->
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label class="col-md-4 col-form-label" for="frmSelesai">
-                                        Selesai Kanvas <span class="spn-required">*</span>
-                                    </label>
-                                    <div class="col-md-8">
-                                        <input type="datetime-local" class="form-control form-control-sm" id="frmSelesai" name="frmSelesai">
-                                    </div>
+                                <div class="col-md-6">
+                                    <label class="form-label-v2">Selesai Kanvas <span class="text-danger">*</span></label>
+                                    <input type="datetime-local" class="form-control" id="inpSelesai">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- ---- STOK PRODUK ---- -->
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="title-card">Stok Produk</span>
-                            <button class="btn btn-outline-success btn-sm" id="btnMuatBarang" style="font-size:0.82rem; padding:0.4rem 0.9rem;">
-                                <i class="fa fa-boxes me-1"></i> Muat Barang
-                            </button>
-                        </div>
-
-                        <!-- Gudang info bar -->
-                        <div class="gudang-bar mb-3" id="gudangBar">
-                            <label>Pengaturan Stok Produk Rute Kanvas</label>
-                            <div class="jumlah-barang">
-                                Jumlah barang <strong id="jumlahBarang">0</strong>
-                                <button type="button" class="btn btn-sm btn-light ms-2" id="btnClearStok" title="Hapus semua stok">
-                                    <i class="fa fa-times"></i>
+                        <div class="form-card">
+                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                                <h3 class="form-section-title mb-0 border-0 pb-0"><i class="fa fa-boxes me-2"></i>Stok Produk</h3>
+                                <button class="btn btn-sm btn-outline-success" id="btnAddProduct">
+                                    <i class="fa fa-plus me-1"></i> Tambah Produk
                                 </button>
                             </div>
-                        </div>
-
-                        <!-- Stok Table -->
-                        <div class="tbl-stok-form">
-                            <table class="table table-sm mb-0" id="tblStokProduk">
-                                <thead>
-                                    <tr class="stok-header">
-                                        <th style="width:30px;">
-                                            <input type="checkbox" id="chkAll" title="Pilih semua">
-                                        </th>
-                                        <th style="width:40px;">No</th>
-                                        <th>Produk</th>
-                                        <th colspan="3" class="text-center">Jumlah</th>
-                                        <th style="width:40px;"></th>
-                                    </tr>
-                                    <tr class="stok-header-sub">
-                                        <th></th>
-                                        <th></th>
-                                        <th></th>
-                                        <th style="width:120px;">Stok</th>
-                                        <th style="width:100px; text-align:center;">KARTON</th>
-                                        <th style="width:100px; text-align:center;">BOX</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stokBody">
-                                    <tr class="stok-row" id="stokRow1">
-                                        <td data-label="Pilih"><input type="checkbox" class="chk-row"></td>
-                                        <td data-label="No" class="row-num">1</td>
-                                        <td data-label="Produk">
-                                            <select class="form-select form-select-sm select2-produk produk-select" style="min-width:220px;" id="frmProduk1">
-                                                <option value="">Tambah barang</option>
-                                                <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
-                                                <option value="NBE15">BENECOL STRAW 200ML (NBE15)</option>
-                                                <option value="FIT01">FITBAR CHOCOLATE (FIT01)</option>
-                                                <option value="FIT02">FITBAR OAT (FIT02)</option>
-                                                <option value="WRP01">WRP DIET SHAKE VANILLA (WRP01)</option>
-                                                <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
-                                            </select>
-                                        </td>
-                                        <td data-label="Stok">
-                                            <span class="stok-info text-muted" style="font-size:0.78rem;">Stok: -</span>
-                                        </td>
-                                        <td data-label="Karton">
-                                            <input type="number" class="form-control form-control-sm qty-input qty-karton-input"
-                                                   placeholder="Qty" min="0" id="qtyKarton1">
-                                            <small class="text-muted" style="font-size:0.7rem;">KARTON</small>
-                                        </td>
-                                        <td data-label="Box">
-                                            <input type="number" class="form-control form-control-sm qty-input qty-box-input"
-                                                   placeholder="Qty" min="0" id="qtyBox1">
-                                            <small class="text-muted" style="font-size:0.7rem;">BOX</small>
-                                        </td>
-                                        <td data-label="Hapus">
-                                            <button class="btn-remove-row" type="button" data-row="1" title="Hapus baris">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Add row button -->
-                        <div class="mt-2">
-                            <button class="btn btn-sm btn-outline-success btn-add-row" id="btnTambahBarang">
-                                <i class="fa fa-plus me-1"></i> Tambah barang lain
-                            </button>
-                        </div>
-
-                        <!-- Validation message -->
-                        <div class="validation-msg" id="validationMsg" role="alert">
-                            Anda harus menambahkan/melengkapi data gudang, item dan kuantitas, dengan minimal kuantitas adalah 1 untuk setiap item
-                        </div>
-
-                        <!-- Total -->
-                        <div class="form-actions mt-3">
-                            <div></div>
-                            <div class="total-produk">
-                                Total Produk &nbsp; <span id="totalProduk">0</span>
+                            
+                            <div id="stokContainer">
+                                <!-- Stok Item 1 -->
+                                <div class="stok-add-item">
+                                    <div class="stok-add-header">
+                                        <select class="form-select select2-produk w-75" data-id="1">
+                                            <option value="">Pilih Produk</option>
+                                            <option value="NBE14" data-stok="99999">BENECOL STRAW 100ML (NBE14)</option>
+                                            <option value="FIT01" data-stok="500">FITBAR CHOCOLATE (FIT01)</option>
+                                        </select>
+                                        <button class="btn-remove-stok-v2" onclick="removeStokItem(this)"><i class="fa fa-trash"></i></button>
+                                    </div>
+                                    <div class="stok-available" id="stokAvail1">Tersedia: -</div>
+                                    
+                                    <div class="stok-add-qty-row mt-3">
+                                        <div class="stok-add-qty-group">
+                                            <label class="stok-add-qty-label">Karton</label>
+                                            <div class="stepper-control">
+                                                <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                                <input type="number" class="stepper-input qty-karton" value="0" min="0" onchange="updateSummary()">
+                                                <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                            </div>
+                                        </div>
+                                        <div class="stok-add-qty-group">
+                                            <label class="stok-add-qty-label">Box</label>
+                                            <div class="stepper-control">
+                                                <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                                <input type="number" class="stepper-input qty-box" value="0" min="0" onchange="updateSummary()">
+                                                <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- ---- FORM ACTIONS ---- -->
-                <div class="d-flex align-items-center justify-content-between mt-3 mb-4">
-                    <a href="index.html" class="btn-back" id="btnKembali2">
-                        <i class="fa fa-arrow-left"></i> Kembali ke list
-                    </a>
-                    <div class="d-flex gap-2">
-                        <a href="index.html" class="btn btn-outline-secondary" id="btnBatal">Batal</a>
-                        <button type="button" class="btn btn-success" id="btnSimpan">
-                            <i class="fa fa-save me-1"></i> Simpan
-                        </button>
+                    <!-- RIGHT PANE: Summary -->
+                    <div class="pane-right">
+                        <div class="summary-panel">
+                            <h3 class="form-section-title"><i class="fa fa-clipboard-list me-2"></i>Ringkasan</h3>
+                            
+                            <div class="summary-item">
+                                <span class="label">Driver</span>
+                                <span class="val" id="sumDriver">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Gudang</span>
+                                <span class="val" id="sumGudang">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Periode</span>
+                                <span class="val" id="sumPeriode">- hari</span>
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <div class="summary-item">
+                                <span class="label">Jenis Produk</span>
+                                <span class="val" id="sumJenis">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Total Karton</span>
+                                <span class="val" id="sumKarton">0</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Total Box</span>
+                                <span class="val" id="sumBox">0</span>
+                            </div>
+                            
+                            <div class="summary-divider"></div>
+                            
+                            <div class="d-flex flex-column gap-2 mt-4">
+                                <button class="btn btn-success w-100 py-2" id="btnSimpanV2"><i class="fa fa-save me-2"></i>Simpan Canvassing</button>
+                                <a href="index.html" class="btn btn-outline-secondary w-100">Batal</a>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
             </div>
-            <!-- /content-wrapper -->
-
-            <footer class="footer">
-                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
-            </footer>
-        </div>
-        <!-- /main-panel -->
-
-    </div>
-</div>
-
-<!-- Confirm Save Modal -->
-<div class="modal fade" id="confirmSaveModal" tabindex="-1" aria-labelledby="confirmSaveLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmSaveLabel">Konfirmasi Simpan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin ingin menyimpan data <strong>Canvassing</strong> ini?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-success btn-mdl" data-bs-dismiss="modal">Tidak</button>
-                <button type="button" class="btn btn-success btn-mdl" id="btnKonfirmasiSimpan">Ya, Simpan</button>
-            </div>
+            <footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer>
         </div>
     </div>
 </div>
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- Bootstrap 5 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Select2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<!-- Layout JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../wwwroot/js/canvassing-store.js"></script>
 <script src="../../../wwwroot/js/layout.js"></script>
 
 <script>
 $(document).ready(function () {
+    $('.select2-basic').select2({ theme: 'bootstrap-5', width: '100%' });
+    initSelect2Produk();
 
-    // Init Select2
-    $('.select2-driver, .select2-helper, .select2-gudang').select2({
-        theme: 'bootstrap-5',
-        width: '100%'
+    // Summary bindings
+    $('#inpDriver').change(function() { 
+        var text = $(this).find('option:selected').text();
+        $('#sumDriver').text(text.indexOf('-') !== -1 ? text.split('-')[1].trim() : text || '-'); 
     });
-
-    initProdukSelect2();
-
-    var rowCounter = 1;
-
-    function initProdukSelect2() {
-        $('.produk-select').select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Tambah barang' });
-    }
-
-    // Dynamic Periode calculation
-    function calculatePeriode() {
-        var startVal = $('#frmMulai').val();
-        var endVal = $('#frmSelesai').val();
-        if (startVal && endVal) {
+    $('#inpGudang').change(function() { $('#sumGudang').text($(this).val() || '-'); });
+    
+    $('#inpMulai, #inpSelesai').change(function() {
+        var startVal = $('#inpMulai').val();
+        var endVal = $('#inpSelesai').val();
+        if(startVal && endVal) {
             var start = new Date(startVal);
             var end = new Date(endVal);
-            var diffTime = end - start;
-            if (diffTime < 0) {
-                $('#frmPeriode').val('Selesai harus setelah mulai');
-            } else {
-                var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                $('#frmPeriode').val(diffDays + ' hari');
+            if(end < start) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Periode Tidak Valid',
+                    text: 'Tanggal Selesai tidak boleh mendahului Tanggal Mulai!',
+                    confirmButtonColor: '#005d41'
+                });
+                $('#inpSelesai').val('');
+                $('#sumPeriode').text('- hari');
+                return;
             }
+            var diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            $('#sumPeriode').text(diff + ' hari');
         } else {
-            $('#frmPeriode').val('');
+            $('#sumPeriode').text('- hari');
         }
-    }
-    $('#frmMulai, #frmSelesai').on('change input', calculatePeriode);
-
-    // Update counts
-    function updateCounts() {
-        var filled = 0;
-        var total = 0;
-        $('.stok-row').each(function () {
-            var produk = $(this).find('.produk-select').val();
-            var qtyK = parseInt($(this).find('.qty-karton-input').val()) || 0;
-            var qtyB = parseInt($(this).find('.qty-box-input').val()) || 0;
-            if (produk && (qtyK > 0 || qtyB > 0)) {
-                filled++;
-                total += qtyK + qtyB;
-            }
-        });
-        $('#jumlahBarang').text(filled);
-        $('#totalProduk').text(filled);
-    }
-
-    // Product stock info binding
-    $(document).on('change', '.produk-select', function () {
-        var val = $(this).val();
-        var stokData = {
-            'NBE14': '99999 KARTON | 0 BOX',
-            'NBE15': '500 KARTON | 1200 BOX',
-            'FIT01': '2000 KARTON | 5000 BOX',
-            'FIT02': '1500 KARTON | 3000 BOX',
-            'WRP01': '800 KARTON | 2400 BOX',
-            'WRP02': '600 KARTON | 1800 BOX'
-        };
-        var row = $(this).closest('.stok-row');
-        if (val && stokData[val]) {
-            row.find('.stok-info').text('Stok: ' + stokData[val]);
-        } else {
-            row.find('.stok-info').text('Stok: -');
-        }
-        updateCounts();
     });
 
-    $(document).on('input', '.qty-input', function () { updateCounts(); });
+    // Detect Edit mode
+    var editId = new URLSearchParams(window.location.search).get('id');
+    var existingItem = null;
+    if (editId) {
+        existingItem = CanvassingStore.getById(editId);
+        if (existingItem) {
+            // Change title
+            $('.title-add').text('Edit Canvassing');
+            document.title = 'Edit Canvassing – Falcon FPRS';
+            
+            // Populate fields
+            $('#inpDriver').val(existingItem.driverCode).trigger('change');
+            $('#inpHelper').val(existingItem.helperCode).trigger('change');
+            $('#inpGudang').val(existingItem.gudang).trigger('change');
+            $('#inpMulai').val(existingItem.tanggalMulai).trigger('change');
+            $('#inpSelesai').val(existingItem.tanggalSelesai).trigger('change');
 
-    // Add row
-    $('#btnTambahBarang').on('click', function () {
-        rowCounter++;
-        var newRow = `
-            <tr class="stok-row" id="stokRow${rowCounter}">
-                <td data-label="Pilih"><input type="checkbox" class="chk-row"></td>
-                <td data-label="No" class="row-num">${rowCounter}</td>
-                <td data-label="Produk">
-                    <select class="form-select form-select-sm produk-select" style="min-width:220px;" id="frmProduk${rowCounter}">
-                        <option value="">Tambah barang</option>
-                        <option value="NBE14">BENECOL STRAW 100ML (NBE14)</option>
-                        <option value="NBE15">BENECOL STRAW 200ML (NBE15)</option>
-                        <option value="FIT01">FITBAR CHOCOLATE (FIT01)</option>
-                        <option value="FIT02">FITBAR OAT (FIT02)</option>
-                        <option value="WRP01">WRP DIET SHAKE VANILLA (WRP01)</option>
-                        <option value="WRP02">WRP DIET SHAKE CHOCOLATE (WRP02)</option>
+            // Render existing items
+            if (existingItem.items && existingItem.items.length > 0) {
+                $('#stokContainer').empty();
+                existingItem.items.forEach(function(stokItem, idx) {
+                    var currentProdId = idx + 1;
+                    var html = `
+                        <div class="stok-add-item">
+                            <div class="stok-add-header">
+                                <select class="form-select select2-produk w-75" data-id="${currentProdId}">
+                                    <option value="">Pilih Produk</option>
+                                    <option value="NBE14" data-stok="99999" ${stokItem.produkCode === 'NBE14' ? 'selected' : ''}>BENECOL STRAW 100ML (NBE14)</option>
+                                    <option value="FIT01" data-stok="500" ${stokItem.produkCode === 'FIT01' ? 'selected' : ''}>FITBAR CHOCOLATE (FIT01)</option>
+                                </select>
+                                <button class="btn-remove-stok-v2" onclick="removeStokItem(this)"><i class="fa fa-trash"></i></button>
+                            </div>
+                            <div class="stok-available" id="stokAvail${currentProdId}">Tersedia: -</div>
+                            <div class="stok-add-qty-row mt-3">
+                                <div class="stok-add-qty-group">
+                                    <label class="stok-add-qty-label">Karton</label>
+                                    <div class="stepper-control">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                        <input type="number" class="stepper-input qty-karton" value="${stokItem.karton || 0}" min="0" onchange="updateSummary()">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                    </div>
+                                </div>
+                                <div class="stok-add-qty-group">
+                                    <label class="stok-add-qty-label">Box</label>
+                                    <div class="stepper-control">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                                        <input type="number" class="stepper-input qty-box" value="${stokItem.box || 0}" min="0" onchange="updateSummary()">
+                                        <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    $('#stokContainer').append(html);
+                });
+                prodCount = existingItem.items.length;
+                initSelect2Produk();
+                
+                // Update available labels
+                $('.select2-produk').each(function() {
+                    var id = $(this).data('id');
+                    var stok = $(this).find(':selected').data('stok');
+                    $('#stokAvail' + id).text(stok ? 'Tersedia: ' + stok + ' Karton' : 'Tersedia: -');
+                });
+                updateSummary();
+            }
+        }
+    }
+
+    // Add product row
+    var prodCount = editId && existingItem && existingItem.items ? existingItem.items.length : 1;
+    $('#btnAddProduct').click(function() {
+        prodCount++;
+        var html = `
+            <div class="stok-add-item">
+                <div class="stok-add-header">
+                    <select class="form-select select2-produk w-75" data-id="${prodCount}">
+                        <option value="">Pilih Produk</option>
+                        <option value="NBE14" data-stok="99999">BENECOL STRAW 100ML (NBE14)</option>
+                        <option value="FIT01" data-stok="500">FITBAR CHOCOLATE (FIT01)</option>
                     </select>
-                </td>
-                <td data-label="Stok"><span class="stok-info text-muted" style="font-size:0.78rem;">Stok: -</span></td>
-                <td data-label="Karton">
-                    <input type="number" class="form-control form-control-sm qty-input qty-karton-input"
-                           placeholder="Qty" min="0" id="qtyKarton${rowCounter}">
-                    <small class="text-muted" style="font-size:0.7rem;">KARTON</small>
-                </td>
-                <td data-label="Box">
-                    <input type="number" class="form-control form-control-sm qty-input qty-box-input"
-                           placeholder="Qty" min="0" id="qtyBox${rowCounter}">
-                    <small class="text-muted" style="font-size:0.7rem;">BOX</small>
-                </td>
-                <td data-label="Hapus">
-                    <button class="btn-remove-row" type="button" data-row="${rowCounter}" title="Hapus baris">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </td>
-            </tr>`;
-        $('#stokBody').append(newRow);
-        $('#frmProduk' + rowCounter).select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Tambah barang' });
-        updateCounts();
+                    <button class="btn-remove-stok-v2" onclick="removeStokItem(this)"><i class="fa fa-trash"></i></button>
+                </div>
+                <div class="stok-available" id="stokAvail${prodCount}">Tersedia: -</div>
+                <div class="stok-add-qty-row mt-3">
+                    <div class="stok-add-qty-group">
+                        <label class="stok-add-qty-label">Karton</label>
+                        <div class="stepper-control">
+                            <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                            <input type="number" class="stepper-input qty-karton" value="0" min="0" onchange="updateSummary()">
+                            <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="stok-add-qty-group">
+                        <label class="stok-add-qty-label">Box</label>
+                        <div class="stepper-control">
+                            <button type="button" class="stepper-btn" onclick="stepQty(this, -1)">-</button>
+                            <input type="number" class="stepper-input qty-box" value="0" min="0" onchange="updateSummary()">
+                            <button type="button" class="stepper-btn" onclick="stepQty(this, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        $('#stokContainer').append(html);
+        initSelect2Produk();
     });
 
-    // Remove row
-    $(document).on('click', '.btn-remove-row', function () {
-        var row = $(this).closest('.stok-row');
-        if ($('.stok-row').length > 1) {
-            row.remove();
-            $('.stok-row').each(function (i) {
-                $(this).find('.row-num').text(i + 1);
+    // Save with SweetAlert
+    $('#btnSimpanV2').click(function() {
+        if(!$('#inpDriver').val() || !$('#inpGudang').val() || !$('#inpMulai').val() || !$('#inpSelesai').val()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Data belum lengkap',
+                text: 'Harap isi semua field bertanda bintang (*)'
             });
-            updateCounts();
-        }
-    });
-
-    // Clear all stok
-    $('#btnClearStok').on('click', function () {
-        if (confirm('Hapus semua stok produk?')) {
-            var firstRow = $('.stok-row:first').clone();
-            firstRow.find('.produk-select').val('').trigger('change.select2');
-            firstRow.find('.qty-input').val('');
-            firstRow.find('.stok-info').text('Stok: -');
-            $('#stokBody').html(firstRow);
-            initProdukSelect2();
-            updateCounts();
-        }
-    });
-
-    // Simpan validation
-    $('#btnSimpan').on('click', function () {
-        var driver = $('#frmDriver').val();
-        var gudang = $('#frmGudang').val();
-        var mulai = $('#frmMulai').val();
-        var selesai = $('#frmSelesai').val();
-
-        if (!driver || !gudang || !mulai || !selesai) {
-            $('#validationMsg').addClass('show').text('Harap lengkapi semua field yang wajib diisi (*).');
             return;
         }
-        $('#validationMsg').removeClass('show');
-        var modal = new bootstrap.Modal(document.getElementById('confirmSaveModal'));
-        modal.show();
-    });
 
-    $('#btnKonfirmasiSimpan').on('click', function () {
-        var modal = bootstrap.Modal.getInstance(document.getElementById('confirmSaveModal'));
-        modal.hide();
-        setTimeout(function () {
-            window.location.href = 'index.html';
-        }, 300);
-    });
+        Swal.fire({
+            title: editId ? 'Simpan Perubahan?' : 'Simpan Canvassing?',
+            text: editId ? "Data canvassing akan diperbarui." : "Data akan disimpan dan status menjadi Ongoing",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#005d41',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Simpan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Collect values and save
+                var driverSelect = $('#inpDriver');
+                var helperSelect = $('#inpHelper');
+                var selectedDriverText = driverSelect.find('option:selected').text();
+                var selectedHelperText = helperSelect.find('option:selected').text();
+                
+                var items = [];
+                $('.stok-add-item').each(function() {
+                    var select = $(this).find('.select2-produk');
+                    var prodCode = select.val();
+                    if(prodCode) {
+                        var prodText = select.find('option:selected').text();
+                        var prodName = prodText.split('(')[0].trim();
+                        var karton = parseInt($(this).find('.qty-karton').val()) || 0;
+                        var box = parseInt($(this).find('.qty-box').val()) || 0;
+                        items.push({
+                            produkCode: prodCode,
+                            produkName: prodName,
+                            karton: karton,
+                            box: box,
+                            pcs: 0
+                        });
+                    }
+                });
 
-    updateCounts();
+                var saveObj = {
+                    id: editId || undefined,
+                    driverCode: driverSelect.val(),
+                    driverName: selectedDriverText.indexOf('-') !== -1 ? selectedDriverText.split('-')[1].trim() : selectedDriverText,
+                    helperCode: helperSelect.val(),
+                    helperName: selectedHelperText.indexOf('-') !== -1 ? selectedHelperText.split('-')[1].trim() : (selectedHelperText || ''),
+                    gudang: $('#inpGudang').val(),
+                    tanggalMulai: $('#inpMulai').val(),
+                    tanggalSelesai: $('#inpSelesai').val(),
+                    items: items
+                };
+                
+                if (editId && existingItem) {
+                    saveObj.status = existingItem.status;
+                }
+
+                CanvassingStore.save(saveObj);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: editId ? 'Perubahan berhasil disimpan.' : 'Canvassing berhasil disimpan.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+    });
 });
+
+function initSelect2Produk() {
+    $('.select2-produk').select2({ theme: 'bootstrap-5', width: '75%' }).on('change', function() {
+        var id = $(this).data('id');
+        var stok = $(this).find(':selected').data('stok');
+        $('#stokAvail' + id).text(stok ? 'Tersedia: ' + stok + ' Karton' : 'Tersedia: -');
+        updateSummary();
+    });
+}
+
+function removeStokItem(btn) {
+    Swal.fire({
+        title: 'Hapus produk ini?',
+        text: 'Produk akan dihapus dari daftar canvassing.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, Hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $(btn).closest('.stok-add-item').remove();
+            updateSummary();
+            Swal.fire({
+                icon: 'success',
+                title: 'Dihapus!',
+                text: 'Produk telah dihapus.',
+                timer: 1000,
+                showConfirmButton: false
+            });
+        }
+    });
+}
+
+function stepQty(btn, step) {
+    var input = $(btn).siblings('.stepper-input');
+    var val = parseInt(input.val()) || 0;
+    if(val + step >= 0) {
+        input.val(val + step);
+        updateSummary();
+    }
+}
+
+function updateSummary() {
+    var jenis = 0, karton = 0, box = 0;
+    $('.stok-add-item').each(function() {
+        if($(this).find('.select2-produk').val()) {
+            jenis++;
+            karton += parseInt($(this).find('.qty-karton').val()) || 0;
+            box += parseInt($(this).find('.qty-box').val()) || 0;
+        }
+    });
+    $('#sumJenis').text(jenis);
+    $('#sumKarton').text(karton);
+    $('#sumBox').text(box);
+}
 </script>
 </body>
 </html>

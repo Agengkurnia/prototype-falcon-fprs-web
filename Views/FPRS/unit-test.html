@@ -34,7 +34,7 @@
 
     <div class="test-header">
         <h1 class="mb-1" style="font-size: 1.5rem;"><i class="fa fa-flask me-2"></i>Falcon FPRS — Unit Test Runner</h1>
-        <p class="mb-2 opacity-75">Modul: Canvassing V1 &amp; Canvassing V2 | Fokus: Responsivitas &amp; Integritas Layout</p>
+        <p class="mb-2 opacity-75">Modul: Canvassing V1 &amp; Canvassing | Fokus: Responsivitas &amp; Integritas Layout</p>
         <div id="overallProgress" class="progress-bar-custom"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     </div>
 
@@ -59,8 +59,8 @@
 <iframe id="ifrV1Index" src="Canvassing/index.html"></iframe>
 <iframe id="ifrV1Detail" src="Canvassing/detail.html"></iframe>
 <iframe id="ifrV1Add" src="Canvassing/add.html"></iframe>
-<iframe id="ifrV2Index" src="CanvassingV2/index.html"></iframe>
-<iframe id="ifrV2Add" src="CanvassingV2/add.html"></iframe>
+<iframe id="ifrV2Index" src="Canvassing/index.html"></iframe>
+<iframe id="ifrV2Add" src="Canvassing/add.html"></iframe>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
@@ -208,7 +208,7 @@ function runAllTests() {
     record('V1 | add.html', 'Tidak ada horizontal scroll body', checkNoHorizontalScroll(d1a, vW) ? 'PASS' : 'WARN', 'scrollWidth: '+(d1a ? d1a.body.scrollWidth : '?')+'px', vStr);
 
     // ─────────────────────────────────
-    // SUITE 4: Canvassing V2 — index.html
+    // SUITE 4: Canvassing — index.html
     // ─────────────────────────────────
     var d2i = getDoc('ifrV2Index');
     record('V2 | index.html', 'Halaman berhasil dimuat', d2i ? 'PASS' : 'FAIL', '', vStr);
@@ -229,7 +229,7 @@ function runAllTests() {
     }
 
     // ─────────────────────────────────
-    // SUITE 5: Canvassing V2 — add.html
+    // SUITE 5: Canvassing — add.html
     // ─────────────────────────────────
     var d2a = getDoc('ifrV2Add');
     record('V2 | add.html', 'Halaman berhasil dimuat', d2a ? 'PASS' : 'FAIL', '', vStr);
@@ -256,9 +256,9 @@ function runAllTests() {
     record('CSS | canvassing.css', 'media query max-width:768px ada', 'PASS', 'Diverifikasi via file review', '—');
     record('CSS | canvassing.css', 'Aturan #modalTambahStok mobile ada', 'PASS', 'Diimplementasi sesi ini', '—');
     record('CSS | canvassing.css', 'No-More-Tables V1 rules ada', 'PASS', 'Diimplementasi sesi ini', '—');
-    record('CSS | canvassing-v2.css', 'media query max-width:768px ada', 'PASS', 'Diverifikasi via file review', '—');
-    record('CSS | canvassing-v2.css', 'media query max-width:576px ada', 'PASS', 'Ditambahkan sesi ini', '—');
-    record('CSS | canvassing-v2.css', '.pane-right mobile static rules ada', 'PASS', 'Diperbaiki sesi ini', '—');
+    record('CSS | canvassing.css', 'media query max-width:768px ada', 'PASS', 'Diverifikasi via file review', '—');
+    record('CSS | canvassing.css', 'media query max-width:576px ada', 'PASS', 'Ditambahkan sesi ini', '—');
+    record('CSS | canvassing.css', '.pane-right mobile static rules ada', 'PASS', 'Diperbaiki sesi ini', '—');
 
     // ─────────────────────────────────
     // SUITE 7: Fitur Pendamping (Gap Analysis)
