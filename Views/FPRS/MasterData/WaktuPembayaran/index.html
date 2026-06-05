@@ -171,7 +171,7 @@ function openModal(item=null){
     document.getElementById('inputDeskripsi').value=item?item.deskripsi:'';
     document.getElementById('inputDefault').checked=item?item.isDefault:false;
     document.getElementById('modalTitle').textContent=item?'Ubah Waktu Pembayaran':'Tambah Waktu Pembayaran';
-    new bootstrap.Modal(document.getElementById('modalForm')).show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
 function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
 function saveItem(){
@@ -180,7 +180,7 @@ function saveItem(){
     const data=getData();const id=document.getElementById('editId').value;
     const obj={id:id?parseInt(id):Date.now(),nama,hari:parseInt(document.getElementById('inputHari').value)||0,deskripsi:document.getElementById('inputDeskripsi').value.trim(),isDefault:document.getElementById('inputDefault').checked,partnerId:''};
     if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
-    saveData(data);bootstrap.Modal.getInstance(document.getElementById('modalForm')).hide();render();
+    saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
     Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false});
 }
 function del(id,nama){Swal.fire({title:`Hapus "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}

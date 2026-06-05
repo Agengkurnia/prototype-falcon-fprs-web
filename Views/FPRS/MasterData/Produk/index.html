@@ -185,7 +185,7 @@ function render(){
             <td><div class="row-actions">
                 <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Detail"><i class="fa fa-eye"></i></a>
                 <a href="add.html?id=${item.id}" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>
-                <button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.nama.replace(/'/g,"\\'")}'" title="Hapus"><i class="fa fa-trash"></i></button>
+                <button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.nama.replace(/'/g,"\\'")}')" title="Hapus"><i class="fa fa-trash"></i></button>
             </div></td>
         </tr>`);
     });

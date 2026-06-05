@@ -170,7 +170,7 @@ function openModal(item=null){
     document.getElementById('inputNama').value=item?item.nama:'';
     document.getElementById('inputParent').value=item?item.parentKategori:'';
     document.getElementById('modalTitle').textContent=item?'Ubah Kategori Produk':'Tambah Kategori Produk';
-    new bootstrap.Modal(document.getElementById('modalForm')).show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
 function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
 function saveItem(){
@@ -179,7 +179,7 @@ function saveItem(){
     const data=getData();const id=document.getElementById('editId').value;
     const obj={id:id?parseInt(id):Date.now(),nama,parentKategori:document.getElementById('inputParent').value};
     if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
-    saveData(data);bootstrap.Modal.getInstance(document.getElementById('modalForm')).hide();render();
+    saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
     Swal.fire({icon:'success',title:'Berhasil!',text:`Kategori "${nama}" telah disimpan.`,timer:1500,showConfirmButton:false});
 }
 function del(id,nama){Swal.fire({title:`Hapus "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}

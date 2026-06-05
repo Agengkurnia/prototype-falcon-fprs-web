@@ -171,7 +171,7 @@ function openModal(item=null){
     document.getElementById('inputPersen').value=item?item.persentase:0;
     document.getElementById('inputDpp').value=item?item.nilaiDpp:'';
     document.getElementById('modalTitle').textContent=item?'Ubah Pajak':'Tambah Pajak';
-    new bootstrap.Modal(document.getElementById('modalForm')).show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
 function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
 function saveItem(){
@@ -181,7 +181,7 @@ function saveItem(){
     const data=getData();const id=document.getElementById('editId').value;
     const obj={id:id?parseInt(id):Date.now(),kodePajak:kode,namaPajak:nama,persentase:parseFloat(document.getElementById('inputPersen').value)||0,nilaiDpp:document.getElementById('inputDpp').value.trim(),partnerId:''};
     if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
-    saveData(data);bootstrap.Modal.getInstance(document.getElementById('modalForm')).hide();render();
+    saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
     Swal.fire({icon:'success',title:'Berhasil!',text:`Pajak "${nama}" telah disimpan.`,timer:1500,showConfirmButton:false});
 }
 function del(id,nama){Swal.fire({title:`Hapus Pajak "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}

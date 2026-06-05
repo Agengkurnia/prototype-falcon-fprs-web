@@ -256,7 +256,7 @@ function openModal(item = null) {
     document.getElementById('inputDeskripsi').value = item ? item.deskripsi : '';
     document.getElementById('inputUomPajak').value = item ? item.uomPajak : '';
     document.getElementById('modalUnitLabel').textContent = item ? 'Ubah Unit' : 'Tambah Unit';
-    new bootstrap.Modal(document.getElementById(MODAL_ID)).show();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID)).show();
 }
 
 function editItem(id) {
@@ -275,7 +275,7 @@ function saveUnit() {
         if (idx > -1) data[idx] = obj;
     } else { data.push(obj); }
     saveData(data);
-    bootstrap.Modal.getInstance(document.getElementById(MODAL_ID)).hide();
+    bootstrap.Modal.getOrCreateInstance(document.getElementById(MODAL_ID)).hide();
     renderTable();
     Swal.fire({ icon:'success', title:'Berhasil!', text:`Unit "${nama}" telah disimpan.`, timer:1500, showConfirmButton:false });
 }
