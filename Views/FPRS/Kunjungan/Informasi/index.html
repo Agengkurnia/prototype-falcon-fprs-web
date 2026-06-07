@@ -1,0 +1,510 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Informasi Kunjungan – Falcon FPRS</title>
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-weight: 400;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"/>
+    <link rel="stylesheet" href="../../../../wwwroot/css/layout.css"/>
+    <style>
+        /* Table overrides to match SimpliDOTS / Falcon */
+        .title-visit {
+            font-family: 'Kalbe Geometric', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            color: #212529;
+        }
+        .table-visit th {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #dee2e6 !important;
+            padding: 12px 16px !important;
+        }
+        .table-visit td {
+            font-size: 0.825rem;
+            padding: 12px 16px !important;
+            vertical-align: middle;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .table-visit tr:hover td {
+            background-color: #f8f9fa;
+        }
+        /* Top Control Bar */
+        .control-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-bar .search-wrapper {
+            position: relative;
+            width: 240px;
+        }
+        .control-bar .search-wrapper input {
+            padding-right: 30px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            height: 34px;
+        }
+        .control-bar .search-wrapper i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        .control-bar .btn-control {
+            background: #fff;
+            border: 1px solid #ced4da;
+            color: #495057;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
+            transition: all 0.2s;
+        }
+        .control-bar .btn-control:hover {
+            background: #f8f9fa;
+            border-color: #b0b3b5;
+        }
+        /* Salesman Link Styles */
+        .salesman-link {
+            color: #005d41;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+        .salesman-link:hover {
+            color: #003e2b;
+            text-decoration: underline !important;
+        }
+        /* Filter Panel */
+        .filter-panel {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../../index.html">
+                <img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                        <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Rute/index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <!-- HEADER & BREADCRUMBS -->
+                <div class="d-flex align-items-center justify-content-between mb-3" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h2 class="title-visit mb-1">Kunjungan</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item">Tracking</li>
+                                <li class="breadcrumb-item active">Daily Visit</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <!-- CONTROLS -->
+                    <div class="control-bar">
+                        <div class="search-wrapper">
+                            <input type="text" class="form-control" id="customSearch" placeholder="Cari..."/>
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <button class="btn btn-control" id="btnFilter">
+                            <i class="fa fa-filter"></i> Filter
+                        </button>
+                        <button class="btn btn-control" id="btnSettings">
+                            <i class="fa fa-cog"></i> Pengaturan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FILTER PANEL -->
+                <div class="filter-panel" id="filterPanel">
+                    <h6 class="fw-bold mb-3"><i class="fa fa-sliders-h me-1 text-success"></i> Filter Kunjungan</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">Nama Salesman</label>
+                            <input type="text" class="form-control form-control-sm" id="filterName" placeholder="Nama Salesman..."/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Bulan/Tahun</label>
+                            <select class="form-select form-select-sm" id="filterMonth">
+                                <option value="">Semua Periode</option>
+                                <option value="2026-06" selected>Juni 2026</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button class="btn btn-success btn-sm w-100" id="applyFilters">Terapkan</button>
+                            <button class="btn btn-secondary btn-sm w-100" id="resetFilters">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATA TABLE CARD -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-visit mb-0" id="tblVisit">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nama</th>
+                                        <th>Visited</th>
+                                        <th>Waktu Mulai</th>
+                                        <th>Waktu Akhir</th>
+                                        <th style="text-align: right;">Total Penjualan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblBody">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FOOTER -->
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+    let table;
+    const fmt = v => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
+    function formatDateDisplay(dateStr) {
+        // Parse "YYYY-MM-DD" to "DD-MM-YYYY"
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateStr;
+    }
+
+    function loadVisitData() {
+        $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
+            let listData = [];
+            
+            // Loop through all dates in the sales JSON
+            Object.keys(data).forEach(dateKey => {
+                const daySales = data[dateKey];
+                
+                // Loop through all salesman entries on this date
+                Object.keys(daySales).forEach(salesmanId => {
+                    const s = daySales[salesmanId];
+                    listData.push({
+                        dateKey: dateKey,
+                        dateDisplay: formatDateDisplay(dateKey),
+                        id: s.id,
+                        name: s.name,
+                        visited: s.visits.length,
+                        startTime: s.startTime + ':00',
+                        endTime: s.endTime + ':00',
+                        invoice: s.invoice
+                    });
+                });
+            });
+
+            // Sort by Date Descending
+            listData.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+
+            // Populate table body
+            const body = $('#tblBody');
+            body.empty();
+            
+            listData.forEach((row, index) => {
+                // Link name to Geografis map view page with date and salesman queries
+                const mapLink = `detail.html?date=${row.dateKey}&salesman=${row.id}`;
+                
+                body.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td data-order="${row.dateKey}">${row.dateDisplay}</td>
+                        <td><a href="${mapLink}" class="salesman-link">${row.name}</a></td>
+                        <td>${row.visited}</td>
+                        <td>${row.startTime}</td>
+                        <td>${row.endTime}</td>
+                        <td style="text-align: right; font-weight: 600;">${fmt(row.invoice)}</td>
+                    </tr>
+                `);
+            });
+
+            // Initialize DataTable
+            table = $('#tblVisit').DataTable({
+                pageLength: 10,
+                order: [[1, 'desc']], // Sort by date descending
+                columnDefs: [
+                    { orderable: false, targets: [0, 4, 5] }
+                ],
+                dom: 'rt<"d-flex align-items-center justify-content-between p-3 border-top bg-light"i<"ms-auto"p>>',
+                language: {
+                    zeroRecords: 'Tidak ada data kunjungan ditemukan',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ entri',
+                    paginate: {
+                        previous: '‹',
+                        next: '›'
+                    }
+                }
+            });
+
+            // Bind Custom Search Box
+            $('#customSearch').on('keyup change', function() {
+                table.search(this.value).draw();
+            });
+
+        }).fail(function(jqxhr, textStatus, error) {
+            console.error("Error loading sales data JSON for daily visit:", textStatus, error);
+        });
+    }
+
+    $(document).ready(function() {
+        loadVisitData();
+
+        // Toggle Filter Panel
+        $('#btnFilter').on('click', function() {
+            $('#filterPanel').slideToggle(200);
+        });
+
+        // Filter Actions
+        $('#applyFilters').on('click', function() {
+            const nameQuery = $('#filterName').val().toLowerCase();
+            const monthQuery = $('#filterMonth').val(); // e.g., "2026-06"
+            
+            table.column(2).search(nameQuery); // Filter by Salesman Name
+            table.column(1).search(monthQuery); // Filter by Date
+            table.draw();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Filter Diterapkan',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        });
+
+        $('#resetFilters').on('click', function() {
+            $('#filterName').val('');
+            $('#filterMonth').val('2026-06');
+            
+            table.column(2).search('');
+            table.column(1).search('2026-06');
+            table.draw();
+        });
+
+        // Settings Dialog Mock
+        $('#btnSettings').on('click', function() {
+            Swal.fire({
+                title: 'Pengaturan Kunjungan',
+                html: `
+                    <div class="text-start">
+                        <div class="mb-3">
+                            <label class="form-label small">Batas Maksimal Baris Per Halaman</label>
+                            <select class="form-select" id="swPageLength">
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="swAutoReload" checked>
+                            <label class="form-check-input-label small" for="swAutoReload">Muat Ulang Otomatis (Real-time)</label>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005d41',
+                confirmButtonText: 'Simpan',
+                showCancelButton: true,
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newLength = parseInt($('#swPageLength').val());
+                    table.page.len(newLength).draw();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengaturan Disimpan',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1200
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

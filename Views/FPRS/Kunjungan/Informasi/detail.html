@@ -1,0 +1,692 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Tabel Kunjungan – Falcon FPRS</title>
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-weight: 400;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"/>
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../../../wwwroot/css/layout.css"/>
+    <style>
+        .title-detail {
+            font-family: 'Kalbe Geometric', sans-serif;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #212529;
+        }
+
+        /* Detail Cards Layout */
+        .info-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #212529;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6c757d;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .meta-val {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 12px;
+        }
+
+        .meta-val-link {
+            color: #005d41;
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .meta-val-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Map & Stats Split Panel */
+        .kunjungan-pesanan-grid {
+            display: flex;
+            gap: 20px;
+            min-height: 250px;
+        }
+
+        .detail-map-box {
+            flex: 1.2;
+            height: 250px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #detailMap {
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-legend {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ced4da;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            gap: 12px;
+            z-index: 5;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* 10-Item Metrics Grid */
+        .detail-metrics-box {
+            flex: 1.8;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .metric-cell {
+            border-bottom: 1px solid #f1f3f5;
+            padding-bottom: 6px;
+        }
+
+        .metric-cell-lbl {
+            font-size: 0.75rem;
+            color: #868e96;
+            margin-bottom: 2px;
+        }
+
+        .metric-cell-val {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        /* Bottom Table Styles */
+        .table-detail-list th {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #dee2e6 !important;
+            padding: 10px 12px !important;
+        }
+
+        .table-detail-list td {
+            font-size: 0.8rem;
+            padding: 10px 12px !important;
+            vertical-align: middle;
+            color: #495057;
+        }
+
+        .store-code {
+            font-size: 0.7rem;
+            color: #868e96;
+        }
+    </style>
+</head>
+<body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../../index.html">
+                <img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                        <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Rute/index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <!-- HEADER & BREADCRUMBS -->
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <div>
+                        <h2 class="title-detail mb-1">Detail Tabel Kunjungan</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Daily Visit</a></li>
+                                <li class="breadcrumb-item active" id="breadcrumbSalesName">Detail</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- TOP SECTION: INFO & GRID -->
+                <div class="row g-3 mb-4">
+                    <!-- Left card: Informasi Kunjungan -->
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="info-card-title">Informasi Kunjungan</div>
+                                
+                                <div class="meta-label"><i class="fa fa-user me-1"></i> Nama</div>
+                                <div class="meta-val">
+                                    <a href="#" class="meta-val-link" id="detName">-</a>
+                                </div>
+
+                                <div class="meta-label"><i class="fa fa-calendar-alt me-1"></i> Tanggal</div>
+                                <div class="meta-val" id="detDate">-</div>
+
+                                <div class="meta-label"><i class="fa fa-clock me-1"></i> Tanggal Mulai</div>
+                                <div class="meta-val" id="detStart">-</div>
+
+                                <div class="meta-label"><i class="fa fa-flag-checkered me-1"></i> Tanggal Selesai</div>
+                                <div class="meta-val" id="detEnd">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right card: Kunjungan & Pesanan -->
+                    <div class="col-md-9">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="info-card-title">Kunjungan & Pesanan</div>
+                                
+                                <div class="kunjungan-pesanan-grid">
+                                    <!-- Map Component -->
+                                    <div class="detail-map-box">
+                                        <div class="map-legend">
+                                            <div class="legend-item">
+                                                <div class="legend-dot" style="background: #e65100;"></div>
+                                                <span>Salesman</span>
+                                            </div>
+                                            <div class="legend-item">
+                                                <div class="legend-dot" style="background: #f5b041;"></div>
+                                                <span>Canvasser</span>
+                                            </div>
+                                            <div class="legend-item">
+                                                <div class="legend-dot" style="background: #2b8a3e;"></div>
+                                                <span>Salesman & Canvasser</span>
+                                            </div>
+                                        </div>
+                                        <div id="detailMap"></div>
+                                    </div>
+
+                                    <!-- 10-Item Metrics Grid -->
+                                    <div class="detail-metrics-box">
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Total Visited</div>
+                                            <div class="metric-cell-val" id="metVisited">0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Unvisited</div>
+                                            <div class="metric-cell-val"><span id="metUnvisited">0</span> <a href="#" class="text-success small ms-1" style="font-size:0.65rem;">Detail selengkapnya</a></div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Planned</div>
+                                            <div class="metric-cell-val" id="metPlanned">0/0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Unplanned</div>
+                                            <div class="metric-cell-val" id="metUnplanned">0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Out of Store</div>
+                                            <div class="metric-cell-val" id="metOos">0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Kunjungan Efektif</div>
+                                            <div class="metric-cell-val" id="metEffective">0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">No Sale</div>
+                                            <div class="metric-cell-val" id="metNoSale">0</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Total Pesanan Penjualan</div>
+                                            <div class="metric-cell-val" id="metSalesmanVal">Rp 0,00</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Total Penjualan Canvass</div>
+                                            <div class="metric-cell-val" id="metCanvassVal">Rp 0,00</div>
+                                        </div>
+                                        <div class="metric-cell">
+                                            <div class="metric-cell-lbl">Total Penjualan</div>
+                                            <div class="metric-cell-val text-success" style="font-size: 0.95rem; font-weight: 800;" id="metTotalVal">Rp 0,00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTTOM SECTION: TABLE -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="info-card-title d-flex align-items-center justify-content-between mb-3">
+                            <span>Daftar Kunjungan</span>
+                            <span class="badge bg-success" id="tblStoreCount" style="font-size: 0.75rem; padding: 4px 8px;">0 Pelanggan</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-detail-list" id="tblDetail">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">No</th>
+                                        <th>Pelanggan</th>
+                                        <th>Check In & Out Time</th>
+                                        <th>Posisi</th>
+                                        <th>PSEQ</th>
+                                        <th>ASEQ</th>
+                                        <th style="text-align: right;">Total Pesanan Penjualan</th>
+                                        <th style="text-align: right;">Total Penjualan Canvass</th>
+                                        <th style="text-align: right;">Total Penjualan</th>
+                                        <th style="text-align: center;">Catatan</th>
+                                        <th style="text-align: right;">OOS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblDetailBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BACK TO LIST BUTTON -->
+                <div class="mb-4">
+                    <a href="index.html" class="btn btn-outline-success btn-sm"><i class="fa fa-arrow-left me-1"></i> Kembali ke list</a>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+    let map;
+    let mapMarkers = [];
+    const fmt = v => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
+    function formatDateDisplay(dateStr) {
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateStr;
+    }
+
+    $(document).ready(function() {
+        // Parse URL Parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const dateParam = urlParams.get('date') || '2026-06-05';
+        const salesmanParam = urlParams.get('salesman') || '106201';
+
+        // Load JSON Data
+        $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
+            const dayData = data[dateParam];
+            if (!dayData || !dayData[salesmanParam]) {
+                alert("Data Kunjungan tidak ditemukan!");
+                window.location.href = "index.html";
+                return;
+            }
+
+            const s = dayData[salesmanParam];
+            
+            // Set Breadcrumb & Left Panel Info
+            $('#breadcrumbSalesName').text(s.name);
+            $('#detName').text(s.name).attr('href', `../Geografis/index.html?date=${dateParam}&salesman=${s.id}`);
+            $('#detDate').text(formatDateDisplay(dateParam));
+            $('#detStart').text(`${formatDateDisplay(dateParam)} | ${s.startTime}`);
+            $('#detEnd').text(`${formatDateDisplay(dateParam)} | ${s.endTime}`);
+
+            // Set Metrics
+            const totalVisited = s.visits.length;
+            const effectiveVisits = s.effective;
+            const noSaleCount = totalVisited - effectiveVisits;
+            
+            $('#metVisited').text(totalVisited);
+            $('#metUnvisited').text(s.unvisited);
+            $('#metPlanned').text(`${s.planned} (visited/target)`);
+            $('#metUnplanned').text(s.unplanned);
+            $('#metOos').text(totalVisited); // Default matching SimpliDOTS behavior
+            $('#metEffective').text(effectiveVisits);
+            $('#metNoSale').text(noSaleCount);
+            
+            // Separate Salesman (order booking) vs Canvasser sales values
+            let salesmanTotal = 0;
+            let canvasserTotal = 0;
+
+            s.visits.forEach(v => {
+                if (v.role === 'Salesman') salesmanTotal += v.invoice;
+                else canvasserTotal += v.invoice;
+            });
+
+            $('#metSalesmanVal').text(`Rp ${fmt(salesmanTotal)}`);
+            $('#metCanvassVal').text(`Rp ${fmt(canvasserTotal)}`);
+            $('#metTotalVal').text(`Rp ${fmt(s.invoice)}`);
+
+            $('#tblStoreCount').text(`${totalVisited} Pelanggan`);
+
+            // Populate Table
+            const tbody = $('#tblDetailBody');
+            tbody.empty();
+
+            s.visits.forEach((v, index) => {
+                const orderVal = v.role === 'Salesman' ? `Rp ${fmt(v.invoice)}` : '-';
+                const canvassVal = v.role === 'Canvasser' ? `Rp ${fmt(v.invoice)}` : '-';
+                const totalVal = `Rp ${fmt(v.invoice)}`;
+                
+                let noteIcon = '-';
+                if (v.invoice === 0) {
+                    const reasons = ['Toko Tutup', 'Stok Masih Banyak', 'Pemilik Tidak di Tempat', 'Kredit Limit Melampaui Batas', 'Tidak Ada Kebutuhan'];
+                    // Deterministic index based on store code string
+                    let charSum = 0;
+                    for (let i = 0; i < v.code.length; i++) charSum += v.code.charCodeAt(i);
+                    const reason = reasons[charSum % reasons.length];
+                    noteIcon = `<i class="fa fa-comment-dots text-secondary" style="cursor: pointer; font-size: 0.9rem;" data-bs-toggle="tooltip" data-bs-placement="top" title="${reason}"></i>`;
+                }
+                
+                // Colorize OOS distance column based on threshold
+                const isFar = parseFloat(v.dist) > 500;
+                const oosStyle = isFar ? 'color:#dc3545; font-weight:600;' : 'color:#2b8a3e;';
+
+                tbody.append(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>
+                            <strong style="color:#005d41;">${v.store}</strong><br/>
+                            <span class="store-code">CS-${v.code}</span>
+                        </td>
+                        <td>${v.inTime} - ${v.outTime}</td>
+                        <td>${v.role}</td>
+                        <td>${v.pseq}</td>
+                        <td>${v.aseq}</td>
+                        <td style="text-align: right;">${orderVal}</td>
+                        <td style="text-align: right;">${canvassVal}</td>
+                        <td style="text-align: right; font-weight:600;">${totalVal}</td>
+                        <td style="text-align: center;">${noteIcon}</td>
+                        <td style="text-align: right; ${oosStyle}">${v.dist}</td>
+                    </tr>
+                `);
+            });
+
+            // Initialize DataTable
+            $('#tblDetail').DataTable({
+                pageLength: 10,
+                dom: 'rt<"d-flex align-items-center justify-content-between p-3 border-top bg-light"i<"ms-auto"p>>',
+                language: {
+                    zeroRecords: 'Tidak ada data kunjungan ditemukan',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ entri',
+                    paginate: {
+                        previous: '‹',
+                        next: '›'
+                    }
+                }
+            });
+
+            // Initialize Bootstrap Tooltips for No Sale reasons
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Render Map Trajectory
+            const center = s.center || [106.8271, -6.1754];
+            map = new maplibregl.Map({
+                container: 'detailMap',
+                style: 'https://tiles.openfreemap.org/styles/liberty',
+                center: center,
+                zoom: 12
+            });
+
+            map.on('load', function() {
+                const coordinates = s.visits.map(v => v.coords);
+
+                // Add route line source
+                map.addSource('route', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'Feature',
+                        'properties': {},
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': coordinates
+                        }
+                    }
+                });
+
+                // White outline casing
+                map.addLayer({
+                    'id': 'route-casing',
+                    'type': 'line',
+                    'source': 'route',
+                    'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                    'paint': {
+                        'line-color': '#fff',
+                        'line-width': 8
+                    }
+                });
+
+                // Main route line (green)
+                map.addLayer({
+                    'id': 'route-line',
+                    'type': 'line',
+                    'source': 'route',
+                    'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                    'paint': {
+                        'line-color': '#005d41',
+                        'line-width': 4
+                    }
+                });
+
+                // Sequence Markers
+                s.visits.forEach(v => {
+                    const el = document.createElement('div');
+                    el.className = 'custom-marker';
+                    el.style.width = '20px';
+                    el.style.height = '20px';
+                    el.style.borderRadius = '50%';
+                    // Marker color based on role
+                    const color = v.role === 'Salesman' ? '#e65100' : (v.role === 'Canvasser' ? '#f5b041' : '#2b8a3e');
+                    el.style.backgroundColor = color;
+                    el.style.color = '#fff';
+                    el.style.fontSize = '0.65rem';
+                    el.style.fontWeight = 'bold';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.border = '1.5px solid #fff';
+                    el.innerText = v.aseq;
+
+                    const marker = new maplibregl.Marker({ element: el })
+                        .setLngLat(v.coords)
+                        .setPopup(new maplibregl.Popup({ offset: 15 }).setHTML(`
+                            <div style="font-family: 'Kalbe Geometric'; font-size: 0.75rem; padding: 2px;">
+                                <strong style="color: #005d41;">${v.store}</strong><br/>
+                                <span style="color:#6c757d;">Code: CS-${v.code}</span><br/>
+                                <span>Check In: ${v.inTime}</span><br/>
+                                <span>Total: Rp ${v.invoice.toLocaleString('id-ID')}</span>
+                            </div>
+                        `))
+                        .addTo(map);
+
+                    mapMarkers.push(marker);
+                });
+
+                // Auto Fit Bounds
+                const bounds = new maplibregl.LngLatBounds();
+                coordinates.forEach(c => bounds.extend(c));
+                map.fitBounds(bounds, { padding: 40, maxZoom: 14 });
+            });
+
+        }).fail(function(jqxhr, textStatus, error) {
+            console.error("Error loading JSON for detail view:", textStatus, error);
+        });
+    });
+</script>
+</body>
+</html>

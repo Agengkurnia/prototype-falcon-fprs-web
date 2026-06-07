@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,37 +16,10 @@
     <div class="container-fluid page-body-wrapper">
         <!-- SIDEBAR -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
-            <ul class="nav">
-                <!-- Penjualan (Parent with children) -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
-                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
-                        <span class="menu-title">Penjualan</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="fprs-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
-                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <!-- Kunjungan (Parent with children) -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="false" aria-controls="kunjungan-menu">
-                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
-                        <span class="menu-title">Kunjungan</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="kunjungan-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Geografis/index.html">Geografis Kunjungan</a></li>
-                        </ul>
-                    </div>
-                </li>
+                        <ul class="nav">
                 <!-- Data Master -->
                 <li class="nav-item nav-parent active">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="true">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="true" aria-controls="master-data-menu">
                         <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
                         <span class="menu-title">Data Master</span>
                         <i class="fa fa-chevron-right menu-arrow"></i>
@@ -61,7 +34,7 @@
                                 </a>
                                 <div class="collapse" id="sub-produk">
                                     <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="index.html">Master Produk</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../Unit/index.html">Unit</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../Divisi/index.html">Divisi</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../DaftarHarga/index.html">Daftar Harga</a></li>
@@ -125,6 +98,35 @@
                                     </ul>
                                 </div>
                             </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="false" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Informasi/index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Rute/index.html">Management Rute</a></li>
                         </ul>
                     </div>
                 </li>

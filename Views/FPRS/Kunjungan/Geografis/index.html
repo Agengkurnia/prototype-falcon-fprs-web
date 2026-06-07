@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" />
@@ -393,34 +393,7 @@
     <div class="container-fluid page-body-wrapper">
         <!-- SIDEBAR -->
         <nav class="sidebar sidebar-offcanvas" id="sidebar">
-            <ul class="nav">
-                <!-- Penjualan (Parent with children) -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
-                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
-                        <span class="menu-title">Penjualan</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="fprs-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
-                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <!-- Kunjungan (Parent with children) -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
-                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
-                        <span class="menu-title">Kunjungan</span>
-                        <i class="fa fa-chevron-down menu-arrow"></i>
-                    </a>
-                    <div class="collapse show" id="kunjungan-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu active" href="index.html">Geografis Kunjungan</a></li>
-                        </ul>
-                    </div>
-                </li>
+                        <ul class="nav">
                 <!-- Data Master -->
                 <li class="nav-item nav-parent">
                     <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
@@ -469,28 +442,68 @@
                                 <div class="collapse" id="sub-pegawai">
                                     <ul class="nav flex-column sub-sub-menu">
                                         <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../../MasterData/Posisi/index.html">Posisi</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
                                     </ul>
                                 </div>
                             </li>
-                            <!-- Transaksi Subgroup -->
+                            <!-- Keuangan Subgroup -->
                             <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-transaksi" aria-expanded="false">
-                                    <span>Transaksi</span>
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
                                     <i class="fa fa-chevron-right sub-arrow"></i>
                                 </a>
-                                <div class="collapse" id="sub-transaksi">
+                                <div class="collapse" id="sub-keuangan">
                                     <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
                                         <li><a class="nav-link child-link text-submenu" href="../../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
                                     </ul>
                                 </div>
                             </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../Informasi/index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Rute/index.html">Management Rute</a></li>
                         </ul>
                     </div>
                 </li>
@@ -577,49 +590,27 @@ $(document).ready(function() {
     // ----------------------------------------------------
     // MOCK DATA: SALESMEN & VISITS COORDINATES
     // ----------------------------------------------------
-    const SALES_DATA = {
-        "202615": {
-            id: "202615",
-            name: "CIREBON2",
-            planned: "0/0",
-            unplanned: 10,
-            unvisited: 0,
-            oos: 2,
-            effective: 10,
-            invoice: 888000,
-            distance: "21.41 km",
-            startTime: "10:15",
-            endTime: "18:46",
-            center: [108.557, -6.722], // Cirebon area
-            visits: [
-                { aseq: 1, code: "CS-260150001", store: "Tk Cirebon Mart", coords: [108.552, -6.720], inTime: "10:15:30", outTime: "10:25:12", duration: "10 min", dist: "0 m", role: "Canvasser", invoice: 250000 },
-                { aseq: 2, code: "CS-260150002", store: "Apotek Sehat Cirebon", coords: [108.555, -6.723], inTime: "11:02:18", outTime: "11:08:45", duration: "6 min", dist: "450 m", role: "Canvasser", invoice: 120000 },
-                { aseq: 3, code: "CS-260150003", store: "Tk Sembako Barokah", coords: [108.560, -6.721], inTime: "11:45:00", outTime: "11:59:10", duration: "14 min", dist: "600 m", role: "Canvasser", invoice: 518000 }
-            ]
-        },
-        "202633": {
-            id: "202633",
-            name: "MALANG4",
-            planned: "0/0",
-            unplanned: 30,
-            unvisited: 0,
-            oos: 6,
-            effective: 20,
-            invoice: 1479000,
-            distance: "104.32 km",
-            startTime: "07:33",
-            endTime: "16:38",
-            center: [107.032, -6.295], // Bekasi Setu area as per screenshot
-            visits: [
-                { aseq: 1, code: "CS-260152774", store: "Tk Pak Yudi", coords: [107.032, -6.295], inTime: "07:33:24", outTime: "07:33:44", duration: "< 1 minute", dist: "8 m", role: "Canvasser", invoice: 52000 },
-                { aseq: 2, code: "CS-260148189", store: "Tk Zamroni", coords: [107.035, -6.298], inTime: "07:39:18", outTime: "07:39:47", duration: "< 1 minute", dist: "18 m", role: "Canvasser", invoice: 70000 },
-                { aseq: 3, code: "CS-260148187", store: "Tk Bu Sria", coords: [107.037, -6.301], inTime: "08:12:49", outTime: "08:13:16", duration: "< 1 minute", dist: "25 m", role: "Canvasser", invoice: 1357000 }
-            ]
-        }
-    };
+// MOCK DATA: SALESMEN & VISITS COORDINATES BY DATE (June 2026 - Jakarta Area)
+    // ----------------------------------------------------
+    let SALES_DATA_BY_DATE = {};
 
-    let activeSalesId = null;
+    let SALES_DATA = {};
+    
+    // Parse URL Parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date'); // e.g. "2026-06-15"
+    const salesmanParam = urlParams.get('salesman'); // e.g. "106207"
+
+    let activeSalesId = salesmanParam || null;
     let mapMarkers = [];
+    let currentDate = new Date(2026, 5, 5); // Default to June 5, 2026
+    
+    if (dateParam) {
+        const parts = dateParam.split('-');
+        if (parts.length === 3) {
+            currentDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        }
+    }
 
     // ----------------------------------------------------
     // INITIALIZE MAPLIBRE GL JS
@@ -627,11 +618,101 @@ $(document).ready(function() {
     const map = new maplibregl.Map({
         container: 'map',
         style: 'https://tiles.openfreemap.org/styles/liberty', // Free high-performance OSM Vector Style
-        center: [107.032, -6.295], // Default center around setu/bekasi
-        zoom: 12
+        center: [106.8271, -6.1754], // Default center around Jakarta
+        zoom: 11
     });
 
-    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    // Helper functions for date navigation and formatting
+    function formatDateForDisplay(date) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = months[date.getMonth()];
+        const y = date.getFullYear();
+        return `${d} ${m} ${y}`;
+    }
+
+    function formatDateKey(date) {
+        const d = String(date.getDate()).padStart(2, '0');
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${y}-${m}-${d}`;
+    }
+
+    // Helper to calculate total active salesmen count for summary metrics
+    function updateSummaryMetrics(salesData) {
+        let activeSalesmenCount = Object.keys(salesData).length;
+        let totalOrders = 0;
+        let totalCanvass = 0;
+        let totalVisited = 0;
+        let grandTotal = 0;
+
+        Object.keys(salesData).forEach(key => {
+            const s = salesData[key];
+            totalVisited += s.visits.length;
+            grandTotal += s.invoice;
+            
+            s.visits.forEach(v => {
+                if (v.invoice > 0) totalOrders++;
+                if (v.role === 'Canvasser') totalCanvass++;
+            });
+        });
+
+        // Update UI summary elements
+        $('.summary-header-grid .summary-header-item').eq(0).find('.val').text(activeSalesmenCount);
+        $('.summary-header-grid .summary-header-item').eq(1).find('.val').text(totalOrders);
+        $('.summary-header-grid .summary-header-item').eq(2).find('.val').text(totalCanvass);
+        $('.summary-header-grid .summary-header-item').eq(3).find('.val').text(totalVisited);
+        
+        $('#lblGrandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
+    }
+
+    function loadDateData() {
+        const dateKey = formatDateKey(currentDate);
+        $('#txtCurrentDate').text(formatDateForDisplay(currentDate));
+        
+        // Reset active salesman and details panel
+        activeSalesId = null;
+        $('#rightPanel').addClass('collapsed');
+        clearMap();
+        
+        // Get current date's data
+        SALES_DATA = SALES_DATA_BY_DATE[dateKey] || {};
+        
+        // Update center of map to first active salesman or default to Jakarta
+        let center = [106.8271, -6.1754];
+        const keys = Object.keys(SALES_DATA);
+        if (keys.length > 0) {
+            center = SALES_DATA[keys[0]].center;
+        }
+        
+        map.jumpTo({
+            center: center,
+            zoom: 11
+        });
+        
+        // Re-render components
+        renderSalesList();
+        updateSummaryMetrics(SALES_DATA);
+    }
+
+    // Set up Date Picker Navigation Click Handlers
+    $('#btnPrevDate').on('click', function() {
+        // Constrain to June 2026
+        if (currentDate.getDate() > 1) {
+            currentDate.setDate(currentDate.getDate() - 1);
+            loadDateData();
+        }
+    });
+
+    $('#btnNextDate').on('click', function() {
+        // Constrain to June 2026
+        if (currentDate.getDate() < 30) {
+            currentDate.setDate(currentDate.getDate() + 1);
+            loadDateData();
+        }
+    });
+
+        map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
     // ----------------------------------------------------
     // RENDER SALES LIST
@@ -642,7 +723,7 @@ $(document).ready(function() {
 
         Object.keys(SALES_DATA).forEach(key => {
             const s = SALES_DATA[key];
-            const isActive = activeSalesId === s.id;
+            const isActive = activeSalesId !== null && String(activeSalesId) === String(s.id);
             
             const cardHtml = `
                 <div class="sales-card ${isActive ? 'active-sales' : ''}" data-id="${s.id}">
@@ -693,7 +774,22 @@ $(document).ready(function() {
         });
     }
 
-    renderSalesList();
+    // Load external JSON data dynamically
+    $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
+        SALES_DATA_BY_DATE = data;
+        loadDateData();
+        
+        if (salesmanParam && SALES_DATA[salesmanParam]) {
+            activeSalesId = salesmanParam;
+            // Short delay to ensure map canvas is loaded and ready
+            setTimeout(() => {
+                viewSalesRoute(salesmanParam);
+                renderSalesList();
+            }, 600);
+        }
+    }).fail(function(jqxhr, textStatus, error) {
+        console.error("Error loading sales data JSON:", textStatus, error);
+    });
 
     // ----------------------------------------------------
     // MAP INTERACTION & ROUTE RENDERING
@@ -801,7 +897,7 @@ $(document).ready(function() {
                     <div class="visit-metric-grid">
                         <div class="visit-metric-item">
                             <span class="visit-metric-lbl">Pseq</span>
-                            <span class="visit-metric-val">0</span>
+                            <span class="visit-metric-val">${v.pseq}</span>
                         </div>
                         <div class="visit-metric-item">
                             <span class="visit-metric-lbl">Aseq</span>
@@ -823,9 +919,9 @@ $(document).ready(function() {
     // Handle clicks on "Lihat Jarak" / "Sembunyikan Jarak"
     $(document).on('click', '.btn-view-route', function(e) {
         e.stopPropagation();
-        const id = $(this).data('id');
+        const id = String($(this).data('id'));
         
-        if (activeSalesId === id) {
+        if (String(activeSalesId) === String(id)) {
             // Hide route
             activeSalesId = null;
             clearMap();
@@ -840,7 +936,7 @@ $(document).ready(function() {
 
     // Handle card clicks
     $(document).on('click', '.sales-card', function() {
-        const id = $(this).data('id');
+        const id = String($(this).data('id'));
         activeSalesId = id;
         viewSalesRoute(id);
         renderSalesList();

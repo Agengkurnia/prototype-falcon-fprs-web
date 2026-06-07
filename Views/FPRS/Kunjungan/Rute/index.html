@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Management Rute – Falcon FPRS</title>
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-weight: 400;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <!-- MapLibre GL JS -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../../../wwwroot/css/layout.css"/>
+    <style>
+        .content-wrapper-route {
+            padding: 0;
+            background: #f8f9fa;
+        }
+        
+        .route-header-bar {
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+        }
+
+        .route-daily-panels-row {
+            display: flex;
+            flex-direction: row;
+            height: 520px;
+            overflow: hidden;
+            border-bottom: 2px solid #dee2e6;
+            background: #fff;
+        }
+
+        .route-panel-col {
+            flex: 0 0 270px;
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .route-panel-col-map {
+            flex: 1;
+            position: relative;
+            background: #f1f3f5;
+        }
+
+        .route-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e7f5ff;
+            color: #03a9f4;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        .route-input-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .route-search-wrapper {
+            position: relative;
+        }
+
+        .route-search-wrapper input {
+            padding-right: 30px;
+        }
+
+        .route-search-wrapper i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .route-list-group {
+            flex: 1;
+            overflow-y: auto;
+            margin-right: -5px;
+            padding-right: 5px;
+        }
+
+        .route-item-card {
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .route-item-card:hover {
+            border-color: #ced4da;
+            background: #f8f9fa;
+        }
+
+        .route-item-card.active-route {
+            border-color: #005d41;
+            background: #f1f7e5;
+        }
+
+        .route-item-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .route-item-id {
+            font-size: 0.7rem;
+            color: #868e96;
+            margin-right: 6px;
+        }
+
+        .route-item-delete, .route-item-action {
+            background: none;
+            border: none;
+            color: #adb5bd;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 4px;
+            transition: color 0.15s;
+        }
+
+        .route-item-delete:hover {
+            color: #dc3545;
+        }
+
+        .route-item-action:hover {
+            color: #005d41;
+        }
+
+        /* Drag handle style */
+        .drag-handle {
+            cursor: grab;
+            color: #ced4da;
+            margin-right: 8px;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Map Type Switcher Floating Style */
+        .map-type-floating {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: #fff;
+            padding: 3px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            display: flex;
+            gap: 2px;
+        }
+
+        .btn-map-type {
+            border: none;
+            background: none;
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #495057;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-map-type.active-type {
+            background: #005d41;
+            color: #fff;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Section 2 - Weekly Management */
+        .route-weekly-section {
+            background: #fff;
+            padding: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .weekly-tab-nav {
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .weekly-tab-link {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #495057;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+        }
+
+        .weekly-tab-link.active {
+            color: #005d41;
+            border-bottom-color: #005d41;
+            font-weight: 600;
+        }
+
+        .weekly-table {
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        .weekly-table th {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            padding: 10px 8px;
+            border-bottom: 2px solid #dee2e6;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .weekly-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .weekly-dropdown {
+            font-size: 0.75rem;
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        .weekly-dropdown:focus {
+            border-color: #005d41;
+            outline: 0;
+        }
+
+        .btn-broom-clear {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 2px 6px;
+        }
+
+        .btn-broom-clear:hover {
+            color: #a71d2a;
+        }
+    </style>
+</head>
+<body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../../index.html">
+                <img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-down menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../Informasi/index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper-route">
+                <!-- HEADER BAR -->
+                <div class="route-header-bar d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="fw-bold mb-1" style="font-family: 'Kalbe Geometric'; font-size: 1.15rem; color:#212529;">Perancangan Rute</h4>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item active">Route</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2" id="btnClearAll">
+                            <i class="fa fa-trash-alt"></i> Hapus semua rute
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BODY MODULE -->
+                <div class="route-daily-panels-row">
+                    <!-- PANEL 1: DAFTAR RUTE -->
+                    <div class="route-panel-col">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="route-badge">1</span>
+                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Kelola Rute Harian</span>
+                        </div>
+                        <div class="route-input-group mb-2">
+                            <input type="text" class="form-control" id="newRouteName" placeholder="Tambah rute baru" style="height:32px; font-size:0.75rem;"/>
+                            <button class="btn btn-add btn-sm" id="btnAddRoute" style="background:#005d41; border:none; color:#fff; height:32px; font-size:0.75rem;">+ Tambah</button>
+                        </div>
+                        <div class="route-search-wrapper mb-2">
+                            <input type="text" class="form-control" id="searchRoute" placeholder="Cari rute harian" style="height:32px; font-size:0.75rem;"/>
+                            <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
+                        </div>
+                        <div class="route-list-group" id="routeList">
+                            <!-- Dynamic daily routes -->
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: ITEM RUTE (Outlets in Active Route) -->
+                    <div class="route-panel-col">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fa fa-list-ol text-primary me-2" style="font-size:0.85rem;"></i>
+                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Urutan Pelanggan</span>
+                        </div>
+                        <div class="route-search-wrapper mb-2">
+                            <input type="text" class="form-control" id="searchRouteItems" placeholder="Cari item rute harian" style="height:32px; font-size:0.75rem;"/>
+                            <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
+                        </div>
+                        <div class="route-list-group" id="routeItemList">
+                            <!-- Outlets in active route -->
+                            <div class="text-center text-muted small py-4">Pilih rute untuk melihat pelanggan</div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3: CARI PELANGGAN (Master Database) -->
+                    <div class="route-panel-col">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fa fa-search-location text-success me-2" style="font-size:0.85rem;"></i>
+                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Cari Pelanggan</span>
+                        </div>
+                        <div class="route-search-wrapper mb-2">
+                            <input type="text" class="form-control" id="searchCustomerDB" placeholder="Cari daftar pelanggan" style="height:32px; font-size:0.75rem;"/>
+                            <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
+                        </div>
+                        <div class="route-list-group" id="customerDBList">
+                            <!-- Master customers to add -->
+                        </div>
+                    </div>
+
+                    <!-- PANEL 4: MAP TRAJECTORY -->
+                    <div class="route-panel-col-map">
+                        <div class="map-type-floating">
+                            <button class="btn-map-type active-type" id="btnOSM">OpenStreetMap</button>
+                            <button class="btn-map-type" id="btnGmaps">Google Map</button>
+                        </div>
+                        <div id="map"></div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: WEEKLY MANAGEMENT -->
+                <div class="route-weekly-section">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <span class="route-badge" style="background:#e7f5ff; color:#03a9f4;">2</span>
+                            <span class="fw-bold text-dark" style="font-size: 0.95rem;">Kelola Kunjungan Mingguan</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="position-relative" style="width: 250px;">
+                                <input type="text" class="form-control form-control-sm" id="searchWeeklyPegawai" placeholder="Cari nama atau kode pegawai" style="font-size:0.75rem; padding-right:25px;"/>
+                                <i class="fa fa-search position-absolute text-muted" style="right: 8px; top: 50%; transform: translateY(-50%); font-size: 0.75rem;"></i>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="toggleActivePegawai" checked>
+                                <label class="form-check-label text-dark small fw-medium" for="toggleActivePegawai">Tampilkan Pegawai Tidak Aktif</label>
+                            </div>
+                            <button class="btn btn-light btn-sm border" style="font-size: 0.75rem;"><i class="fa fa-cog"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Weekly Tabs -->
+                    <div class="weekly-tab-nav">
+                        <a class="weekly-tab-link active" data-tab="week1">Minggu 1</a>
+                        <a class="weekly-tab-link" data-tab="week2">Minggu 2</a>
+                        <a class="weekly-tab-link" data-tab="week3">Minggu 3</a>
+                        <a class="weekly-tab-link" data-tab="week4">Minggu 4</a>
+                    </div>
+
+                    <!-- Weekly Grid Table -->
+                    <div class="table-responsive">
+                        <table class="weekly-table table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width: 220px; vertical-align: middle;">Pegawai</th>
+                                    <th style="width: 180px; vertical-align: middle;">Rute Mingguan</th>
+                                    <th style="width: 45px; text-align: center; vertical-align: middle;"><i class="fa fa-broom text-danger"></i></th>
+                                    <th style="vertical-align: middle;">Senin</th>
+                                    <th style="vertical-align: middle;">Selasa</th>
+                                    <th style="vertical-align: middle;">Rabu</th>
+                                    <th style="vertical-align: middle;">Kamis</th>
+                                    <th style="vertical-align: middle;">Jumat</th>
+                                    <th style="vertical-align: middle;">Sabtu</th>
+                                    <th style="vertical-align: middle;">Minggu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="weeklyTableBody">
+                                <!-- Populated dynamically from pegawai.json -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+    const KEY_ROUTES = 'fprs_route_planning_list';
+    const KEY_ROUTE_ITEMS = 'fprs_route_planning_items';
+    const KEY_WEEKLY_ASSIGN = 'fprs_weekly_assignments';
+
+    let activeRouteId = null;
+    let map;
+    let mapMarkers = [];
+    let customersList = [];
+    let employeesList = [];
+    let currentWeekTab = 'week1';
+
+    // Mock coordinates for customers
+    const customerCoordinates = {
+        'CS-001': [106.827153, -6.175402],
+        'CS-002': [106.832968, -6.168748],
+        'CS-003': [106.844391, -6.175112],
+        'CS-004': [106.849202, -6.184321],
+        'CS-005': [106.812401, -6.208760],
+        'CS-006': [106.801321, -6.224391],
+        'CS-007': [106.793202, -6.201201],
+        'CS-008': [106.802102, -6.189403],
+        'CS-009': [106.824391, -6.241392],
+        'CS-010': [106.815201, -6.270123],
+        'CS-011': [106.811402, -6.300678],
+        'CS-012': [106.843202, -6.291230],
+        'CS-013': [106.853202, -6.281230],
+        'CS-014': [106.863202, -6.271230],
+        'CS-015': [106.873202, -6.261230]
+    };
+
+    const defaultRoutes = [
+        { id: '81105', name: 'All Route' },
+        { id: '81106', name: 'Rute Jakarta Pusat' },
+        { id: '81107', name: 'Rute Jakarta Selatan' },
+        { id: '81108', name: 'Rute Jakarta Barat' }
+    ];
+
+    const defaultRouteItems = {
+        '81105': ['CS-001', 'CS-004', 'CS-014'],
+        '81106': ['CS-001', 'CS-004'],
+        '81107': ['CS-009', 'CS-011'],
+        '81108': ['CS-006']
+    };
+
+    function getRoutes() {
+        const stored = localStorage.getItem(KEY_ROUTES);
+        if (!stored) {
+            localStorage.setItem(KEY_ROUTES, JSON.stringify(defaultRoutes));
+            return defaultRoutes;
+        }
+        return JSON.parse(stored);
+    }
+
+    function saveRoutes(routes) {
+        localStorage.setItem(KEY_ROUTES, JSON.stringify(routes));
+    }
+
+    function getRouteItems(routeId) {
+        const stored = localStorage.getItem(KEY_ROUTE_ITEMS);
+        let itemsMap = stored ? JSON.parse(stored) : defaultRouteItems;
+        if (!itemsMap[routeId]) {
+            itemsMap[routeId] = [];
+            localStorage.setItem(KEY_ROUTE_ITEMS, JSON.stringify(itemsMap));
+        }
+        return itemsMap[routeId];
+    }
+
+    function saveRouteItems(routeId, items) {
+        const stored = localStorage.getItem(KEY_ROUTE_ITEMS);
+        let itemsMap = stored ? JSON.parse(stored) : defaultRouteItems;
+        itemsMap[routeId] = items;
+        localStorage.setItem(KEY_ROUTE_ITEMS, JSON.stringify(itemsMap));
+    }
+
+    function getWeeklyAssignments() {
+        const stored = localStorage.getItem(KEY_WEEKLY_ASSIGN);
+        return stored ? JSON.parse(stored) : {};
+    }
+
+    function saveWeeklyAssignments(assignments) {
+        localStorage.setItem(KEY_WEEKLY_ASSIGN, JSON.stringify(assignments));
+    }
+
+    // Initialize MapLibre
+    function initMap() {
+        map = new maplibregl.Map({
+            container: 'map',
+            style: 'https://tiles.openfreemap.org/styles/liberty',
+            center: [106.8271, -6.1754],
+            zoom: 11
+        });
+        map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    }
+
+    function clearRouteLayer() {
+        mapMarkers.forEach(m => m.remove());
+        mapMarkers = [];
+
+        if (map.getLayer('route-line')) map.removeLayer('route-line');
+        if (map.getLayer('route-casing')) map.removeLayer('route-casing');
+        if (map.getSource('route')) map.removeSource('route');
+    }
+
+    function drawRouteOnMap() {
+        clearRouteLayer();
+        if (!activeRouteId) return;
+
+        const items = getRouteItems(activeRouteId);
+        if (items.length === 0) return;
+
+        // Map assigned codes to coordinates
+        const coords = [];
+        items.forEach(code => {
+            if (customerCoordinates[code]) {
+                coords.push(customerCoordinates[code]);
+            }
+        });
+
+        if (coords.length === 0) return;
+
+        // Draw LineString if coordinates > 1
+        if (coords.length > 1) {
+            map.addSource('route', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': coords
+                    }
+                }
+            });
+
+            // White border casing
+            map.addLayer({
+                'id': 'route-casing',
+                'type': 'line',
+                'source': 'route',
+                'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                'paint': {
+                    'line-color': '#fff',
+                    'line-width': 8
+                }
+            });
+
+            // Green line
+            map.addLayer({
+                'id': 'route-line',
+                'type': 'line',
+                'source': 'route',
+                'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                'paint': {
+                    'line-color': '#005d41',
+                    'line-width': 4
+                }
+            });
+        }
+
+        // Add markers
+        coords.forEach((c, index) => {
+            const el = document.createElement('div');
+            el.style.width = '22px';
+            el.style.height = '22px';
+            el.style.borderRadius = '50%';
+            el.style.backgroundColor = '#005d41';
+            el.style.color = '#fff';
+            el.style.fontSize = '0.7rem';
+            el.style.fontWeight = 'bold';
+            el.style.display = 'flex';
+            el.style.alignItems = 'center';
+            el.style.justifyContent = 'center';
+            el.style.border = '2px solid #fff';
+            el.innerText = index + 1;
+
+            const m = new maplibregl.Marker({ element: el })
+                .setLngLat(c)
+                .addTo(map);
+            mapMarkers.push(m);
+        });
+
+        // Fit map bounds
+        const bounds = new maplibregl.LngLatBounds();
+        coords.forEach(c => bounds.extend(c));
+        map.fitBounds(bounds, { padding: 50, maxZoom: 14 });
+    }
+
+    function renderRoutesList(query = '') {
+        const routes = getRoutes();
+        const list = $('#routeList');
+        list.empty();
+
+        const filtered = routes.filter(r => r.name.toLowerCase().includes(query.toLowerCase()));
+
+        if (filtered.length === 0) {
+            list.append(`<div class="text-center text-muted small py-4">Tidak ada rute</div>`);
+            return;
+        }
+
+        filtered.forEach(r => {
+            const isActive = String(activeRouteId) === String(r.id);
+            list.append(`
+                <div class="route-item-card ${isActive ? 'active-route' : ''}" data-id="${r.id}">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-map-marked text-success me-2" style="font-size:0.8rem;"></i>
+                            <span class="route-item-name">${r.name}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="route-item-id">${r.id}</span>
+                            <button class="route-item-delete" data-id="${r.id}" title="Hapus Rute">
+                                <i class="fa fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    function renderActiveRouteItems(query = '') {
+        const list = $('#routeItemList');
+        list.empty();
+
+        if (!activeRouteId) {
+            list.append(`<div class="text-center text-muted small py-4">Pilih rute untuk melihat pelanggan</div>`);
+            return;
+        }
+
+        const items = getRouteItems(activeRouteId);
+        if (items.length === 0) {
+            list.append(`<div class="text-center text-muted small py-4">Rute ini belum memiliki pelanggan</div>`);
+            return;
+        }
+
+        let renderedCount = 0;
+        items.forEach((code, index) => {
+            const cust = customersList.find(c => c.kode === code);
+            if (cust) {
+                if (query && !cust.nama.toLowerCase().includes(query.toLowerCase()) && !cust.kode.toLowerCase().includes(query.toLowerCase())) {
+                    return;
+                }
+                renderedCount++;
+                list.append(`
+                    <div class="route-item-card d-flex align-items-center justify-content-between p-2 mb-2" style="cursor: grab;" draggable="true" data-code="${code}" data-index="${index}">
+                        <div class="d-flex align-items-center overflow-hidden">
+                            <i class="fa fa-grip-vertical drag-handle"></i>
+                            <div class="text-truncate">
+                                <strong class="d-block text-truncate" style="font-size:0.75rem; color:#005d41;">${cust.nama}</strong>
+                                <span style="font-size:0.65rem; color:#868e96;">${cust.kode}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-map-marker-alt text-primary me-2" style="font-size:0.75rem;" title="Miliki koordinat"></i>
+                            <button class="route-item-action text-danger remove-item-btn" data-code="${code}" title="Hapus dari Rute">
+                                <i class="fa fa-minus-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                `);
+            }
+        });
+
+        if (renderedCount === 0 && query) {
+            list.append(`<div class="text-center text-muted small py-4">Tidak ada pelanggan cocok</div>`);
+        }
+
+        // Setup Drag & Drop listeners
+        setupDragAndDrop();
+    }
+
+    function renderCustomerDBList(query = '') {
+        const list = $('#customerDBList');
+        list.empty();
+
+        const filtered = customersList.filter(c => {
+            const matchesQuery = c.nama.toLowerCase().includes(query.toLowerCase()) || c.kode.toLowerCase().includes(query.toLowerCase());
+            // Hide customers already in current active route
+            if (activeRouteId) {
+                const activeItems = getRouteItems(activeRouteId);
+                return matchesQuery && !activeItems.includes(c.kode);
+            }
+            return matchesQuery;
+        });
+
+        if (filtered.length === 0) {
+            list.append(`<div class="text-center text-muted small py-4">Tidak ada pelanggan tersedia</div>`);
+            return;
+        }
+
+        filtered.forEach(c => {
+            list.append(`
+                <div class="route-item-card d-flex align-items-center justify-content-between p-2 mb-2">
+                    <div class="text-truncate">
+                        <strong class="d-block text-truncate" style="font-size:0.75rem;">${c.nama}</strong>
+                        <span style="font-size:0.65rem; color:#868e96;">${c.kode}</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <button class="route-item-action text-success add-item-btn" data-code="${c.kode}" title="Tambah ke Rute">
+                            <i class="fa fa-plus-circle" style="font-size:1rem;"></i>
+                        </button>
+                    </div>
+                </div>
+            `);
+        });
+    }
+
+    function setupDragAndDrop() {
+        let dragSrcEl = null;
+
+        const items = document.querySelectorAll('#routeItemList [draggable]');
+        items.forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                dragSrcEl = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', this.getAttribute('data-index'));
+                this.style.opacity = '0.4';
+            });
+
+            item.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+                const cols = document.querySelectorAll('#routeItemList [draggable]');
+                cols.forEach(c => c.style.border = '');
+            });
+
+            item.addEventListener('dragover', function(e) {
+                if (e.preventDefault) {
+                    e.preventDefault();
+                }
+                e.dataTransfer.dropEffect = 'move';
+                return false;
+            });
+
+            item.addEventListener('dragenter', function() {
+                this.style.border = '2px dashed #005d41';
+            });
+
+            item.addEventListener('dragleave', function() {
+                this.style.border = '';
+            });
+
+            item.addEventListener('drop', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                if (dragSrcEl !== this) {
+                    const srcIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                    const destIndex = parseInt(this.getAttribute('data-index'));
+
+                    const activeItems = getRouteItems(activeRouteId);
+                    // Reorder array
+                    const [removed] = activeItems.splice(srcIndex, 1);
+                    activeItems.splice(destIndex, 0, removed);
+
+                    saveRouteItems(activeRouteId, activeItems);
+                    renderActiveRouteItems();
+                    drawRouteOnMap();
+                }
+                return false;
+            });
+        });
+    }
+
+    function renderWeeklyGrid() {
+        const tbody = $('#weeklyTableBody');
+        tbody.empty();
+
+        const query = $('#searchWeeklyPegawai').val().toLowerCase();
+        const showInactive = $('#toggleActivePegawai').is(':checked');
+        const assignments = getWeeklyAssignments();
+        const routesList = getRoutes();
+
+        const filtered = employeesList.filter(emp => {
+            const matchesQuery = emp.nama.toLowerCase().includes(query) || emp.kode.toLowerCase().includes(query);
+            const matchesStatus = showInactive ? true : emp.status === 'Active';
+            return matchesQuery && matchesStatus;
+        });
+
+        if (filtered.length === 0) {
+            tbody.append(`<tr><td colspan="10" class="text-center text-muted small py-4">Tidak ada data pegawai</td></tr>`);
+            return;
+        }
+
+        filtered.forEach(emp => {
+            const assign = assignments[emp.kode] || {};
+            const weekData = assign[currentWeekTab] || { route: '-', days: { Mon: '-', Tue: '-', Wed: '-', Thu: '-', Fri: '-', Sat: '-', Sun: '-' } };
+
+            // Generate main weekly route selector options
+            let weeklyRouteOptions = `<option value="-">Pilih Rute Mingguan</option>`;
+            routesList.forEach(r => {
+                const selected = weekData.route === r.id ? 'selected' : '';
+                weeklyRouteOptions += `<option value="${r.id}" ${selected}>${r.name}</option>`;
+            });
+
+            // Helper to generate daily dropdowns
+            const makeDaySelect = (dayKey) => {
+                const dayVal = weekData.days[dayKey] || '-';
+                let opts = `<option value="-">-</option>`;
+                routesList.forEach(r => {
+                    const selected = dayVal === r.id ? 'selected' : '';
+                    opts += `<option value="${r.id}" ${selected}>${r.name.replace('Rute ', '')}</option>`;
+                });
+                return `<select class="weekly-dropdown day-select" data-emp="${emp.kode}" data-day="${dayKey}">${opts}</select>`;
+            };
+
+            tbody.append(`
+                <tr data-emp="${emp.kode}">
+                    <td>
+                        <strong style="color:#005d41; font-size:0.8rem;">${emp.nama}</strong><br/>
+                        <span class="text-muted" style="font-size:0.65rem;">${emp.kode} (${emp.posisi || 'Salesman'})</span>
+                    </td>
+                    <td>
+                        <select class="weekly-dropdown route-select" data-emp="${emp.kode}">
+                            ${weeklyRouteOptions}
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn-broom-clear btn-clear-row" data-emp="${emp.kode}" title="Bersihkan rute minggu ini">
+                            <i class="fa fa-eraser"></i>
+                        </button>
+                    </td>
+                    <td>${makeDaySelect('Mon')}</td>
+                    <td>${makeDaySelect('Tue')}</td>
+                    <td>${makeDaySelect('Wed')}</td>
+                    <td>${makeDaySelect('Thu')}</td>
+                    <td>${makeDaySelect('Fri')}</td>
+                    <td>${makeDaySelect('Sat')}</td>
+                    <td>${makeDaySelect('Sun')}</td>
+                </tr>
+            `);
+        });
+    }
+
+    $(document).ready(function() {
+        initMap();
+
+        // Load Customers & Employees
+        $.getJSON('../../../../wwwroot/data/pelanggan.json', function(data) {
+            customersList = data;
+            renderCustomerDBList();
+        });
+
+        $.getJSON('../../../../wwwroot/data/pegawai.json', function(data) {
+            employeesList = data;
+            renderWeeklyGrid();
+        });
+
+        renderRoutesList();
+
+        // Handle Card Clicks in Route List
+        $(document).on('click', '#routeList .route-item-card', function(e) {
+            if ($(e.target).closest('.route-item-delete').length) return;
+            const id = String($(this).data('id'));
+            activeRouteId = id;
+            $('#routeList .route-item-card').removeClass('active-route');
+            $(this).addClass('active-route');
+
+            renderActiveRouteItems();
+            renderCustomerDBList();
+            drawRouteOnMap();
+        });
+
+        // Add Route
+        $('#btnAddRoute').on('click', function() {
+            const name = $.trim($('#newRouteName').val());
+            if (!name) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Nama rute tidak boleh kosong!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            const routes = getRoutes();
+            const id = String(Math.floor(10000 + Math.random() * 90000));
+            routes.push({ id: id, name: name });
+            saveRoutes(routes);
+            $('#newRouteName').val('');
+
+            renderRoutesList();
+            renderWeeklyGrid(); // refresh dropdown selections
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Rute Ditambahkan',
+                text: `Rute "${name}" berhasil dibuat.`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+
+        // Delete Individual Route
+        $(document).on('click', '.route-item-delete', function(e) {
+            e.stopPropagation();
+            const id = String($(this).data('id'));
+            const routes = getRoutes();
+            const target = routes.find(r => String(r.id) === id);
+
+            if (!target) return;
+
+            Swal.fire({
+                title: `Hapus Rute "${target.name}"?`,
+                text: "Tindakan ini juga menghapus penugasan rute mingguan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const updated = routes.filter(r => String(r.id) !== id);
+                    saveRoutes(updated);
+                    
+                    if (activeRouteId === id) {
+                        activeRouteId = null;
+                        clearRouteLayer();
+                        renderActiveRouteItems();
+                    }
+
+                    // Clean weekly assignments holding this route
+                    const weeklyAssigns = getWeeklyAssignments();
+                    Object.keys(weeklyAssigns).forEach(empKey => {
+                        Object.keys(weeklyAssigns[empKey]).forEach(weekKey => {
+                            if (weeklyAssigns[empKey][weekKey].route === id) {
+                                weeklyAssigns[empKey][weekKey].route = '-';
+                            }
+                            Object.keys(weeklyAssigns[empKey][weekKey].days).forEach(dayKey => {
+                                if (weeklyAssigns[empKey][weekKey].days[dayKey] === id) {
+                                    weeklyAssigns[empKey][weekKey].days[dayKey] = '-';
+                                }
+                            });
+                        });
+                    });
+                    saveWeeklyAssignments(weeklyAssigns);
+
+                    renderRoutesList();
+                    renderCustomerDBList();
+                    renderWeeklyGrid();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rute Dihapus',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        // Add Customer to Route
+        $(document).on('click', '.add-item-btn', function() {
+            if (!activeRouteId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Rute',
+                    text: 'Silakan pilih salah satu rute harian terlebih dahulu!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                return;
+            }
+            const code = $(this).data('code');
+            const items = getRouteItems(activeRouteId);
+            if (!items.includes(code)) {
+                items.push(code);
+                saveRouteItems(activeRouteId, items);
+                renderActiveRouteItems();
+                renderCustomerDBList();
+                drawRouteOnMap();
+            }
+        });
+
+        // Remove Customer from Route
+        $(document).on('click', '.remove-item-btn', function() {
+            const code = $(this).data('code');
+            const items = getRouteItems(activeRouteId);
+            const filtered = items.filter(item => item !== code);
+            saveRouteItems(activeRouteId, filtered);
+            renderActiveRouteItems();
+            renderCustomerDBList();
+            drawRouteOnMap();
+        });
+
+        // Clear All Routes
+        $('#btnClearAll').on('click', function() {
+            Swal.fire({
+                title: 'Hapus Semua Rute?',
+                text: 'Seluruh konfigurasi harian dan mingguan akan direset!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus Semua',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    saveRoutes([]);
+                    localStorage.removeItem(KEY_ROUTE_ITEMS);
+                    localStorage.removeItem(KEY_WEEKLY_ASSIGN);
+                    activeRouteId = null;
+                    clearRouteLayer();
+                    renderRoutesList();
+                    renderActiveRouteItems();
+                    renderCustomerDBList();
+                    renderWeeklyGrid();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Direset!',
+                        timer: 1200,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        // Search inputs
+        $('#searchRoute').on('input', function() {
+            renderRoutesList(this.value);
+        });
+
+        $('#searchRouteItems').on('input', function() {
+            renderActiveRouteItems(this.value);
+        });
+
+        $('#searchCustomerDB').on('input', function() {
+            renderCustomerDBList(this.value);
+        });
+
+        $('#searchWeeklyPegawai').on('input', function() {
+            renderWeeklyGrid();
+        });
+
+        $('#toggleActivePegawai').on('change', function() {
+            renderWeeklyGrid();
+        });
+
+        // Weekly tabs switching
+        $('.weekly-tab-link').on('click', function() {
+            $('.weekly-tab-link').removeClass('active');
+            $(this).addClass('active');
+            currentWeekTab = $(this).data('tab');
+            renderWeeklyGrid();
+        });
+
+        // Weekly dropdown assignment handler
+        $(document).on('change', '.route-select', function() {
+            const empCode = $(this).data('emp');
+            const routeId = $(this).val();
+            const assignments = getWeeklyAssignments();
+
+            if (!assignments[empCode]) {
+                assignments[empCode] = {};
+            }
+            if (!assignments[empCode][currentWeekTab]) {
+                assignments[empCode][currentWeekTab] = { route: '-', days: { Mon: '-', Tue: '-', Wed: '-', Thu: '-', Fri: '-', Sat: '-', Sun: '-' } };
+            }
+
+            assignments[empCode][currentWeekTab].route = routeId;
+
+            // Auto-populate weekdays with chosen route, Sat & Sun remain empty
+            const daysObj = assignments[empCode][currentWeekTab].days;
+            if (routeId !== '-') {
+                daysObj.Mon = routeId;
+                daysObj.Tue = routeId;
+                daysObj.Wed = routeId;
+                daysObj.Thu = routeId;
+                daysObj.Fri = routeId;
+            } else {
+                daysObj.Mon = '-';
+                daysObj.Tue = '-';
+                daysObj.Wed = '-';
+                daysObj.Thu = '-';
+                daysObj.Fri = '-';
+            }
+            daysObj.Sat = '-';
+            daysObj.Sun = '-';
+
+            saveWeeklyAssignments(assignments);
+            renderWeeklyGrid();
+        });
+
+        // Custom daily weekday selector override
+        $(document).on('change', '.day-select', function() {
+            const empCode = $(this).data('emp');
+            const dayKey = $(this).data('day');
+            const routeId = $(this).val();
+            const assignments = getWeeklyAssignments();
+
+            if (!assignments[empCode]) {
+                assignments[empCode] = {};
+            }
+            if (!assignments[empCode][currentWeekTab]) {
+                assignments[empCode][currentWeekTab] = { route: '-', days: { Mon: '-', Tue: '-', Wed: '-', Thu: '-', Fri: '-', Sat: '-', Sun: '-' } };
+            }
+
+            assignments[empCode][currentWeekTab].days[dayKey] = routeId;
+            saveWeeklyAssignments(assignments);
+        });
+
+        // Weekly eraser / clear row button
+        $(document).on('click', '.btn-clear-row', function() {
+            const empCode = $(this).data('emp');
+            const assignments = getWeeklyAssignments();
+            if (assignments[empCode] && assignments[empCode][currentWeekTab]) {
+                delete assignments[empCode][currentWeekTab];
+                saveWeeklyAssignments(assignments);
+                renderWeeklyGrid();
+
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Jadwal Mingguan Direset',
+                    text: 'Penugasan rute pegawai minggu ini dibersihkan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
+
+        // Map switches
+        $('#btnOSM').on('click', function() {
+            $('.btn-map-type').removeClass('active-type');
+            $(this).addClass('active-type');
+            map.setStyle('https://tiles.openfreemap.org/styles/liberty');
+        });
+
+        $('#btnGmaps').on('click', function() {
+            $('.btn-map-type').removeClass('active-type');
+            $(this).addClass('active-type');
+            map.setStyle('https://tiles.openfreemap.org/styles/bright');
+        });
+    });
+</script>
+</body>
+</html>
