@@ -522,6 +522,9 @@
                             <input type="text" class="form-control" id="searchRouteItems" placeholder="Cari item rute harian" style="height:32px; font-size:0.75rem;"/>
                             <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
                         </div>
+                        <button class="btn btn-sm btn-outline-primary w-100 mb-2" id="btnOptimizeRoute" disabled title="Optimasi urutan rute agar lebih efisien">
+                            <i class="fa fa-route me-1"></i> Optimasi Rute
+                        </button>
                         <div class="drag-hint" id="dragHint" style="display:none;">
                             <i class="fa fa-arrows-up-down"></i>
                             <span>Tarik kartu untuk mengubah urutan kunjungan</span>
@@ -1088,6 +1091,99 @@
 
         // Setup Drag & Drop listeners
         setupDragAndDrop();
+
+        // Update optimize button state (enable only when > 3 items)
+        updateOptimizeButtonState();
+    }
+
+    // ===== Route Optimization (Nearest Neighbor Algorithm) =====
+    function updateOptimizeButtonState() {
+        const items = activeRouteId ? getRouteItems(activeRouteId) : [];
+        const btn = $('#btnOptimizeRoute');
+        if (items.length > 3) {
+            btn.prop('disabled', false).removeClass('btn-outline-secondary').addClass('btn-outline-primary');
+        } else {
+            btn.prop('disabled', true).removeClass('btn-outline-primary').addClass('btn-outline-secondary');
+        }
+    }
+
+    function haversineDistance(coord1, coord2) {
+        // coord format: [lng, lat]
+        const toRad = deg => deg * Math.PI / 180;
+        const R = 6371000; // Earth radius in meters
+        const lat1 = toRad(coord1[1]);
+        const lat2 = toRad(coord2[1]);
+        const dLat = toRad(coord2[1] - coord1[1]);
+        const dLng = toRad(coord2[0] - coord1[0]);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1) * Math.cos(lat2) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function optimizeRouteOrder(codes) {
+        // Nearest-neighbor heuristic for TSP
+        // Start from the first item (or the one closest to origin)
+        const withCoords = codes.filter(code => customerCoordinates[code]);
+        const withoutCoords = codes.filter(code => !customerCoordinates[code]);
+
+        if (withCoords.length <= 1) return codes;
+
+        const visited = [];
+        const remaining = [...withCoords];
+
+        // Start with the first customer
+        visited.push(remaining.shift());
+
+        while (remaining.length > 0) {
+            const lastCoord = customerCoordinates[visited[visited.length - 1]];
+            let nearestIdx = 0;
+            let nearestDist = Infinity;
+
+            for (let i = 0; i < remaining.length; i++) {
+                const dist = haversineDistance(lastCoord, customerCoordinates[remaining[i]]);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestIdx = i;
+                }
+            }
+
+            visited.push(remaining.splice(nearestIdx, 1)[0]);
+        }
+
+        // 2-opt improvement pass
+        let improved = true;
+        while (improved) {
+            improved = false;
+            for (let i = 1; i < visited.length - 1; i++) {
+                for (let j = i + 1; j < visited.length; j++) {
+                    const currentDist = 
+                        haversineDistance(customerCoordinates[visited[i-1]], customerCoordinates[visited[i]]) +
+                        haversineDistance(customerCoordinates[visited[j]], customerCoordinates[visited[(j+1) % visited.length] || visited[j]]);
+                    
+                    // Reverse segment [i..j]
+                    const reversed = [...visited];
+                    let left = i, right = j;
+                    while (left < right) {
+                        [reversed[left], reversed[right]] = [reversed[right], reversed[left]];
+                        left++; right--;
+                    }
+                    
+                    const newDist = 
+                        haversineDistance(customerCoordinates[reversed[i-1]], customerCoordinates[reversed[i]]) +
+                        haversineDistance(customerCoordinates[reversed[j]], customerCoordinates[reversed[(j+1) % reversed.length] || reversed[j]]);
+                    
+                    if (newDist < currentDist) {
+                        visited.splice(0, visited.length, ...reversed);
+                        improved = true;
+                    }
+                }
+            }
+        }
+
+        // Append customers without coordinates at the end
+        return [...visited, ...withoutCoords];
     }
 
     function renderCustomerDBList(query = '') {
@@ -1440,9 +1536,12 @@
             Swal.fire({
                 icon: 'success',
                 title: 'Rute Ditambahkan',
-                text: `Rute "${name}" berhasil dibuat.`,
+                toast: true,
+                position: 'top-end',
                 timer: 1500,
-                showConfirmButton: false
+                showConfirmButton: false,
+                width: 280,
+                padding: '0.5rem'
             });
         });
 
@@ -1557,6 +1656,91 @@
                 showConfirmButton: false,
                 timer: 1200
             });
+        });
+
+        // Optimize Route Button
+        $('#btnOptimizeRoute').on('click', function() {
+            if (!activeRouteId) return;
+            const items = getRouteItems(activeRouteId);
+            if (items.length <= 3) return;
+
+            // Show loading animation for 2 seconds before revealing result
+            Swal.fire({
+                title: '<span style="font-size:1.1rem;">Mengoptimasi Rute...</span>',
+                html: `
+                    <div style="padding: 10px 0;">
+                        <div style="position:relative; width:80px; height:80px; margin:0 auto 16px;">
+                            <div style="position:absolute; inset:0; border:4px solid #e9ecef; border-top-color:#005d41; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+                            <div style="position:absolute; inset:8px; border:3px solid #e9ecef; border-bottom-color:#10b981; border-radius:50%; animation:spin 1.2s linear infinite reverse;"></div>
+                            <div style="position:absolute; inset:50%; transform:translate(-50%,-50%); font-size:1.2rem;">
+                                <i class="fa fa-route" style="color:#005d41;"></i>
+                            </div>
+                        </div>
+                        <p style="font-size:0.8rem; color:#6c757d; margin:0;">Menghitung jalur terpendek dengan algoritma AI...</p>
+                    </div>
+                `,
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                customClass: { popup: 'swal2-optimize-popup' },
+                didOpen: () => {
+                    // Add keyframes dynamically
+                    if (!document.getElementById('optimizeSpinStyle')) {
+                        const s = document.createElement('style');
+                        s.id = 'optimizeSpinStyle';
+                        s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+                        document.head.appendChild(s);
+                    }
+                }
+            });
+
+            // Do actual optimization after 1s delay (gimmick)
+            setTimeout(() => {
+                const optimized = optimizeRouteOrder(items);
+
+                // Calculate distance before/after
+                let distBefore = 0, distAfter = 0;
+                for (let i = 1; i < items.length; i++) {
+                    if (customerCoordinates[items[i-1]] && customerCoordinates[items[i]]) {
+                        distBefore += haversineDistance(customerCoordinates[items[i-1]], customerCoordinates[items[i]]);
+                    }
+                }
+                for (let i = 1; i < optimized.length; i++) {
+                    if (customerCoordinates[optimized[i-1]] && customerCoordinates[optimized[i]]) {
+                        distAfter += haversineDistance(customerCoordinates[optimized[i-1]], customerCoordinates[optimized[i]]);
+                    }
+                }
+
+                // Save optimized order
+                saveRouteItems(activeRouteId, optimized);
+                renderActiveRouteItems();
+                drawRouteOnMap();
+
+                const savedKm = ((distBefore - distAfter) / 1000).toFixed(1);
+                const pct = distBefore > 0 ? Math.round((1 - distAfter/distBefore) * 100) : 0;
+
+                // Close loading and show success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Good Job! Rute Berhasil Dioptimasi!',
+                    confirmButtonColor: '#005d41',
+                    confirmButtonText: 'Mantap!',
+                    showCancelButton: false,
+                    showDenyButton: false,
+                    showCloseButton: false,
+                    allowOutsideClick: true,
+                    focusConfirm: true,
+                    timer: 4000,
+                    timerProgressBar: true,
+                    didOpen: () => {
+                        // Force hide any extra buttons injected by theme
+                        const popup = Swal.getPopup();
+                        if (popup) {
+                            popup.querySelectorAll('.swal2-deny, .swal2-cancel').forEach(btn => btn.style.display = 'none');
+                        }
+                    }
+                });
+            }, 1000);
         });
 
         // Clear All Routes

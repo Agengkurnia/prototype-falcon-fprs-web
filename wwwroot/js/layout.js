@@ -111,6 +111,23 @@ class Layout {
                 color: #333;
             }
 
+            /* ===== SweetAlert2 Toast Override ===== */
+            .swal2-toast {
+                max-width: 250px !important;
+                min-width: unset !important;
+                padding: 8px 12px !important;
+                font-size: 0.8rem !important;
+            }
+            .swal2-toast .swal2-title {
+                font-size: 0.85rem !important;
+                margin: 0 0 0 8px !important;
+            }
+            .swal2-toast .swal2-icon {
+                width: 24px !important;
+                height: 24px !important;
+                margin: 0 !important;
+            }
+
             /* ===== Mobile responsive ===== */
             @media (max-width: 1199.98px) {
                 .layout-menu-toggle {
