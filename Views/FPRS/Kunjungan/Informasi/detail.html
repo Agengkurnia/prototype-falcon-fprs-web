@@ -114,18 +114,41 @@
             flex: 1.8;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .metric-cell {
-            border-bottom: 1px solid #f1f3f5;
-            padding-bottom: 6px;
+            background: #fbfcfd;
+            border: 1px solid #eef1f6;
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
+        .metric-cell:hover {
+            border-color: #d4e6dd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .metric-ic {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            background: #e7f5ee;
+            color: #005d41;
+        }
+        .metric-body { min-width: 0; }
 
         .metric-cell-lbl {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #868e96;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
 
         .metric-cell-val {
@@ -133,6 +156,13 @@
             font-weight: 700;
             color: #212529;
         }
+        /* Highlighted total cell spanning both columns */
+        .metric-cell.metric-total {
+            grid-column: 1 / -1;
+            background: #e7f5ee;
+            border-color: #c3e6d3;
+        }
+        .metric-cell.metric-total .metric-ic { background: #005d41; color: #fff; }
 
         /* Bottom Table Styles */
         .table-detail-list th {
@@ -156,6 +186,41 @@
         .store-code {
             font-size: 0.7rem;
             color: #868e96;
+        }
+
+        /* Role badge */
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 20px;
+        }
+        .role-badge.role-salesman { background: #fff4e5; color: #e65100; }
+        .role-badge.role-canvasser { background: #fffbe6; color: #b88300; }
+
+        /* OOS pill */
+        .oos-pill {
+            display: inline-block;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            font-size: 0.78rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .oos-pill.oos-near { background: #e7f5ee; color: #2b8a3e; }
+        .oos-pill.oos-far { background: #fdecea; color: #dc3545; }
+
+        @media (max-width: 992px) {
+            .kunjungan-pesanan-grid {
+                flex-direction: column;
+            }
+            .detail-map-box { height: 300px; }
+        }
+        @media (max-width: 576px) {
+            .detail-metrics-box { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -369,44 +434,74 @@
                                     <!-- 10-Item Metrics Grid -->
                                     <div class="detail-metrics-box">
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Total Visited</div>
-                                            <div class="metric-cell-val" id="metVisited">0</div>
+                                            <div class="metric-ic" style="background:#e7f5ee; color:#005d41;"><i class="fa fa-store"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Total Visited</div>
+                                                <div class="metric-cell-val" id="metVisited">0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Unvisited</div>
-                                            <div class="metric-cell-val"><span id="metUnvisited">0</span> <a href="#" class="text-success small ms-1" style="font-size:0.65rem;">Detail selengkapnya</a></div>
+                                            <div class="metric-ic" style="background:#fdecea; color:#dc3545;"><i class="fa fa-store-slash"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Unvisited</div>
+                                                <div class="metric-cell-val"><span id="metUnvisited">0</span> <a href="#" class="text-success small ms-1" style="font-size:0.65rem;">Detail</a></div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Planned</div>
-                                            <div class="metric-cell-val" id="metPlanned">0/0</div>
+                                            <div class="metric-ic" style="background:#e7f1ff; color:#1565c0;"><i class="fa fa-bullseye"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Planned</div>
+                                                <div class="metric-cell-val" id="metPlanned">0/0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Unplanned</div>
-                                            <div class="metric-cell-val" id="metUnplanned">0</div>
+                                            <div class="metric-ic" style="background:#fff4e5; color:#e65100;"><i class="fa fa-bolt"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Unplanned</div>
+                                                <div class="metric-cell-val" id="metUnplanned">0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Out of Store</div>
-                                            <div class="metric-cell-val" id="metOos">0</div>
+                                            <div class="metric-ic" style="background:#fef2f2; color:#b91c1c;"><i class="fa fa-box-open"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Out of Store</div>
+                                                <div class="metric-cell-val" id="metOos">0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Kunjungan Efektif</div>
-                                            <div class="metric-cell-val" id="metEffective">0</div>
+                                            <div class="metric-ic" style="background:#e7f5ee; color:#2b8a3e;"><i class="fa fa-check-circle"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Kunjungan Efektif</div>
+                                                <div class="metric-cell-val" id="metEffective">0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">No Sale</div>
-                                            <div class="metric-cell-val" id="metNoSale">0</div>
+                                            <div class="metric-ic" style="background:#f1f3f5; color:#6c757d;"><i class="fa fa-ban"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">No Sale</div>
+                                                <div class="metric-cell-val" id="metNoSale">0</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Total Pesanan Penjualan</div>
-                                            <div class="metric-cell-val" id="metSalesmanVal">Rp 0,00</div>
+                                            <div class="metric-ic" style="background:#e7f1ff; color:#1565c0;"><i class="fa fa-file-invoice"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Pesanan Penjualan</div>
+                                                <div class="metric-cell-val" id="metSalesmanVal">Rp 0,00</div>
+                                            </div>
                                         </div>
                                         <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Total Penjualan Canvass</div>
-                                            <div class="metric-cell-val" id="metCanvassVal">Rp 0,00</div>
+                                            <div class="metric-ic" style="background:#fff4e5; color:#e65100;"><i class="fa fa-truck-fast"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl">Penjualan Canvass</div>
+                                                <div class="metric-cell-val" id="metCanvassVal">Rp 0,00</div>
+                                            </div>
                                         </div>
-                                        <div class="metric-cell">
-                                            <div class="metric-cell-lbl">Total Penjualan</div>
-                                            <div class="metric-cell-val text-success" style="font-size: 0.95rem; font-weight: 800;" id="metTotalVal">Rp 0,00</div>
+                                        <div class="metric-cell metric-total">
+                                            <div class="metric-ic"><i class="fa fa-coins"></i></div>
+                                            <div class="metric-body">
+                                                <div class="metric-cell-lbl" style="color:#005d41;">Total Penjualan</div>
+                                                <div class="metric-cell-val text-success" style="font-size: 1rem; font-weight: 800;" id="metTotalVal">Rp 0,00</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -552,7 +647,9 @@
                 
                 // Colorize OOS distance column based on threshold
                 const isFar = parseFloat(v.dist) > 500;
-                const oosStyle = isFar ? 'color:#dc3545; font-weight:600;' : 'color:#2b8a3e;';
+                const oosClass = isFar ? 'oos-far' : 'oos-near';
+                const roleClass = v.role === 'Salesman' ? 'role-salesman' : 'role-canvasser';
+                const roleIcon = v.role === 'Salesman' ? 'fa-user-tie' : 'fa-truck-fast';
 
                 tbody.append(`
                     <tr>
@@ -561,15 +658,15 @@
                             <strong style="color:#005d41;">${v.store}</strong><br/>
                             <span class="store-code">CS-${v.code}</span>
                         </td>
-                        <td>${v.inTime} - ${v.outTime}</td>
-                        <td>${v.role}</td>
+                        <td><span class="time-pill"><i class="fa fa-clock me-1 text-muted"></i>${v.inTime} - ${v.outTime}</span></td>
+                        <td><span class="role-badge ${roleClass}"><i class="fa ${roleIcon}"></i>${v.role}</span></td>
                         <td>${v.pseq}</td>
                         <td>${v.aseq}</td>
                         <td style="text-align: right;">${orderVal}</td>
                         <td style="text-align: right;">${canvassVal}</td>
-                        <td style="text-align: right; font-weight:600;">${totalVal}</td>
+                        <td style="text-align: right; font-weight:700; color:#005d41;">${totalVal}</td>
                         <td style="text-align: center;">${noteIcon}</td>
-                        <td style="text-align: right; ${oosStyle}">${v.dist}</td>
+                        <td style="text-align: right;"><span class="oos-pill ${oosClass}">${v.dist}</span></td>
                     </tr>
                 `);
             });

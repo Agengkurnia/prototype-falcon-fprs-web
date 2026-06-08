@@ -128,6 +128,95 @@
             margin-right: 6px;
         }
 
+        /* customer count chip on route card */
+        .route-count-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e7f5ee;
+            color: #005d41;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-right: 6px;
+        }
+        .route-count-chip i { font-size: 0.55rem; }
+
+        /* active mini badge */
+        .active-pill {
+            background: #005d41;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        /* panel title row with counter */
+        .panel-title-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .panel-counter {
+            font-size: 0.65rem;
+            color: #868e96;
+            background: #f1f3f5;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* sequence number marker in route items */
+        .seq-num {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #e7f5ee;
+            color: #005d41;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+
+        /* drag hint banner */
+        .drag-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.65rem;
+            color: #6c757d;
+            background: #f8f9fa;
+            border: 1px dashed #dee2e6;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-bottom: 8px;
+        }
+        .drag-hint i { color: #adb5bd; }
+
+        /* empty state */
+        .empty-state {
+            text-align: center;
+            padding: 28px 14px;
+            color: #adb5bd;
+        }
+        .empty-state i {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+            color: #ced4da;
+        }
+        .empty-state p {
+            font-size: 0.75rem;
+            margin: 0;
+        }
+
         .route-item-delete, .route-item-action {
             background: none;
             border: none;
@@ -272,6 +361,35 @@
 
         .btn-broom-clear:hover {
             color: #a71d2a;
+        }
+
+        /* weekly row hover */
+        #weeklyTableBody tr:hover {
+            background: #f8fbf9;
+        }
+        .weekly-dropdown:hover {
+            border-color: #005d41;
+        }
+
+        @media (max-width: 1200px) {
+            .route-daily-panels-row {
+                flex-wrap: wrap;
+                height: auto;
+            }
+            .route-panel-col {
+                flex: 1 1 50%;
+                border-bottom: 1px solid #e9ecef;
+                max-height: 400px;
+            }
+            .route-panel-col-map {
+                flex: 1 1 100%;
+                min-height: 380px;
+            }
+        }
+        @media (max-width: 768px) {
+            .route-panel-col {
+                flex: 1 1 100%;
+            }
         }
     </style>
 </head>
@@ -434,9 +552,12 @@
                 <div class="route-daily-panels-row">
                     <!-- PANEL 1: DAFTAR RUTE -->
                     <div class="route-panel-col">
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="route-badge">1</span>
-                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Kelola Rute Harian</span>
+                        <div class="panel-title-bar">
+                            <div class="d-flex align-items-center">
+                                <span class="route-badge">1</span>
+                                <span class="fw-bold text-dark" style="font-size: 0.825rem;">Kelola Rute Harian</span>
+                            </div>
+                            <span class="panel-counter" id="routeCounter">0</span>
                         </div>
                         <div class="route-input-group mb-2">
                             <input type="text" class="form-control" id="newRouteName" placeholder="Tambah rute baru" style="height:32px; font-size:0.75rem;"/>
@@ -453,25 +574,38 @@
 
                     <!-- PANEL 2: ITEM RUTE (Outlets in Active Route) -->
                     <div class="route-panel-col">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fa fa-list-ol text-primary me-2" style="font-size:0.85rem;"></i>
-                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Urutan Pelanggan</span>
+                        <div class="panel-title-bar">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-list-ol text-primary me-2" style="font-size:0.85rem;"></i>
+                                <span class="fw-bold text-dark" style="font-size: 0.825rem;">Urutan Pelanggan</span>
+                            </div>
+                            <span class="panel-counter" id="routeItemCounter">0</span>
                         </div>
                         <div class="route-search-wrapper mb-2">
                             <input type="text" class="form-control" id="searchRouteItems" placeholder="Cari item rute harian" style="height:32px; font-size:0.75rem;"/>
                             <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
                         </div>
+                        <div class="drag-hint" id="dragHint" style="display:none;">
+                            <i class="fa fa-arrows-up-down"></i>
+                            <span>Tarik kartu untuk mengubah urutan kunjungan</span>
+                        </div>
                         <div class="route-list-group" id="routeItemList">
                             <!-- Outlets in active route -->
-                            <div class="text-center text-muted small py-4">Pilih rute untuk melihat pelanggan</div>
+                            <div class="empty-state">
+                                <i class="fa fa-hand-pointer"></i>
+                                <p>Pilih salah satu rute untuk melihat pelanggan</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- PANEL 3: CARI PELANGGAN (Master Database) -->
                     <div class="route-panel-col">
-                        <div class="d-flex align-items-center mb-3">
-                            <i class="fa fa-search-location text-success me-2" style="font-size:0.85rem;"></i>
-                            <span class="fw-bold text-dark" style="font-size: 0.825rem;">Cari Pelanggan</span>
+                        <div class="panel-title-bar">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-search-location text-success me-2" style="font-size:0.85rem;"></i>
+                                <span class="fw-bold text-dark" style="font-size: 0.825rem;">Cari Pelanggan</span>
+                            </div>
+                            <span class="panel-counter" id="customerCounter">0</span>
                         </div>
                         <div class="route-search-wrapper mb-2">
                             <input type="text" class="form-control" id="searchCustomerDB" placeholder="Cari daftar pelanggan" style="height:32px; font-size:0.75rem;"/>
@@ -747,21 +881,36 @@
 
         const filtered = routes.filter(r => r.name.toLowerCase().includes(query.toLowerCase()));
 
+        // Update header counter
+        $('#routeCounter').text(routes.length + ' rute');
+
         if (filtered.length === 0) {
-            list.append(`<div class="text-center text-muted small py-4">Tidak ada rute</div>`);
+            list.append(`
+                <div class="empty-state">
+                    <i class="fa fa-route"></i>
+                    <p>${query ? 'Tidak ada rute cocok' : 'Belum ada rute. Tambahkan rute pertama di atas.'}</p>
+                </div>
+            `);
             return;
         }
 
+        // Read items map once for efficient counter rendering
+        const stored = localStorage.getItem(KEY_ROUTE_ITEMS);
+        const itemsMap = stored ? JSON.parse(stored) : defaultRouteItems;
+
         filtered.forEach(r => {
             const isActive = String(activeRouteId) === String(r.id);
+            const itemCount = (itemsMap[r.id] || []).length;
             list.append(`
                 <div class="route-item-card ${isActive ? 'active-route' : ''}" data-id="${r.id}">
                     <div class="d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center overflow-hidden">
                             <i class="fa fa-map-marked text-success me-2" style="font-size:0.8rem;"></i>
-                            <span class="route-item-name">${r.name}</span>
+                            <span class="route-item-name text-truncate">${r.name}</span>
+                            ${isActive ? '<span class="active-pill">Aktif</span>' : ''}
                         </div>
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center flex-shrink-0">
+                            <span class="route-count-chip" title="Jumlah pelanggan"><i class="fa fa-users"></i>${itemCount}</span>
                             <span class="route-item-id">${r.id}</span>
                             <button class="route-item-delete" data-id="${r.id}" title="Hapus Rute">
                                 <i class="fa fa-trash-alt"></i>
@@ -778,15 +927,33 @@
         list.empty();
 
         if (!activeRouteId) {
-            list.append(`<div class="text-center text-muted small py-4">Pilih rute untuk melihat pelanggan</div>`);
+            $('#routeItemCounter').text('0');
+            $('#dragHint').hide();
+            list.append(`
+                <div class="empty-state">
+                    <i class="fa fa-hand-pointer"></i>
+                    <p>Pilih salah satu rute untuk melihat pelanggan</p>
+                </div>
+            `);
             return;
         }
 
         const items = getRouteItems(activeRouteId);
+        $('#routeItemCounter').text(items.length + ' pelanggan');
+
         if (items.length === 0) {
-            list.append(`<div class="text-center text-muted small py-4">Rute ini belum memiliki pelanggan</div>`);
+            $('#dragHint').hide();
+            list.append(`
+                <div class="empty-state">
+                    <i class="fa fa-store-slash"></i>
+                    <p>Rute ini belum memiliki pelanggan.<br/>Tambahkan dari panel kanan.</p>
+                </div>
+            `);
             return;
         }
+
+        // Show drag hint only when there are 2+ items (only then ordering matters)
+        $('#dragHint').toggle(items.length >= 2);
 
         let renderedCount = 0;
         items.forEach((code, index) => {
@@ -799,6 +966,7 @@
                 list.append(`
                     <div class="route-item-card d-flex align-items-center justify-content-between p-2 mb-2" style="cursor: grab;" draggable="true" data-code="${code}" data-index="${index}">
                         <div class="d-flex align-items-center overflow-hidden">
+                            <span class="seq-num">${index + 1}</span>
                             <i class="fa fa-grip-vertical drag-handle"></i>
                             <div class="text-truncate">
                                 <strong class="d-block text-truncate" style="font-size:0.75rem; color:#005d41;">${cust.nama}</strong>
@@ -806,7 +974,7 @@
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <i class="fa fa-map-marker-alt text-primary me-2" style="font-size:0.75rem;" title="Miliki koordinat"></i>
+                            <i class="fa fa-map-marker-alt text-primary me-2" style="font-size:0.75rem;" title="Memiliki koordinat"></i>
                             <button class="route-item-action text-danger remove-item-btn" data-code="${code}" title="Hapus dari Rute">
                                 <i class="fa fa-minus-circle"></i>
                             </button>
@@ -817,7 +985,12 @@
         });
 
         if (renderedCount === 0 && query) {
-            list.append(`<div class="text-center text-muted small py-4">Tidak ada pelanggan cocok</div>`);
+            list.append(`
+                <div class="empty-state">
+                    <i class="fa fa-search"></i>
+                    <p>Tidak ada pelanggan cocok</p>
+                </div>
+            `);
         }
 
         // Setup Drag & Drop listeners
@@ -838,8 +1011,15 @@
             return matchesQuery;
         });
 
+        $('#customerCounter').text(filtered.length + ' tersedia');
+
         if (filtered.length === 0) {
-            list.append(`<div class="text-center text-muted small py-4">Tidak ada pelanggan tersedia</div>`);
+            list.append(`
+                <div class="empty-state">
+                    <i class="fa fa-users-slash"></i>
+                    <p>${query ? 'Tidak ada pelanggan cocok' : 'Semua pelanggan sudah ditambahkan'}</p>
+                </div>
+            `);
             return;
         }
 
@@ -1007,11 +1187,10 @@
             if ($(e.target).closest('.route-item-delete').length) return;
             const id = String($(this).data('id'));
             activeRouteId = id;
-            $('#routeList .route-item-card').removeClass('active-route');
-            $(this).addClass('active-route');
 
+            renderRoutesList($('#searchRoute').val());
             renderActiveRouteItems();
-            renderCustomerDBList();
+            renderCustomerDBList($('#searchCustomerDB').val());
             drawRouteOnMap();
         });
 
@@ -1123,9 +1302,19 @@
             if (!items.includes(code)) {
                 items.push(code);
                 saveRouteItems(activeRouteId, items);
+                renderRoutesList($('#searchRoute').val());
                 renderActiveRouteItems();
-                renderCustomerDBList();
+                renderCustomerDBList($('#searchCustomerDB').val());
                 drawRouteOnMap();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pelanggan ditambahkan',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1200
+                });
             }
         });
 
@@ -1135,9 +1324,19 @@
             const items = getRouteItems(activeRouteId);
             const filtered = items.filter(item => item !== code);
             saveRouteItems(activeRouteId, filtered);
+            renderRoutesList($('#searchRoute').val());
             renderActiveRouteItems();
-            renderCustomerDBList();
+            renderCustomerDBList($('#searchCustomerDB').val());
             drawRouteOnMap();
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Pelanggan dihapus dari rute',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1200
+            });
         });
 
         // Clear All Routes

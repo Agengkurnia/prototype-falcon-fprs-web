@@ -106,6 +106,110 @@
             display: none;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
+
+        /* ===== Summary Stat Cards ===== */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eef1f6;
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.ic-visit { background: #e7f5ee; color: #005d41; }
+        .stat-icon.ic-sales { background: #fff4e5; color: #e65100; }
+        .stat-icon.ic-sales-amt { background: #e7f1ff; color: #1565c0; }
+        .stat-icon.ic-avg { background: #f3e8ff; color: #7b2cbf; }
+        .stat-meta { min-width: 0; }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #868e96;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #212529;
+            font-family: 'Kalbe Geometric', sans-serif;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== Visited badge ===== */
+        .visit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e7f5ee;
+            color: #005d41;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .visit-badge i { font-size: 0.65rem; }
+
+        /* time pill */
+        .time-pill {
+            color: #495057;
+            font-variant-numeric: tabular-nums;
+        }
+        .time-pill i { color: #adb5bd; font-size: 0.7rem; margin-right: 4px; }
+
+        /* Sticky table header for long lists */
+        .table-visit thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        /* Row chevron affordance */
+        .row-go {
+            color: #ced4da;
+            font-size: 0.75rem;
+            transition: transform 0.15s, color 0.15s;
+        }
+        .table-visit tr:hover .row-go {
+            color: #005d41;
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 992px) {
+            .stat-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .stat-row { grid-template-columns: 1fr; }
+            .control-bar { flex-wrap: wrap; }
+            .control-bar .search-wrapper { width: 100%; }
+        }
     </style>
 </head>
 <body class="sidebar-light">
@@ -299,8 +403,44 @@
                     </div>
                 </div>
 
+                <!-- SUMMARY STAT CARDS -->
+                <div class="stat-row" id="statRow">
+                    <div class="stat-card">
+                        <div class="stat-icon ic-visit"><i class="fa fa-route"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Kunjungan</div>
+                            <div class="stat-value" id="statTrips">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ic-sales"><i class="fa fa-store"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Outlet Dikunjungi</div>
+                            <div class="stat-value" id="statVisited">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ic-sales-amt"><i class="fa fa-coins"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Penjualan</div>
+                            <div class="stat-value" id="statSales">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon ic-avg"><i class="fa fa-chart-line"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Rata-rata / Kunjungan</div>
+                            <div class="stat-value" id="statAvg">Rp 0</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- DATA TABLE CARD -->
                 <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3" style="border-radius: 0.375rem 0.375rem 0 0;">
+                        <h6 class="mb-0 fw-bold" style="color:#212529; font-size:0.9rem;"><i class="fa fa-list-ul me-2 text-success"></i>Daftar Kunjungan Harian</h6>
+                        <span class="badge rounded-pill" id="rowCountBadge" style="background:#e7f5ee; color:#005d41; font-size:0.72rem; padding:5px 10px;">0 entri</span>
+                    </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-visit mb-0" id="tblVisit">
@@ -309,10 +449,11 @@
                                         <th style="width: 60px;">No</th>
                                         <th>Tanggal</th>
                                         <th>Nama</th>
-                                        <th>Visited</th>
+                                        <th style="text-align:center;">Visited</th>
                                         <th>Waktu Mulai</th>
                                         <th>Waktu Akhir</th>
                                         <th style="text-align: right;">Total Penjualan</th>
+                                        <th style="width: 40px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="tblBody">
@@ -378,6 +519,19 @@
             // Sort by Date Descending
             listData.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
 
+            // ===== Summary aggregation =====
+            const totalTrips = listData.length;
+            const totalVisited = listData.reduce((sum, r) => sum + r.visited, 0);
+            const totalSales = listData.reduce((sum, r) => sum + r.invoice, 0);
+            const avgSales = totalTrips > 0 ? totalSales / totalTrips : 0;
+            const fmtRp = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v));
+
+            $('#statTrips').text(totalTrips);
+            $('#statVisited').text(totalVisited + ' outlet');
+            $('#statSales').text(fmtRp(totalSales));
+            $('#statAvg').text(fmtRp(avgSales));
+            $('#rowCountBadge').text(totalTrips + ' entri');
+
             // Populate table body
             const body = $('#tblBody');
             body.empty();
@@ -387,14 +541,15 @@
                 const mapLink = `detail.html?date=${row.dateKey}&salesman=${row.id}`;
                 
                 body.append(`
-                    <tr>
+                    <tr style="cursor:pointer;" data-href="${mapLink}">
                         <td>${index + 1}</td>
                         <td data-order="${row.dateKey}">${row.dateDisplay}</td>
                         <td><a href="${mapLink}" class="salesman-link">${row.name}</a></td>
-                        <td>${row.visited}</td>
-                        <td>${row.startTime}</td>
-                        <td>${row.endTime}</td>
-                        <td style="text-align: right; font-weight: 600;">${fmt(row.invoice)}</td>
+                        <td style="text-align:center;"><span class="visit-badge"><i class="fa fa-store"></i>${row.visited}</span></td>
+                        <td><span class="time-pill"><i class="fa fa-play"></i>${row.startTime}</span></td>
+                        <td><span class="time-pill"><i class="fa fa-flag-checkered"></i>${row.endTime}</span></td>
+                        <td style="text-align: right; font-weight: 600; color:#005d41;">${fmt(row.invoice)}</td>
+                        <td style="text-align:center;"><i class="fa fa-chevron-right row-go"></i></td>
                     </tr>
                 `);
             });
@@ -404,7 +559,7 @@
                 pageLength: 10,
                 order: [[1, 'desc']], // Sort by date descending
                 columnDefs: [
-                    { orderable: false, targets: [0, 4, 5] }
+                    { orderable: false, targets: [0, 4, 5, 7] }
                 ],
                 dom: 'rt<"d-flex align-items-center justify-content-between p-3 border-top bg-light"i<"ms-auto"p>>',
                 language: {
@@ -415,6 +570,19 @@
                         next: '›'
                     }
                 }
+            });
+
+            // Row click navigates to detail (ignore clicks on the link itself to avoid double nav)
+            $('#tblBody').on('click', 'tr', function(e) {
+                if ($(e.target).closest('a').length) return;
+                const href = $(this).data('href');
+                if (href) window.location.href = href;
+            });
+
+            // Keep row count badge in sync with search/filter
+            table.on('draw', function() {
+                const info = table.page.info();
+                $('#rowCountBadge').text(info.recordsDisplay + ' entri');
             });
 
             // Bind Custom Search Box
