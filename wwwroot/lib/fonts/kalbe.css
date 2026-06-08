@@ -1,0 +1,42 @@
+﻿@font-face {
+    font-family: 'kalbesystem';
+    src: url('kalbefonts/kalbesystem-regular.woff2') format('woff2'),url('kalbefonts/kalbesystem-semibolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-bold.woff2') format('woff2'), url('kalbefonts/kalbesystem-bolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed[wght].woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-bold.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-bolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-extrabold.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-extrabolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-extralight.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-extralightitalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-italic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-light.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-lightitalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-medium.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-mediumitalic.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-regular.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-semibold.woff2') format('woff2'), url('kalbefonts/kalbesystemcondensed-semibolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-extrabold.woff2') format('woff2'), url('kalbefonts/kalbesystem-extrabolditalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-extralight.woff2') format('woff2'), url('kalbefonts/kalbesystem-extralightitalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-italic.woff2') format('woff2'), url('kalbefonts/kalbesystem-light.woff2') format('woff2'), url('kalbefonts/kalbesystem-lightitalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-medium.woff2') format('woff2'), url('kalbefonts/kalbesystem-mediumitalic.woff2') format('woff2'), url('kalbefonts/kalbesystem-semibold.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'kalbegeometric';
+    src: url('kalbefonts/kalbegeometric[wght].woff2') format('woff2'), url('kalbefonts/kalbegeometric-black.woff2') format('woff2'), url('kalbefonts/kalbegeometric-bold.woff2') format('woff2'), url('kalbefonts/kalbegeometric-extrabold.woff2') format('woff2'), url('kalbefonts/kalbegeometric-medium.woff2') format('woff2'), url('kalbefonts/kalbegeometric-regular.woff2') format('woff2'), url('kalbefonts/kalbegeometric-semibold.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'kalbehelix';
+    src: url('kalbefonts/KalbeHelix-Regular.woff2') format('woff2'),url('kalbefonts/KalbeHelix-SemiBold.woff2') format('woff2'),url('kalbefonts/kalbehelix-bold.woff2') format('woff2'), url('kalbefonts/kalbehelix-extrabold.woff2') format('woff2'), url('kalbefonts/kalbehelix-extralight.woff2') format('woff2'), url('kalbefonts/kalbehelix-light.woff2') format('woff2'), url('kalbefonts/kalbehelix-medium.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'kalbesquare';
+    src: url('kalbefonts/kalbesquarenarrow-bold.woff2') format('woff2'), url('kalbefonts/kalbesquarenarrow-extrabold.woff2') format('woff2'), url('kalbefonts/kalbesquarenarrow-medium.woff2') format('woff2'), url('kalbefonts/kalbesquarenarrow-regular.woff2') format('woff2'), url('kalbefonts/kalbesquarenarrow-semibold.woff2') format('woff2'), url('kalbefonts/kalbesquarewide-bold.woff2') format('woff2'), url('kalbefonts/kalbesquarewide-extrabold.woff2') format('woff2'), url('kalbefonts/kalbesquarewide-medium.woff2') format('woff2'), url('kalbefonts/kalbesquarewide-regular.woff2') format('woff2'), url('kalbefonts/kalbesquarewide-semibold.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'kalbeserif';
+    src: url('kalbefonts/kalbeserif[wght].woff2') format('woff2'), url('kalbefonts/kalbeserif-bold.woff2') format('woff2'), url('kalbefonts/kalbeserif-extrabold.woff2') format('woff2'), url('kalbefonts/kalbeserif-light.woff2') format('woff2'), url('kalbefonts/kalbeserif-medium.woff2') format('woff2'), url('kalbefonts/kalbeserif-regular.woff2') format('woff2'), url('kalbefonts/kalbeserif-semibold.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'kalberounded';
+    src: url('kalbefonts/kalberounded[wght].woff2') format('woff2'), url('kalbefonts/kalberounded-bold.woff2') format('woff2'), url('kalbefonts/kalberounded-extrabold.woff2') format('woff2'), url('kalbefonts/kalberounded-extralight.woff2') format('woff2'), url('kalbefonts/kalberounded-light.woff2') format('woff2'), url('kalbefonts/kalberounded-medium.woff2') format('woff2'), url('kalbefonts/kalberounded-regular.woff2') format('woff2'), url('kalbefonts/kalberounded-semibold.woff2') format('woff2');
+    font-style: normal;
+    font-weight: normal;
+}
+

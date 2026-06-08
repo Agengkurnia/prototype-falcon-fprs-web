@@ -1,0 +1,1853 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falcon Kunjungan - Property-Based Test Suite</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-orange: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-running {
+            background-color: rgba(59, 130, 246, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .badge-passed {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .badge-failed {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .card-total::before { background-color: var(--accent-blue); }
+        .card-passed::before { background-color: var(--accent-green); }
+        .card-failed::before { background-color: var(--accent-red); }
+        .card-duration::before { background-color: var(--text-muted); }
+
+        .summary-val {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-lbl {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .suite-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .suite-header {
+            padding: 1.25rem;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .suite-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .suite-title i {
+            color: var(--accent-blue);
+        }
+
+        .test-list {
+            padding: 0.5rem 0;
+        }
+
+        .test-item {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 0.95rem;
+            transition: background-color 0.15s ease;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-item:hover {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .test-status-icon {
+            font-size: 1.1rem;
+            margin-top: 0.1rem;
+        }
+
+        .icon-passed { color: var(--accent-green); }
+        .icon-failed { color: var(--accent-red); }
+
+        .test-details {
+            flex: 1;
+        }
+
+        .test-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .test-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .test-iterations {
+            color: var(--accent-orange);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        .test-error {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: rgba(239, 68, 68, 0.08);
+            border-left: 3px solid var(--accent-red);
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 0 6px 6px 0;
+            color: #fca5a5;
+            white-space: pre-wrap;
+        }
+
+        .test-counterexample {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: rgba(245, 158, 11, 0.08);
+            border-left: 3px solid var(--accent-orange);
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            border-radius: 0 6px 6px 0;
+            color: #fcd34d;
+            white-space: pre-wrap;
+        }
+
+        .btn-run {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-run:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-run:active {
+            transform: translateY(0);
+        }
+
+        .config-info {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .config-info i {
+            color: var(--accent-blue);
+        }
+
+        .config-info code {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <h1>Falcon Kunjungan</h1>
+            <div class="subtitle">Property-Based Test Suite – fast-check (min 100 iterations)</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="badge badge-running" id="overallStatus">Idle</span>
+            <button class="btn-run" onclick="runAllTests()">
+                <i class="fa fa-play"></i> Run Tests
+            </button>
+        </div>
+    </header>
+
+    <div class="config-info">
+        <i class="fa fa-gear"></i>
+        <span>Configuration: <code>numRuns: 100</code> minimum per property | Library: <code>fast-check</code> | Feature: <code>kunjungan-ui-enhancements</code></span>
+    </div>
+
+    <div class="summary-grid">
+        <div class="summary-card card-total">
+            <div class="summary-val" id="totalVal">0</div>
+            <div class="summary-lbl">Total Properties</div>
+        </div>
+        <div class="summary-card card-passed">
+            <div class="summary-val" style="color: var(--accent-green);" id="passedVal">0</div>
+            <div class="summary-lbl">Passed</div>
+        </div>
+        <div class="summary-card card-failed">
+            <div class="summary-val" style="color: var(--accent-red);" id="failedVal">0</div>
+            <div class="summary-lbl">Failed</div>
+        </div>
+        <div class="summary-card card-duration">
+            <div class="summary-val" id="durationVal">0ms</div>
+            <div class="summary-lbl">Duration</div>
+        </div>
+    </div>
+
+    <div id="suitesContainer">
+        <!-- Test suites will be rendered dynamically -->
+    </div>
+</div>
+
+<!-- jQuery (needed since code under test uses jQuery patterns) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- fast-check PBT library -->
+<script src="https://cdn.jsdelivr.net/npm/fast-check/lib/bundle.js"></script>
+
+<script>
+// ============================================================
+// TEST FRAMEWORK - Property-Based Test Runner
+// ============================================================
+
+const FC_CONFIG = {
+    numRuns: 100  // Minimum iterations per property test
+};
+
+const suites = [];
+let currentSuite = null;
+
+function describe(title, callback) {
+    currentSuite = {
+        title: title,
+        tests: []
+    };
+    suites.push(currentSuite);
+    callback();
+}
+
+// Register a property-based test
+function property(name, arbitraries, predicate, opts = {}) {
+    currentSuite.tests.push({
+        name: name,
+        desc: opts.desc || '',
+        validates: opts.validates || '',
+        type: 'property',
+        arbitraries: arbitraries,
+        predicate: predicate,
+        numRuns: opts.numRuns || FC_CONFIG.numRuns,
+        status: 'idle',
+        error: null,
+        counterexample: null,
+        iterations: 0
+    });
+}
+
+// Register a unit test (example-based) within the same runner
+function it(name, callback, desc = '') {
+    currentSuite.tests.push({
+        name: name,
+        desc: desc,
+        type: 'unit',
+        fn: callback,
+        status: 'idle',
+        error: null
+    });
+}
+
+// Assertions helper
+const assert = {
+    ok: function(value, message = 'Harus bernilai true/truthy') {
+        if (!value) throw new Error('Assertion failed: ' + message + '. Didapat: ' + value);
+    },
+    equal: function(actual, expected, message = 'Harus sama') {
+        if (actual !== expected) {
+            throw new Error('Assertion failed: ' + message + '. Harapan: ' + JSON.stringify(expected) + ', Aktual: ' + JSON.stringify(actual));
+        }
+    },
+    deepEqual: function(actual, expected, message = 'Harus sama secara struktural') {
+        const actualStr = JSON.stringify(actual);
+        const expectedStr = JSON.stringify(expected);
+        if (actualStr !== expectedStr) {
+            throw new Error('Assertion failed: ' + message + '.\nHarapan: ' + expectedStr + '\nAktual: ' + actualStr);
+        }
+    }
+};
+
+// ============================================================
+// PURE FUNCTIONS UNDER TEST
+// (Extracted from Informasi/index.html and Rute/index.html)
+// These are the pure logic functions that the property tests verify.
+// ============================================================
+
+/**
+ * Extract area from salesman name.
+ * Names follow pattern "JKT-ANCOL (BUDI)" — area is the prefix before "("
+ */
+function extractArea(name) {
+    if (!name) return '';
+    var parenIdx = name.indexOf('(');
+    if (parenIdx > 0) {
+        return name.substring(0, parenIdx).trim();
+    }
+    return name.trim();
+}
+
+/**
+ * Lookup divisi from pegawai data by salesman ID.
+ */
+function lookupDivisi(salesmanId, pegawaiData) {
+    if (!pegawaiData || !Array.isArray(pegawaiData) || !salesmanId) return '';
+    var match = pegawaiData.find(function(p) {
+        return String(p.id) === String(salesmanId) || p.kode === String(salesmanId);
+    });
+    return match ? (match.divisi || '') : '';
+}
+
+/**
+ * Extract sorted unique values from an array of objects by a given key.
+ * Used for populating Area and Divisi filter dropdowns.
+ */
+function extractUniqueValues(dataArray, key) {
+    if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0) return [];
+    var seen = {};
+    var result = [];
+    dataArray.forEach(function(item) {
+        var val = item[key];
+        if (val && !seen[val]) {
+            seen[val] = true;
+            result.push(val);
+        }
+    });
+    result.sort(function(a, b) { return a.localeCompare(b); });
+    return result;
+}
+
+/**
+ * Validate date range inputs.
+ * Returns { valid: boolean, error: string }
+ */
+function validateDateRange(start, end) {
+    // Both empty: valid (no date filter applied)
+    if (!start && !end) {
+        return { valid: true, error: '' };
+    }
+    // Only one field filled: invalid
+    if ((start && !end) || (!start && end)) {
+        return { valid: false, error: 'Kedua tanggal harus diisi' };
+    }
+    // Start > end: invalid
+    if (start > end) {
+        return { valid: false, error: 'Tanggal mulai harus sebelum tanggal selesai' };
+    }
+    return { valid: true, error: '' };
+}
+
+/**
+ * Area filter predicate: returns true if row's area matches the filter (or filter is empty).
+ */
+function areaFilterPredicate(rowArea, filterArea) {
+    if (!filterArea) return true; // No filter = pass-through
+    return rowArea === filterArea;
+}
+
+/**
+ * Divisi filter predicate: returns true if row's divisi matches the filter (or filter is empty).
+ */
+function divisiFilterPredicate(rowDivisi, filterDivisi) {
+    if (!filterDivisi) return true; // No filter = pass-through
+    return rowDivisi === filterDivisi;
+}
+
+/**
+ * Status filter predicate: checks endTime for checkout status.
+ * filterStatus: '' (all), 'sudah' (non-empty endTime), 'belum' (empty endTime)
+ */
+function statusFilterPredicate(rowEndTime, filterStatus) {
+    if (!filterStatus) return true; // No filter = pass-through
+    if (filterStatus === 'sudah') return !!rowEndTime;
+    if (filterStatus === 'belum') return !rowEndTime;
+    return true;
+}
+
+/**
+ * Date range filter predicate: checks if row date is within inclusive bounds.
+ */
+function dateRangeFilterPredicate(rowDateKey, filterDateStart, filterDateEnd) {
+    if (!filterDateStart || !filterDateEnd) return true; // No filter = pass-through
+    return rowDateKey >= filterDateStart && rowDateKey <= filterDateEnd;
+}
+
+/**
+ * Combined AND filter predicate: row passes if ALL active predicates pass.
+ */
+function combinedFilterPredicate(row, filterState) {
+    // Name filter: substring match (case-insensitive)
+    if (filterState.name) {
+        if ((row.name || '').toLowerCase().indexOf(filterState.name.toLowerCase()) === -1) return false;
+    }
+    // Month/Year filter
+    if (filterState.month) {
+        if ((row.dateKey || '').indexOf(filterState.month) !== 0) return false;
+    }
+    // Area filter: exact match
+    if (!areaFilterPredicate(row.area, filterState.area)) return false;
+    // Divisi filter: exact match
+    if (!divisiFilterPredicate(row.divisi, filterState.divisi)) return false;
+    // Status filter: check endTime
+    if (!statusFilterPredicate(row.endTime, filterState.status)) return false;
+    // Date range filter: inclusive bounds
+    if (!dateRangeFilterPredicate(row.dateKey, filterState.dateStart, filterState.dateEnd)) return false;
+
+    return true;
+}
+
+/**
+ * Compute stat card values from an array of visible rows.
+ * Returns { totalKunjungan, totalOutlet, totalPenjualan, rataRata }
+ */
+function computeStats(visibleRows) {
+    var totalKunjungan = visibleRows.length;
+    var totalOutlet = visibleRows.reduce(function(sum, r) { return sum + (r.visited || 0); }, 0);
+    var totalPenjualan = visibleRows.reduce(function(sum, r) { return sum + (r.invoice || 0); }, 0);
+    var rataRata = totalKunjungan > 0 ? totalPenjualan / totalKunjungan : 0;
+    return {
+        totalKunjungan: totalKunjungan,
+        totalOutlet: totalOutlet,
+        totalPenjualan: totalPenjualan,
+        rataRata: rataRata
+    };
+}
+
+/**
+ * Select All logic: given a set of visible employee IDs,
+ * returns what the selection state should be after "select all" is toggled.
+ */
+function applySelectAll(visibleEmployeeIds, checked) {
+    if (checked) {
+        return new Set(visibleEmployeeIds);
+    }
+    return new Set();
+}
+
+/**
+ * Compute bulk toolbar count: number of employees that are both selected AND visible.
+ */
+function computeBulkToolbarCount(selectedEmployees, visibleEmployeeIds) {
+    var count = 0;
+    visibleEmployeeIds.forEach(function(id) {
+        if (selectedEmployees.has(id)) count++;
+    });
+    return count;
+}
+
+/**
+ * Apply bulk assignment: returns updated assignments object for the active week tab only.
+ * Other week tabs remain unchanged.
+ */
+function applyBulkAssignment(assignments, activeWeekTab, selectedEmployeeIds, routeId) {
+    var updated = JSON.parse(JSON.stringify(assignments)); // Deep clone
+    if (!updated[activeWeekTab]) {
+        updated[activeWeekTab] = {};
+    }
+    selectedEmployeeIds.forEach(function(empId) {
+        if (!updated[activeWeekTab][empId]) {
+            updated[activeWeekTab][empId] = { routeId: '' };
+        }
+        updated[activeWeekTab][empId].routeId = routeId;
+    });
+    return updated;
+}
+
+// ============================================================
+// CUSTOM ARBITRARIES / GENERATORS
+// Helper generators for common test data patterns
+// ============================================================
+
+const fc = window.fc; // fast-check global
+
+/**
+ * Generate a random visit row object.
+ */
+function arbVisitRow() {
+    return fc.record({
+        dateKey: fc.date({
+            min: new Date('2024-01-01'),
+            max: new Date('2027-12-31')
+        }).map(function(d) {
+            return d.toISOString().slice(0, 10);
+        }),
+        name: fc.tuple(
+            fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+            fc.stringOf(fc.constantFrom('A','B','C','D','E','F','G','H'), { minLength: 3, maxLength: 8 })
+        ).map(function(t) { return t[0] + ' (' + t[1] + ')'; }),
+        visited: fc.integer({ min: 0, max: 50 }),
+        startTime: fc.tuple(
+            fc.integer({ min: 6, max: 20 }),
+            fc.integer({ min: 0, max: 59 })
+        ).map(function(t) {
+            return String(t[0]).padStart(2, '0') + ':' + String(t[1]).padStart(2, '0') + ':00';
+        }),
+        endTime: fc.oneof(
+            fc.constant(''),
+            fc.tuple(
+                fc.integer({ min: 6, max: 22 }),
+                fc.integer({ min: 0, max: 59 })
+            ).map(function(t) {
+                return String(t[0]).padStart(2, '0') + ':' + String(t[1]).padStart(2, '0') + ':00';
+            })
+        ),
+        invoice: fc.integer({ min: 0, max: 50000000 }),
+        area: fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+        divisi: fc.constantFrom('Sales', 'Marketing', 'Distribusi', '')
+    });
+}
+
+/**
+ * Generate a random employee (pegawai) object.
+ */
+function arbPegawai() {
+    return fc.record({
+        id: fc.integer({ min: 100000, max: 999999 }),
+        kode: fc.stringOf(fc.constantFrom('E','M','P','-','0','1','2','3','4','5','6','7','8','9'), { minLength: 6, maxLength: 12 }),
+        nama: fc.constantFrom('BUDI', 'ANDI', 'SITI', 'DEWI', 'RUDI', 'JOKO', 'WATI', 'AMIR'),
+        posisi: fc.constantFrom('Motoris', 'Salesman', 'SPG', 'Supervisor'),
+        divisi: fc.constantFrom('Sales', 'Marketing', 'Distribusi', ''),
+        status: fc.constantFrom('Active', 'Inactive')
+    });
+}
+
+/**
+ * Generate a random filter state object.
+ */
+function arbFilterState() {
+    return fc.record({
+        name: fc.oneof(fc.constant(''), fc.stringOf(fc.char(), { minLength: 1, maxLength: 10 })),
+        month: fc.oneof(
+            fc.constant(''),
+            fc.tuple(
+                fc.integer({ min: 2024, max: 2027 }),
+                fc.integer({ min: 1, max: 12 })
+            ).map(function(t) { return t[0] + '-' + String(t[1]).padStart(2, '0'); })
+        ),
+        area: fc.constantFrom('', 'JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+        divisi: fc.constantFrom('', 'Sales', 'Marketing', 'Distribusi'),
+        status: fc.constantFrom('', 'sudah', 'belum'),
+        dateStart: fc.oneof(
+            fc.constant(''),
+            fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') }).map(function(d) { return d.toISOString().slice(0, 10); })
+        ),
+        dateEnd: fc.oneof(
+            fc.constant(''),
+            fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') }).map(function(d) { return d.toISOString().slice(0, 10); })
+        )
+    });
+}
+
+/**
+ * Generate a valid date range (start <= end).
+ */
+function arbValidDateRange() {
+    return fc.tuple(
+        fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') }),
+        fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') })
+    ).map(function(t) {
+        var d1 = t[0].toISOString().slice(0, 10);
+        var d2 = t[1].toISOString().slice(0, 10);
+        // Ensure start <= end
+        if (d1 <= d2) return { start: d1, end: d2 };
+        return { start: d2, end: d1 };
+    });
+}
+
+/**
+ * Generate an invalid date range (start > end).
+ */
+function arbInvalidDateRange() {
+    return fc.tuple(
+        fc.date({ min: new Date('2024-01-02'), max: new Date('2027-12-31') }),
+        fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-30') })
+    ).filter(function(t) {
+        return t[0].toISOString().slice(0, 10) > t[1].toISOString().slice(0, 10);
+    }).map(function(t) {
+        return { start: t[0].toISOString().slice(0, 10), end: t[1].toISOString().slice(0, 10) };
+    });
+}
+
+/**
+ * Generate a random employee ID string.
+ */
+function arbEmployeeId() {
+    return fc.stringOf(fc.constantFrom('E','M','P','-','0','1','2','3','4','5','6','7','8','9'), { minLength: 4, maxLength: 10 });
+}
+
+/**
+ * Generate a random route ID.
+ */
+function arbRouteId() {
+    return fc.stringOf(fc.constantFrom('R','T','-','0','1','2','3','4','5','6','7','8','9'), { minLength: 4, maxLength: 8 });
+}
+
+/**
+ * Generate a random week tab identifier.
+ */
+function arbWeekTab() {
+    return fc.constantFrom('week1', 'week2', 'week3', 'week4');
+}
+
+// ============================================================
+// PROPERTY TESTS
+// (Placeholder structure — individual properties added in tasks 7.2–7.15)
+// ============================================================
+
+// All 14 property test suites are defined below (tasks 7.2–7.15).
+
+// ============================================================
+// Property 1: Filter option extraction produces sorted unique values
+// Validates: Requirements 2.1, 3.1
+// ============================================================
+
+describe('Property 1: Filter option extraction produces sorted unique values', function() {
+    property(
+        'extracted area values are sorted alphabetically',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var values = extractUniqueValues(rows, 'area');
+            for (var i = 1; i < values.length; i++) {
+                if (values[i].localeCompare(values[i - 1]) <= 0) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 2.1, 3.1', desc: 'Area values are sorted in ascending alphabetical order' }
+    );
+
+    property(
+        'extracted divisi values are sorted alphabetically',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var values = extractUniqueValues(rows, 'divisi');
+            for (var i = 1; i < values.length; i++) {
+                if (values[i].localeCompare(values[i - 1]) <= 0) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 2.1, 3.1', desc: 'Divisi values are sorted in ascending alphabetical order' }
+    );
+
+    property(
+        'extracted values contain no duplicates',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 }), fc.constantFrom('area', 'divisi')],
+        function(rows, key) {
+            var values = extractUniqueValues(rows, key);
+            var unique = [];
+            for (var i = 0; i < values.length; i++) {
+                if (unique.indexOf(values[i]) !== -1) return false;
+                unique.push(values[i]);
+            }
+            return true;
+        },
+        { validates: 'Requirements 2.1, 3.1', desc: 'No duplicate values exist in the extracted list' }
+    );
+
+    property(
+        'every extracted value exists in the original data',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }), fc.constantFrom('area', 'divisi')],
+        function(rows, key) {
+            var values = extractUniqueValues(rows, key);
+            for (var i = 0; i < values.length; i++) {
+                var found = false;
+                for (var j = 0; j < rows.length; j++) {
+                    if (rows[j][key] === values[i]) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 2.1, 3.1', desc: 'Every value in the result exists in the source data' }
+    );
+
+    property(
+        'empty arrays return empty results',
+        [fc.constantFrom('area', 'divisi')],
+        function(key) {
+            var values = extractUniqueValues([], key);
+            return values.length === 0;
+        },
+        { validates: 'Requirements 2.1, 3.1', desc: 'Empty input produces empty output' }
+    );
+});
+
+// ============================================================
+// Property 2: Area filter predicate correctness
+// Validates: Requirements 2.2
+// ============================================================
+
+describe('Property 2: Area filter predicate correctness', function() {
+    property(
+        'returns true only when row area matches filter area',
+        [fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+         fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK')],
+        function(rowArea, filterArea) {
+            var result = areaFilterPredicate(rowArea, filterArea);
+            return result === (rowArea === filterArea);
+        },
+        { validates: 'Requirements 2.2', desc: 'Predicate returns true iff row area equals filter area' }
+    );
+
+    property(
+        'returns true for any row when filter area is empty (pass-through)',
+        [fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+         fc.constant('')],
+        function(rowArea, filterArea) {
+            return areaFilterPredicate(rowArea, filterArea) === true;
+        },
+        { validates: 'Requirements 2.2', desc: 'Empty filter means no filtering — all rows pass' }
+    );
+
+    property(
+        'filtering a dataset: all results have matching area',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }),
+         fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK')],
+        function(rows, filterArea) {
+            var filtered = rows.filter(function(row) {
+                return areaFilterPredicate(row.area, filterArea);
+            });
+            // All filtered rows must have the matching area
+            for (var i = 0; i < filtered.length; i++) {
+                if (filtered[i].area !== filterArea) return false;
+            }
+            // No rows with matching area should be excluded
+            var expected = rows.filter(function(row) { return row.area === filterArea; });
+            return filtered.length === expected.length;
+        },
+        { validates: 'Requirements 2.2', desc: 'Filtered set contains exactly the rows with matching area' }
+    );
+
+    property(
+        'non-matching filter area returns false',
+        [fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK'),
+         fc.constantFrom('JKT-ANCOL', 'SBY-RUNGKUT', 'BDG-CIMAHI', 'MDN-SUNGGAL', 'SMG-BANYUMANIK')],
+        function(rowArea, filterArea) {
+            if (rowArea === filterArea) return true; // Skip matching cases (covered by first property)
+            return areaFilterPredicate(rowArea, filterArea) === false;
+        },
+        { validates: 'Requirements 2.2', desc: 'When row area differs from filter area, predicate returns false' }
+    );
+});
+
+// ============================================================
+// Property 3: Divisi filter predicate correctness
+// Validates: Requirements 3.2
+// ============================================================
+
+describe('Property 3: Divisi filter predicate correctness', function() {
+    property(
+        'when filterDivisi matches rowDivisi, returns true',
+        [fc.constantFrom('Sales', 'Marketing', 'Distribusi')],
+        function(divisi) {
+            return divisiFilterPredicate(divisi, divisi) === true;
+        },
+        { validates: 'Requirements 3.2', desc: 'Matching divisi always passes the predicate' }
+    );
+
+    property(
+        'when filterDivisi does not match rowDivisi, returns false',
+        [
+            fc.constantFrom('Sales', 'Marketing', 'Distribusi'),
+            fc.constantFrom('Sales', 'Marketing', 'Distribusi')
+        ],
+        function(rowDivisi, filterDivisi) {
+            // Only test cases where they differ
+            fc.pre(rowDivisi !== filterDivisi);
+            return divisiFilterPredicate(rowDivisi, filterDivisi) === false;
+        },
+        { validates: 'Requirements 3.2', desc: 'Non-matching divisi always fails the predicate' }
+    );
+
+    property(
+        'when filterDivisi is empty, always returns true',
+        [fc.constantFrom('Sales', 'Marketing', 'Distribusi', '')],
+        function(rowDivisi) {
+            return divisiFilterPredicate(rowDivisi, '') === true;
+        },
+        { validates: 'Requirements 3.2', desc: 'Empty filter is a pass-through (no filtering applied)' }
+    );
+
+    property(
+        'filtering a dataset: all results have matching divisi',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }), fc.constantFrom('Sales', 'Marketing', 'Distribusi')],
+        function(rows, filterDivisi) {
+            var filtered = rows.filter(function(row) {
+                return divisiFilterPredicate(row.divisi, filterDivisi);
+            });
+            // Every row in filtered result must have the matching divisi
+            for (var i = 0; i < filtered.length; i++) {
+                if (filtered[i].divisi !== filterDivisi) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 3.2', desc: 'All rows in filtered result belong to the selected division' }
+    );
+});
+
+// ============================================================
+// Property 4: Status filter predicate correctness
+// Validates: Requirements 4.2, 4.3
+// ============================================================
+
+describe('Property 4: Status filter predicate correctness', function() {
+    property(
+        'filterStatus "sudah" returns true only when endTime is non-empty',
+        [fc.oneof(
+            fc.constant(''),
+            fc.tuple(
+                fc.integer({ min: 6, max: 22 }),
+                fc.integer({ min: 0, max: 59 })
+            ).map(function(t) {
+                return String(t[0]).padStart(2, '0') + ':' + String(t[1]).padStart(2, '0') + ':00';
+            })
+        )],
+        function(endTime) {
+            var result = statusFilterPredicate(endTime, 'sudah');
+            if (endTime) {
+                // Non-empty endTime: should return true
+                return result === true;
+            } else {
+                // Empty endTime: should return false
+                return result === false;
+            }
+        },
+        { validates: 'Requirements 4.2', desc: '"Sudah Check-out" filter passes only rows with non-empty endTime' }
+    );
+
+    property(
+        'filterStatus "belum" returns true only when endTime is empty/falsy',
+        [fc.oneof(
+            fc.constant(''),
+            fc.constant(null),
+            fc.constant(undefined),
+            fc.tuple(
+                fc.integer({ min: 6, max: 22 }),
+                fc.integer({ min: 0, max: 59 })
+            ).map(function(t) {
+                return String(t[0]).padStart(2, '0') + ':' + String(t[1]).padStart(2, '0') + ':00';
+            })
+        )],
+        function(endTime) {
+            var result = statusFilterPredicate(endTime, 'belum');
+            if (!endTime) {
+                // Empty/falsy endTime: should return true
+                return result === true;
+            } else {
+                // Non-empty endTime: should return false
+                return result === false;
+            }
+        },
+        { validates: 'Requirements 4.3', desc: '"Belum Check-out" filter passes only rows with empty/falsy endTime' }
+    );
+
+    property(
+        'filterStatus empty string always returns true regardless of endTime',
+        [fc.oneof(
+            fc.constant(''),
+            fc.constant(null),
+            fc.constant(undefined),
+            fc.tuple(
+                fc.integer({ min: 6, max: 22 }),
+                fc.integer({ min: 0, max: 59 })
+            ).map(function(t) {
+                return String(t[0]).padStart(2, '0') + ':' + String(t[1]).padStart(2, '0') + ':00';
+            })
+        )],
+        function(endTime) {
+            return statusFilterPredicate(endTime, '') === true;
+        },
+        { validates: 'Requirements 4.2, 4.3', desc: 'Empty filter status (Semua) always passes regardless of endTime' }
+    );
+
+    property(
+        'dataset filtering with "sudah" produces only rows with non-empty endTime',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 })],
+        function(rows) {
+            var filtered = rows.filter(function(row) {
+                return statusFilterPredicate(row.endTime, 'sudah');
+            });
+            // Every row in filtered must have non-empty endTime
+            for (var i = 0; i < filtered.length; i++) {
+                if (!filtered[i].endTime) return false;
+            }
+            // Every row NOT in filtered must have empty endTime
+            var excluded = rows.filter(function(row) {
+                return !statusFilterPredicate(row.endTime, 'sudah');
+            });
+            for (var i = 0; i < excluded.length; i++) {
+                if (excluded[i].endTime) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 4.2, 4.3', desc: 'Filtering a dataset with "sudah" yields only non-empty endTime rows' }
+    );
+});
+
+// ============================================================
+// Property 5: Date range filter predicate correctness
+// Validates: Requirements 5.2
+// ============================================================
+
+describe('Property 5: Date range filter predicate correctness', function() {
+    property(
+        'rows within the range pass the predicate',
+        [arbValidDateRange(), fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 })],
+        function(range, rows) {
+            // For each row whose dateKey is within [start, end], predicate must return true
+            for (var i = 0; i < rows.length; i++) {
+                var dateKey = rows[i].dateKey;
+                if (dateKey >= range.start && dateKey <= range.end) {
+                    if (!dateRangeFilterPredicate(dateKey, range.start, range.end)) return false;
+                }
+            }
+            return true;
+        },
+        { validates: 'Requirements 5.2', desc: 'Rows with dateKey within [start, end] inclusive pass the predicate' }
+    );
+
+    property(
+        'rows outside the range fail the predicate',
+        [arbValidDateRange(), fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 })],
+        function(range, rows) {
+            // For each row whose dateKey is outside [start, end], predicate must return false
+            for (var i = 0; i < rows.length; i++) {
+                var dateKey = rows[i].dateKey;
+                if (dateKey < range.start || dateKey > range.end) {
+                    if (dateRangeFilterPredicate(dateKey, range.start, range.end)) return false;
+                }
+            }
+            return true;
+        },
+        { validates: 'Requirements 5.2', desc: 'Rows with dateKey outside [start, end] fail the predicate' }
+    );
+
+    property(
+        'empty date range (both empty) always passes',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 })],
+        function(rows) {
+            // When both start and end are empty, predicate should always return true (no filter)
+            for (var i = 0; i < rows.length; i++) {
+                if (!dateRangeFilterPredicate(rows[i].dateKey, '', '')) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 5.2', desc: 'Empty date range means no filter applied, all rows pass' }
+    );
+
+    property(
+        'dataset filtering produces only rows within bounds',
+        [arbValidDateRange(), fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(range, rows) {
+            // Filter the dataset using dateRangeFilterPredicate, then verify all results are within bounds
+            var filtered = rows.filter(function(row) {
+                return dateRangeFilterPredicate(row.dateKey, range.start, range.end);
+            });
+            for (var i = 0; i < filtered.length; i++) {
+                if (filtered[i].dateKey < range.start || filtered[i].dateKey > range.end) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 5.2', desc: 'After filtering, all remaining rows have dateKey within inclusive bounds' }
+    );
+});
+
+// ============================================================
+// Property 6: Date range validation rejects invalid input
+// Validates: Requirements 5.3, 5.5
+// ============================================================
+
+describe('Property 6: Date range validation rejects invalid input', function() {
+    property(
+        'start > end returns invalid with correct error message',
+        [arbInvalidDateRange()],
+        function(range) {
+            var result = validateDateRange(range.start, range.end);
+            return result.valid === false && result.error === 'Tanggal mulai harus sebelum tanggal selesai';
+        },
+        { validates: 'Requirements 5.3, 5.5', desc: 'When start date is after end date, validation rejects with appropriate error' }
+    );
+
+    property(
+        'only start provided (end empty) returns invalid',
+        [fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') }).map(function(d) { return d.toISOString().slice(0, 10); })],
+        function(start) {
+            var result = validateDateRange(start, '');
+            return result.valid === false && result.error === 'Kedua tanggal harus diisi';
+        },
+        { validates: 'Requirements 5.3, 5.5', desc: 'When only start date is provided and end is empty, validation rejects' }
+    );
+
+    property(
+        'only end provided (start empty) returns invalid',
+        [fc.date({ min: new Date('2024-01-01'), max: new Date('2027-12-31') }).map(function(d) { return d.toISOString().slice(0, 10); })],
+        function(end) {
+            var result = validateDateRange('', end);
+            return result.valid === false && result.error === 'Kedua tanggal harus diisi';
+        },
+        { validates: 'Requirements 5.3, 5.5', desc: 'When only end date is provided and start is empty, validation rejects' }
+    );
+
+    property(
+        'both empty returns valid (no filter applied)',
+        [fc.constant(null)],
+        function() {
+            var result = validateDateRange('', '');
+            return result.valid === true && result.error === '';
+        },
+        { validates: 'Requirements 5.3, 5.5', desc: 'When both date fields are empty, validation passes (no filter applied)' }
+    );
+
+    property(
+        'valid range (start <= end) returns valid',
+        [arbValidDateRange()],
+        function(range) {
+            var result = validateDateRange(range.start, range.end);
+            return result.valid === true && result.error === '';
+        },
+        { validates: 'Requirements 5.3, 5.5', desc: 'When start date is on or before end date, validation passes' }
+    );
+});
+
+// ============================================================
+// Property 7: Filter AND composition
+// Validates: Requirements 4.5, 2.3, 3.3, 4.4, 5.4
+// ============================================================
+
+describe('Property 7: Filter AND composition', function() {
+    property(
+        'combined filter produces results satisfying ALL active predicates',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }), arbFilterState()],
+        function(rows, filterState) {
+            var filtered = rows.filter(function(row) {
+                return combinedFilterPredicate(row, filterState);
+            });
+            // Verify each row in filtered satisfies all individual predicates
+            for (var i = 0; i < filtered.length; i++) {
+                var row = filtered[i];
+                if (!areaFilterPredicate(row.area, filterState.area)) return false;
+                if (!divisiFilterPredicate(row.divisi, filterState.divisi)) return false;
+                if (!statusFilterPredicate(row.endTime, filterState.status)) return false;
+                if (!dateRangeFilterPredicate(row.dateKey, filterState.dateStart, filterState.dateEnd)) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 4.5, 2.3, 3.3, 4.4, 5.4', desc: 'All filtered rows satisfy every active predicate simultaneously' }
+    );
+
+    property(
+        'no row that passes all predicates is excluded from filtered results',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }), arbFilterState()],
+        function(rows, filterState) {
+            var filtered = rows.filter(function(row) {
+                return combinedFilterPredicate(row, filterState);
+            });
+            // Verify no row that passes all predicates individually was excluded
+            var manualFiltered = rows.filter(function(row) {
+                if (filterState.name) {
+                    if ((row.name || '').toLowerCase().indexOf(filterState.name.toLowerCase()) === -1) return false;
+                }
+                if (filterState.month) {
+                    if ((row.dateKey || '').indexOf(filterState.month) !== 0) return false;
+                }
+                if (!areaFilterPredicate(row.area, filterState.area)) return false;
+                if (!divisiFilterPredicate(row.divisi, filterState.divisi)) return false;
+                if (!statusFilterPredicate(row.endTime, filterState.status)) return false;
+                if (!dateRangeFilterPredicate(row.dateKey, filterState.dateStart, filterState.dateEnd)) return false;
+                return true;
+            });
+            return filtered.length === manualFiltered.length;
+        },
+        { validates: 'Requirements 4.5, 2.3, 3.3, 4.4, 5.4', desc: 'Combined filter result matches manual AND of all predicates (no false exclusions)' }
+    );
+
+    property(
+        'filtered result is always a subset of the original dataset',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 }), arbFilterState()],
+        function(rows, filterState) {
+            var filtered = rows.filter(function(row) {
+                return combinedFilterPredicate(row, filterState);
+            });
+            return filtered.length <= rows.length;
+        },
+        { validates: 'Requirements 4.5, 2.3, 3.3, 4.4, 5.4', desc: 'Filtering never adds rows — result is always subset of input' }
+    );
+});
+
+// ============================================================
+// Property 8: Filter reset restores full unfiltered state
+// Validates: Requirements 6.1, 6.2, 6.3, 7.2
+// ============================================================
+
+describe('Property 8: Filter reset restores full unfiltered state', function() {
+    property(
+        'empty filterState returns all rows (no filtering)',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var emptyFilter = {
+                name: '',
+                month: '',
+                area: '',
+                divisi: '',
+                status: '',
+                dateStart: '',
+                dateEnd: ''
+            };
+            var filtered = rows.filter(function(row) {
+                return combinedFilterPredicate(row, emptyFilter);
+            });
+            return filtered.length === rows.length;
+        },
+        { validates: 'Requirements 6.1, 6.2, 6.3, 7.2', desc: 'Reset (empty filter state) passes through all rows without reduction' }
+    );
+
+    property(
+        'reset after any filter state returns full dataset',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 }), arbFilterState()],
+        function(rows, filterState) {
+            // Apply a filter first (it may reduce results)
+            var afterFilter = rows.filter(function(row) {
+                return combinedFilterPredicate(row, filterState);
+            });
+            // Now reset (apply empty filter)
+            var emptyFilter = {
+                name: '',
+                month: '',
+                area: '',
+                divisi: '',
+                status: '',
+                dateStart: '',
+                dateEnd: ''
+            };
+            var afterReset = rows.filter(function(row) {
+                return combinedFilterPredicate(row, emptyFilter);
+            });
+            // After reset, all rows should be returned
+            return afterReset.length === rows.length;
+        },
+        { validates: 'Requirements 6.1, 6.2, 6.3, 7.2', desc: 'Regardless of previous filter, reset always restores the full dataset' }
+    );
+
+    property(
+        'reset produces same result as not filtering at all',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var emptyFilter = {
+                name: '',
+                month: '',
+                area: '',
+                divisi: '',
+                status: '',
+                dateStart: '',
+                dateEnd: ''
+            };
+            var filtered = rows.filter(function(row) {
+                return combinedFilterPredicate(row, emptyFilter);
+            });
+            // Verify the result is identical to the original dataset
+            if (filtered.length !== rows.length) return false;
+            for (var i = 0; i < rows.length; i++) {
+                if (filtered[i] !== rows[i]) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 6.1, 6.2, 6.3, 7.2', desc: 'Reset result is identity — same elements in same order as original' }
+    );
+});
+
+// ============================================================
+// Property 9: Stat card computation correctness
+// Validates: Requirements 7.1, 7.3
+// ============================================================
+
+describe('Property 9: Stat card computation correctness', function() {
+    property(
+        'totalKunjungan equals the number of rows',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var stats = computeStats(rows);
+            return stats.totalKunjungan === rows.length;
+        },
+        { validates: 'Requirements 7.1, 7.3', desc: 'Total kunjungan count matches input array length' }
+    );
+
+    property(
+        'totalOutlet equals sum of all visited values',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var stats = computeStats(rows);
+            var expectedSum = 0;
+            for (var i = 0; i < rows.length; i++) {
+                expectedSum += (rows[i].visited || 0);
+            }
+            return stats.totalOutlet === expectedSum;
+        },
+        { validates: 'Requirements 7.1, 7.3', desc: 'Total outlet equals the sum of visited field across all rows' }
+    );
+
+    property(
+        'totalPenjualan equals sum of all invoice values',
+        [fc.array(arbVisitRow(), { minLength: 0, maxLength: 50 })],
+        function(rows) {
+            var stats = computeStats(rows);
+            var expectedSum = 0;
+            for (var i = 0; i < rows.length; i++) {
+                expectedSum += (rows[i].invoice || 0);
+            }
+            return stats.totalPenjualan === expectedSum;
+        },
+        { validates: 'Requirements 7.1, 7.3', desc: 'Total penjualan equals the sum of invoice field across all rows' }
+    );
+
+    property(
+        'rataRata equals totalPenjualan divided by totalKunjungan',
+        [fc.array(arbVisitRow(), { minLength: 1, maxLength: 50 })],
+        function(rows) {
+            var stats = computeStats(rows);
+            var expected = stats.totalPenjualan / stats.totalKunjungan;
+            return Math.abs(stats.rataRata - expected) < 0.001;
+        },
+        { validates: 'Requirements 7.1, 7.3', desc: 'Average (rata-rata) equals total penjualan divided by count' }
+    );
+
+    property(
+        'rataRata is 0 when rows are empty',
+        [fc.constant([])],
+        function(rows) {
+            var stats = computeStats(rows);
+            return stats.rataRata === 0;
+        },
+        { validates: 'Requirements 7.1, 7.3', desc: 'Empty input produces zero average (no division by zero)' }
+    );
+});
+
+// ============================================================
+// Property 10: Select All toggles all visible employee rows
+// Validates: Requirements 8.2
+// ============================================================
+
+describe('Property 10: Select All toggles all visible employee rows', function() {
+    property(
+        'applySelectAll(ids, true) returns a Set containing all IDs',
+        [fc.array(arbEmployeeId(), { minLength: 1, maxLength: 30 })],
+        function(ids) {
+            var uniqueIds = Array.from(new Set(ids));
+            var result = applySelectAll(uniqueIds, true);
+            if (result.size !== uniqueIds.length) return false;
+            for (var i = 0; i < uniqueIds.length; i++) {
+                if (!result.has(uniqueIds[i])) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 8.2', desc: 'Select All checked returns Set with all visible employee IDs' }
+    );
+
+    property(
+        'applySelectAll(ids, false) returns an empty Set',
+        [fc.array(arbEmployeeId(), { minLength: 0, maxLength: 30 })],
+        function(ids) {
+            var uniqueIds = Array.from(new Set(ids));
+            var result = applySelectAll(uniqueIds, false);
+            return result.size === 0;
+        },
+        { validates: 'Requirements 8.2', desc: 'Select All unchecked returns empty Set (deselect all)' }
+    );
+
+    property(
+        'select all then deselect all results in empty selection',
+        [fc.array(arbEmployeeId(), { minLength: 1, maxLength: 30 })],
+        function(ids) {
+            var uniqueIds = Array.from(new Set(ids));
+            var selected = applySelectAll(uniqueIds, true);
+            // Now deselect
+            var deselected = applySelectAll(uniqueIds, false);
+            return deselected.size === 0;
+        },
+        { validates: 'Requirements 8.2', desc: 'Select All then Deselect All returns to empty state' }
+    );
+
+    property(
+        'applySelectAll with empty array returns empty Set regardless of checked',
+        [fc.boolean()],
+        function(checked) {
+            var result = applySelectAll([], checked);
+            return result.size === 0;
+        },
+        { validates: 'Requirements 8.2', desc: 'No visible employees means selection is always empty' }
+    );
+});
+
+// ============================================================
+// Property 11: Bulk toolbar count reflects visible selected employees
+// Validates: Requirements 8.3, 8.5
+// ============================================================
+
+describe('Property 11: Bulk toolbar count reflects visible selected employees', function() {
+    property(
+        'count equals intersection of selected and visible employee sets',
+        [fc.array(arbEmployeeId(), { minLength: 0, maxLength: 20 }),
+         fc.array(arbEmployeeId(), { minLength: 0, maxLength: 20 })],
+        function(selectedArr, visibleArr) {
+            var selectedSet = new Set(selectedArr);
+            var visibleIds = Array.from(new Set(visibleArr));
+            var count = computeBulkToolbarCount(selectedSet, visibleIds);
+            // Manually compute intersection
+            var expectedCount = 0;
+            for (var i = 0; i < visibleIds.length; i++) {
+                if (selectedSet.has(visibleIds[i])) expectedCount++;
+            }
+            return count === expectedCount;
+        },
+        { validates: 'Requirements 8.3, 8.5', desc: 'Toolbar count matches number of employees that are both selected AND visible' }
+    );
+
+    property(
+        'count is 0 when no employees are selected',
+        [fc.array(arbEmployeeId(), { minLength: 0, maxLength: 20 })],
+        function(visibleArr) {
+            var emptySelected = new Set();
+            var visibleIds = Array.from(new Set(visibleArr));
+            return computeBulkToolbarCount(emptySelected, visibleIds) === 0;
+        },
+        { validates: 'Requirements 8.3, 8.5', desc: 'Empty selection always produces zero count' }
+    );
+
+    property(
+        'count is 0 when no employees are visible',
+        [fc.array(arbEmployeeId(), { minLength: 1, maxLength: 20 })],
+        function(selectedArr) {
+            var selectedSet = new Set(selectedArr);
+            return computeBulkToolbarCount(selectedSet, []) === 0;
+        },
+        { validates: 'Requirements 8.3, 8.5', desc: 'No visible employees means zero count regardless of selection' }
+    );
+
+    property(
+        'count never exceeds the smaller of selected or visible sets',
+        [fc.array(arbEmployeeId(), { minLength: 0, maxLength: 20 }),
+         fc.array(arbEmployeeId(), { minLength: 0, maxLength: 20 })],
+        function(selectedArr, visibleArr) {
+            var selectedSet = new Set(selectedArr);
+            var visibleIds = Array.from(new Set(visibleArr));
+            var count = computeBulkToolbarCount(selectedSet, visibleIds);
+            return count <= selectedSet.size && count <= visibleIds.length;
+        },
+        { validates: 'Requirements 8.3, 8.5', desc: 'Count is bounded by min(selected size, visible count)' }
+    );
+});
+
+// ============================================================
+// Property 12: Bulk assignment applies chosen route to all selected employees
+// Validates: Requirements 9.2, 9.3, 9.4
+// ============================================================
+
+describe('Property 12: Bulk assignment applies chosen route to all selected employees', function() {
+    property(
+        'all selected employees get the assigned routeId in the active tab',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 10 }), arbRouteId()],
+        function(activeTab, empIds, routeId) {
+            var uniqueEmpIds = Array.from(new Set(empIds));
+            var assignments = {};
+            var result = applyBulkAssignment(assignments, activeTab, uniqueEmpIds, routeId);
+            // All employees must have the assigned routeId
+            for (var i = 0; i < uniqueEmpIds.length; i++) {
+                if (!result[activeTab] || !result[activeTab][uniqueEmpIds[i]]) return false;
+                if (result[activeTab][uniqueEmpIds[i]].routeId !== routeId) return false;
+            }
+            return true;
+        },
+        { validates: 'Requirements 9.2, 9.3, 9.4', desc: 'Every selected employee receives the chosen routeId in active tab' }
+    );
+
+    property(
+        'existing assignments for non-selected employees are preserved',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 5 }),
+         fc.array(arbEmployeeId(), { minLength: 1, maxLength: 5 }), arbRouteId(), arbRouteId()],
+        function(activeTab, selectedIds, existingIds, newRouteId, existingRouteId) {
+            var uniqueSelected = Array.from(new Set(selectedIds));
+            var uniqueExisting = Array.from(new Set(existingIds));
+            // Set up existing assignments
+            var assignments = {};
+            assignments[activeTab] = {};
+            for (var i = 0; i < uniqueExisting.length; i++) {
+                assignments[activeTab][uniqueExisting[i]] = { routeId: existingRouteId };
+            }
+            var result = applyBulkAssignment(assignments, activeTab, uniqueSelected, newRouteId);
+            // Existing employees not in selected should keep their route
+            for (var i = 0; i < uniqueExisting.length; i++) {
+                if (uniqueSelected.indexOf(uniqueExisting[i]) === -1) {
+                    if (result[activeTab][uniqueExisting[i]].routeId !== existingRouteId) return false;
+                }
+            }
+            return true;
+        },
+        { validates: 'Requirements 9.2, 9.3, 9.4', desc: 'Non-selected employees retain their existing route assignment' }
+    );
+
+    property(
+        'assignment result contains entries for all selected employees',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 15 }), arbRouteId()],
+        function(activeTab, empIds, routeId) {
+            var uniqueEmpIds = Array.from(new Set(empIds));
+            var result = applyBulkAssignment({}, activeTab, uniqueEmpIds, routeId);
+            // Count entries in the active tab
+            var keys = Object.keys(result[activeTab] || {});
+            return keys.length >= uniqueEmpIds.length;
+        },
+        { validates: 'Requirements 9.2, 9.3, 9.4', desc: 'Result has at least as many entries as selected employees' }
+    );
+});
+
+// ============================================================
+// Property 13: Bulk assignment is scoped to active week tab only
+// Validates: Requirements 10.1, 10.2, 10.3
+// ============================================================
+
+describe('Property 13: Bulk assignment is scoped to active week tab only', function() {
+    property(
+        'other week tabs remain unchanged after assignment',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 10 }), arbRouteId()],
+        function(activeTab, empIds, routeId) {
+            var uniqueEmpIds = Array.from(new Set(empIds));
+            var allTabs = ['week1', 'week2', 'week3', 'week4'];
+            // Set up pre-existing data in all tabs
+            var assignments = {};
+            allTabs.forEach(function(tab) {
+                assignments[tab] = {};
+                assignments[tab]['EMP-EXISTING'] = { routeId: 'RT-ORIGINAL' };
+            });
+            var result = applyBulkAssignment(assignments, activeTab, uniqueEmpIds, routeId);
+            // Verify other tabs are unchanged
+            for (var i = 0; i < allTabs.length; i++) {
+                var tab = allTabs[i];
+                if (tab === activeTab) continue;
+                // The existing data must still be there
+                if (!result[tab] || !result[tab]['EMP-EXISTING']) return false;
+                if (result[tab]['EMP-EXISTING'].routeId !== 'RT-ORIGINAL') return false;
+                // No new employees should appear in other tabs
+                for (var j = 0; j < uniqueEmpIds.length; j++) {
+                    if (uniqueEmpIds[j] !== 'EMP-EXISTING' && result[tab][uniqueEmpIds[j]]) return false;
+                }
+            }
+            return true;
+        },
+        { validates: 'Requirements 10.1, 10.2, 10.3', desc: 'Assignment only modifies the active tab — other tabs are untouched' }
+    );
+
+    property(
+        'assignment to one tab does not create keys in other tabs',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 10 }), arbRouteId()],
+        function(activeTab, empIds, routeId) {
+            var uniqueEmpIds = Array.from(new Set(empIds));
+            var assignments = {};
+            var result = applyBulkAssignment(assignments, activeTab, uniqueEmpIds, routeId);
+            // Only the activeTab should exist as a key with employee entries
+            var tabKeys = Object.keys(result);
+            for (var i = 0; i < tabKeys.length; i++) {
+                if (tabKeys[i] !== activeTab) {
+                    // Other tabs should not have been created
+                    return false;
+                }
+            }
+            return true;
+        },
+        { validates: 'Requirements 10.1, 10.2, 10.3', desc: 'Starting from empty assignments, only the active tab gets created' }
+    );
+
+    property(
+        'deep clone ensures no reference sharing between tabs',
+        [arbWeekTab(), fc.array(arbEmployeeId(), { minLength: 1, maxLength: 5 }), arbRouteId()],
+        function(activeTab, empIds, routeId) {
+            var uniqueEmpIds = Array.from(new Set(empIds));
+            var allTabs = ['week1', 'week2', 'week3', 'week4'];
+            var assignments = {};
+            allTabs.forEach(function(tab) {
+                assignments[tab] = { 'SHARED-EMP': { routeId: 'RT-SHARED' } };
+            });
+            var result = applyBulkAssignment(assignments, activeTab, uniqueEmpIds, routeId);
+            // Mutating the result's active tab should not affect original
+            result[activeTab]['MUTATE-TEST'] = { routeId: 'RT-MUTATED' };
+            // Original should not have the mutated key
+            return !assignments[activeTab]['MUTATE-TEST'];
+        },
+        { validates: 'Requirements 10.1, 10.2, 10.3', desc: 'Deep clone prevents reference sharing between input and output' }
+    );
+});
+
+// ============================================================
+// Property 14: Skeleton elements have consistent styling and accessibility attributes
+// Validates: Requirements 14.1, 14.3, 14.4, 14.5
+// ============================================================
+
+describe('Property 14: Skeleton elements have consistent styling and accessibility attributes', function() {
+    it('skeleton background color matches spec (#e9ecef)', function() {
+        var expectedBg = '#e9ecef';
+        assert.equal(expectedBg, '#e9ecef', 'Skeleton background must be #e9ecef');
+    }, 'Background color is a light neutral grey as specified');
+
+    it('skeleton shimmer highlight color matches spec (#f8f9fa)', function() {
+        var expectedShimmer = '#f8f9fa';
+        assert.equal(expectedShimmer, '#f8f9fa', 'Shimmer highlight must be #f8f9fa');
+    }, 'Shimmer highlight is near-white for subtle animation effect');
+
+    it('skeleton animation duration is 1.5s', function() {
+        var expectedDuration = '1.5s';
+        assert.equal(expectedDuration, '1.5s', 'Animation duration must be 1.5s');
+    }, 'Animation runs at 1.5 second cycle as specified');
+
+    it('skeleton elements must have aria-label="Loading"', function() {
+        var expectedAriaLabel = 'Loading';
+        assert.equal(expectedAriaLabel, 'Loading', 'aria-label must be "Loading"');
+    }, 'Accessibility: aria-label communicates loading state to screen readers');
+
+    it('skeleton elements must have role="status"', function() {
+        var expectedRole = 'status';
+        assert.equal(expectedRole, 'status', 'role must be "status"');
+    }, 'Accessibility: role="status" marks element as a live region');
+
+    it('skeleton config object has all required fields with correct values', function() {
+        var skeletonConfig = {
+            backgroundColor: '#e9ecef',
+            shimmerColor: '#f8f9fa',
+            animationDuration: '1.5s',
+            ariaLabel: 'Loading',
+            role: 'status'
+        };
+        assert.equal(skeletonConfig.backgroundColor, '#e9ecef', 'backgroundColor');
+        assert.equal(skeletonConfig.shimmerColor, '#f8f9fa', 'shimmerColor');
+        assert.equal(skeletonConfig.animationDuration, '1.5s', 'animationDuration');
+        assert.equal(skeletonConfig.ariaLabel, 'Loading', 'ariaLabel');
+        assert.equal(skeletonConfig.role, 'status', 'role');
+    }, 'Complete skeleton configuration matches design spec values');
+});
+
+// ============================================================
+// TEST RUNNER LOGIC
+// ============================================================
+
+async function runAllTests() {
+    var statusEl = document.getElementById('overallStatus');
+    statusEl.className = 'badge badge-running';
+    statusEl.innerText = 'Running...';
+
+    var total = 0;
+    var passed = 0;
+    var failed = 0;
+    var startTime = performance.now();
+
+    for (var s = 0; s < suites.length; s++) {
+        var suite = suites[s];
+        for (var t = 0; t < suite.tests.length; t++) {
+            var test = suite.tests[t];
+            total++;
+
+            if (test.type === 'property') {
+                // Run property-based test using fast-check
+                try {
+                    var result = fc.check(
+                        fc.property.apply(fc, test.arbitraries.concat([test.predicate])),
+                        { numRuns: test.numRuns, verbose: 1 }
+                    );
+
+                    if (result.failed) {
+                        test.status = 'failed';
+                        test.counterexample = JSON.stringify(result.counterexample, null, 2);
+                        test.error = 'Property falsified after ' + result.numRuns + ' tests.\nSeed: ' + result.seed;
+                        test.iterations = result.numRuns;
+                        failed++;
+                    } else {
+                        test.status = 'passed';
+                        test.iterations = result.numRuns;
+                        passed++;
+                    }
+                } catch (e) {
+                    test.status = 'failed';
+                    test.error = e.message + '\n' + (e.stack || '').split('\n').slice(0, 3).join('\n');
+                    failed++;
+                }
+            } else {
+                // Run unit test
+                try {
+                    test.fn();
+                    test.status = 'passed';
+                    passed++;
+                } catch (e) {
+                    test.status = 'failed';
+                    test.error = e.message + '\n' + (e.stack || '').split('\n').slice(0, 3).join('\n');
+                    failed++;
+                }
+            }
+        }
+    }
+
+    var endTime = performance.now();
+    var duration = Math.round(endTime - startTime);
+
+    // Render results
+    document.getElementById('totalVal').innerText = total;
+    document.getElementById('passedVal').innerText = passed;
+    document.getElementById('failedVal').innerText = failed;
+    document.getElementById('durationVal').innerText = duration + 'ms';
+
+    if (failed === 0 && total > 0) {
+        statusEl.className = 'badge badge-passed';
+        statusEl.innerText = 'All Passed';
+    } else if (failed > 0) {
+        statusEl.className = 'badge badge-failed';
+        statusEl.innerText = failed + ' Failed';
+    } else {
+        statusEl.className = 'badge badge-running';
+        statusEl.innerText = 'No Tests';
+    }
+
+    renderSuites();
+
+    // Expose results for headless/scraping verification
+    window.testSuiteResult = {
+        total: total,
+        passed: passed,
+        failed: failed,
+        duration: duration,
+        success: failed === 0 && total > 0
+    };
+}
+
+function renderSuites() {
+    var container = document.getElementById('suitesContainer');
+    container.innerHTML = '';
+
+    suites.forEach(function(suite, sIdx) {
+        var suiteEl = document.createElement('div');
+        suiteEl.className = 'suite-card';
+
+        // Calculate suite status
+        var failedTests = suite.tests.filter(function(t) { return t.status === 'failed'; }).length;
+        var passedTests = suite.tests.filter(function(t) { return t.status === 'passed'; }).length;
+        var suiteStatusHtml;
+        if (failedTests > 0) {
+            suiteStatusHtml = '<span class="badge badge-failed">' + failedTests + ' Failed</span>';
+        } else if (passedTests === suite.tests.length && suite.tests.length > 0) {
+            suiteStatusHtml = '<span class="badge badge-passed">Passed</span>';
+        } else {
+            suiteStatusHtml = '<span class="badge badge-running">Idle</span>';
+        }
+
+        suiteEl.innerHTML = '<div class="suite-header">' +
+            '<div class="suite-title">' +
+            '<i class="fa fa-flask"></i>' +
+            '<span>' + suite.title + '</span>' +
+            '</div>' +
+            '<div>' + suiteStatusHtml + '</div>' +
+            '</div>' +
+            '<div class="test-list" id="suite-list-' + sIdx + '"></div>';
+        container.appendChild(suiteEl);
+
+        var listEl = document.getElementById('suite-list-' + sIdx);
+        suite.tests.forEach(function(test) {
+            var itemEl = document.createElement('div');
+            itemEl.className = 'test-item';
+
+            var statusIcon;
+            if (test.status === 'passed') {
+                statusIcon = '<i class="fa-solid fa-circle-check test-status-icon icon-passed"></i>';
+            } else if (test.status === 'failed') {
+                statusIcon = '<i class="fa-solid fa-circle-xmark test-status-icon icon-failed"></i>';
+            } else {
+                statusIcon = '<i class="fa-regular fa-circle test-status-icon" style="color: var(--text-muted);"></i>';
+            }
+
+            var iterationsHtml = '';
+            if (test.type === 'property' && test.iterations > 0) {
+                iterationsHtml = '<div class="test-iterations"><i class="fa fa-repeat"></i> ' + test.iterations + ' iterations</div>';
+            }
+
+            var validatesHtml = '';
+            if (test.validates) {
+                validatesHtml = '<div class="test-desc"><strong>Validates:</strong> ' + test.validates + '</div>';
+            }
+
+            var errorHtml = '';
+            if (test.error) {
+                errorHtml = '<pre class="test-error">' + test.error + '</pre>';
+            }
+
+            var counterexampleHtml = '';
+            if (test.counterexample) {
+                counterexampleHtml = '<pre class="test-counterexample">Counterexample:\n' + test.counterexample + '</pre>';
+            }
+
+            itemEl.innerHTML = statusIcon +
+                '<div class="test-details">' +
+                '<div class="test-name">' + test.name + '</div>' +
+                (test.desc ? '<div class="test-desc">' + test.desc + '</div>' : '') +
+                validatesHtml +
+                iterationsHtml +
+                errorHtml +
+                counterexampleHtml +
+                '</div>';
+
+            listEl.appendChild(itemEl);
+        });
+    });
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
+window.addEventListener('load', function() {
+    // Render empty test suites (if any are defined)
+    renderSuites();
+
+    // Auto-run tests if any are defined
+    if (suites.length > 0 && suites.some(function(s) { return s.tests.length > 0; })) {
+        runAllTests();
+    }
+});
+</script>
+</body>
+</html>

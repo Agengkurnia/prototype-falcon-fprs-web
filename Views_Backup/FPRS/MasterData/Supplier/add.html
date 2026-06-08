@@ -1,0 +1,311 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Supplier – Master Data | Falcon FPRS</title>
+    <style>@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}@font-face{font-family:'Kalbe Geometric';font-weight:700;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2')format('woff2')}</style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="../../../../wwwroot/css/layout.css" />
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css" />
+</head>
+<body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+    <nav class="navbar"><div class="navbar-brand-wrapper"><a class="navbar-brand" href="../../../../index.html"><img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon"></a></div><div class="navbar-menu-wrapper"><button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button><div class="nav-profile"><div class="avatar">FA</div><div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div></div></div></nav>
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                        <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="true" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="false" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Informasi/index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Kunjungan/Rute/index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="mb-3">
+                    <h2 class="title-page mb-1" id="formTitle">Tambah Supplier</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                            <li class="breadcrumb-item">Data Master</li>
+                            <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Supplier</a></li>
+                            <li class="breadcrumb-item active" id="breadcrumbActive">Tambah</li>
+                        </ol>
+                    </nav>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form id="formSupplier" onsubmit="saveDataForm(event)">
+                            <input type="hidden" id="editId" />
+                            
+                            <div class="row g-3">
+                                <h5 class="border-bottom pb-2 text-success"><i class="fa fa-truck me-1"></i> Data Supplier</h5>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Kode Supplier <span class="required-mark">*</span></label>
+                                    <input type="text" class="form-control" id="kode" placeholder="SUPXXXX (Akan diisi otomatis jika kosong)" maxlength="50" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Nama Supplier <span class="required-mark">*</span></label>
+                                    <input type="text" class="form-control" id="nama" placeholder="Nama lengkap supplier/badan usaha..." maxlength="100" required />
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Telepon</label>
+                                    <input type="text" class="form-control" id="telepon" placeholder="Nomor telepon aktif..." maxlength="20" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Email</label>
+                                    <input type="email" class="form-control" id="email" placeholder="Alamat email supplier..." maxlength="80" />
+                                </div>
+                                
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Alamat Lengkap</label>
+                                    <textarea class="form-control" id="alamat" rows="2" placeholder="Nama jalan, nomor, kota..." maxlength="250"></textarea>
+                                </div>
+                                
+                                <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-file-invoice-dollar me-1"></i> Pengaturan Transaksi</h5>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Waktu Pembayaran <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="waktuPembayaran" required>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Net 7">Net 7</option>
+                                        <option value="Net 14">Net 14</option>
+                                        <option value="Net 30">Net 30</option>
+                                        <option value="Net 45">Net 45</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Status Hubungan <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="status" required>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                <a href="index.html" class="btn btn-secondary"><i class="fa fa-times me-1"></i> Batal</a>
+                                <button type="submit" class="btn btn-success"><i class="fa fa-save me-1"></i> Simpan Supplier</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+const KEY='md_supplier';
+
+function getLocalData() {
+    return JSON.parse(localStorage.getItem(KEY) || '[]');
+}
+
+function setLocalData(data) {
+    localStorage.setItem(KEY, JSON.stringify(data));
+}
+
+function checkEditMode() {
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('id');
+    if (editId) {
+        document.getElementById('formTitle').textContent = 'Ubah Supplier';
+        document.getElementById('breadcrumbActive').textContent = 'Ubah';
+        document.getElementById('editId').value = editId;
+        
+        const dataList = getLocalData();
+        const item = dataList.find(d => d.id === parseInt(editId));
+        if (item) {
+            document.getElementById('kode').value = item.kode || '';
+            document.getElementById('nama').value = item.nama || '';
+            document.getElementById('telepon').value = item.telepon || '';
+            document.getElementById('email').value = item.email || '';
+            document.getElementById('alamat').value = item.alamat || '';
+            document.getElementById('waktuPembayaran').value = item.waktuPembayaran || 'Net 30';
+            document.getElementById('status').value = item.status || 'Active';
+            
+            // Kode is read-only in Edit mode
+            document.getElementById('kode').readOnly = true;
+        }
+    }
+}
+
+function saveDataForm(event) {
+    event.preventDefault();
+    
+    const nama = document.getElementById('nama').value.trim();
+    if (!nama) {
+        Swal.fire('Peringatan', 'Nama supplier wajib diisi.', 'warning');
+        return;
+    }
+    
+    const dataList = getLocalData();
+    const editId = document.getElementById('editId').value;
+    let kode = document.getElementById('kode').value.trim();
+    
+    if (!kode && !editId) {
+        const lastNum = dataList.length + 1;
+        kode = 'SUP' + String(lastNum).padStart(3, '0');
+    }
+    
+    const newObj = {
+        id: editId ? parseInt(editId) : Date.now(),
+        kode: kode,
+        nama: nama,
+        telepon: document.getElementById('telepon').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        alamat: document.getElementById('alamat').value.trim(),
+        waktuPembayaran: document.getElementById('waktuPembayaran').value,
+        status: document.getElementById('status').value
+    };
+    
+    if (editId) {
+        const idx = dataList.findIndex(d => d.id === parseInt(editId));
+        if (idx > -1) {
+            dataList[idx] = newObj;
+        }
+    } else {
+        dataList.push(newObj);
+    }
+    
+    setLocalData(dataList);
+    
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: `Supplier "${nama}" telah disimpan.`,
+        timer: 1500,
+        showConfirmButton: false
+    }).then(() => {
+        window.location.href = 'index.html';
+    });
+}
+
+$(document).ready(function() {
+    checkEditMode();
+});
+</script>
+</body>
+</html>

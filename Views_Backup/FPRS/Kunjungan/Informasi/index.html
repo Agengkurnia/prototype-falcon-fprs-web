@@ -1,0 +1,1001 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Informasi Kunjungan – Falcon FPRS</title>
+    <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-weight: 400;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css"/>
+    <link rel="stylesheet" href="../../../../wwwroot/css/layout.css"/>
+    <style>
+        /* Table overrides to match SimpliDOTS / Falcon */
+        .title-visit {
+            font-family: 'Kalbe Geometric', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            color: #212529;
+        }
+        .table-visit th {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #dee2e6 !important;
+            padding: 12px 16px !important;
+        }
+        .table-visit td {
+            font-size: 0.825rem;
+            padding: 12px 16px !important;
+            vertical-align: middle;
+            color: #495057;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .table-visit tr:hover td {
+            background-color: #f8f9fa;
+        }
+        /* Top Control Bar */
+        .control-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-bar .search-wrapper {
+            position: relative;
+            width: 240px;
+        }
+        .control-bar .search-wrapper input {
+            padding-right: 30px;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            height: 34px;
+        }
+        .control-bar .search-wrapper i {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+        .control-bar .btn-control {
+            background: #fff;
+            border: 1px solid #ced4da;
+            color: #495057;
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
+            transition: all 0.2s;
+        }
+        .control-bar .btn-control:hover {
+            background: #f8f9fa;
+            border-color: #b0b3b5;
+        }
+        /* Salesman Link Styles */
+        .salesman-link {
+            color: #005d41;
+            font-weight: 600;
+            transition: color 0.15s;
+        }
+        .salesman-link:hover {
+            color: #003e2b;
+            text-decoration: underline !important;
+        }
+        /* Filter Panel */
+        .filter-panel {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* ===== Summary Stat Cards ===== */
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eef1f6;
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .stat-icon.ic-visit { background: #e7f5ee; color: #005d41; }
+        .stat-icon.ic-sales { background: #fff4e5; color: #e65100; }
+        .stat-icon.ic-sales-amt { background: #e7f1ff; color: #1565c0; }
+        .stat-icon.ic-avg { background: #f3e8ff; color: #7b2cbf; }
+        .stat-meta { min-width: 0; }
+        .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #868e96;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #212529;
+            font-family: 'Kalbe Geometric', sans-serif;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== Visited badge ===== */
+        .visit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e7f5ee;
+            color: #005d41;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .visit-badge i { font-size: 0.65rem; }
+
+        /* time pill */
+        .time-pill {
+            color: #495057;
+            font-variant-numeric: tabular-nums;
+        }
+        .time-pill i { color: #adb5bd; font-size: 0.7rem; margin-right: 4px; }
+
+        /* Sticky table header for long lists */
+        .table-visit thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        /* Row chevron affordance */
+        .row-go {
+            color: #ced4da;
+            font-size: 0.75rem;
+            transition: transform 0.15s, color 0.15s;
+        }
+        .table-visit tr:hover .row-go {
+            color: #005d41;
+            transform: translateX(3px);
+        }
+
+        /* ===== Skeleton Loading Placeholders ===== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: #e9ecef;
+            background-image: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            pointer-events: none;
+            cursor: default;
+        }
+        .skeleton-stat-card {
+            border-radius: 10px;
+            height: 78px;
+        }
+        .skeleton-table-row {
+            border-radius: 4px;
+            height: 44px;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 992px) {
+            .stat-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .stat-row { grid-template-columns: 1fr; }
+            .control-bar { flex-wrap: wrap; }
+            .control-bar .search-wrapper { width: 100%; }
+        }
+    </style>
+</head>
+<body class="sidebar-light">
+<div id="loader-wrapper"><div id="loader"></div></div>
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../../index.html">
+                <img src="../../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                        <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="false" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../../Canvassing/index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="true" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Rute/index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <!-- HEADER & BREADCRUMBS -->
+                <div class="d-flex align-items-center justify-content-between mb-3" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h2 class="title-visit mb-1">Kunjungan</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item">Tracking</li>
+                                <li class="breadcrumb-item active">Daily Visit</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <!-- CONTROLS -->
+                    <div class="control-bar">
+                        <div class="search-wrapper">
+                            <input type="text" class="form-control" id="customSearch" placeholder="Cari..."/>
+                            <i class="fa fa-search"></i>
+                        </div>
+                        <button class="btn btn-control" id="btnFilter">
+                            <i class="fa fa-filter"></i> Filter
+                        </button>
+                        <button class="btn btn-control" id="btnSettings">
+                            <i class="fa fa-cog"></i> Pengaturan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FILTER PANEL -->
+                <div class="filter-panel" id="filterPanel">
+                    <h6 class="fw-bold mb-3"><i class="fa fa-sliders-h me-1 text-success"></i> Filter Kunjungan</h6>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">Nama Salesman</label>
+                            <input type="text" class="form-control form-control-sm" id="filterName" placeholder="Nama Salesman..."/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Bulan/Tahun</label>
+                            <select class="form-select form-select-sm" id="filterMonth">
+                                <option value="">Semua Periode</option>
+                                <option value="2026-06" selected>Juni 2026</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button class="btn btn-success btn-sm w-100" id="applyFilters">Terapkan</button>
+                            <button class="btn btn-secondary btn-sm w-100" id="resetFilters">Reset</button>
+                        </div>
+                    </div>
+                    <!-- Advanced Filter Controls -->
+                    <div class="row g-3 mt-2" id="advancedFilterRow">
+                        <div class="col-md-4">
+                            <label class="form-label small">Area/Region</label>
+                            <select class="form-select form-select-sm" id="filterArea">
+                                <option value="">Semua Area</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Divisi</label>
+                            <select class="form-select form-select-sm" id="filterDivisi">
+                                <option value="">Semua Divisi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Status Kunjungan</label>
+                            <select class="form-select form-select-sm" id="filterStatus">
+                                <option value="">Semua</option>
+                                <option value="sudah">Sudah Check-out</option>
+                                <option value="belum">Belum Check-out</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Dari</label>
+                            <input type="date" class="form-control form-control-sm" id="filterDateStart"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Sampai</label>
+                            <input type="date" class="form-control form-control-sm" id="filterDateEnd"/>
+                        </div>
+                    </div>
+                    <div id="dateValidationError" class="text-danger small mt-1" style="display:none;"></div>
+                </div>
+
+                <!-- SUMMARY STAT CARDS -->
+                <div class="stat-row" id="statRow">
+                    <!-- Skeleton stat cards (shown during loading) -->
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat1" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat2" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat3" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat4" aria-label="Loading" role="status"></div>
+                    <!-- Real stat cards (hidden during loading) -->
+                    <div class="stat-card" id="realStatCard1" style="display:none;">
+                        <div class="stat-icon ic-visit"><i class="fa fa-route"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Kunjungan</div>
+                            <div class="stat-value" id="statTrips">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="realStatCard2" style="display:none;">
+                        <div class="stat-icon ic-sales"><i class="fa fa-store"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Outlet Dikunjungi</div>
+                            <div class="stat-value" id="statVisited">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="realStatCard3" style="display:none;">
+                        <div class="stat-icon ic-sales-amt"><i class="fa fa-coins"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Total Penjualan</div>
+                            <div class="stat-value" id="statSales">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="realStatCard4" style="display:none;">
+                        <div class="stat-icon ic-avg"><i class="fa fa-chart-line"></i></div>
+                        <div class="stat-meta">
+                            <div class="stat-label">Rata-rata / Kunjungan</div>
+                            <div class="stat-value" id="statAvg">Rp 0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DATA TABLE CARD -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3" style="border-radius: 0.375rem 0.375rem 0 0;">
+                        <h6 class="mb-0 fw-bold" style="color:#212529; font-size:0.9rem;"><i class="fa fa-list-ul me-2 text-success"></i>Daftar Kunjungan Harian</h6>
+                        <span class="badge rounded-pill" id="rowCountBadge" style="background:#e7f5ee; color:#005d41; font-size:0.72rem; padding:5px 10px;">0 entri</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-visit mb-0" id="tblVisit">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nama</th>
+                                        <th style="text-align:center;">Visited</th>
+                                        <th>Waktu Mulai</th>
+                                        <th>Waktu Akhir</th>
+                                        <th style="text-align: right;">Total Penjualan</th>
+                                        <th style="width: 40px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblBody">
+                                    <!-- Skeleton table rows (shown during loading) -->
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- FOOTER -->
+            <footer class="footer">
+                <span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+    let table;
+    let listData = []; // Global reference for filter access
+    const fmt = v => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
+    // ===== Filter State =====
+    const filterState = {
+        name: '',        // text input
+        month: '',       // select
+        area: '',        // select
+        divisi: '',      // select
+        status: '',      // select: '' | 'sudah' | 'belum'
+        dateStart: '',   // date string 'YYYY-MM-DD'
+        dateEnd: ''      // date string 'YYYY-MM-DD'
+    };
+
+    function formatDateDisplay(dateStr) {
+        // Parse "YYYY-MM-DD" to "DD-MM-YYYY"
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+        return dateStr;
+    }
+
+    // ===== Area extraction from name =====
+    // Names follow pattern "JKT-ANCOL (BUDI)" — area is the prefix before "("
+    function extractArea(name) {
+        if (!name) return '';
+        const parenIdx = name.indexOf('(');
+        if (parenIdx > 0) {
+            return name.substring(0, parenIdx).trim();
+        }
+        return name.trim();
+    }
+
+    // ===== Divisi lookup from pegawai data =====
+    function lookupDivisi(salesmanId, pegawaiData) {
+        if (!pegawaiData || !Array.isArray(pegawaiData) || !salesmanId) return '';
+        // Try matching by kode or id field
+        const match = pegawaiData.find(function(p) {
+            return String(p.id) === String(salesmanId) || p.kode === String(salesmanId);
+        });
+        return match ? (match.divisi || '') : '';
+    }
+
+    // ===== Populate filter dropdowns with sorted unique values =====
+    function populateFilterDropdowns(salesData, pegawaiData) {
+        // Extract sorted unique area values from salesData names
+        const areas = [];
+        if (salesData && salesData.length > 0) {
+            const areaSet = {};
+            salesData.forEach(function(row) {
+                const area = row.area;
+                if (area && !areaSet[area]) {
+                    areaSet[area] = true;
+                    areas.push(area);
+                }
+            });
+            areas.sort(function(a, b) { return a.localeCompare(b); });
+        }
+
+        // Extract sorted unique divisi values from pegawaiData
+        const divisiList = [];
+        if (pegawaiData && Array.isArray(pegawaiData) && pegawaiData.length > 0) {
+            const divisiSet = {};
+            pegawaiData.forEach(function(p) {
+                if (p.divisi && !divisiSet[p.divisi]) {
+                    divisiSet[p.divisi] = true;
+                    divisiList.push(p.divisi);
+                }
+            });
+            divisiList.sort(function(a, b) { return a.localeCompare(b); });
+        }
+
+        // Populate #filterArea dropdown
+        const $filterArea = $('#filterArea');
+        $filterArea.find('option:not(:first)').remove(); // Keep placeholder
+        areas.forEach(function(area) {
+            $filterArea.append($('<option>').val(area).text(area));
+        });
+
+        // Populate #filterDivisi dropdown
+        const $filterDivisi = $('#filterDivisi');
+        $filterDivisi.find('option:not(:first)').remove(); // Keep placeholder
+        divisiList.forEach(function(divisi) {
+            $filterDivisi.append($('<option>').val(divisi).text(divisi));
+        });
+    }
+
+    // ===== DataTables Custom Filter Function (AND Composition) =====
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex, rowData) {
+        // Only apply to #tblVisit
+        if (settings.nTable.id !== 'tblVisit') return true;
+
+        // Get the row element from the table
+        var $row = $(settings.aoData[dataIndex].nTr);
+
+        // Name filter: substring match (case-insensitive)
+        if (filterState.name) {
+            var rowName = data[2] || ''; // column 2 = Nama
+            if (rowName.toLowerCase().indexOf(filterState.name.toLowerCase()) === -1) return false;
+        }
+
+        // Month/Year filter: match dateKey prefix (e.g., "2026-06")
+        if (filterState.month) {
+            var rowDate = $row.data('datekey') || '';
+            if (rowDate.indexOf(filterState.month) !== 0) return false;
+        }
+
+        // Area filter: exact match
+        if (filterState.area) {
+            var rowArea = $row.data('area') || '';
+            if (rowArea !== filterState.area) return false;
+        }
+
+        // Divisi filter: exact match
+        if (filterState.divisi) {
+            var rowDivisi = $row.data('divisi') || '';
+            if (rowDivisi !== filterState.divisi) return false;
+        }
+
+        // Status filter: check endTime
+        if (filterState.status) {
+            var rowEndTime = $row.data('endtime') || '';
+            if (filterState.status === 'sudah' && !rowEndTime) return false;
+            if (filterState.status === 'belum' && rowEndTime) return false;
+        }
+
+        // Date range filter: inclusive bounds
+        if (filterState.dateStart && filterState.dateEnd) {
+            var rowDateKey = $row.data('datekey') || '';
+            if (rowDateKey < filterState.dateStart || rowDateKey > filterState.dateEnd) return false;
+        }
+
+        return true; // Row passes all predicates
+    });
+
+    // ===== Date Range Validation =====
+    function validateDateRange() {
+        var start = $('#filterDateStart').val();
+        var end = $('#filterDateEnd').val();
+
+        // Both empty: valid (no date filter applied)
+        if (!start && !end) {
+            return { valid: true, error: '' };
+        }
+
+        // Only one field filled: invalid
+        if ((start && !end) || (!start && end)) {
+            return { valid: false, error: 'Kedua tanggal harus diisi' };
+        }
+
+        // Start > end: invalid
+        if (start > end) {
+            return { valid: false, error: 'Tanggal mulai harus sebelum tanggal selesai' };
+        }
+
+        return { valid: true, error: '' };
+    }
+
+    // ===== Show/hide date validation error =====
+    function showDateValidationError(error) {
+        var $el = $('#dateValidationError');
+        if (error) {
+            $el.text(error).show();
+        } else {
+            $el.text('').hide();
+        }
+    }
+
+    // ===== Skeleton Loading Functions =====
+    function showSkeletons() {
+        // Show skeleton stat cards, hide real stat cards
+        $('.skeleton-stat-card').show();
+        $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').hide();
+        // Show skeleton table rows
+        $('.skeleton-table-row-wrapper').show();
+    }
+
+    function hideSkeletons() {
+        // Use requestAnimationFrame for single-repaint swap
+        requestAnimationFrame(function() {
+            // Hide skeleton stat cards, show real stat cards
+            $('.skeleton-stat-card').hide();
+            $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').show();
+            // Remove skeleton table rows (real content replaces them)
+            $('.skeleton-table-row-wrapper').remove();
+        });
+    }
+
+    function loadVisitData() {
+        showSkeletons();
+
+        // Load both sales data and pegawai data in parallel
+        var salesPromise = $.getJSON('../../../../wwwroot/data/sales_data_by_date.json');
+        var pegawaiPromise = $.getJSON('../../../../wwwroot/data/pegawai.json');
+
+        $.when(salesPromise, pegawaiPromise).then(function(salesResult, pegawaiResult) {
+            // $.when resolves with [data, textStatus, jqXHR] for each promise
+            var data = salesResult[0];
+            var pegawaiData = pegawaiResult[0];
+
+            listData = [];
+            
+            // Loop through all dates in the sales JSON
+            Object.keys(data).forEach(dateKey => {
+                const daySales = data[dateKey];
+                
+                // Loop through all salesman entries on this date
+                Object.keys(daySales).forEach(salesmanId => {
+                    const s = daySales[salesmanId];
+                    const area = extractArea(s.name);
+                    const divisi = lookupDivisi(s.id, pegawaiData);
+                    listData.push({
+                        dateKey: dateKey,
+                        dateDisplay: formatDateDisplay(dateKey),
+                        id: s.id,
+                        name: s.name,
+                        visited: s.visits.length,
+                        startTime: s.startTime + ':00',
+                        endTime: s.endTime + ':00',
+                        invoice: s.invoice,
+                        area: area,
+                        divisi: divisi
+                    });
+                });
+            });
+
+            // Sort by Date Descending
+            listData.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+
+            // Populate filter dropdowns with enriched data
+            populateFilterDropdowns(listData, pegawaiData);
+
+            // ===== Summary aggregation =====
+            const totalTrips = listData.length;
+            const totalVisited = listData.reduce((sum, r) => sum + r.visited, 0);
+            const totalSales = listData.reduce((sum, r) => sum + r.invoice, 0);
+            const avgSales = totalTrips > 0 ? totalSales / totalTrips : 0;
+            const fmtRp = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v));
+
+            $('#statTrips').text(totalTrips);
+            $('#statVisited').text(totalVisited + ' outlet');
+            $('#statSales').text(fmtRp(totalSales));
+            $('#statAvg').text(fmtRp(avgSales));
+            $('#rowCountBadge').text(totalTrips + ' entri');
+
+            // Populate table body
+            const body = $('#tblBody');
+            // Remove skeleton rows before populating real data
+            body.find('.skeleton-table-row-wrapper').remove();
+            
+            listData.forEach((row, index) => {
+                // Link name to Geografis map view page with date and salesman queries
+                const mapLink = `detail.html?date=${row.dateKey}&salesman=${row.id}`;
+                
+                body.append(`
+                    <tr style="cursor:pointer;" data-href="${mapLink}" data-area="${row.area}" data-divisi="${row.divisi}" data-datekey="${row.dateKey}" data-endtime="${row.endTime}" data-visited="${row.visited}" data-invoice="${row.invoice}">
+                        <td>${index + 1}</td>
+                        <td data-order="${row.dateKey}">${row.dateDisplay}</td>
+                        <td><a href="${mapLink}" class="salesman-link">${row.name}</a></td>
+                        <td style="text-align:center;"><span class="visit-badge"><i class="fa fa-store"></i>${row.visited}</span></td>
+                        <td><span class="time-pill"><i class="fa fa-play"></i>${row.startTime}</span></td>
+                        <td><span class="time-pill"><i class="fa fa-flag-checkered"></i>${row.endTime}</span></td>
+                        <td style="text-align: right; font-weight: 600; color:#005d41;">${fmt(row.invoice)}</td>
+                        <td style="text-align:center;"><i class="fa fa-chevron-right row-go"></i></td>
+                    </tr>
+                `);
+            });
+
+            // Initialize DataTable
+            table = $('#tblVisit').DataTable({
+                pageLength: 10,
+                order: [[1, 'desc']], // Sort by date descending
+                columnDefs: [
+                    { orderable: false, targets: [0, 4, 5, 7] }
+                ],
+                dom: 'rt<"d-flex align-items-center justify-content-between p-3 border-top bg-light"i<"ms-auto"p>>',
+                language: {
+                    zeroRecords: 'Tidak ada data kunjungan ditemukan',
+                    info: 'Menampilkan _START_ sampai _END_ dari _TOTAL_ entri',
+                    paginate: {
+                        previous: '‹',
+                        next: '›'
+                    }
+                }
+            });
+
+            // Hide skeletons and show real content
+            hideSkeletons();
+
+            // Row click navigates to detail (ignore clicks on the link itself to avoid double nav)
+            $('#tblBody').on('click', 'tr', function(e) {
+                if ($(e.target).closest('a').length) return;
+                const href = $(this).data('href');
+                if (href) window.location.href = href;
+            });
+
+            // Keep row count badge and stat cards in sync with search/filter
+            table.on('draw', function() {
+                updateStatCards();
+            });
+
+            // Bind Custom Search Box
+            $('#customSearch').on('keyup change', function() {
+                table.search(this.value).draw();
+            });
+
+        }, function(jqxhr, textStatus, error) {
+            console.error("Error loading data JSON for daily visit:", textStatus, error);
+            // Remove skeletons and show error message on fetch failure
+            $('.skeleton-stat-card').hide();
+            $('.skeleton-table-row-wrapper').remove();
+            $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').show();
+            $('#tblBody').html('<tr><td colspan="8" class="text-center text-danger py-4"><i class="fa fa-exclamation-circle me-2"></i>Data kunjungan tidak dapat dimuat</td></tr>');
+        });
+    }
+
+    // ===== Apply Filters =====
+    function applyFilters() {
+        // Validate date range first
+        var dateValidation = validateDateRange();
+        if (!dateValidation.valid) {
+            showDateValidationError(dateValidation.error);
+            return;
+        }
+        showDateValidationError(''); // Clear any previous error
+
+        // Read UI inputs into filterState
+        filterState.name = $('#filterName').val().trim();
+        filterState.month = $('#filterMonth').val();
+        filterState.area = $('#filterArea').val();
+        filterState.divisi = $('#filterDivisi').val();
+        filterState.status = $('#filterStatus').val();
+        filterState.dateStart = $('#filterDateStart').val();
+        filterState.dateEnd = $('#filterDateEnd').val();
+
+        // Trigger DataTable redraw (custom filter function will use filterState)
+        table.draw();
+    }
+
+    // ===== Reset Filters =====
+    function resetFilters() {
+        // Clear all inputs to defaults
+        $('#filterName').val('');
+        $('#filterMonth').val('');
+        $('#filterArea').val('');
+        $('#filterDivisi').val('');
+        $('#filterStatus').val('');
+        $('#filterDateStart').val('');
+        $('#filterDateEnd').val('');
+        showDateValidationError(''); // Clear validation error
+
+        // Reset filterState
+        filterState.name = '';
+        filterState.month = '';
+        filterState.area = '';
+        filterState.divisi = '';
+        filterState.status = '';
+        filterState.dateStart = '';
+        filterState.dateEnd = '';
+
+        // Also clear DataTables built-in search
+        table.search('');
+        $('#customSearch').val('');
+
+        // Redraw table
+        table.draw();
+    }
+
+    // ===== Update Stat Cards from Filtered Rows =====
+    function updateStatCards() {
+        // Get currently filtered/visible rows from the DataTable
+        var visibleData = [];
+        table.rows({ search: 'applied' }).every(function() {
+            var $row = $(this.node());
+            visibleData.push({
+                visited: parseInt($row.data('visited')) || 0,
+                invoice: parseFloat($row.data('invoice')) || 0
+            });
+        });
+
+        var totalKunjungan = visibleData.length;
+        var totalOutlet = visibleData.reduce(function(sum, r) { return sum + r.visited; }, 0);
+        var totalPenjualan = visibleData.reduce(function(sum, r) { return sum + r.invoice; }, 0);
+        var rataRata = totalKunjungan > 0 ? totalPenjualan / totalKunjungan : 0;
+
+        var fmtRp = function(v) { return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v)); };
+
+        $('#statTrips').text(totalKunjungan);
+        $('#statVisited').text(totalOutlet + ' outlet');
+        $('#statSales').text(fmtRp(totalPenjualan));
+        $('#statAvg').text(fmtRp(rataRata));
+        $('#rowCountBadge').text(totalKunjungan + ' entri');
+    }
+
+    $(document).ready(function() {
+        loadVisitData();
+
+        // Toggle Filter Panel (300ms slide animation, retains values when hidden)
+        $('#btnFilter').on('click', function() {
+            $('#filterPanel').slideToggle(300);
+        });
+
+        // Wire filter action buttons
+        $('#applyFilters').on('click', applyFilters);
+        $('#resetFilters').on('click', resetFilters);
+
+        // Settings Dialog Mock
+        $('#btnSettings').on('click', function() {
+            Swal.fire({
+                title: 'Pengaturan Kunjungan',
+                html: `
+                    <div class="text-start">
+                        <div class="mb-3">
+                            <label class="form-label small">Batas Maksimal Baris Per Halaman</label>
+                            <select class="form-select" id="swPageLength">
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="swAutoReload" checked>
+                            <label class="form-check-input-label small" for="swAutoReload">Muat Ulang Otomatis (Real-time)</label>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005d41',
+                confirmButtonText: 'Simpan',
+                showCancelButton: true,
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newLength = parseInt($('#swPageLength').val());
+                    table.page.len(newLength).draw();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Pengaturan Disimpan',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 1200
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

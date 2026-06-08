@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvassing – Falcon FPRS</title>
+
+    <style>
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
+        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+
+    <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css" />
+</head>
+<body class="sidebar-light">
+
+<div id="loader-wrapper"><div id="loader"></div></div>
+
+<div class="container-scroller">
+    <!-- NAVBAR -->
+    <nav class="navbar" aria-label="falcon-navbar">
+        <div class="navbar-brand-wrapper">
+            <a class="navbar-brand" href="../../../index.html">
+                <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
+            </a>
+        </div>
+        <div class="navbar-menu-wrapper">
+            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
+            <div class="nav-profile">
+                <div class="avatar">FA</div>
+                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid page-body-wrapper">
+        <!-- SIDEBAR -->
+                <!-- SIDEBAR -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                        <ul class="nav">
+                <!-- Data Master -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
+                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
+                        <span class="menu-title">Data Master</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="master-data-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <!-- Produk Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
+                                    <span>Produk</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-produk">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Produk/index.html">Master Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Unit/index.html">Unit</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Divisi/index.html">Divisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Brand/index.html">Brand</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pelanggan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
+                                    <span>Pelanggan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pelanggan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Pegawai Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
+                                    <span>Pegawai</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-pegawai">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pegawai/index.html">Master Pegawai</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Akun/index.html">Akun</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Posisi/index.html">Posisi</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Keuangan Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
+                                    <span>Keuangan</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-keuangan">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pajak/index.html">Pajak</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <!-- Lainnya Subgroup -->
+                            <li class="nav-item nav-subgroup">
+                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
+                                    <span>Lainnya</span>
+                                    <i class="fa fa-chevron-right sub-arrow"></i>
+                                </a>
+                                <div class="collapse" id="sub-lainnya">
+                                    <ul class="nav flex-column sub-sub-menu">
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Alasan/index.html">Alasan</a></li>
+                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Supplier/index.html">Supplier</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Penjualan -->
+                <li class="nav-item nav-parent active">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="true" aria-controls="fprs-menu">
+                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
+                        <span class="menu-title">Penjualan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse show" id="fprs-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
+                            <li><a class="nav-link child-link text-submenu active" href="index.html">Canvassing</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!-- Kunjungan -->
+                <li class="nav-item nav-parent">
+                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="false" aria-controls="kunjungan-menu">
+                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
+                        <span class="menu-title">Kunjungan</span>
+                        <i class="fa fa-chevron-right menu-arrow"></i>
+                    </a>
+                    <div class="collapse" id="kunjungan-menu">
+                        <ul class="nav flex-column sub-menu">
+                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Informasi/index.html">Informasi Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Geografis/index.html">Geografis Kunjungan</a></li>
+                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Rute/index.html">Management Rute</a></li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+            <div class="content-wrapper">
+                
+                <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap; gap:0.75rem;">
+                    <div>
+                        <h2 class="title-page mb-1">Canvassing</h2>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="../../../index.html" class="a-breadcrumb">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Canvassing</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div>
+                        <a href="add.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Canvassing</a>
+                    </div>
+                </div>
+
+                <!-- SUMMARY CARDS -->
+                <div class="summary-cards-grid">
+                    <div class="summary-card total active-filter" data-filter="" title="Tampilkan Semua">
+                        <div class="summary-card-icon"><i class="fa fa-boxes"></i></div>
+                        <div class="stat-title">Total Kanvas</div>
+                        <div class="stat-value">20</div>
+                        <div class="stat-desc">Tahun ini</div>
+                    </div>
+                    <div class="summary-card ongoing" data-filter="Ongoing" title="Filter: Ongoing">
+                        <div class="summary-card-icon"><i class="fa fa-spinner"></i></div>
+                        <div class="stat-title">Ongoing</div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-desc">Sedang berjalan</div>
+                    </div>
+                    <div class="summary-card completed" data-filter="Completed" title="Filter: Completed">
+                        <div class="summary-card-icon"><i class="fa fa-check"></i></div>
+                        <div class="stat-title">Completed</div>
+                        <div class="stat-value">6</div>
+                        <div class="stat-desc">Selesai direkonsiliasi</div>
+                    </div>
+                    <div class="summary-card cancelled" data-filter="Cancelled" title="Filter: Cancelled">
+                        <div class="summary-card-icon"><i class="fa fa-times"></i></div>
+                        <div class="stat-title">Cancelled</div>
+                        <div class="stat-value">2</div>
+                        <div class="stat-desc">Dibatalkan</div>
+                    </div>
+                </div>
+
+                <!-- LIST CARD -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tblCanvassingV2">
+                                <thead>
+                                    <tr>
+                                        <th style="width:50px;">NO</th>
+                                        <th>KODE KANVAS</th>
+                                        <th>DRIVER</th>
+                                        <th>GUDANG</th>
+                                        <th style="width: 150px;">PERIODE</th>
+                                        <th style="width: 120px;">STATUS</th>
+                                        <th style="width: 80px; text-align:center;">AKSI</th>
+                                    </tr>
+                                    <tr class="filter-row">
+                                        <th></th>
+                                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter kode..."></th>
+                                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter driver..."></th>
+                                        <th>
+                                            <select class="form-select form-select-sm">
+                                                <option value="">Semua Gudang</option>
+                                                <option>JAMBI</option>
+                                                <option>JAKARTA PUSAT</option>
+                                                <option>SURABAYA</option>
+                                            </select>
+                                        </th>
+                                        <th></th>
+                                        <th>
+                                            <select class="form-select form-select-sm">
+                                                <option value="">Semua</option>
+                                                <option>Ongoing</option>
+                                                <option>Completed</option>
+                                                <option>Draft</option>
+                                            </select>
+                                        </th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../../wwwroot/js/canvassing-store.js"></script>
+<script src="../../../wwwroot/js/layout.js"></script>
+<script>
+$(document).ready(function () {
+    var table;
+
+    function updateSummaryCards() {
+        var summary = CanvassingStore.getSummary();
+        $('.summary-card.total .stat-value').text(summary.total);
+        $('.summary-card.ongoing .stat-value').text(summary.ongoing);
+        $('.summary-card.completed .stat-value').text(summary.completed);
+        $('.summary-card.cancelled .stat-value').text(summary.cancelled);
+    }
+
+    function renderTable() {
+        var tbody = $('#tblBody');
+        tbody.empty();
+        var list = CanvassingStore.getAll();
+        
+        var statuses = {
+            'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>',
+            'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
+            'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
+            'Draft': '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'
+        };
+        
+        list.forEach(function (item, idx) {
+            var i = idx + 1;
+            var stat = statuses[item.status] || '<span class="badge-status badge-draft">' + item.status + '</span>';
+            var pct = item.progressPct || 0;
+            var days = item.durationDays || 0;
+            
+            // Format dates for display, e.g. "01 Jan - 31 Des"
+            var startDateStr = '-';
+            var endDateStr = '-';
+            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            
+            if (item.tanggalMulai) {
+                var dStart = new Date(item.tanggalMulai);
+                startDateStr = dStart.getDate() + ' ' + months[dStart.getMonth()];
+            }
+            if (item.tanggalSelesai) {
+                var dEnd = new Date(item.tanggalSelesai);
+                endDateStr = dEnd.getDate() + ' ' + months[dEnd.getMonth()];
+            }
+            var dateRangeStr = startDateStr + (endDateStr ? ' - ' + endDateStr : '');
+            
+            // Calculate elapsed days
+            var elapsedDays = Math.floor(pct / 100 * days);
+            
+            var act = '<div class="row-actions">' +
+                '<a href="detail.html?id=' + item.id + '" class="btn-action" title="Lihat Detail"><i class="fa fa-eye"></i></a>' +
+                (item.status === 'Ongoing' || item.status === 'Draft' ? '<a href="add.html?id=' + item.id + '" class="btn-action" title="Edit"><i class="fa fa-pen"></i></a>' : '') +
+                '<button class="btn-action text-danger btn-delete-canvassing" data-id="' + item.id + '" title="Hapus"><i class="fa fa-trash"></i></button>' +
+                '</div>';
+                
+            var driverDisplay = item.driverName || 'Driver';
+            if (item.driverCode) {
+                driverDisplay = driverDisplay + '<br><small class="text-muted">' + item.driverCode + '</small>';
+            } else {
+                driverDisplay = '<span class="text-muted">-</span>';
+            }
+            
+            var tr = '<tr>' +
+                '<td data-label="No">' + i + '</td>' +
+                '<td data-label="Kode"><a href="detail.html?id=' + item.id + '" class="kode-link fw-bold">' + item.id + '</a></td>' +
+                '<td data-label="Driver">' + driverDisplay + '</td>' +
+                '<td data-label="Gudang">' + (item.gudang || '-') + '</td>' +
+                '<td data-label="Periode"><div class="periode-progress-container"><div class="periode-progress-text"><span>' + dateRangeStr + '</span><span>' + pct + '%</span></div><div class="periode-progress"><div class="periode-progress-bar ' + (pct === 100 ? 'bg-success' : '') + '" style="width: ' + pct + '%;"></div></div><small class="text-muted" style="font-size:0.65rem;">' + elapsedDays + ' dari ' + days + ' hari</small></div></td>' +
+                '<td data-label="Status">' + stat + '</td>' +
+                '<td data-label="Aksi">' + act + '</td>' +
+                '</tr>';
+            tbody.append(tr);
+        });
+    }
+
+    function initDataTable() {
+        if ($.fn.DataTable.isDataTable('#tblCanvassingV2')) {
+            $('#tblCanvassingV2').DataTable().destroy();
+        }
+        
+        table = $('#tblCanvassingV2').DataTable({
+            language: { 
+                search: '', 
+                searchPlaceholder: 'Cari global...', 
+                lengthMenu: '_MENU_ entri per halaman', 
+                info: 'Menampilkan _START_ - _END_ dari _TOTAL_', 
+                paginate: { previous: '‹', next: '›' }, 
+                zeroRecords: 'Tidak ada data' 
+            },
+            pageLength: 10,
+            columnDefs: [{ orderable: false, targets: [6] }],
+            dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
+        });
+    }
+
+    // Initial render
+    updateSummaryCards();
+    renderTable();
+    initDataTable();
+
+    // Delete row event handler
+    $('#tblCanvassingV2').on('click', '.btn-delete-canvassing', function() {
+        var id = $(this).data('id');
+        
+        Swal.fire({
+            title: 'Hapus Canvassing?',
+            text: 'Apakah Anda yakin ingin menghapus data canvassing ' + id + '? Tindakan ini tidak dapat dibatalkan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Delete from localStorage
+                CanvassingStore.delete(id);
+                
+                // Re-render, re-init DataTable, update summary cards
+                renderTable();
+                initDataTable();
+                updateSummaryCards();
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Dihapus!',
+                    text: 'Data Canvassing ' + id + ' telah berhasil dihapus.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        });
+    });
+
+    // Prevent sort on filter click
+    $('.filter-row input, .filter-row select').on('click', function(e) {
+        e.stopPropagation();
+    });
+
+    // Apply column filters
+    $('.filter-row input').on('keyup change', function () {
+        var colIdx = $(this).closest('th').index();
+        table.column(colIdx).search(this.value).draw();
+    });
+    
+    $('.filter-row select').on('change', function () {
+        var colIdx = $(this).closest('th').index();
+        table.column(colIdx).search(this.value).draw();
+        
+        // Sync cards if status is changed manually
+        if (colIdx === 5) {
+            $('.summary-card').removeClass('active-filter');
+            var val = this.value;
+            $('.summary-card').each(function() {
+                if ($(this).data('filter') === val) {
+                    $(this).addClass('active-filter');
+                }
+            });
+        }
+    });
+
+    // Card interaction for filtering
+    $('.summary-card').on('click', function() {
+        var filterVal = $(this).data('filter');
+        $('.summary-card').removeClass('active-filter');
+        $(this).addClass('active-filter');
+        
+        // Sync with the select dropdown
+        var statusSelect = $('.filter-row select').last();
+        statusSelect.val(filterVal);
+        
+        // Filter table (Status column is index 5)
+        table.column(5).search(filterVal).draw();
+    });
+});
+</script>
+</body>
+</html>

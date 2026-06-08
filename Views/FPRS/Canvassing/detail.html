@@ -1,167 +1,21 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detail Canvassing – Falcon FPRS</title>
-
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Canvassing â€“ Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css"/>
     <style>
+
         @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
         @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
         @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
-    </style>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-
-    <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
-    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css" />
+    
+</style>
 </head>
-<body class="sidebar-light">
+<body>
+    <div id="app-content">
 
-<div id="loader-wrapper"><div id="loader"></div></div>
-
-<div class="container-scroller">
-    <!-- NAVBAR -->
-    <nav class="navbar" aria-label="falcon-navbar">
-        <div class="navbar-brand-wrapper">
-            <a class="navbar-brand" href="../../../index.html">
-                <img src="../../../wwwroot/assets/images/logo-kalbe.png" alt="Falcon - Kalbe">
-            </a>
-        </div>
-        <div class="navbar-menu-wrapper">
-            <button class="navbar-toggler d-md-none" id="sidebarToggler"><i class="fa fa-bars"></i></button>
-            <div class="nav-profile">
-                <div class="avatar">FA</div>
-                <div><div class="nav-profile-name">Falcon Admin</div><div class="nav-profile-sub">PT Kalbe Nutritionals</div></div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-fluid page-body-wrapper">
-        <!-- SIDEBAR -->
-                <!-- SIDEBAR -->
-        <nav class="sidebar sidebar-offcanvas" id="sidebar">
-                        <ul class="nav">
-                <!-- Data Master -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#master-data-menu" aria-expanded="false" aria-controls="master-data-menu">
-                        <i class="fa fa-database img-icon" style="color:#1565c0;"></i>
-                        <span class="menu-title">Data Master</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="master-data-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <!-- Produk Subgroup -->
-                            <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-produk" aria-expanded="false">
-                                    <span>Produk</span>
-                                    <i class="fa fa-chevron-right sub-arrow"></i>
-                                </a>
-                                <div class="collapse" id="sub-produk">
-                                    <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Produk/index.html">Master Produk</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Unit/index.html">Unit</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Divisi/index.html">Divisi</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/DaftarHarga/index.html">Daftar Harga</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KategoriProduk/index.html">Kategori Produk</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Brand/index.html">Brand</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- Pelanggan Subgroup -->
-                            <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pelanggan" aria-expanded="false">
-                                    <span>Pelanggan</span>
-                                    <i class="fa fa-chevron-right sub-arrow"></i>
-                                </a>
-                                <div class="collapse" id="sub-pelanggan">
-                                    <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pelanggan/index.html">Master Pelanggan</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/GrupPelanggan/index.html">Grup Pelanggan</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- Pegawai Subgroup -->
-                            <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-pegawai" aria-expanded="false">
-                                    <span>Pegawai</span>
-                                    <i class="fa fa-chevron-right sub-arrow"></i>
-                                </a>
-                                <div class="collapse" id="sub-pegawai">
-                                    <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pegawai/index.html">Master Pegawai</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Akun/index.html">Akun</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Posisi/index.html">Posisi</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/KonfigurasiAkses/index.html">Konfigurasi Akses</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- Keuangan Subgroup -->
-                            <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-keuangan" aria-expanded="false">
-                                    <span>Keuangan</span>
-                                    <i class="fa fa-chevron-right sub-arrow"></i>
-                                </a>
-                                <div class="collapse" id="sub-keuangan">
-                                    <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/MetodePembayaran/index.html">Metode Pembayaran</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/WaktuPembayaran/index.html">Waktu Pembayaran</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Pajak/index.html">Pajak</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- Lainnya Subgroup -->
-                            <li class="nav-item nav-subgroup">
-                                <a class="nav-link" data-bs-toggle="collapse" href="#sub-lainnya" aria-expanded="false">
-                                    <span>Lainnya</span>
-                                    <i class="fa fa-chevron-right sub-arrow"></i>
-                                </a>
-                                <div class="collapse" id="sub-lainnya">
-                                    <ul class="nav flex-column sub-sub-menu">
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Alasan/index.html">Alasan</a></li>
-                                        <li><a class="nav-link child-link text-submenu" href="../MasterData/Supplier/index.html">Supplier</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                <!-- Penjualan -->
-                <li class="nav-item nav-parent active">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#fprs-menu" aria-expanded="true" aria-controls="fprs-menu">
-                        <i class="fa fa-layer-group img-icon" style="color:#005d41;"></i>
-                        <span class="menu-title">Penjualan</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse show" id="fprs-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu d-flex align-items-center justify-content-between" href="javascript:void(0)" style="opacity: 0.6; cursor: not-allowed;"><span>Faktur</span><span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span></a></li>
-                            <li><a class="nav-link child-link text-submenu active" href="index.html">Canvassing</a></li>
-                        </ul>
-                    </div>
-                </li>
-                <!-- Kunjungan -->
-                <li class="nav-item nav-parent">
-                    <a class="nav-link" data-bs-toggle="collapse" href="#kunjungan-menu" aria-expanded="false" aria-controls="kunjungan-menu">
-                        <i class="fa fa-map-marked-alt img-icon" style="color:#e65100;"></i>
-                        <span class="menu-title">Kunjungan</span>
-                        <i class="fa fa-chevron-right menu-arrow"></i>
-                    </a>
-                    <div class="collapse" id="kunjungan-menu">
-                        <ul class="nav flex-column sub-menu">
-                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Informasi/index.html">Informasi Kunjungan</a></li>
-                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Geografis/index.html">Geografis Kunjungan</a></li>
-                            <li><a class="nav-link child-link text-submenu" href="../Kunjungan/Rute/index.html">Management Rute</a></li>
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- MAIN PANEL -->
-        <div class="main-panel">
-            <div class="content-wrapper">
                 
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb">
@@ -191,7 +45,7 @@
                     </div>
                     <div class="detail-header-info">
                         <div class="info-item" title="Driver"><i class="fa fa-user"></i> <strong>EMP-260500040</strong> (JAMBI)</div>
-                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 – 01 Jan 2027</div>
+                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 â€“ 01 Jan 2027</div>
                         <div class="info-item" title="Gudang"><i class="fa fa-warehouse"></i> <strong>JAMBI</strong></div>
                         <div class="info-item" title="Durasi"><i class="fa fa-clock"></i> 235 Hari</div>
                         <div class="info-item" style="flex:1; min-width:200px;">
@@ -316,78 +170,12 @@
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <footer class="footer"><span>Copyright &copy; 2025 <a href="#" style="color:#005d41;">Falcon</a>. All rights reserved.</span></footer>
-        </div>
     </div>
-</div>
+    <script src="../../../wwwroot/js/canvassing-store.js"></script>
+    <script src="../../../wwwroot/js/layout.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
 
-<!-- Modal Riwayat -->
-<div class="modal fade" id="modalRiwayat" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Riwayat Stok Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                    <strong id="riwayatProdName">Nama Produk</strong>
-                    <span class="text-muted" id="riwayatProdCode">KODE</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Aksi</th>
-                                <th class="text-center">Karton</th>
-                                <th class="text-center">Box</th>
-                                <th class="text-center">Pcs</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>11 Mei 2026 14:00</td>
-                                <td>Stok Awal</td>
-                                <td class="text-end">99999</td>
-                                <td class="text-end">0</td>
-                                <td class="text-end">0</td>
-                            </tr>
-                            <tr>
-                                <td>12 Mei 2026 09:30</td>
-                                <td><span class="text-success">Penjualan</span></td>
-                                <td class="text-end">-5</td>
-                                <td class="text-end">-2</td>
-                                <td class="text-end">0</td>
-                            </tr>
-                            <tr>
-                                <td>13 Mei 2026 15:15</td>
-                                <td><span class="text-warning">Pengembalian</span></td>
-                                <td class="text-end">+1</td>
-                                <td class="text-end">0</td>
-                                <td class="text-end">0</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../../../wwwroot/js/canvassing-store.js"></script>
-<script src="../../../wwwroot/js/layout.js"></script>
-
-<script>
 $(document).ready(function () {
     var id = new URLSearchParams(window.location.search).get('id');
     if (!id) {
@@ -440,7 +228,7 @@ $(document).ready(function () {
     var driverInfo = `<i class="fa fa-user"></i> <strong>${item.driverCode || '-'}</strong> (${item.driverName || '-'})`;
     $('div.info-item[title="Driver"]').html(driverInfo);
 
-    var periodInfo = `<i class="fa fa-calendar-alt"></i> ${formatDate(item.tanggalMulai)} – ${formatDate(item.tanggalSelesai)}`;
+    var periodInfo = `<i class="fa fa-calendar-alt"></i> ${formatDate(item.tanggalMulai)} â€“ ${formatDate(item.tanggalSelesai)}`;
     $('div.info-item[title="Jadwal"]').html(periodInfo);
 
     var warehouseInfo = `<i class="fa fa-warehouse"></i> <strong>${item.gudang || '-'}</strong>`;
@@ -651,6 +439,8 @@ $(document).ready(function () {
         });
     });
 });
-</script>
+
+        });
+    </script>
 </body>
 </html>
