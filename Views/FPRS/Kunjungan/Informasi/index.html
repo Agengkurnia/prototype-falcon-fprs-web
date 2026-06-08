@@ -202,6 +202,29 @@
             transform: translateX(3px);
         }
 
+        /* ===== Skeleton Loading Placeholders ===== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: #e9ecef;
+            background-image: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            pointer-events: none;
+            cursor: default;
+        }
+        .skeleton-stat-card {
+            border-radius: 10px;
+            height: 78px;
+        }
+        .skeleton-table-row {
+            border-radius: 4px;
+            height: 44px;
+            margin-bottom: 4px;
+        }
+
         @media (max-width: 992px) {
             .stat-row { grid-template-columns: repeat(2, 1fr); }
         }
@@ -401,32 +424,70 @@
                             <button class="btn btn-secondary btn-sm w-100" id="resetFilters">Reset</button>
                         </div>
                     </div>
+                    <!-- Advanced Filter Controls -->
+                    <div class="row g-3 mt-2" id="advancedFilterRow">
+                        <div class="col-md-4">
+                            <label class="form-label small">Area/Region</label>
+                            <select class="form-select form-select-sm" id="filterArea">
+                                <option value="">Semua Area</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Divisi</label>
+                            <select class="form-select form-select-sm" id="filterDivisi">
+                                <option value="">Semua Divisi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Status Kunjungan</label>
+                            <select class="form-select form-select-sm" id="filterStatus">
+                                <option value="">Semua</option>
+                                <option value="sudah">Sudah Check-out</option>
+                                <option value="belum">Belum Check-out</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Dari</label>
+                            <input type="date" class="form-control form-control-sm" id="filterDateStart"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Sampai</label>
+                            <input type="date" class="form-control form-control-sm" id="filterDateEnd"/>
+                        </div>
+                    </div>
+                    <div id="dateValidationError" class="text-danger small mt-1" style="display:none;"></div>
                 </div>
 
                 <!-- SUMMARY STAT CARDS -->
                 <div class="stat-row" id="statRow">
-                    <div class="stat-card">
+                    <!-- Skeleton stat cards (shown during loading) -->
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat1" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat2" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat3" aria-label="Loading" role="status"></div>
+                    <div class="skeleton skeleton-stat-card" id="skeletonStat4" aria-label="Loading" role="status"></div>
+                    <!-- Real stat cards (hidden during loading) -->
+                    <div class="stat-card" id="realStatCard1" style="display:none;">
                         <div class="stat-icon ic-visit"><i class="fa fa-route"></i></div>
                         <div class="stat-meta">
                             <div class="stat-label">Total Kunjungan</div>
                             <div class="stat-value" id="statTrips">0</div>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="realStatCard2" style="display:none;">
                         <div class="stat-icon ic-sales"><i class="fa fa-store"></i></div>
                         <div class="stat-meta">
                             <div class="stat-label">Total Outlet Dikunjungi</div>
                             <div class="stat-value" id="statVisited">0</div>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="realStatCard3" style="display:none;">
                         <div class="stat-icon ic-sales-amt"><i class="fa fa-coins"></i></div>
                         <div class="stat-meta">
                             <div class="stat-label">Total Penjualan</div>
                             <div class="stat-value" id="statSales">Rp 0</div>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card" id="realStatCard4" style="display:none;">
                         <div class="stat-icon ic-avg"><i class="fa fa-chart-line"></i></div>
                         <div class="stat-meta">
                             <div class="stat-label">Rata-rata / Kunjungan</div>
@@ -457,7 +518,12 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tblBody">
-                                    <!-- Dynamic content -->
+                                    <!-- Skeleton table rows (shown during loading) -->
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
+                                    <tr class="skeleton-table-row-wrapper" aria-label="Loading" role="status"><td colspan="8"><div class="skeleton skeleton-table-row"></div></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -481,7 +547,19 @@
 <script src="../../../../wwwroot/js/layout.js"></script>
 <script>
     let table;
+    let listData = []; // Global reference for filter access
     const fmt = v => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
+
+    // ===== Filter State =====
+    const filterState = {
+        name: '',        // text input
+        month: '',       // select
+        area: '',        // select
+        divisi: '',      // select
+        status: '',      // select: '' | 'sudah' | 'belum'
+        dateStart: '',   // date string 'YYYY-MM-DD'
+        dateEnd: ''      // date string 'YYYY-MM-DD'
+    };
 
     function formatDateDisplay(dateStr) {
         // Parse "YYYY-MM-DD" to "DD-MM-YYYY"
@@ -492,9 +570,185 @@
         return dateStr;
     }
 
+    // ===== Area extraction from name =====
+    // Names follow pattern "JKT-ANCOL (BUDI)" — area is the prefix before "("
+    function extractArea(name) {
+        if (!name) return '';
+        const parenIdx = name.indexOf('(');
+        if (parenIdx > 0) {
+            return name.substring(0, parenIdx).trim();
+        }
+        return name.trim();
+    }
+
+    // ===== Divisi lookup from pegawai data =====
+    function lookupDivisi(salesmanId, pegawaiData) {
+        if (!pegawaiData || !Array.isArray(pegawaiData) || !salesmanId) return '';
+        // Try matching by kode or id field
+        const match = pegawaiData.find(function(p) {
+            return String(p.id) === String(salesmanId) || p.kode === String(salesmanId);
+        });
+        return match ? (match.divisi || '') : '';
+    }
+
+    // ===== Populate filter dropdowns with sorted unique values =====
+    function populateFilterDropdowns(salesData, pegawaiData) {
+        // Extract sorted unique area values from salesData names
+        const areas = [];
+        if (salesData && salesData.length > 0) {
+            const areaSet = {};
+            salesData.forEach(function(row) {
+                const area = row.area;
+                if (area && !areaSet[area]) {
+                    areaSet[area] = true;
+                    areas.push(area);
+                }
+            });
+            areas.sort(function(a, b) { return a.localeCompare(b); });
+        }
+
+        // Extract sorted unique divisi values from pegawaiData
+        const divisiList = [];
+        if (pegawaiData && Array.isArray(pegawaiData) && pegawaiData.length > 0) {
+            const divisiSet = {};
+            pegawaiData.forEach(function(p) {
+                if (p.divisi && !divisiSet[p.divisi]) {
+                    divisiSet[p.divisi] = true;
+                    divisiList.push(p.divisi);
+                }
+            });
+            divisiList.sort(function(a, b) { return a.localeCompare(b); });
+        }
+
+        // Populate #filterArea dropdown
+        const $filterArea = $('#filterArea');
+        $filterArea.find('option:not(:first)').remove(); // Keep placeholder
+        areas.forEach(function(area) {
+            $filterArea.append($('<option>').val(area).text(area));
+        });
+
+        // Populate #filterDivisi dropdown
+        const $filterDivisi = $('#filterDivisi');
+        $filterDivisi.find('option:not(:first)').remove(); // Keep placeholder
+        divisiList.forEach(function(divisi) {
+            $filterDivisi.append($('<option>').val(divisi).text(divisi));
+        });
+    }
+
+    // ===== DataTables Custom Filter Function (AND Composition) =====
+    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex, rowData) {
+        // Only apply to #tblVisit
+        if (settings.nTable.id !== 'tblVisit') return true;
+
+        // Get the row element from the table
+        var $row = $(settings.aoData[dataIndex].nTr);
+
+        // Name filter: substring match (case-insensitive)
+        if (filterState.name) {
+            var rowName = data[2] || ''; // column 2 = Nama
+            if (rowName.toLowerCase().indexOf(filterState.name.toLowerCase()) === -1) return false;
+        }
+
+        // Month/Year filter: match dateKey prefix (e.g., "2026-06")
+        if (filterState.month) {
+            var rowDate = $row.data('datekey') || '';
+            if (rowDate.indexOf(filterState.month) !== 0) return false;
+        }
+
+        // Area filter: exact match
+        if (filterState.area) {
+            var rowArea = $row.data('area') || '';
+            if (rowArea !== filterState.area) return false;
+        }
+
+        // Divisi filter: exact match
+        if (filterState.divisi) {
+            var rowDivisi = $row.data('divisi') || '';
+            if (rowDivisi !== filterState.divisi) return false;
+        }
+
+        // Status filter: check endTime
+        if (filterState.status) {
+            var rowEndTime = $row.data('endtime') || '';
+            if (filterState.status === 'sudah' && !rowEndTime) return false;
+            if (filterState.status === 'belum' && rowEndTime) return false;
+        }
+
+        // Date range filter: inclusive bounds
+        if (filterState.dateStart && filterState.dateEnd) {
+            var rowDateKey = $row.data('datekey') || '';
+            if (rowDateKey < filterState.dateStart || rowDateKey > filterState.dateEnd) return false;
+        }
+
+        return true; // Row passes all predicates
+    });
+
+    // ===== Date Range Validation =====
+    function validateDateRange() {
+        var start = $('#filterDateStart').val();
+        var end = $('#filterDateEnd').val();
+
+        // Both empty: valid (no date filter applied)
+        if (!start && !end) {
+            return { valid: true, error: '' };
+        }
+
+        // Only one field filled: invalid
+        if ((start && !end) || (!start && end)) {
+            return { valid: false, error: 'Kedua tanggal harus diisi' };
+        }
+
+        // Start > end: invalid
+        if (start > end) {
+            return { valid: false, error: 'Tanggal mulai harus sebelum tanggal selesai' };
+        }
+
+        return { valid: true, error: '' };
+    }
+
+    // ===== Show/hide date validation error =====
+    function showDateValidationError(error) {
+        var $el = $('#dateValidationError');
+        if (error) {
+            $el.text(error).show();
+        } else {
+            $el.text('').hide();
+        }
+    }
+
+    // ===== Skeleton Loading Functions =====
+    function showSkeletons() {
+        // Show skeleton stat cards, hide real stat cards
+        $('.skeleton-stat-card').show();
+        $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').hide();
+        // Show skeleton table rows
+        $('.skeleton-table-row-wrapper').show();
+    }
+
+    function hideSkeletons() {
+        // Use requestAnimationFrame for single-repaint swap
+        requestAnimationFrame(function() {
+            // Hide skeleton stat cards, show real stat cards
+            $('.skeleton-stat-card').hide();
+            $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').show();
+            // Remove skeleton table rows (real content replaces them)
+            $('.skeleton-table-row-wrapper').remove();
+        });
+    }
+
     function loadVisitData() {
-        $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
-            let listData = [];
+        showSkeletons();
+
+        // Load both sales data and pegawai data in parallel
+        var salesPromise = $.getJSON('../../../../wwwroot/data/sales_data_by_date.json');
+        var pegawaiPromise = $.getJSON('../../../../wwwroot/data/pegawai.json');
+
+        $.when(salesPromise, pegawaiPromise).then(function(salesResult, pegawaiResult) {
+            // $.when resolves with [data, textStatus, jqXHR] for each promise
+            var data = salesResult[0];
+            var pegawaiData = pegawaiResult[0];
+
+            listData = [];
             
             // Loop through all dates in the sales JSON
             Object.keys(data).forEach(dateKey => {
@@ -503,6 +757,8 @@
                 // Loop through all salesman entries on this date
                 Object.keys(daySales).forEach(salesmanId => {
                     const s = daySales[salesmanId];
+                    const area = extractArea(s.name);
+                    const divisi = lookupDivisi(s.id, pegawaiData);
                     listData.push({
                         dateKey: dateKey,
                         dateDisplay: formatDateDisplay(dateKey),
@@ -511,13 +767,18 @@
                         visited: s.visits.length,
                         startTime: s.startTime + ':00',
                         endTime: s.endTime + ':00',
-                        invoice: s.invoice
+                        invoice: s.invoice,
+                        area: area,
+                        divisi: divisi
                     });
                 });
             });
 
             // Sort by Date Descending
             listData.sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+
+            // Populate filter dropdowns with enriched data
+            populateFilterDropdowns(listData, pegawaiData);
 
             // ===== Summary aggregation =====
             const totalTrips = listData.length;
@@ -534,14 +795,15 @@
 
             // Populate table body
             const body = $('#tblBody');
-            body.empty();
+            // Remove skeleton rows before populating real data
+            body.find('.skeleton-table-row-wrapper').remove();
             
             listData.forEach((row, index) => {
                 // Link name to Geografis map view page with date and salesman queries
                 const mapLink = `detail.html?date=${row.dateKey}&salesman=${row.id}`;
                 
                 body.append(`
-                    <tr style="cursor:pointer;" data-href="${mapLink}">
+                    <tr style="cursor:pointer;" data-href="${mapLink}" data-area="${row.area}" data-divisi="${row.divisi}" data-datekey="${row.dateKey}" data-endtime="${row.endTime}" data-visited="${row.visited}" data-invoice="${row.invoice}">
                         <td>${index + 1}</td>
                         <td data-order="${row.dateKey}">${row.dateDisplay}</td>
                         <td><a href="${mapLink}" class="salesman-link">${row.name}</a></td>
@@ -572,6 +834,9 @@
                 }
             });
 
+            // Hide skeletons and show real content
+            hideSkeletons();
+
             // Row click navigates to detail (ignore clicks on the link itself to avoid double nav)
             $('#tblBody').on('click', 'tr', function(e) {
                 if ($(e.target).closest('a').length) return;
@@ -579,10 +844,9 @@
                 if (href) window.location.href = href;
             });
 
-            // Keep row count badge in sync with search/filter
+            // Keep row count badge and stat cards in sync with search/filter
             table.on('draw', function() {
-                const info = table.page.info();
-                $('#rowCountBadge').text(info.recordsDisplay + ' entri');
+                updateStatCards();
             });
 
             // Bind Custom Search Box
@@ -590,46 +854,105 @@
                 table.search(this.value).draw();
             });
 
-        }).fail(function(jqxhr, textStatus, error) {
-            console.error("Error loading sales data JSON for daily visit:", textStatus, error);
+        }, function(jqxhr, textStatus, error) {
+            console.error("Error loading data JSON for daily visit:", textStatus, error);
+            // Remove skeletons and show error message on fetch failure
+            $('.skeleton-stat-card').hide();
+            $('.skeleton-table-row-wrapper').remove();
+            $('#realStatCard1, #realStatCard2, #realStatCard3, #realStatCard4').show();
+            $('#tblBody').html('<tr><td colspan="8" class="text-center text-danger py-4"><i class="fa fa-exclamation-circle me-2"></i>Data kunjungan tidak dapat dimuat</td></tr>');
         });
+    }
+
+    // ===== Apply Filters =====
+    function applyFilters() {
+        // Validate date range first
+        var dateValidation = validateDateRange();
+        if (!dateValidation.valid) {
+            showDateValidationError(dateValidation.error);
+            return;
+        }
+        showDateValidationError(''); // Clear any previous error
+
+        // Read UI inputs into filterState
+        filterState.name = $('#filterName').val().trim();
+        filterState.month = $('#filterMonth').val();
+        filterState.area = $('#filterArea').val();
+        filterState.divisi = $('#filterDivisi').val();
+        filterState.status = $('#filterStatus').val();
+        filterState.dateStart = $('#filterDateStart').val();
+        filterState.dateEnd = $('#filterDateEnd').val();
+
+        // Trigger DataTable redraw (custom filter function will use filterState)
+        table.draw();
+    }
+
+    // ===== Reset Filters =====
+    function resetFilters() {
+        // Clear all inputs to defaults
+        $('#filterName').val('');
+        $('#filterMonth').val('');
+        $('#filterArea').val('');
+        $('#filterDivisi').val('');
+        $('#filterStatus').val('');
+        $('#filterDateStart').val('');
+        $('#filterDateEnd').val('');
+        showDateValidationError(''); // Clear validation error
+
+        // Reset filterState
+        filterState.name = '';
+        filterState.month = '';
+        filterState.area = '';
+        filterState.divisi = '';
+        filterState.status = '';
+        filterState.dateStart = '';
+        filterState.dateEnd = '';
+
+        // Also clear DataTables built-in search
+        table.search('');
+        $('#customSearch').val('');
+
+        // Redraw table
+        table.draw();
+    }
+
+    // ===== Update Stat Cards from Filtered Rows =====
+    function updateStatCards() {
+        // Get currently filtered/visible rows from the DataTable
+        var visibleData = [];
+        table.rows({ search: 'applied' }).every(function() {
+            var $row = $(this.node());
+            visibleData.push({
+                visited: parseInt($row.data('visited')) || 0,
+                invoice: parseFloat($row.data('invoice')) || 0
+            });
+        });
+
+        var totalKunjungan = visibleData.length;
+        var totalOutlet = visibleData.reduce(function(sum, r) { return sum + r.visited; }, 0);
+        var totalPenjualan = visibleData.reduce(function(sum, r) { return sum + r.invoice; }, 0);
+        var rataRata = totalKunjungan > 0 ? totalPenjualan / totalKunjungan : 0;
+
+        var fmtRp = function(v) { return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(v)); };
+
+        $('#statTrips').text(totalKunjungan);
+        $('#statVisited').text(totalOutlet + ' outlet');
+        $('#statSales').text(fmtRp(totalPenjualan));
+        $('#statAvg').text(fmtRp(rataRata));
+        $('#rowCountBadge').text(totalKunjungan + ' entri');
     }
 
     $(document).ready(function() {
         loadVisitData();
 
-        // Toggle Filter Panel
+        // Toggle Filter Panel (300ms slide animation, retains values when hidden)
         $('#btnFilter').on('click', function() {
-            $('#filterPanel').slideToggle(200);
+            $('#filterPanel').slideToggle(300);
         });
 
-        // Filter Actions
-        $('#applyFilters').on('click', function() {
-            const nameQuery = $('#filterName').val().toLowerCase();
-            const monthQuery = $('#filterMonth').val(); // e.g., "2026-06"
-            
-            table.column(2).search(nameQuery); // Filter by Salesman Name
-            table.column(1).search(monthQuery); // Filter by Date
-            table.draw();
-            
-            Swal.fire({
-                icon: 'success',
-                title: 'Filter Diterapkan',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        });
-
-        $('#resetFilters').on('click', function() {
-            $('#filterName').val('');
-            $('#filterMonth').val('2026-06');
-            
-            table.column(2).search('');
-            table.column(1).search('2026-06');
-            table.draw();
-        });
+        // Wire filter action buttons
+        $('#applyFilters').on('click', applyFilters);
+        $('#resetFilters').on('click', resetFilters);
 
         // Settings Dialog Mock
         $('#btnSettings').on('click', function() {

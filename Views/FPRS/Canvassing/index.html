@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" />
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
 
     <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
-    <link rel="stylesheet" href="../../../wwwroot/css/canvassing.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css" />
 </head>
 <body class="sidebar-light">
 
@@ -286,7 +286,7 @@ $(document).ready(function () {
         var list = CanvassingStore.getAll();
         
         var statuses = {
-            'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>',
+            'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>',
             'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
             'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
             'Draft': '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'

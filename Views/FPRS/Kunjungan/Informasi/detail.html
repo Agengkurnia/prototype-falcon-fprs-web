@@ -213,6 +213,37 @@
         .oos-pill.oos-near { background: #e7f5ee; color: #2b8a3e; }
         .oos-pill.oos-far { background: #fdecea; color: #dc3545; }
 
+        /* ===== Skeleton Loading Placeholders ===== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: #e9ecef;
+            background-image: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            pointer-events: none;
+            cursor: default;
+        }
+        .skeleton-stat-card {
+            border-radius: 10px;
+            height: 78px;
+        }
+        .skeleton-table-row {
+            border-radius: 4px;
+            height: 44px;
+            margin-bottom: 4px;
+        }
+        .skeleton-metric-cell {
+            border-radius: 8px;
+            height: 48px;
+        }
+        .skeleton-info-card {
+            border-radius: 10px;
+            min-height: 220px;
+        }
+
         @media (max-width: 992px) {
             .kunjungan-pesanan-grid {
                 flex-direction: column;
@@ -384,7 +415,10 @@
                 <div class="row g-3 mb-4">
                     <!-- Left card: Informasi Kunjungan -->
                     <div class="col-md-3">
-                        <div class="card border-0 shadow-sm h-100">
+                        <!-- Skeleton info card placeholder (shown during loading) -->
+                        <div class="skeleton skeleton-info-card" id="skeletonInfoCard" aria-label="Loading" role="status"></div>
+                        <!-- Real info card (hidden during loading) -->
+                        <div class="card border-0 shadow-sm h-100" id="realInfoCard" style="display:none;">
                             <div class="card-body">
                                 <div class="info-card-title">Informasi Kunjungan</div>
                                 
@@ -407,7 +441,29 @@
 
                     <!-- Right card: Kunjungan & Pesanan -->
                     <div class="col-md-9">
-                        <div class="card border-0 shadow-sm h-100">
+                        <!-- Skeleton metrics placeholder (shown during loading) -->
+                        <div class="card border-0 shadow-sm h-100" id="skeletonMetricsCard" aria-label="Loading" role="status">
+                            <div class="card-body">
+                                <div class="skeleton" style="width: 180px; height: 20px; border-radius: 4px; margin-bottom: 15px;"></div>
+                                <div class="kunjungan-pesanan-grid">
+                                    <div class="skeleton" style="flex: 1.2; height: 250px; border-radius: 6px;"></div>
+                                    <div class="detail-metrics-box">
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" aria-label="Loading" role="status"></div>
+                                        <div class="skeleton skeleton-metric-cell" style="grid-column: 1 / -1;" aria-label="Loading" role="status"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Real metrics card (hidden during loading) -->
+                        <div class="card border-0 shadow-sm h-100" id="realMetricsCard" style="display:none;">
                             <div class="card-body">
                                 <div class="info-card-title">Kunjungan & Pesanan</div>
                                 
@@ -517,7 +573,14 @@
                             <span>Daftar Kunjungan</span>
                             <span class="badge bg-success" id="tblStoreCount" style="font-size: 0.75rem; padding: 4px 8px;">0 Pelanggan</span>
                         </div>
-                        <div class="table-responsive">
+                        <!-- Skeleton table rows (shown during loading) -->
+                        <div id="skeletonTableRows">
+                            <div class="skeleton skeleton-table-row" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-table-row" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-table-row" aria-label="Loading" role="status"></div>
+                        </div>
+                        <!-- Real table (hidden during loading) -->
+                        <div class="table-responsive" id="realTableContainer" style="display:none;">
                             <table class="table table-hover table-detail-list" id="tblDetail">
                                 <thead>
                                     <tr>
@@ -546,6 +609,11 @@
                 <div class="mb-4">
                     <a href="index.html" class="btn btn-outline-success btn-sm"><i class="fa fa-arrow-left me-1"></i> Kembali ke list</a>
                 </div>
+
+                <!-- Error message (hidden by default) -->
+                <div id="detailLoadError" class="alert alert-danger text-center" style="display:none;">
+                    <i class="fa fa-exclamation-circle me-2"></i>Data detail tidak dapat dimuat
+                </div>
             </div>
 
             <!-- FOOTER -->
@@ -564,6 +632,7 @@
 <script>
     let map;
     let mapMarkers = [];
+    let loadTimeout;
     const fmt = v => new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
 
     function formatDateDisplay(dateStr) {
@@ -574,18 +643,48 @@
         return dateStr;
     }
 
+    // ===== Skeleton Loading Functions =====
+    function hideSkeletons() {
+        // Use requestAnimationFrame for single-repaint content swap
+        requestAnimationFrame(function() {
+            // Hide skeleton placeholders
+            $('#skeletonInfoCard').hide();
+            $('#skeletonMetricsCard').hide();
+            $('#skeletonTableRows').hide();
+            // Show real content
+            $('#realInfoCard').show();
+            $('#realMetricsCard').show();
+            $('#realTableContainer').show();
+        });
+    }
+
+    function showLoadError() {
+        // Remove skeletons and show error message
+        $('#skeletonInfoCard').hide();
+        $('#skeletonMetricsCard').hide();
+        $('#skeletonTableRows').hide();
+        $('#detailLoadError').show();
+    }
+
     $(document).ready(function() {
         // Parse URL Parameters
         const urlParams = new URLSearchParams(window.location.search);
         const dateParam = urlParams.get('date') || '2026-06-05';
         const salesmanParam = urlParams.get('salesman') || '106201';
 
+        // Set 10-second timeout for data loading
+        loadTimeout = setTimeout(function() {
+            showLoadError();
+        }, 10000);
+
         // Load JSON Data
         $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
+            // Clear the timeout since data loaded successfully
+            clearTimeout(loadTimeout);
+
             const dayData = data[dateParam];
             if (!dayData || !dayData[salesmanParam]) {
-                alert("Data Kunjungan tidak ditemukan!");
-                window.location.href = "index.html";
+                showLoadError();
                 return;
             }
 
@@ -685,6 +784,9 @@
                 }
             });
 
+            // Hide skeletons and show real content
+            hideSkeletons();
+
             // Initialize Bootstrap Tooltips for No Sale reasons
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -781,7 +883,9 @@
             });
 
         }).fail(function(jqxhr, textStatus, error) {
+            clearTimeout(loadTimeout);
             console.error("Error loading JSON for detail view:", textStatus, error);
+            showLoadError();
         });
     });
 </script>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8" />
@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
     <link rel="stylesheet" href="../../../wwwroot/css/layout.css" />
-    <link rel="stylesheet" href="../../../wwwroot/css/canvassing.css" />
+    <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css" />
 </head>
 <body class="sidebar-light">
 
@@ -176,7 +176,7 @@
                     <div class="detail-header-top">
                         <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i></a>
                         <h2 class="detail-header-title">CVS-260500194</h2>
-                        <span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>
+                        <span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>
                         
                         <div class="ms-auto d-flex gap-2">
                             <button class="btn btn-outline-success"><i class="fa fa-plus me-1"></i> Tambah Stok</button>
@@ -429,7 +429,7 @@ $(document).ready(function () {
     
     // Populate Status Badge
     var statuses = {
-        'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-spinner fa-spin"></i> Ongoing</span>',
+        'Ongoing': '<span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>',
         'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
         'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
         'Draft': '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'

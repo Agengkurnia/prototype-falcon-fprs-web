@@ -391,6 +391,62 @@
                 flex: 1 1 100%;
             }
         }
+
+        /* ===== Skeleton Loading Placeholders ===== */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton {
+            background: #e9ecef;
+            background-image: linear-gradient(90deg, #e9ecef 25%, #f8f9fa 50%, #e9ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+            pointer-events: none;
+            cursor: default;
+        }
+        .skeleton-route-card {
+            border-radius: 4px;
+            height: 52px;
+            margin-bottom: 8px;
+        }
+        .skeleton-table-row {
+            border-radius: 4px;
+            height: 44px;
+            margin-bottom: 4px;
+        }
+        .skeleton-load-error {
+            text-align: center;
+            padding: 20px 14px;
+            color: #dc3545;
+            font-size: 0.8rem;
+        }
+        .skeleton-load-error i {
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .skeleton-load-error .btn-retry {
+            margin-top: 8px;
+            font-size: 0.75rem;
+        }
+
+        /* ===== Bulk Assign Toolbar ===== */
+        .bulk-assign-toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 1px solid #dee2e6;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+            z-index: 1050;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
     </style>
 </head>
 <body class="sidebar-light">
@@ -568,6 +624,10 @@
                             <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
                         </div>
                         <div class="route-list-group" id="routeList">
+                            <!-- Skeleton route-item-cards (shown during loading) -->
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
                             <!-- Dynamic daily routes -->
                         </div>
                     </div>
@@ -612,6 +672,10 @@
                             <i class="fa fa-search" style="font-size:0.75rem; right:8px;"></i>
                         </div>
                         <div class="route-list-group" id="customerDBList">
+                            <!-- Skeleton customer-item-cards (shown during loading) -->
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
+                            <div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>
                             <!-- Master customers to add -->
                         </div>
                     </div>
@@ -659,6 +723,9 @@
                         <table class="weekly-table table table-bordered">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px; text-align: center; vertical-align: middle;">
+                                        <input type="checkbox" id="selectAllWeekly" aria-label="Select all employees"/>
+                                    </th>
                                     <th style="width: 220px; vertical-align: middle;">Pegawai</th>
                                     <th style="width: 180px; vertical-align: middle;">Rute Mingguan</th>
                                     <th style="width: 45px; text-align: center; vertical-align: middle;"><i class="fa fa-broom text-danger"></i></th>
@@ -672,6 +739,16 @@
                                 </tr>
                             </thead>
                             <tbody id="weeklyTableBody">
+                                <!-- Skeleton table rows (shown during loading) -->
+                                <tr class="skeleton-weekly-row" aria-label="Loading" role="status">
+                                    <td colspan="11"><div class="skeleton skeleton-table-row"></div></td>
+                                </tr>
+                                <tr class="skeleton-weekly-row" aria-label="Loading" role="status">
+                                    <td colspan="11"><div class="skeleton skeleton-table-row"></div></td>
+                                </tr>
+                                <tr class="skeleton-weekly-row" aria-label="Loading" role="status">
+                                    <td colspan="11"><div class="skeleton skeleton-table-row"></div></td>
+                                </tr>
                                 <!-- Populated dynamically from pegawai.json -->
                             </tbody>
                         </table>
@@ -680,6 +757,16 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Bulk Assign Toolbar (fixed at bottom) -->
+<div id="bulkAssignToolbar" class="bulk-assign-toolbar" style="display:none;">
+    <span id="bulkCount">0 pegawai dipilih</span>
+    <select id="bulkRouteSelect" class="form-select form-select-sm" style="width: auto; min-width: 180px;">
+        <option value="">Pilih Rute...</option>
+    </select>
+    <button class="btn btn-success btn-sm" id="btnBulkAssign">Assign</button>
+    <button class="btn btn-outline-secondary btn-sm" id="btnBulkCancel">Batal</button>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -697,6 +784,138 @@
     let customersList = [];
     let employeesList = [];
     let currentWeekTab = 'week1';
+    let dataLoadTimeout = null;
+    let selectedEmployees = new Set(); // Set of employee IDs for bulk selection
+
+    // ===== Skeleton Loading Management =====
+    function showSkeletons() {
+        // Route list skeletons
+        $('#routeList .skeleton').show();
+        // Customer list skeletons
+        $('#customerDBList .skeleton').show();
+        // Weekly table skeletons
+        $('.skeleton-weekly-row').show();
+    }
+
+    function hideSkeletons() {
+        // Remove skeleton elements (intended to be called within requestAnimationFrame)
+        $('#routeList .skeleton').remove();
+        $('#customerDBList .skeleton').remove();
+        $('.skeleton-weekly-row').remove();
+    }
+
+    function showLoadError(containerSelector, message) {
+        var errorHtml = '<div class="skeleton-load-error">' +
+            '<i class="fa fa-exclamation-triangle"></i>' +
+            '<p>' + message + '</p>' +
+            '<button class="btn btn-outline-danger btn-sm btn-retry" onclick="loadPageData()">Coba Lagi</button>' +
+            '</div>';
+        $(containerSelector).html(errorHtml);
+    }
+
+    function showAllLoadErrors() {
+        // Remove any remaining skeletons
+        $('#routeList .skeleton').remove();
+        $('#customerDBList .skeleton').remove();
+        $('.skeleton-weekly-row').remove();
+
+        // Show inline error with retry button in each area
+        showLoadError('#routeList', 'Data rute tidak dapat dimuat');
+        showLoadError('#customerDBList', 'Data pelanggan tidak dapat dimuat');
+        $('#weeklyTableBody').html(
+            '<tr><td colspan="11" class="skeleton-load-error">' +
+            '<i class="fa fa-exclamation-triangle"></i>' +
+            '<p>Data pegawai tidak dapat dimuat</p>' +
+            '<button class="btn btn-outline-danger btn-sm btn-retry" onclick="loadPageData()">Coba Lagi</button>' +
+            '</td></tr>'
+        );
+    }
+
+    function loadPageData() {
+        // Reset state
+        customersList = [];
+        employeesList = [];
+
+        // Re-add skeletons if they were removed
+        if ($('#routeList .skeleton').length === 0) {
+            $('#routeList').html(
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>' +
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>' +
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>'
+            );
+        }
+        if ($('#customerDBList .skeleton').length === 0) {
+            $('#customerDBList').html(
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>' +
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>' +
+                '<div class="skeleton skeleton-route-card" aria-label="Loading" role="status"></div>'
+            );
+        }
+        if ($('.skeleton-weekly-row').length === 0) {
+            $('#weeklyTableBody').html(
+                '<tr class="skeleton-weekly-row" aria-label="Loading" role="status"><td colspan="11"><div class="skeleton skeleton-table-row"></div></td></tr>' +
+                '<tr class="skeleton-weekly-row" aria-label="Loading" role="status"><td colspan="11"><div class="skeleton skeleton-table-row"></div></td></tr>' +
+                '<tr class="skeleton-weekly-row" aria-label="Loading" role="status"><td colspan="11"><div class="skeleton skeleton-table-row"></div></td></tr>'
+            );
+        }
+
+        var customersLoaded = false;
+        var employeesLoaded = false;
+        var failed = false;
+
+        // Set 10-second timeout
+        if (dataLoadTimeout) clearTimeout(dataLoadTimeout);
+        dataLoadTimeout = setTimeout(function() {
+            if (!customersLoaded || !employeesLoaded) {
+                failed = true;
+                showAllLoadErrors();
+            }
+        }, 10000);
+
+        // Load Customers
+        $.getJSON('../../../../wwwroot/data/pelanggan.json', function(data) {
+            if (failed) return;
+            customersList = data;
+            customersLoaded = true;
+
+            if (customersLoaded && employeesLoaded) {
+                clearTimeout(dataLoadTimeout);
+                onDataLoadComplete();
+            }
+        }).fail(function() {
+            if (failed) return;
+            failed = true;
+            clearTimeout(dataLoadTimeout);
+            showAllLoadErrors();
+        });
+
+        // Load Employees
+        $.getJSON('../../../../wwwroot/data/pegawai.json', function(data) {
+            if (failed) return;
+            employeesList = data;
+            employeesLoaded = true;
+
+            if (customersLoaded && employeesLoaded) {
+                clearTimeout(dataLoadTimeout);
+                onDataLoadComplete();
+            }
+        }).fail(function() {
+            if (failed) return;
+            failed = true;
+            clearTimeout(dataLoadTimeout);
+            showAllLoadErrors();
+        });
+    }
+
+    function onDataLoadComplete() {
+        requestAnimationFrame(function() {
+            hideSkeletons();
+            renderRoutesList();
+            renderCustomerDBList();
+            renderWeeklyGrid();
+            populateBulkRouteDropdown();
+        });
+    }
 
     // Mock coordinates for customers
     const customerCoordinates = {
@@ -1096,6 +1315,130 @@
         });
     }
 
+    // ===== Employee Selection for Bulk Assignment =====
+    function toggleEmployeeSelection(employeeId, checked) {
+        if (checked) {
+            selectedEmployees.add(employeeId);
+        } else {
+            selectedEmployees.delete(employeeId);
+        }
+        updateSelectAllState();
+
+        // Show/hide bulk toolbar based on selection
+        if (selectedEmployees.size > 0) {
+            showBulkToolbar();
+        } else {
+            hideBulkToolbar();
+        }
+    }
+
+    function updateSelectAllState() {
+        const visibleCheckboxes = $('#weeklyTableBody input[type="checkbox"]:visible');
+        const checkedCount = visibleCheckboxes.filter(':checked').length;
+        const totalCount = visibleCheckboxes.length;
+
+        const selectAll = $('#selectAllWeekly');
+        if (checkedCount === 0) {
+            selectAll.prop('checked', false).prop('indeterminate', false);
+        } else if (checkedCount === totalCount) {
+            selectAll.prop('checked', true).prop('indeterminate', false);
+        } else {
+            selectAll.prop('checked', false).prop('indeterminate', true);
+        }
+    }
+
+    // ===== Bulk Assign Toolbar Visibility =====
+    function getVisibleSelectedCount() {
+        // Count employees that are both in selectedEmployees Set AND currently visible
+        var count = 0;
+        $('#weeklyTableBody input.employee-checkbox:visible:checked').each(function() {
+            count++;
+        });
+        return count;
+    }
+
+    function showBulkToolbar() {
+        var visibleSelected = getVisibleSelectedCount();
+        $('#bulkCount').text(visibleSelected + ' pegawai dipilih');
+        populateBulkRouteDropdown();
+        $('#bulkAssignToolbar').show();
+    }
+
+    function hideBulkToolbar() {
+        $('#bulkAssignToolbar').fadeOut(200);
+    }
+
+    // ===== Bulk Assign Execution and Persistence =====
+    function populateBulkRouteDropdown() {
+        var routeList = JSON.parse(localStorage.getItem('fprs_route_planning_list') || '[]');
+        var $select = $('#bulkRouteSelect');
+        $select.find('option:not(:first)').remove();
+
+        if (routeList.length === 0) {
+            $select.prop('disabled', true);
+            $select.find('option:first').text('Tidak ada rute tersedia');
+        } else {
+            $select.prop('disabled', false);
+            $select.find('option:first').text('Pilih Rute...');
+            routeList.forEach(function(route) {
+                $select.append($('<option>').val(route.id).text(route.name));
+            });
+        }
+    }
+
+    function applyBulkAssignment(routeId) {
+        // Get current weekly assignments from localStorage
+        var assignments = getWeeklyAssignments();
+
+        // Apply route to all selected employees
+        var count = 0;
+        selectedEmployees.forEach(function(empId) {
+            if (!assignments[empId]) {
+                assignments[empId] = {};
+            }
+            if (!assignments[empId][currentWeekTab]) {
+                assignments[empId][currentWeekTab] = { route: '-', days: { Mon: '-', Tue: '-', Wed: '-', Thu: '-', Fri: '-', Sat: '-', Sun: '-' } };
+            }
+            assignments[empId][currentWeekTab].route = routeId;
+
+            // Auto-populate weekdays with chosen route (Sat & Sun remain unchanged)
+            var daysObj = assignments[empId][currentWeekTab].days;
+            daysObj.Mon = routeId;
+            daysObj.Tue = routeId;
+            daysObj.Wed = routeId;
+            daysObj.Thu = routeId;
+            daysObj.Fri = routeId;
+
+            count++;
+
+            // Update the UI: set the "Rute Mingguan" dropdown for this employee
+            $('tr[data-emp="' + empId + '"] select.route-select').val(routeId);
+        });
+
+        // Persist to localStorage
+        saveWeeklyAssignments(assignments);
+
+        // Show success toast
+        Swal.fire({
+            icon: 'success',
+            title: count + ' pegawai diperbarui',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
+        // Deselect all and hide toolbar
+        clearAllSelections();
+    }
+
+    function clearAllSelections() {
+        selectedEmployees.clear();
+        $('#weeklyTableBody input.employee-checkbox').prop('checked', false);
+        $('#selectAllWeekly').prop('checked', false).prop('indeterminate', false);
+        hideBulkToolbar();
+    }
+
     function renderWeeklyGrid() {
         const tbody = $('#weeklyTableBody');
         tbody.empty();
@@ -1112,7 +1455,7 @@
         });
 
         if (filtered.length === 0) {
-            tbody.append(`<tr><td colspan="10" class="text-center text-muted small py-4">Tidak ada data pegawai</td></tr>`);
+            tbody.append(`<tr><td colspan="11" class="text-center text-muted small py-4">Tidak ada data pegawai</td></tr>`);
             return;
         }
 
@@ -1140,6 +1483,9 @@
 
             tbody.append(`
                 <tr data-emp="${emp.kode}">
+                    <td style="text-align: center; vertical-align: middle;">
+                        <input type="checkbox" class="employee-checkbox" data-emp="${emp.kode}" ${selectedEmployees.has(emp.kode) ? 'checked' : ''} aria-label="Select ${emp.nama}"/>
+                    </td>
                     <td>
                         <strong style="color:#005d41; font-size:0.8rem;">${emp.nama}</strong><br/>
                         <span class="text-muted" style="font-size:0.65rem;">${emp.kode} (${emp.posisi || 'Salesman'})</span>
@@ -1164,23 +1510,23 @@
                 </tr>
             `);
         });
+
+        // Update Select All checkbox state after rendering
+        updateSelectAllState();
+
+        // Update bulk toolbar count to reflect only selected AND visible employees
+        if (selectedEmployees.size > 0) {
+            showBulkToolbar();
+        } else {
+            hideBulkToolbar();
+        }
     }
 
     $(document).ready(function() {
         initMap();
 
-        // Load Customers & Employees
-        $.getJSON('../../../../wwwroot/data/pelanggan.json', function(data) {
-            customersList = data;
-            renderCustomerDBList();
-        });
-
-        $.getJSON('../../../../wwwroot/data/pegawai.json', function(data) {
-            employeesList = data;
-            renderWeeklyGrid();
-        });
-
-        renderRoutesList();
+        // Load data with skeleton loading pattern
+        loadPageData();
 
         // Handle Card Clicks in Route List
         $(document).on('click', '#routeList .route-item-card', function(e) {
@@ -1393,12 +1739,43 @@
             renderWeeklyGrid();
         });
 
-        // Weekly tabs switching
+        // Weekly tabs switching — clear selections to scope bulk assign to active tab only
         $('.weekly-tab-link').on('click', function() {
             $('.weekly-tab-link').removeClass('active');
             $(this).addClass('active');
             currentWeekTab = $(this).data('tab');
+            // Clear all selections: deselect checkboxes (including Select All), hide toolbar
+            clearAllSelections();
             renderWeeklyGrid();
+        });
+
+        // Employee checkbox selection handler
+        $(document).on('change', '.employee-checkbox', function() {
+            const empId = $(this).data('emp');
+            const checked = $(this).is(':checked');
+            toggleEmployeeSelection(empId, checked);
+        });
+
+        // Select All checkbox handler
+        $('#selectAllWeekly').on('change', function() {
+            const checked = $(this).is(':checked');
+            $('#weeklyTableBody input[type="checkbox"]:visible').each(function() {
+                const empId = $(this).data('emp');
+                $(this).prop('checked', checked);
+                if (checked) {
+                    selectedEmployees.add(empId);
+                } else {
+                    selectedEmployees.delete(empId);
+                }
+            });
+            updateSelectAllState();
+
+            // Show/hide bulk toolbar based on selection
+            if (selectedEmployees.size > 0) {
+                showBulkToolbar();
+            } else {
+                hideBulkToolbar();
+            }
         });
 
         // Weekly dropdown assignment handler
@@ -1473,6 +1850,28 @@
                     showConfirmButton: false
                 });
             }
+        });
+
+        // Bulk Assign Batal button handler
+        $('#btnBulkCancel').on('click', function() {
+            clearAllSelections();
+        });
+
+        // Bulk Assign "Assign" button handler
+        $('#btnBulkAssign').on('click', function() {
+            var routeId = $('#bulkRouteSelect').val();
+            if (!routeId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pilih rute terlebih dahulu',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                return;
+            }
+            applyBulkAssignment(routeId);
         });
 
         // Map switches
