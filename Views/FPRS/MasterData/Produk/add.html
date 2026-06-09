@@ -186,28 +186,125 @@ function checkEditMode() {
 function saveDataForm(event) {
     event.preventDefault();
     
+    // Get all field values
+    const kode = document.getElementById('kode').value.trim().toUpperCase();
     const nama = document.getElementById('nama').value.trim();
-    if (!nama) {
-        Swal.fire('Peringatan', 'Nama produk wajib diisi.', 'warning');
-        return;
-    }
+    const kategori = document.getElementById('kategori').value;
+    const brand = document.getElementById('brand').value;
+    const hargaBeli = parseFloat(document.getElementById('hargaBeli').value);
+    const hargaJual = parseFloat(document.getElementById('hargaJual').value);
+    const berat = parseFloat(document.getElementById('berat').value) || 0;
     
     const dataList = getLocalData();
     const editId = document.getElementById('editId').value;
     
+    // Clear all previous validation errors
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+    
+    function showFieldError(id, message) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add('is-invalid');
+        const feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        feedback.style.display = 'block';
+        feedback.textContent = message;
+        el.parentNode.appendChild(feedback);
+    }
+    
+    let firstError = null;
+    
+    // Validate Kode (required, min 3 chars, alphanumeric+dash)
+    if (!kode) {
+        showFieldError('kode', 'Kode produk wajib diisi.');
+        firstError = firstError || 'kode';
+    } else if (kode.length < 3) {
+        showFieldError('kode', 'Kode produk minimal 3 karakter.');
+        firstError = firstError || 'kode';
+    } else if (!/^[A-Z0-9-_]+$/.test(kode)) {
+        showFieldError('kode', 'Kode hanya boleh berisi huruf, angka, dash (-), atau underscore (_).');
+        firstError = firstError || 'kode';
+    } else {
+        // Uniqueness check
+        const duplicate = dataList.find(d => d.kode === kode && (!editId || d.id !== parseInt(editId)));
+        if (duplicate) {
+            showFieldError('kode', `Kode "${kode}" sudah digunakan oleh produk lain.`);
+            firstError = firstError || 'kode';
+        }
+    }
+    
+    // Validate Nama (required, min 3 chars)
+    if (!nama) {
+        showFieldError('nama', 'Nama produk wajib diisi.');
+        firstError = firstError || 'nama';
+    } else if (nama.length < 3) {
+        showFieldError('nama', 'Nama produk minimal 3 karakter.');
+        firstError = firstError || 'nama';
+    }
+    
+    // Validate Kategori (required)
+    if (!kategori) {
+        showFieldError('kategori', 'Kategori wajib dipilih.');
+        firstError = firstError || 'kategori';
+    }
+    
+    // Validate Brand (required)
+    if (!brand) {
+        showFieldError('brand', 'Brand wajib dipilih.');
+        firstError = firstError || 'brand';
+    }
+    
+    // Validate Harga Beli (must be > 0)
+    if (isNaN(hargaBeli) || hargaBeli <= 0) {
+        showFieldError('hargaBeli', 'Harga beli harus lebih dari 0.');
+        firstError = firstError || 'hargaBeli';
+    }
+    
+    // Validate Harga Jual (must be > 0 and >= hargaBeli)
+    if (isNaN(hargaJual) || hargaJual <= 0) {
+        showFieldError('hargaJual', 'Harga jual harus lebih dari 0.');
+        firstError = firstError || 'hargaJual';
+    } else if (!isNaN(hargaBeli) && hargaJual < hargaBeli) {
+        showFieldError('hargaJual', 'Harga jual tidak boleh lebih kecil dari harga beli.');
+        firstError = firstError || 'hargaJual';
+    }
+    
+    // Validate Berat (must be >= 0)
+    if (berat < 0) {
+        showFieldError('berat', 'Berat tidak boleh negatif.');
+        firstError = firstError || 'berat';
+    }
+    
+    if (firstError) {
+        const el = document.getElementById(firstError);
+        if (el) {
+            el.focus();
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        Swal.fire({
+            icon: 'warning',
+            title: 'Validasi Gagal',
+            text: 'Mohon perbaiki kesalahan pada form sebelum menyimpan.',
+            timer: 2000,
+            showConfirmButton: false
+        });
+        return;
+    }
+    
     const newObj = {
         id: editId ? parseInt(editId) : Date.now(),
-        kode: document.getElementById('kode').value.trim().toUpperCase(),
+        kode: kode,
         nama: nama,
-        kategori: document.getElementById('kategori').value,
-        brand: document.getElementById('brand').value,
+        kategori: kategori,
+        brand: brand,
         divisi: document.getElementById('divisi').value,
-        hargaBeli: parseFloat(document.getElementById('hargaBeli').value),
-        hargaJual: parseFloat(document.getElementById('hargaJual').value),
+        hargaBeli: hargaBeli,
+        hargaJual: hargaJual,
         namaPajak: document.getElementById('namaPajak').value,
         unitNama: document.getElementById('unitNama').value.trim(),
         status: document.getElementById('status').value,
-        berat: parseFloat(document.getElementById('berat').value) || 0,
+        berat: berat,
         panjang: parseInt(document.getElementById('panjang').value) || 0,
         lebar: parseInt(document.getElementById('lebar').value) || 0,
         tinggi: parseInt(document.getElementById('tinggi').value) || 0,

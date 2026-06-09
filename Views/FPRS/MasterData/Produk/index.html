@@ -17,10 +17,54 @@
                 <a href="add.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Produk</a>
             </div>
             <div class="row g-3 mb-3">
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-primary" id="cntTotal">0</div><div class="small text-muted">Total Produk</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-success" id="cntActive">0</div><div class="small text-muted">Aktif</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-danger" id="cntInactive">0</div><div class="small text-muted">Nonaktif</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-info" id="cntBrand">0</div><div class="small text-muted">Brand</div></div></div></div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #1565c0 !important; background: linear-gradient(135deg, #fff 60%, #e7f1ff 100%);">
+                        <div class="card-body py-3 d-flex align-items-center gap-3">
+                            <div style="width:48px;height:48px;border-radius:12px;background:#e7f1ff;color:#1565c0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-boxes"></i></div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Total Produk</div>
+                                <div class="fs-3 fw-bold text-dark mb-0" id="cntTotal">0</div>
+                                <div class="small text-muted" style="font-size:0.7rem;" id="cntCategoryNote">— kategori</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #2b8a3e !important; background: linear-gradient(135deg, #fff 60%, #e7f5ee 100%);">
+                        <div class="card-body py-3 d-flex align-items-center gap-3">
+                            <div style="width:48px;height:48px;border-radius:12px;background:#e7f5ee;color:#2b8a3e;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-check-circle"></i></div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Produk Aktif</div>
+                                <div class="fs-3 fw-bold text-dark mb-0" id="cntActive">0</div>
+                                <div class="small" style="font-size:0.7rem;color:#2b8a3e;" id="cntActivePct">0% dari total</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #c92a2a !important; background: linear-gradient(135deg, #fff 60%, #fdecea 100%);">
+                        <div class="card-body py-3 d-flex align-items-center gap-3">
+                            <div style="width:48px;height:48px;border-radius:12px;background:#fdecea;color:#c92a2a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-pause-circle"></i></div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Nonaktif</div>
+                                <div class="fs-3 fw-bold text-dark mb-0" id="cntInactive">0</div>
+                                <div class="small text-muted" style="font-size:0.7rem;" id="cntInactivePct">Perlu review</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #7b2cbf !important; background: linear-gradient(135deg, #fff 60%, #f3e8ff 100%);">
+                        <div class="card-body py-3 d-flex align-items-center gap-3">
+                            <div style="width:48px;height:48px;border-radius:12px;background:#f3e8ff;color:#7b2cbf;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-coins"></i></div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Rata-rata Harga</div>
+                                <div class="fs-5 fw-bold text-dark mb-0" id="cntAvgPrice">Rp 0</div>
+                                <div class="small text-muted" style="font-size:0.7rem;" id="cntBrand">0 brand</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
                 <i class="fa fa-link me-2 text-info"></i>
@@ -62,8 +106,21 @@ function render(){
     if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
     const data=getData();$('#tblBody').empty();
     const brands=[...new Set(data.map(d=>d.brand).filter(Boolean))];
-    $('#cntTotal').text(data.length);$('#cntActive').text(data.filter(d=>d.status==='active').length);
-    $('#cntInactive').text(data.filter(d=>d.status!=='active').length);$('#cntBrand').text(brands.length);
+    const categories=[...new Set(data.map(d=>d.kategori).filter(Boolean))];
+    const activeCount = data.filter(d=>d.status==='active').length;
+    const inactiveCount = data.filter(d=>d.status!=='active').length;
+    const activePct = data.length > 0 ? Math.round(activeCount/data.length*100) : 0;
+    const totalPrice = data.reduce((s,d)=>s+(parseFloat(d.hargaJual)||0),0);
+    const avgPrice = data.length > 0 ? totalPrice/data.length : 0;
+    
+    $('#cntTotal').text(data.length);
+    $('#cntCategoryNote').text(categories.length + ' kategori');
+    $('#cntActive').text(activeCount);
+    $('#cntActivePct').text(activePct + '% dari total');
+    $('#cntInactive').text(inactiveCount);
+    $('#cntInactivePct').text(inactiveCount > 0 ? 'Perlu review' : 'Semua aktif ✓');
+    $('#cntAvgPrice').text('Rp ' + fmt(Math.round(avgPrice)));
+    $('#cntBrand').text(brands.length + ' brand');
     data.forEach((item,i)=>{
         const badge=item.status==='active'?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';
         $('#tblBody').append(`<tr>
