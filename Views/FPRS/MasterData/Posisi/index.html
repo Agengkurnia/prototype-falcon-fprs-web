@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8"/>
@@ -16,6 +16,13 @@
 <div><h2 class="title-page mb-1">Posisi</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Posisi</li></ol></nav></div>
 <button class="btn btn-success" onclick="openModal()"><i class="fa fa-plus me-1"></i> Tambah Posisi</button>
 </div>
+<div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+    <i class="fa fa-link me-2 text-info"></i>
+    <strong>Integrasi Master Data API:</strong> Modul ini terintegrasi dengan API: 
+    <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Position</code></a> & <code>/api/v1/PositionType</code>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
 <div class="card"><div class="card-body"><div class="table-responsive">
 <table class="table table-bordered table-hover" id="tbl">
 <thead><tr><th style="width:50px;">NO</th><th>NAMA</th><th>LEVEL</th><th style="text-align:center;">JUMLAH</th><th style="text-align:center;">ANGGOTA</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>

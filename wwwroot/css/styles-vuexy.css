@@ -331,3 +331,28 @@ a {
     padding: 1.5rem !important;
     gap: 1rem;
 }
+
+
+/* ===== Sidebar Scrollable Fix ===== */
+.layout-menu {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+.layout-menu .menu-inner {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: calc(100vh - 100px) !important;
+}
+.layout-menu::-webkit-scrollbar,
+.layout-menu .menu-inner::-webkit-scrollbar {
+    width: 4px;
+}
+.layout-menu::-webkit-scrollbar-track,
+.layout-menu .menu-inner::-webkit-scrollbar-track {
+    background: transparent;
+}
+.layout-menu::-webkit-scrollbar-thumb,
+.layout-menu .menu-inner::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+}

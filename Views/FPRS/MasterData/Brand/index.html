@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8"/>
@@ -19,6 +19,13 @@
                     </div>
                     <button class="btn btn-success" onclick="openModal()"><i class="fa fa-plus me-1"></i> Tambah Brand</button>
                 </div>
+                <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+                    <i class="fa fa-link me-2 text-info"></i>
+                    <strong>Integrasi Master Data API:</strong> Modul ini terintegrasi dengan API: 
+                    <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Brand</code></a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
                 <div class="card"><div class="card-body"><div class="table-responsive">
                     <table class="table table-bordered table-hover" id="tblBrand">
                         <thead><tr><th style="width:50px;">NO</th><th>NAMA</th><th>DESKRIPSI</th><th style="width:120px;text-align:center;">TOTAL PRODUK</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>

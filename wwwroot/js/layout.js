@@ -244,12 +244,12 @@ class Layout {
                                     <div data-i18n="Produk">Produk</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Unit/index.html" class="menu-link"><div data-i18n="Unit">Unit</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Divisi/index.html" class="menu-link"><div data-i18n="Divisi">Divisi</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Unit/index.html" class="menu-link"><div data-i18n="Unit">Unit</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Divisi/index.html" class="menu-link"><div data-i18n="Divisi">Divisi</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/DaftarHarga/index.html" class="menu-link"><div data-i18n="Daftar Harga">Daftar Harga</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/KategoriProduk/index.html" class="menu-link"><div data-i18n="Kategori Produk">Kategori Produk</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Brand/index.html" class="menu-link"><div data-i18n="Brand">Brand</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/KategoriProduk/index.html" class="menu-link"><div data-i18n="Kategori Produk">Kategori Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Brand/index.html" class="menu-link"><div data-i18n="Brand">Brand</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                             <!-- Pelanggan Subgroup -->
@@ -259,7 +259,7 @@ class Layout {
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Master Pelanggan">Master Pelanggan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/GrupPelanggan/index.html" class="menu-link"><div data-i18n="Grup Pelanggan">Grup Pelanggan</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/GrupPelanggan/index.html" class="menu-link"><div data-i18n="Grup Pelanggan">Grup Pelanggan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                             <!-- Pegawai Subgroup -->
@@ -268,10 +268,10 @@ class Layout {
                                     <div data-i18n="Pegawai">Pegawai</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Akun/index.html" class="menu-link"><div data-i18n="Akun">Akun</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Posisi/index.html" class="menu-link"><div data-i18n="Posisi">Posisi</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/KonfigurasiAkses/index.html" class="menu-link"><div data-i18n="Konfigurasi Akses">Konfigurasi Akses</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Akun/index.html" class="menu-link"><div data-i18n="Akun">Akun</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Posisi/index.html" class="menu-link"><div data-i18n="Posisi">Posisi</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/KonfigurasiAkses/index.html" class="menu-link"><div data-i18n="Konfigurasi Akses">Konfigurasi Akses</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                             <!-- Keuangan Subgroup -->
@@ -291,8 +291,8 @@ class Layout {
                                     <div data-i18n="Lainnya">Lainnya</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Supplier/index.html" class="menu-link"><div data-i18n="Supplier">Supplier</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Supplier/index.html" class="menu-link"><div data-i18n="Supplier">Supplier</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                         </ul>
