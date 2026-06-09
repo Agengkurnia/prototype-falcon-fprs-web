@@ -127,6 +127,10 @@ class Layout {
                 height: 24px !important;
                 margin: 0 !important;
             }
+            /* Hide Vuexy injected deny button globally */
+            .swal2-deny {
+                display: none !important;
+            }
 
             /* ===== Mobile responsive ===== */
             @media (max-width: 1199.98px) {

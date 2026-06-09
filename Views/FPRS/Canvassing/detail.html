@@ -1,23 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Detail Canvassing â€“ Falcon FPRS</title>
+    <title>Detail Canvassing - Falcon FPRS</title>
     <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css"/>
-    <style>
-
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
-    
-</style>
 </head>
 <body>
     <div id="app-content">
-
-                
-                <nav aria-label="breadcrumb" class="mb-3">
+<nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="../../../index.html" class="a-breadcrumb">Home</a></li>
                         <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing</a></li>
@@ -45,7 +36,7 @@
                     </div>
                     <div class="detail-header-info">
                         <div class="info-item" title="Driver"><i class="fa fa-user"></i> <strong>EMP-260500040</strong> (JAMBI)</div>
-                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 â€“ 01 Jan 2027</div>
+                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 – 01 Jan 2027</div>
                         <div class="info-item" title="Gudang"><i class="fa fa-warehouse"></i> <strong>JAMBI</strong></div>
                         <div class="info-item" title="Durasi"><i class="fa fa-clock"></i> 235 Hari</div>
                         <div class="info-item" style="flex:1; min-width:200px;">
@@ -170,13 +161,14 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
     </div>
     <script src="../../../wwwroot/js/canvassing-store.js"></script>
     <script src="../../../wwwroot/js/layout.js"></script>
     <script>
         document.addEventListener('layoutReady', () => {
 
-$(document).ready(function () {
     var id = new URLSearchParams(window.location.search).get('id');
     if (!id) {
         Swal.fire({
@@ -228,7 +220,7 @@ $(document).ready(function () {
     var driverInfo = `<i class="fa fa-user"></i> <strong>${item.driverCode || '-'}</strong> (${item.driverName || '-'})`;
     $('div.info-item[title="Driver"]').html(driverInfo);
 
-    var periodInfo = `<i class="fa fa-calendar-alt"></i> ${formatDate(item.tanggalMulai)} â€“ ${formatDate(item.tanggalSelesai)}`;
+    var periodInfo = `<i class="fa fa-calendar-alt"></i> ${formatDate(item.tanggalMulai)} – ${formatDate(item.tanggalSelesai)}`;
     $('div.info-item[title="Jadwal"]').html(periodInfo);
 
     var warehouseInfo = `<i class="fa fa-warehouse"></i> <strong>${item.gudang || '-'}</strong>`;
@@ -438,7 +430,6 @@ $(document).ready(function () {
             }
         });
     });
-});
 
         });
     </script>

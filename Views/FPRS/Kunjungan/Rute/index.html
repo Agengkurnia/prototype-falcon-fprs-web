@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Management Rute â€“ Falcon FPRS</title>
+    <title>Management Rute - Falcon FPRS</title>
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"/>
     <style>
 
@@ -21,11 +21,11 @@
             background: #f8f9fa;
         }
 
-        /* ── Layout Scroll Overrides ──────────────────────────────────────
+        /* â"€â"€ Layout Scroll Overrides â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
            Vuexy's .content-wrapper normally has overflow:hidden.
            For the Route page we need vertical scroll so the weekly table
            below the map panels is reachable.
-        ────────────────────────────────────────────────────────────────── */
+        â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€ */
         body.light-style .layout-page,
         body.light-style .content-wrapper {
             overflow-y: visible !important;
@@ -1797,7 +1797,7 @@
             renderWeeklyGrid();
         });
 
-        // Weekly tabs switching â€” clear selections to scope bulk assign to active tab only
+        // Weekly tabs switching Ã¢â‚¬â€ clear selections to scope bulk assign to active tab only
         $('.weekly-tab-link').on('click', function() {
             $('.weekly-tab-link').removeClass('active');
             $(this).addClass('active');

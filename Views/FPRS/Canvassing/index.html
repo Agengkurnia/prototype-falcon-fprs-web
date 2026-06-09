@@ -1,23 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Canvassing â€“ Falcon FPRS</title>
+    <title>Canvassing - Falcon FPRS</title>
     <link rel="stylesheet" href="../../../wwwroot/css/canvassing-v2.css"/>
     <style>
-
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
-    
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
 </style>
 </head>
 <body>
     <div id="app-content">
-
-                
-                <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap; gap:0.75rem;">
+<div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap; gap:0.75rem;">
                     <div>
                         <h2 class="title-page mb-1">Canvassing</h2>
                         <nav aria-label="breadcrumb">
@@ -106,13 +100,14 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
     </div>
     <script src="../../../wwwroot/js/canvassing-store.js"></script>
     <script src="../../../wwwroot/js/layout.js"></script>
     <script>
         document.addEventListener('layoutReady', () => {
 
-$(document).ready(function () {
     var table;
 
     function updateSummaryCards() {
@@ -196,7 +191,7 @@ $(document).ready(function () {
                 searchPlaceholder: 'Cari global...', 
                 lengthMenu: '_MENU_ entri per halaman', 
                 info: 'Menampilkan _START_ - _END_ dari _TOTAL_', 
-                paginate: { previous: '&lsaquo;', next: '&rsaquo;' }, 
+                paginate: { previous: '‹', next: '›' }, 
                 zeroRecords: 'Tidak ada data' 
             },
             pageLength: 10,
@@ -284,7 +279,6 @@ $(document).ready(function () {
         // Filter table (Status column is index 5)
         table.column(5).search(filterVal).draw();
     });
-});
 
         });
     </script>
