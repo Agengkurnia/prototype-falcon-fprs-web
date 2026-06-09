@@ -48,7 +48,7 @@ class Layout {
 
         // Contextual loading of module CSS stylesheets
         const hrefUrl = window.location.href;
-        if (hrefUrl.includes('/Canvassing/')) {
+        if (hrefUrl.includes('/Canvassing/') || hrefUrl.includes('/Penjualan/')) {
             styles.push('wwwroot/css/canvassing-v2.css');
         }
         if (hrefUrl.includes('/MasterData/')) {
@@ -306,9 +306,8 @@ class Layout {
                         </a>
                         <ul class="menu-sub">
                             <li class="menu-item">
-                                <a href="javascript:void(0);" class="menu-link d-flex align-items-center justify-content-between" style="opacity: 0.6; cursor: not-allowed;">
+                                <a href="${this.basePath}Views/FPRS/Penjualan/Faktur/index.html" class="menu-link">
                                     <div data-i18n="Faktur">Faktur</div>
-                                    <span class="badge bg-secondary" style="font-size: 0.65rem; padding: 2px 5px;">Soon</span>
                                 </a>
                             </li>
                             <li class="menu-item">

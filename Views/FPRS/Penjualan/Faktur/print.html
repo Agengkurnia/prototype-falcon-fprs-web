@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Cetak Faktur – Falcon FPRS</title>
+    <style>
+/* =========================================================
+   PRINT TEMPLATE – Faktur Penjualan (Falcon FPRS)
+   Layout mengacu pada SimpliDOTS Print Preview
+   ========================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    color: #000;
+    background: #e0e0e0;
+}
+
+/* ---- Screen: toolbar + paper preview ---- */
+.print-toolbar {
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: 48px;
+}
+.print-toolbar h2 { font-size: 14px; font-weight: 600; }
+.print-toolbar .btn-group { display: flex; gap: 8px; }
+.print-toolbar button {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+.btn-print-now { background: #005d41; color: #fff; }
+.btn-print-now:hover { background: #004a34; }
+.btn-close-print { background: #6c757d; color: #fff; }
+.btn-close-print:hover { background: #5a6268; }
+
+.paper-container {
+    padding: 68px 0 40px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ---- The A4 paper ---- */
+.invoice-paper {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    padding: 12mm 14mm;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* ---- SECTION: Header ---- */
+.inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #000;
+}
+
+.company-block .company-name {
+    font-size: 14px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #005d41;
+    letter-spacing: 0.05em;
+}
+.company-block .company-sub {
+    font-size: 10px;
+    color: #444;
+    margin-top: 2px;
+    line-height: 1.5;
+}
+.company-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px 12px;
+    margin-top: 5px;
+    font-size: 10px;
+    color: #555;
+}
+
+.inv-title-block { text-align: right; }
+.inv-title-block .print-ts { font-size: 9px; color: #777; margin-bottom: 4px; }
+.inv-title-block .inv-title-text {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #005d41;
+    letter-spacing: 0.08em;
+}
+.inv-meta-table {
+    margin-top: 6px;
+    font-size: 10px;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 230px;
+    margin-left: auto;
+}
+.inv-meta-table td { padding: 2px 4px; vertical-align: top; }
+.inv-meta-table td:first-child { color: #555; white-space: nowrap; }
+.inv-meta-table td:last-child { font-weight: 700; color: #000; text-align: right; }
+.inv-meta-table tr.highlight td { background: #f0f7f4; }
+
+/* ---- Customer block ---- */
+.customer-block {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    font-size: 10px;
+}
+.customer-block .cust-col { flex: 1; }
+.customer-block .cust-label { color: #777; margin-bottom: 2px; font-weight: 700; text-transform: uppercase; font-size: 9px; }
+.customer-block .cust-val { font-weight: 700; font-size: 11px; color: #000; }
+.customer-block .cust-addr { color: #555; margin-top: 2px; }
+
+/* ---- Item table ---- */
+.inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    font-size: 10px;
+}
+.inv-table thead tr { background: #005d41; color: #fff; }
+.inv-table thead th {
+    padding: 5px 6px;
+    text-align: left;
+    font-weight: 700;
+    border: 1px solid #004a34;
+    font-size: 9.5px;
+    text-transform: uppercase;
+}
+.inv-table thead th.text-right { text-align: right; }
+.inv-table tbody tr { border: 1px solid #ddd; }
+.inv-table tbody tr:nth-child(even) { background: #f9fdf7; }
+.inv-table tbody td {
+    padding: 5px 6px;
+    border: 1px solid #e0e0e0;
+    vertical-align: top;
+}
+.inv-table tbody td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+.inv-table .prod-code { font-size: 9px; color: #888; }
+.inv-table .prod-name { font-weight: 600; color: #000; }
+.inv-table tfoot tr { background: #f5f5f5; font-weight: 600; }
+.inv-table tfoot td { padding: 5px 6px; border: 1px solid #ccc; }
+
+/* ---- Footer ---- */
+.inv-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #ccc;
+}
+
+.bank-info { font-size: 9.5px; flex: 1; }
+.bank-info .bank-label { font-weight: 700; color: #005d41; margin-bottom: 4px; font-size: 10px; }
+.bank-info .bank-row { color: #333; margin-bottom: 2px; }
+
+.total-block { min-width: 200px; }
+.total-table { width: 100%; font-size: 10px; border-collapse: collapse; }
+.total-table td { padding: 3px 4px; }
+.total-table td:first-child { color: #555; }
+.total-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.total-table .grand-row td { font-size: 13px; font-weight: 900; color: #005d41; border-top: 2px solid #005d41; padding-top: 5px; }
+.terbilang { font-size: 9px; color: #555; font-style: italic; text-align: right; margin-top: 4px; }
+
+/* ---- Signature block ---- */
+.signature-block {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+.sig-col {
+    flex: 1;
+    border: 1px solid #aaa;
+    text-align: center;
+    padding: 6px;
+    font-size: 9.5px;
+    color: #555;
+}
+.sig-col .sig-title { font-weight: 700; color: #000; margin-bottom: 36px; }
+.sig-col .sig-line { border-top: 1px solid #aaa; padding-top: 4px; font-size: 9px; color: #888; }
+
+/* ---- PRINT MEDIA ---- */
+@media print {
+    body { background: #fff !important; }
+    .print-toolbar { display: none !important; }
+    .paper-container { padding: 0 !important; }
+    .invoice-paper {
+        box-shadow: none !important;
+        width: 100% !important;
+        padding: 8mm 10mm !important;
+        min-height: auto !important;
+    }
+    @page { margin: 0; size: A4 portrait; }
+}
+    </style>
+</head>
+<body>
+
+<!-- Screen toolbar -->
+<div class="print-toolbar">
+    <h2><i>🖨</i> &nbsp;Pratinjau Cetak – Faktur Penjualan</h2>
+    <div class="btn-group">
+        <button class="btn-print-now" onclick="window.print()">🖨 Cetak Sekarang</button>
+        <button class="btn-close-print" onclick="window.close()">✕ Tutup</button>
+    </div>
+</div>
+
+<!-- Paper -->
+<div class="paper-container">
+<div class="invoice-paper" id="invoicePaper">
+
+    <!-- HEADER: Company + Title -->
+    <div class="inv-header">
+        <div class="company-block">
+            <div class="company-name">PT Kalbe Nutritionals</div>
+            <div class="company-sub">
+                Jl. Let. Jend. Suprapto Kav.4, Jakarta Pusat 10510<br>
+                DKI Jakarta, Indonesia
+            </div>
+            <div class="company-meta">
+                <span>Telepon : (021) 4287-3377</span>
+                <span id="hdrSales">Salesman : —</span>
+                <span>NPWP : 01.000.000.0-000.000</span>
+                <span id="hdrGudang">Gudang : —</span>
+            </div>
+        </div>
+        <div class="inv-title-block">
+            <div class="print-ts" id="hdrPrintTs">Tanggal print: —</div>
+            <div class="inv-title-text">Faktur Penjualan</div>
+            <table class="inv-meta-table">
+                <tr class="highlight"><td>FAKTUR #</td><td id="metaNoFaktur">—</td></tr>
+                <tr><td>TGL FAKTUR</td><td id="metaTglFaktur">—</td></tr>
+                <tr><td>JATUH TEMPO</td><td id="metaJatuhTempo">—</td></tr>
+                <tr><td>WAKTU PEMBAYARAN</td><td id="metaJangka">—</td></tr>
+                <tr><td>STATUS</td><td id="metaStatus">—</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Customer info -->
+    <div class="customer-block">
+        <div class="cust-col">
+            <div class="cust-label">Ditagih Kepada:</div>
+            <div class="cust-val" id="custBill">—</div>
+            <div class="cust-addr" id="custBillAddr">—</div>
+        </div>
+        <div class="cust-col">
+            <div class="cust-label">Dikirim Ke:</div>
+            <div class="cust-val" id="custShip">—</div>
+            <div class="cust-addr" id="custShipAddr">—</div>
+        </div>
+        <div class="cust-col" style="max-width:180px;">
+            <div class="cust-label">Kode Transaksi:</div>
+            <div style="font-size:9.5px; color:#333; line-height:1.4;" id="custKodeTrx">—</div>
+        </div>
+    </div>
+
+    <!-- Item Table -->
+    <table class="inv-table">
+        <thead>
+            <tr>
+                <th style="width:28px;">No</th>
+                <th style="width:68px;">Kode Produk</th>
+                <th>Produk</th>
+                <th class="text-right" style="width:90px;">Harga/Unit</th>
+                <th class="text-right" style="width:70px;">Kuantitas</th>
+                <th class="text-right" style="width:65px;">Diskon</th>
+                <th style="width:55px;">Pajak</th>
+                <th class="text-right" style="width:85px;">Nominal</th>
+            </tr>
+        </thead>
+        <tbody id="tblItemsBody"></tbody>
+        <tfoot id="tblItemsFoot"></tfoot>
+    </table>
+
+    <!-- Footer: Bank + Totals -->
+    <div class="inv-footer">
+        <div class="bank-info">
+            <div class="bank-label">Untuk Pembayaran:</div>
+            <div class="bank-row">BCA No. 123.456.789.0 (PT Kalbe Nutritionals) a/n Kalbe Nutritionals</div>
+            <div class="bank-row">Mandiri No. 157.0000.12345 (PT Kalbe Nutritionals) a/n Kalbe Nutritionals</div>
+        </div>
+        <div class="total-block">
+            <table class="total-table">
+                <tr><td>Sub Total</td><td id="totSubtotal">0,00</td></tr>
+                <tr><td>Diskon Order</td><td id="totDiskon">0,00</td></tr>
+                <tr><td>PPN</td><td id="totPpn">0,00</td></tr>
+                <tr class="grand-row"><td>Total</td><td id="totGrand">0,00</td></tr>
+            </table>
+            <div class="terbilang" id="terbilang">(—)</div>
+        </div>
+    </div>
+
+    <!-- Signature block -->
+    <div class="signature-block">
+        <div class="sig-col">
+            <div class="sig-title">Hormat kami</div>
+            <div class="sig-line">PT Kalbe Nutritionals</div>
+        </div>
+        <div class="sig-col">
+            <div class="sig-title">Dikirim oleh</div>
+            <div class="sig-line" id="sigSales">—</div>
+        </div>
+        <div class="sig-col">
+            <div class="sig-title">Diterima oleh</div>
+            <div class="sig-line" id="sigCust">—</div>
+        </div>
+    </div>
+
+</div><!-- .invoice-paper -->
+</div><!-- .paper-container -->
+
+<script>
+(function() {
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+    const STORAGE_KEY = 'fprs_faktur';
+
+    function fmtD(s) {
+        if (!s) return '—';
+        const d = new Date(s);
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function fmtDT(s) {
+        if (!s) return '—';
+        const d = new Date(s);
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear()
+             + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
+    function fmtNum(v) {
+        return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 2 }).format(v || 0);
+    }
+    function fmtRp(v) {
+        return 'Rp ' + new Intl.NumberFormat('id-ID').format(v || 0);
+    }
+
+    /* ---- Terbilang (number to words) ---- */
+    const satuan = ['','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan',
+                    'sepuluh','sebelas'];
+    function ribuan(n) {
+        if (n < 12) return satuan[n];
+        if (n < 20) return satuan[n - 10] + ' belas';
+        if (n < 100) return satuan[Math.floor(n/10)] + ' puluh' + (n%10 ? ' ' + satuan[n%10] : '');
+        if (n < 200) return 'seratus' + (n%100 ? ' ' + ribuan(n%100) : '');
+        if (n < 1000) return satuan[Math.floor(n/100)] + ' ratus' + (n%100 ? ' ' + ribuan(n%100) : '');
+        if (n < 2000) return 'seribu' + (n%1000 ? ' ' + ribuan(n%1000) : '');
+        if (n < 1000000) return ribuan(Math.floor(n/1000)) + ' ribu' + (n%1000 ? ' ' + ribuan(n%1000) : '');
+        if (n < 1000000000) return ribuan(Math.floor(n/1000000)) + ' juta' + (n%1000000 ? ' ' + ribuan(n%1000000) : '');
+        return ribuan(Math.floor(n/1000000000)) + ' miliar' + (n%1000000000 ? ' ' + ribuan(n%1000000000) : '');
+    }
+    function terbilang(n) {
+        const v = Math.floor(n);
+        if (v === 0) return 'nol rupiah';
+        return ribuan(v) + ' rupiah';
+    }
+
+    /* ---- Load data ---- */
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) { document.body.innerHTML = '<p style="padding:40px;text-align:center;font-size:14px;">ID faktur tidak ditemukan.</p>'; return; }
+
+    function render(data) {
+        const item = data.find(d => d.id === id);
+        if (!item) {
+            document.body.innerHTML = `<p style="padding:40px;text-align:center;font-size:14px;">Faktur <strong>${id}</strong> tidak ditemukan.</p>`;
+            return;
+        }
+
+        // Title & meta
+        document.title = 'Cetak Faktur ' + item.id + ' | Falcon FPRS';
+        const now = new Date();
+        const printTs = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear()
+                      + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        document.getElementById('hdrPrintTs').textContent   = 'Tanggal print: ' + printTs + ' | ' + item.id;
+        document.getElementById('hdrSales').textContent     = 'Salesman : ' + (item.salesNama || '—');
+        document.getElementById('hdrGudang').textContent    = 'Gudang : ' + (item.gudang || '—');
+        document.getElementById('metaNoFaktur').textContent = item.id;
+        document.getElementById('metaTglFaktur').textContent   = fmtD(item.tanggalFaktur);
+        document.getElementById('metaJatuhTempo').textContent  = fmtD(item.tanggalJatuhTempo);
+        document.getElementById('metaJangka').textContent      = item.jangkaWaktuPembayaran || '—';
+        document.getElementById('metaStatus').textContent      = item.status || '—';
+
+        // Customer
+        document.getElementById('custBill').textContent      = item.pelangganNama || '—';
+        document.getElementById('custBillAddr').textContent  = item.pelangganAlamat || '—';
+        document.getElementById('custShip').textContent      = item.pelangganNama || '—';
+        document.getElementById('custShipAddr').textContent  = item.pelangganAlamat || '—';
+        document.getElementById('custKodeTrx').textContent   = item.kodeTransaksi || '—';
+        document.getElementById('sigSales').textContent      = item.salesNama || '—';
+        document.getElementById('sigCust').textContent       = item.pelangganNama || '—';
+
+        // Items
+        const tbody = document.getElementById('tblItemsBody');
+        const items = item.items || [];
+        let subtotal = 0;
+        let totalPpn = 0;
+
+        items.forEach((it, idx) => {
+            const qty       = it.qty || 0;
+            const harga     = it.hargaUnit || 0;
+            const diskon    = it.diskon || 0;
+            const lineTotal = harga * qty - diskon;
+            const isPpn     = it.pajak && it.pajak !== 'NoPPN';
+            const ppn       = isPpn ? lineTotal * 0.11 : 0;
+            subtotal   += lineTotal;
+            totalPpn   += ppn;
+
+            tbody.insertAdjacentHTML('beforeend', `
+                <tr>
+                    <td style="text-align:center;">${idx + 1}</td>
+                    <td><span class="prod-code">${it.kode || ''}</span></td>
+                    <td class="prod-name">${it.nama || '—'}</td>
+                    <td class="text-right">${fmtNum(harga)}/${it.satuan || 'PCS'}</td>
+                    <td class="text-right">${qty} ${it.satuan || 'PCS'}</td>
+                    <td class="text-right">${fmtNum(diskon)}</td>
+                    <td>${it.pajak || 'NoPPN'}</td>
+                    <td class="text-right">${fmtNum(lineTotal)}</td>
+                </tr>`);
+        });
+
+        // Empty row filler for short invoices
+        if (items.length < 5) {
+            for (let i = items.length; i < 5; i++) {
+                tbody.insertAdjacentHTML('beforeend',
+                    `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`);
+            }
+        }
+
+        const grand = subtotal + Math.round(totalPpn);
+        document.getElementById('totSubtotal').textContent = fmtNum(subtotal);
+        document.getElementById('totDiskon').textContent   = fmtNum(0);
+        document.getElementById('totPpn').textContent      = fmtNum(Math.round(totalPpn));
+        document.getElementById('totGrand').textContent    = fmtNum(grand);
+        document.getElementById('terbilang').textContent   = '(' + terbilang(grand) + ')';
+    }
+
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        render(JSON.parse(stored));
+    } else {
+        fetch('../../../../wwwroot/data/faktur.json')
+            .then(r => r.json())
+            .then(data => { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); render(data); });
+    }
+})();
+</script>
+</body>
+</html>

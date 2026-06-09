@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Faktur Penjualan – Penjualan | Falcon FPRS</title>
+    <meta name="description" content="Daftar faktur penjualan dari aktivitas canvassing salesman di lapangan."/>
+    <link rel="stylesheet" href="../../../../wwwroot/css/canvassing-v2.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+
+/* ---- FAKTUR-SPECIFIC OVERRIDES ---- */
+
+/* KPI Card: Paid */
+.summary-card.paid .summary-card-icon {
+    background-color: rgba(40, 199, 111, 0.12);
+    color: #1a9956;
+}
+.summary-card.paid::before { background: linear-gradient(90deg, #1a9956, #52d68a); }
+.summary-card.paid.active-filter { border-color: #1a9956; }
+
+/* KPI Card: Unpaid */
+.summary-card.unpaid .summary-card-icon {
+    background-color: rgba(234, 84, 85, 0.12);
+    color: #c0392b;
+}
+.summary-card.unpaid::before { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+.summary-card.unpaid.active-filter { border-color: #c0392b; }
+
+/* KPI Card: Draft */
+.summary-card.draft-card .summary-card-icon {
+    background-color: rgba(255, 159, 67, 0.12);
+    color: #d68910;
+}
+.summary-card.draft-card::before { background: linear-gradient(90deg, #d68910, #f39c12); }
+.summary-card.draft-card.active-filter { border-color: #d68910; }
+
+/* KPI Card: Total Nilai */
+.summary-card.nilai .summary-card-icon {
+    background-color: rgba(115, 103, 240, 0.12);
+    color: #5f4fcf;
+}
+.summary-card.nilai::before { background: linear-gradient(90deg, #5f4fcf, #9b86f5); }
+
+/* Badge Status Faktur */
+.badge-paid {
+    background-color: #E8F5E9;
+    color: #1a9956;
+    border: 1px solid #A5D6A7;
+}
+.badge-unpaid {
+    background-color: #FFEBEE;
+    color: #c0392b;
+    border: 1px solid #EF9A9A;
+}
+.badge-draft {
+    background-color: #FFF8E1;
+    color: #d68910;
+    border: 1px solid #FFE082;
+}
+.badge-approved {
+    background-color: #E3F2FD;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+/* Nomor Faktur link */
+.faktur-link {
+    font-weight: 700;
+    color: #005d41;
+    text-decoration: none;
+    font-family: 'Kalbe Geometric', sans-serif;
+    letter-spacing: 0.02em;
+}
+.faktur-link:hover { color: #1a9956; text-decoration: underline; }
+
+/* Currency align right */
+.text-currency {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+.text-currency.unpaid-amount { color: #c0392b; }
+
+/* Belum Dibayar zero */
+.text-zero { color: #adb5bd; font-weight: 400; }
+
+/* Filter top-bar (above DataTable) */
+.filter-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #eef1f6;
+    background: #fafafa;
+}
+.filter-topbar label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6c757d;
+    white-space: nowrap;
+}
+.filter-topbar .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.filter-topbar select, .filter-topbar input[type="date"] {
+    font-size: 0.82rem;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    color: #495057;
+    background: #fff;
+    cursor: pointer;
+}
+.filter-topbar select:focus, .filter-topbar input[type="date"]:focus {
+    outline: none;
+    border-color: #005d41;
+    box-shadow: 0 0 0 2px rgba(0,93,65,0.1);
+}
+.filter-topbar .btn-reset-filter {
+    background: none;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: #6c757d;
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.filter-topbar .btn-reset-filter:hover {
+    background: #f1f3f5;
+    color: #343a40;
+}
+
+/* Seller display in table */
+.sales-badge {
+    display: inline-block;
+    background: #F1F7E5;
+    color: #005d41;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 7px;
+}
+
+/* Mobile: stack table as cards */
+@media (max-width: 768px) {
+    #tblFaktur, #tblFaktur tbody, #tblFaktur tr, #tblFaktur td {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    #tblFaktur thead { display: none !important; }
+    #tblFaktur tr {
+        background: #fff;
+        border: 1px solid #eef1f6 !important;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+    #tblFaktur td {
+        border: none !important;
+        padding: 0.4rem 0 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        text-align: right !important;
+        min-height: 30px;
+    }
+    #tblFaktur td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        text-align: left;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    .filter-row { display: none !important; }
+    .filter-topbar { flex-direction: column; align-items: stretch; }
+    .filter-topbar .filter-group { flex-direction: column; align-items: stretch; }
+    .filter-topbar select, .filter-topbar input[type="date"] { width: 100%; }
+}
+    </style>
+</head>
+<body>
+    <div id="app-content">
+
+        <!-- ===== PAGE HEADER ===== -->
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h1 class="title-page mb-1" style="font-size:1.5rem;">Faktur Penjualan</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Penjualan</li>
+                        <li class="breadcrumb-item active" aria-current="page">Faktur</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary btn-sm" id="btnEkspor" title="Ekspor ke Excel">
+                    <i class="fa fa-file-export me-1"></i> Ekspor
+                </button>
+                <a href="add.html" class="btn btn-success" id="btnTambahFaktur">
+                    <i class="fa fa-plus me-1"></i> Tambah Faktur Penjualan
+                </a>
+            </div>
+        </div>
+
+        <!-- ===== KPI SUMMARY CARDS ===== -->
+        <div class="summary-cards-grid" id="summaryCards">
+            <!-- Total Faktur -->
+            <div class="summary-card total active-filter" data-filter="" title="Tampilkan semua faktur" id="cardTotal">
+                <div class="summary-card-icon"><i class="fa fa-file-invoice"></i></div>
+                <div class="stat-title">Total Faktur</div>
+                <div class="stat-value" id="valTotal">0</div>
+                <div class="stat-desc">Bulan ini</div>
+            </div>
+            <!-- Paid -->
+            <div class="summary-card paid" data-filter="Paid" title="Filter: Faktur Lunas" id="cardPaid">
+                <div class="summary-card-icon"><i class="fa fa-check-circle"></i></div>
+                <div class="stat-title">Paid</div>
+                <div class="stat-value" id="valPaid">0</div>
+                <div class="stat-desc">Sudah lunas</div>
+            </div>
+            <!-- Unpaid -->
+            <div class="summary-card unpaid" data-filter="Unpaid" title="Filter: Belum Dibayar" id="cardUnpaid">
+                <div class="summary-card-icon"><i class="fa fa-exclamation-circle"></i></div>
+                <div class="stat-title">Unpaid</div>
+                <div class="stat-value" id="valUnpaid">0</div>
+                <div class="stat-desc">Belum terbayar</div>
+            </div>
+            <!-- Total Nilai -->
+            <div class="summary-card nilai" title="Total nilai tagihan" id="cardNilai">
+                <div class="summary-card-icon"><i class="fa fa-coins"></i></div>
+                <div class="stat-title">Total Tagihan</div>
+                <div class="stat-value" id="valNilai" style="font-size:1.4rem;">Rp0</div>
+                <div class="stat-desc">Keseluruhan nilai</div>
+            </div>
+        </div>
+
+        <!-- ===== LIST CARD ===== -->
+        <div class="card" style="border:none;box-shadow:0 2px 12px rgba(0,0,0,0.04);border-radius:12px;overflow:hidden;">
+
+            <!-- Filter Top Bar -->
+            <div class="filter-topbar" id="filterTopbar">
+                <div class="filter-group">
+                    <label for="filterTglMulai"><i class="fa fa-calendar-alt me-1"></i> Dari:</label>
+                    <input type="date" id="filterTglMulai" value="2026-06-01"/>
+                </div>
+                <div class="filter-group">
+                    <label for="filterTglAkhir">s/d:</label>
+                    <input type="date" id="filterTglAkhir" value="2026-06-30"/>
+                </div>
+                <div class="filter-group">
+                    <label for="filterPelanggan"><i class="fa fa-store me-1"></i></label>
+                    <select id="filterPelanggan">
+                        <option value="">Pelanggan: Semua</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterSales"><i class="fa fa-user-tie me-1"></i></label>
+                    <select id="filterSales">
+                        <option value="">Sales: Semua</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus"><i class="fa fa-tag me-1"></i></label>
+                    <select id="filterStatus">
+                        <option value="">Status: Semua</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Unpaid">Unpaid</option>
+                        <option value="Draft">Draft</option>
+                        <option value="Approved">Approved</option>
+                    </select>
+                </div>
+                <button class="btn-reset-filter" id="btnResetFilter" title="Reset semua filter">
+                    <i class="fa fa-undo"></i> Reset
+                </button>
+            </div>
+
+            <div class="card-body" style="padding:1.25rem;">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tblFaktur" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">NO</th>
+                                <th>TANGGAL FAKTUR</th>
+                                <th>NOMOR FAKTUR</th>
+                                <th>PELANGGAN</th>
+                                <th>SALES</th>
+                                <th>JATUH TEMPO</th>
+                                <th style="text-align:right;">JUMLAH TAGIHAN</th>
+                                <th style="text-align:right;">BELUM DIBAYAR</th>
+                                <th style="width:110px;text-align:center;">STATUS</th>
+                                <th style="width:80px;text-align:center;">AKSI</th>
+                            </tr>
+                            <tr class="filter-row">
+                                <th></th>
+                                <th></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="No. Faktur..."></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="Pelanggan..."></th>
+                                <th>
+                                    <select class="form-select form-select-sm" id="filterSalesCol">
+                                        <option value="">Semua</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>
+                                    <select class="form-select form-select-sm" id="filterStatusCol">
+                                        <option value="">Semua</option>
+                                        <option>Paid</option>
+                                        <option>Unpaid</option>
+                                        <option>Draft</option>
+                                        <option>Approved</option>
+                                    </select>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /#app-content -->
+
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script>
+    document.addEventListener('layoutReady', () => {
+
+        /* =========================================
+           DATA & STATE
+        ========================================= */
+        const STORAGE_KEY = 'fprs_faktur';
+        const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+        let allData = [];
+        let table;
+
+        // Load from localStorage or fetch JSON
+        function loadData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                allData = JSON.parse(stored);
+                init();
+            } else {
+                fetch('../../../../wwwroot/data/faktur.json')
+                    .then(r => r.json())
+                    .then(d => {
+                        allData = d;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+                        init();
+                    });
+            }
+        }
+
+        /* =========================================
+           HELPERS
+        ========================================= */
+        const fmt = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
+        const fmtShort = v => {
+            if (v >= 1000000) return 'Rp ' + (v / 1000000).toFixed(1).replace('.', ',') + ' Jt';
+            if (v >= 1000) return 'Rp ' + (v / 1000).toFixed(0) + ' Rb';
+            return 'Rp ' + v;
+        };
+
+        function formatDateDisplay(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+        }
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            const hh = String(d.getHours()).padStart(2,'0');
+            const mm = String(d.getMinutes()).padStart(2,'0');
+            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hh + ':' + mm;
+        }
+
+        const STATUS_BADGE = {
+            'Paid':     '<span class="badge-status badge-paid"><i class="fa fa-check"></i> Paid</span>',
+            'Unpaid':   '<span class="badge-status badge-unpaid"><i class="fa fa-clock"></i> Unpaid</span>',
+            'Draft':    '<span class="badge-status badge-draft"><i class="fa fa-file-alt"></i> Draft</span>',
+            'Approved': '<span class="badge-status badge-approved"><i class="fa fa-thumbs-up"></i> Approved</span>'
+        };
+
+        /* =========================================
+           POPULATE FILTER DROPDOWNS
+        ========================================= */
+        function populateFilters(data) {
+            const pelList = [...new Set(data.map(d => d.pelangganNama))].sort();
+            const salesList = [...new Set(data.map(d => d.salesNama))].sort();
+
+            const pelSel = document.getElementById('filterPelanggan');
+            pelList.forEach(p => {
+                const o = document.createElement('option'); o.value = p; o.textContent = p;
+                pelSel.appendChild(o);
+            });
+
+            const salesSel = document.getElementById('filterSales');
+            const salesColSel = document.getElementById('filterSalesCol');
+            salesList.forEach(s => {
+                let o = document.createElement('option'); o.value = s; o.textContent = s;
+                salesSel.appendChild(o);
+                o = document.createElement('option'); o.value = s; o.textContent = s;
+                salesColSel.appendChild(o);
+            });
+        }
+
+        /* =========================================
+           KPI SUMMARY CARDS
+        ========================================= */
+        function updateSummaryCards(data) {
+            const total = data.length;
+            const paid = data.filter(d => d.status === 'Paid').length;
+            const unpaid = data.filter(d => d.status === 'Unpaid').length;
+            const totalNilai = data.reduce((a, d) => a + (d.jumlahTagihan || 0), 0);
+
+            document.getElementById('valTotal').textContent = total;
+            document.getElementById('valPaid').textContent = paid;
+            document.getElementById('valUnpaid').textContent = unpaid;
+            document.getElementById('valNilai').textContent = fmtShort(totalNilai);
+        }
+
+        /* =========================================
+           RENDER TABLE
+        ========================================= */
+        function renderTable(data) {
+            const tbody = document.getElementById('tblBody');
+            tbody.innerHTML = '';
+
+            data.forEach((item, idx) => {
+                const i = idx + 1;
+                const badge = STATUS_BADGE[item.status] || `<span class="badge-status badge-draft">${item.status}</span>`;
+                const belumBayarVal = item.belumDibayar || 0;
+                const belumBayarDisplay = belumBayarVal > 0
+                    ? `<span class="unpaid-amount">${fmt(belumBayarVal)}</span>`
+                    : `<span class="text-zero">0</span>`;
+
+                const act = `
+                    <div class="row-actions" style="justify-content:center;">
+                        <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Lihat Detail"><i class="fa fa-eye"></i></a>
+                        ${item.status === 'Draft' ? `<a href="add.html?id=${item.id}" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>` : ''}
+                        <button class="btn-action" style="color:#adb5bd;" title="Cetak Faktur" onclick="cetakFaktur('${item.id}')"><i class="fa fa-print"></i></button>
+                    </div>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="No">${i}</td>
+                    <td data-label="Tanggal">${formatDateTime(item.tanggalFaktur)}</td>
+                    <td data-label="Nomor Faktur"><a href="detail.html?id=${item.id}" class="faktur-link">${item.id}</a></td>
+                    <td data-label="Pelanggan"><span style="font-weight:500;">${item.pelangganNama}</span></td>
+                    <td data-label="Sales"><span class="sales-badge">${item.salesNama}</span></td>
+                    <td data-label="Jatuh Tempo">${formatDateDisplay(item.tanggalJatuhTempo)}</td>
+                    <td data-label="Jumlah Tagihan" class="text-currency">${fmt(item.jumlahTagihan)}</td>
+                    <td data-label="Belum Dibayar" class="text-currency">${belumBayarDisplay}</td>
+                    <td data-label="Status" style="text-align:center;">${badge}</td>
+                    <td data-label="Aksi">${act}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        /* =========================================
+           DATATABLES INIT
+        ========================================= */
+        function initDataTable() {
+            if ($.fn.DataTable.isDataTable('#tblFaktur')) {
+                $('#tblFaktur').DataTable().destroy();
+            }
+            table = $('#tblFaktur').DataTable({
+                language: {
+                    search: '',
+                    searchPlaceholder: 'Cari nomor faktur, pelanggan...',
+                    lengthMenu: '_MENU_ entri per halaman',
+                    info: 'Menampilkan _START_–_END_ dari _TOTAL_',
+                    paginate: { previous: '‹', next: '›' },
+                    zeroRecords: '<div style="text-align:center;padding:2rem;color:#adb5bd;"><i class="fa fa-inbox fa-2x mb-2"></i><br>Tidak ada data faktur</div>'
+                },
+                pageLength: 10,
+                order: [[1, 'desc']], // Sort by tanggal desc by default
+                columnDefs: [
+                    { orderable: false, targets: [0, 8, 9] },
+                    { type: 'num', targets: [6, 7] }
+                ],
+                dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
+            });
+
+            // Column-level filter row
+            $('.filter-row input').on('keyup change', function () {
+                const colIdx = $(this).closest('th').index();
+                table.column(colIdx).search(this.value).draw();
+            });
+            $('.filter-row select').on('change', function () {
+                const colIdx = $(this).closest('th').index();
+                table.column(colIdx).search(this.value).draw();
+                // Sync status card
+                if (colIdx === 8) syncCardFromStatus(this.value);
+            });
+            $('.filter-row input, .filter-row select').on('click', e => e.stopPropagation());
+        }
+
+        /* =========================================
+           TOP-BAR FILTERS (date range, pelanggan, sales, status)
+        ========================================= */
+        function applyTopbarFilters() {
+            const tglMulai = document.getElementById('filterTglMulai').value;
+            const tglAkhir = document.getElementById('filterTglAkhir').value;
+            const pelanggan = document.getElementById('filterPelanggan').value;
+            const sales = document.getElementById('filterSales').value;
+            const status = document.getElementById('filterStatus').value;
+
+            const filtered = allData.filter(item => {
+                const tgl = item.tanggalFaktur ? item.tanggalFaktur.substring(0, 10) : '';
+                if (tglMulai && tgl < tglMulai) return false;
+                if (tglAkhir && tgl > tglAkhir) return false;
+                if (pelanggan && item.pelangganNama !== pelanggan) return false;
+                if (sales && item.salesNama !== sales) return false;
+                if (status && item.status !== status) return false;
+                return true;
+            });
+
+            renderTable(filtered);
+            initDataTable();
+            updateSummaryCards(filtered);
+
+            // Sync status card highlight
+            syncCardFromStatus(status);
+        }
+
+        ['filterTglMulai','filterTglAkhir','filterPelanggan','filterSales','filterStatus'].forEach(id => {
+            document.getElementById(id).addEventListener('change', applyTopbarFilters);
+        });
+
+        document.getElementById('btnResetFilter').addEventListener('click', () => {
+            document.getElementById('filterTglMulai').value = '2026-06-01';
+            document.getElementById('filterTglAkhir').value = '2026-06-30';
+            document.getElementById('filterPelanggan').value = '';
+            document.getElementById('filterSales').value = '';
+            document.getElementById('filterStatus').value = '';
+            applyTopbarFilters();
+        });
+
+        /* =========================================
+           KPI CARD CLICK → FILTER TABLE BY STATUS
+        ========================================= */
+        function syncCardFromStatus(statusVal) {
+            document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
+                card.classList.toggle('active-filter', card.dataset.filter === statusVal);
+            });
+        }
+
+        document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
+            card.addEventListener('click', () => {
+                const filterVal = card.dataset.filter;
+                // Update top filter select
+                document.getElementById('filterStatus').value = filterVal;
+                // Re-apply all filters
+                applyTopbarFilters();
+            });
+        });
+
+        /* =========================================
+           CETAK FAKTUR (Mock)
+        ========================================= */
+        window.cetakFaktur = function(id) {
+            window.open('print.html?id=' + encodeURIComponent(id), '_blank');
+        };
+
+        /* =========================================
+           EKSPOR (Mock)
+        ========================================= */
+        document.getElementById('btnEkspor').addEventListener('click', () => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Ekspor Berhasil',
+                html: 'Data faktur telah diekspor ke <strong>Excel</strong>.<br><small class="text-muted">Fitur ini akan terintegrasi dengan API pada produksi.</small>',
+                confirmButtonColor: '#005d41',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        });
+
+        /* =========================================
+           INIT
+        ========================================= */
+        function init() {
+            populateFilters(allData);
+            renderTable(allData);
+            initDataTable();
+            updateSummaryCards(allData);
+        }
+
+        loadData();
+
+    });
+    </script>
+</body>
+</html>

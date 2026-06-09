@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Faktur – Penjualan | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/canvassing-v2.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+
+/* ---- STATUS BADGES ---- */
+.badge-paid   { background:#E8F5E9; color:#1a9956; border:1px solid #A5D6A7; }
+.badge-unpaid { background:#FFEBEE; color:#c0392b; border:1px solid #EF9A9A; }
+.badge-draft  { background:#FFF8E1; color:#d68910; border:1px solid #FFE082; }
+.badge-approved { background:#E3F2FD; color:#1565C0; border:1px solid #90CAF9; }
+
+/* ---- LAYOUT ---- */
+.faktur-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+@media(max-width:768px){ .faktur-detail-grid{ grid-template-columns:1fr; } }
+
+.detail-card {
+    background:#fff;
+    border-radius:10px;
+    border:1px solid #eef1f6;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    padding:1.25rem 1.5rem;
+}
+
+/* Info grid 3 cols */
+.info-grid-3 {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1rem;
+}
+@media(max-width:768px){ .info-grid-3{ grid-template-columns:1fr 1fr; } }
+
+.info-field label {
+    font-size:0.72rem;
+    font-weight:700;
+    color:#adb5bd;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+    margin-bottom:0.3rem;
+}
+.info-field .val {
+    font-size:0.9rem;
+    color:#212529;
+    font-weight:500;
+}
+.info-field .val a {
+    color:#005d41;
+    text-decoration:none;
+}
+.info-field .val a:hover{ text-decoration:underline; }
+
+/* Payment summary */
+.payment-summary {
+    display:flex;
+    gap:2rem;
+    justify-content:flex-end;
+    align-items:flex-start;
+}
+.pay-item { text-align:right; }
+.pay-item .pay-label { font-size:0.75rem; color:#adb5bd; font-weight:600; text-transform:uppercase; }
+.pay-item .pay-val { font-size:1.15rem; font-weight:700; color:#212529; }
+.pay-item .pay-val.text-success { color:#1a9956 !important; }
+.pay-item .pay-val.text-danger  { color:#c0392b !important; }
+
+/* Customer info in card */
+.cust-name { font-size:1.1rem; font-weight:700; color:#005d41; margin-bottom:0.2rem; }
+.cust-code { font-size:0.78rem; color:#adb5bd; font-weight:600; margin-bottom:0.75rem; }
+.cust-addr { font-size:0.83rem; color:#6c757d; display:flex; gap:0.5rem; align-items:flex-start; }
+.cust-addr i { color:#005d41; margin-top:2px; flex-shrink:0; }
+
+/* Item table */
+.item-table-wrap {
+    background:#fff;
+    border-radius:10px;
+    border:1px solid #eef1f6;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+    overflow:hidden;
+    margin-bottom:1.25rem;
+}
+.item-table-head {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:1rem 1.5rem;
+    border-bottom:1px solid #eef1f6;
+    background:#fafafa;
+    flex-wrap:wrap;
+    gap:.5rem;
+}
+.item-table-head h3 { font-size:0.95rem; font-weight:700; color:#343a40; margin:0; }
+.pricelist-badge {
+    background:#E8F5E9;
+    color:#1a9956;
+    border-radius:20px;
+    font-size:0.72rem;
+    font-weight:600;
+    padding:3px 10px;
+}
+
+.tbl-items th {
+    background:#F8FBF2;
+    font-size:0.72rem;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#6c757d;
+    letter-spacing:.03em;
+    padding:.7rem 1rem;
+    border-bottom:2px solid #C8E099;
+}
+.tbl-items td { padding:.7rem 1rem; font-size:0.875rem; vertical-align:middle; }
+.tbl-items tbody tr:hover { background:#F8FBF2; }
+.tbl-items .prod-code { font-size:0.72rem; color:#adb5bd; font-weight:600; }
+.tbl-items .prod-name { font-weight:600; color:#212529; }
+.tbl-items .qty-main  { font-weight:700; color:#212529; }
+.tbl-items .qty-unit  { font-size:0.72rem; color:#adb5bd; }
+.tbl-items td.text-end { font-variant-numeric:tabular-nums; }
+
+/* Summary total panel */
+.summary-total-panel {
+    background:#F8FBF2;
+    border:1px solid #C8E099;
+    border-radius:8px;
+    padding:1.25rem 1.5rem;
+    min-width:280px;
+}
+.summ-row { display:flex; justify-content:space-between; margin-bottom:.6rem; font-size:.875rem; }
+.summ-row .lbl { color:#6c757d; }
+.summ-row .val { font-weight:600; color:#212529; font-variant-numeric:tabular-nums; }
+.summ-divider { height:1px; background:#C8E099; margin:.75rem 0; }
+.summ-grand { display:flex; justify-content:space-between; align-items:center; }
+.summ-grand .lbl { font-size:1rem; font-weight:700; color:#005d41; }
+.summ-grand .val { font-size:1.25rem; font-weight:800; color:#005d41; font-variant-numeric:tabular-nums; }
+
+/* Catatan */
+.catatan-box {
+    background:#fff;
+    border-radius:10px;
+    border:1px solid #eef1f6;
+    padding:1.25rem 1.5rem;
+    box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+.catatan-box label { font-size:.72rem; font-weight:700; color:#adb5bd; text-transform:uppercase; letter-spacing:.05em; }
+.catatan-box p { font-size:.875rem; color:#495057; margin:0; margin-top:.4rem; }
+
+/* Action buttons */
+.btn-back-faktur {
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    font-size:.82rem;
+    color:#6c757d;
+    background:none;
+    border:1px solid #dee2e6;
+    border-radius:6px;
+    padding:.35rem .75rem;
+    cursor:pointer;
+    text-decoration:none;
+    transition:all .2s;
+}
+.btn-back-faktur:hover { background:#f8f9fa; color:#212529; }
+.btn-cetak-faktur {
+    display:inline-flex;
+    align-items:center;
+    gap:.4rem;
+    font-size:.82rem;
+    color:#fff;
+    background:#005d41;
+    border:none;
+    border-radius:6px;
+    padding:.4rem 1rem;
+    cursor:pointer;
+    transition:all .2s;
+}
+.btn-cetak-faktur:hover { background:#004a34; }
+
+/* Header top bar */
+.detail-top-bar {
+    display:flex;
+    align-items:center;
+    gap:.75rem;
+    flex-wrap:wrap;
+    margin-bottom:1.25rem;
+}
+.detail-top-bar .faktur-title {
+    font-size:1.3rem;
+    font-weight:800;
+    color:#005d41;
+    font-family:'Kalbe Geometric',sans-serif;
+    margin:0;
+}
+.detail-source-badge {
+    font-size:.72rem;
+    background:#E3F2FD;
+    color:#1565C0;
+    border-radius:20px;
+    padding:2px 9px;
+    font-weight:600;
+}
+    </style>
+</head>
+<body>
+<div id="app-content">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+            <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Faktur Penjualan</a></li>
+            <li class="breadcrumb-item active" id="bcNomor">—</li>
+        </ol>
+    </nav>
+
+    <!-- Top Bar: title + actions -->
+    <div class="detail-top-bar">
+        <a href="index.html" class="btn-back-faktur"><i class="fa fa-arrow-left"></i> Kembali</a>
+        <h1 class="faktur-title" id="hdrNomor">—</h1>
+        <span class="badge-status" id="hdrStatus"></span>
+        <span class="detail-source-badge" id="hdrSource">Mobile</span>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn-cetak-faktur" id="btnCetak"><i class="fa fa-print"></i> Cetak Faktur</button>
+        </div>
+    </div>
+
+    <!-- Row 1: Customer card + Payment summary -->
+    <div class="faktur-detail-grid">
+
+        <!-- Left: Customer -->
+        <div class="detail-card">
+            <div class="cust-name" id="custNama">—</div>
+            <div class="cust-code" id="custKode">—</div>
+            <div class="cust-addr"><i class="fa fa-map-marker-alt"></i><span id="custAlamat">—</span></div>
+        </div>
+
+        <!-- Right: Payment Summary + Info -->
+        <div class="detail-card">
+            <div class="payment-summary mb-3">
+                <div class="pay-item">
+                    <div class="pay-label">Sudah Bayar</div>
+                    <div class="pay-val text-success" id="payBayar">Rp0</div>
+                </div>
+                <div class="pay-item">
+                    <div class="pay-label">Sisa Bayar</div>
+                    <div class="pay-val" id="paySisa">Rp0</div>
+                </div>
+            </div>
+            <hr style="border-color:#eef1f6; margin:.75rem 0;">
+            <div class="info-grid-3">
+                <div class="info-field">
+                    <label><i class="fa fa-calendar-alt"></i> Tanggal Faktur</label>
+                    <div class="val" id="infoTglFaktur">—</div>
+                </div>
+                <div class="info-field">
+                    <label><i class="fa fa-user-tie"></i> Sales</label>
+                    <div class="val" id="infoSales">—</div>
+                </div>
+                <div class="info-field">
+                    <label><i class="fa fa-warehouse"></i> Gudang</label>
+                    <div class="val" id="infoGudang">—</div>
+                </div>
+                <div class="info-field">
+                    <label><i class="fa fa-dollar-sign"></i> Jangka Waktu Bayar</label>
+                    <div class="val" id="infoJangka">—</div>
+                </div>
+                <div class="info-field">
+                    <label><i class="fa fa-calendar-times"></i> Jatuh Tempo</label>
+                    <div class="val" id="infoJatuhTempo">—</div>
+                </div>
+                <div class="info-field">
+                    <label><i class="fa fa-tag"></i> Kode Transaksi</label>
+                    <div class="val" id="infoKodeTrx" style="font-size:.78rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Table -->
+    <div class="item-table-wrap">
+        <div class="item-table-head">
+            <h3><i class="fa fa-list-ul me-2" style="color:#005d41;"></i>Item Faktur Penjualan</h3>
+            <span class="pricelist-badge" id="pricelistBadge">Inc Pajak</span>
+        </div>
+        <div class="table-responsive">
+            <table class="table tbl-items mb-0">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">NO</th>
+                        <th>PRODUK</th>
+                        <th style="text-align:center;">KUANTITAS</th>
+                        <th style="text-align:right;">HARGA/UNIT</th>
+                        <th style="text-align:right;">DISKON</th>
+                        <th>PAJAK</th>
+                        <th style="text-align:right;">LINE TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody id="tblItems"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bottom: Catatan + Summary Total -->
+    <div class="d-flex gap-3 flex-wrap" style="align-items:flex-start;">
+        <div class="catatan-box flex-grow-1">
+            <label><i class="fa fa-sticky-note me-1"></i> Catatan</label>
+            <p id="infoCatatan" class="text-muted fst-italic">Tidak ada catatan.</p>
+        </div>
+        <div class="summary-total-panel">
+            <div class="summ-row">
+                <span class="lbl">Subtotal</span>
+                <span class="val" id="sumSubtotal">Rp 0</span>
+            </div>
+            <div class="summ-row">
+                <span class="lbl">Diskon Faktur</span>
+                <span class="val" id="sumDiskon">0</span>
+            </div>
+            <div class="summ-row">
+                <span class="lbl">Total Pajak</span>
+                <span class="val" id="sumPajak">Rp 0</span>
+            </div>
+            <div class="summ-divider"></div>
+            <div class="summ-grand">
+                <span class="lbl">Total</span>
+                <span class="val" id="sumTotal">Rp 0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="d-flex justify-content-between align-items-center mt-3" style="font-size:.78rem; color:#adb5bd;">
+        <a href="index.html" class="btn-back-faktur"><i class="fa fa-arrow-left"></i> Kembali ke List</a>
+        <span id="footerInfo">—</span>
+    </div>
+
+</div><!-- #app-content -->
+
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+document.addEventListener('layoutReady', () => {
+
+    const STORAGE_KEY = 'fprs_faktur';
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+    /* helpers */
+    const fmt = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
+    function fmtDT(s) {
+        if (!s) return '—';
+        const d = new Date(s);
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear()
+             + ' | ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
+    function fmtD(s) {
+        if (!s) return '—';
+        const d = new Date(s);
+        return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    const STATUS_MAP = {
+        'Paid':     '<span class="badge-status badge-paid"><i class="fa fa-check"></i> Paid</span>',
+        'Unpaid':   '<span class="badge-status badge-unpaid"><i class="fa fa-clock"></i> Unpaid</span>',
+        'Draft':    '<span class="badge-status badge-draft"><i class="fa fa-file-alt"></i> Draft</span>',
+        'Approved': '<span class="badge-status badge-approved"><i class="fa fa-thumbs-up"></i> Approved</span>'
+    };
+
+    /* get ID from URL */
+    const id = new URLSearchParams(window.location.search).get('id');
+    if (!id) { window.location.href = 'index.html'; return; }
+
+    /* load data */
+    function getData() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+
+    function render(data) {
+        const item = data.find(d => d.id === id);
+        if (!item) {
+            Swal.fire({ icon:'error', title:'Tidak Ditemukan', text:'Data faktur tidak ditemukan.', confirmButtonColor:'#005d41' })
+                .then(() => window.location.href = 'index.html');
+            return;
+        }
+
+        /* Header */
+        document.getElementById('bcNomor').textContent   = item.id;
+        document.getElementById('hdrNomor').textContent  = item.id;
+        document.getElementById('hdrStatus').outerHTML   = STATUS_MAP[item.status] || `<span class="badge-status badge-draft">${item.status}</span>`;
+        document.getElementById('hdrSource').textContent = item.sumber || 'Mobile';
+        document.title = item.id + ' – Faktur Penjualan | Falcon FPRS';
+
+        /* Customer */
+        document.getElementById('custNama').textContent   = item.pelangganNama || '—';
+        document.getElementById('custKode').textContent   = item.pelangganKode || '—';
+        document.getElementById('custAlamat').textContent = item.pelangganAlamat || 'Alamat tidak tersedia';
+
+        /* Payment */
+        const sudahBayar = (item.jumlahTagihan || 0) - (item.belumDibayar || 0);
+        const sisaBayar  = item.belumDibayar || 0;
+        document.getElementById('payBayar').textContent = fmt(sudahBayar);
+        const sisaEl = document.getElementById('paySisa');
+        sisaEl.textContent = fmt(sisaBayar);
+        if (sisaBayar > 0) sisaEl.classList.add('text-danger');
+
+        /* Info Grid */
+        document.getElementById('infoTglFaktur').textContent  = fmtDT(item.tanggalFaktur);
+        document.getElementById('infoSales').textContent      = item.salesNama || '—';
+        document.getElementById('infoGudang').textContent     = item.gudang || '—';
+        document.getElementById('infoJangka').textContent     = item.jangkaWaktuPembayaran || '—';
+        document.getElementById('infoJatuhTempo').textContent = fmtDT(item.tanggalJatuhTempo || item.tanggalJatuhTempo);
+        document.getElementById('infoKodeTrx').textContent    = item.kodeTransaksi || '—';
+
+        /* Catatan */
+        const catatanEl = document.getElementById('infoCatatan');
+        if (item.catatan) { catatanEl.textContent = item.catatan; catatanEl.classList.remove('text-muted','fst-italic'); }
+
+        /* Items Table */
+        renderItems(item.items || []);
+
+        /* Footer */
+        document.getElementById('footerInfo').textContent = fmtDT(item.tanggalFaktur);
+    }
+
+    function renderItems(items) {
+        const tbody = document.getElementById('tblItems');
+        tbody.innerHTML = '';
+        let subtotal = 0;
+        let totalPajak = 0;
+
+        if (!items || items.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4"><i class="fa fa-inbox fa-2x d-block mb-2"></i>Tidak ada item produk.</td></tr>`;
+        } else {
+            items.forEach((it, idx) => {
+                const lineTotal = (it.hargaUnit || 0) * (it.qty || 0) - (it.diskon || 0);
+                const pajak     = it.pajak || 'NoPPN';
+                subtotal   += lineTotal;
+                if (pajak !== 'NoPPN') totalPajak += lineTotal * 0.11;
+
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>
+                            <div class="prod-code">${it.kode || ''}</div>
+                            <div class="prod-name">${it.nama || '—'}</div>
+                        </td>
+                        <td style="text-align:center;">
+                            <span class="qty-main">${it.qty || 0}</span>
+                            <span class="qty-unit ms-1">${it.satuan || 'PCS'}</span>
+                        </td>
+                        <td class="text-end">${fmt(it.hargaUnit || 0)}<span class="qty-unit d-block">/${it.satuan || 'PCS'}</span></td>
+                        <td class="text-end">${fmt(it.diskon || 0)}</td>
+                        <td>
+                            <span style="font-size:.78rem; color:#6c757d;">${pajak}</span>
+                            <div style="font-size:.7rem; color:#adb5bd;">0% | DPP: 100%</div>
+                        </td>
+                        <td class="text-end fw-bold">${fmt(lineTotal)}</td>
+                    </tr>`);
+            });
+        }
+
+        document.getElementById('sumSubtotal').textContent = fmt(subtotal);
+        document.getElementById('sumDiskon').textContent   = fmt(0);
+        document.getElementById('sumPajak').textContent    = fmt(Math.round(totalPajak));
+        document.getElementById('sumTotal').textContent    = fmt(subtotal + Math.round(totalPajak));
+    }
+
+    /* Cetak – buka print.html di tab baru */
+    document.getElementById('btnCetak').addEventListener('click', () => {
+        window.open('print.html?id=' + encodeURIComponent(id), '_blank');
+    });
+
+    /* init */
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        render(JSON.parse(stored));
+    } else {
+        fetch('../../../../wwwroot/data/faktur.json')
+            .then(r => r.json())
+            .then(data => {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                render(data);
+            });
+    }
+
+});
+</script>
+</body>
+</html>
