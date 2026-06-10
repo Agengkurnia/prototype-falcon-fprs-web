@@ -28,6 +28,21 @@
 <thead><tr><th style="width:50px;">NO</th><th>USERNAME</th><th>ROLE GROUP</th><th>TELEPON</th><th>EMAIL</th><th>NAMA KARYAWAN</th><th style="width:80px;">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
 <tbody id="tblBody"></tbody>
 </table></div></div></div>
+<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+<div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Akun</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-body">
+<input type="hidden" id="editId"/>
+<div class="row g-3">
+<div class="col-md-6"><label class="form-label">Username <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputUsername" placeholder="Username..."/></div>
+<div class="col-md-6"><label class="form-label">Role Group <span class="required-mark">*</span></label><select class="form-select" id="inputRole"><option value="">-- Pilih Role --</option><option>Admin</option><option>Salesman Canvassing (SI)</option><option>Salesman Order</option><option>Supervisor</option><option>Driver</option><option>Customer</option></select></div>
+<div class="col-md-6"><label class="form-label">Email</label><input type="email" class="form-control" id="inputEmail" placeholder="Email..."/></div>
+<div class="col-md-6"><label class="form-label">Telepon</label><input type="text" class="form-control" id="inputTelepon" placeholder="Nomor telepon..."/></div>
+<div class="col-md-6"><label class="form-label">Nama Karyawan</label><input type="text" class="form-control" id="inputNamaKaryawan" placeholder="Nama karyawan..."/></div>
+<div class="col-md-6"><label class="form-label">Status</label><select class="form-select" id="inputStatus"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
+</div></div></div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
@@ -39,23 +54,23 @@ function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
 function loadData(){if(!localStorage.getItem(KEY)){fetch('../../../../wwwroot/data/akun.json').then(r=>r.json()).then(d=>{saveData(d);render();});}else{render();}}
 function render(){
 if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();$('#tblBody').empty();
-getData().forEach((item,i)=>{const badge=item.status==='Active'?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';$('#tblBody').append(`<tr><td>${i+1}</td><td><strong><code>${item.username}</code></strong></td><td>${item.roleGroup}</td><td>${item.telepon||'-'}</td><td>${item.email||'-'}</td><td>${item.namaKaryawan||'-'}</td><td>${badge}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem(${item.id})" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.username}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
+getData().forEach((item,i)=>{const badge=item.status==='Active'?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';$('#tblBody').append(`<tr><td>${i+1}</td><td><strong><code>${item.username}</code></strong></td><td>${item.roleGroup}</td><td>${item.telepon||'-'}</td><td>${item.email||'-'}</td><td>${item.namaKaryawan||'-'}</td><td>${badge}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.username}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
 $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[6,7]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
 }
 function openModal(item=null){document.getElementById('editId').value=item?item.id:'';document.getElementById('inputUsername').value=item?item.username:'';document.getElementById('inputRole').value=item?item.roleGroup:'';document.getElementById('inputEmail').value=item?item.email:'';document.getElementById('inputTelepon').value=item?item.telepon:'';document.getElementById('inputNamaKaryawan').value=item?item.namaKaryawan:'';document.getElementById('inputStatus').value=item?item.status:'Active';document.getElementById('modalTitle').textContent=item?'Ubah Akun':'Tambah Akun';bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();}
-function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
+function editItem(id){const item=getData().find(d=>String(d.id)===String(id));if(item)openModal(item);}
 function saveItem(){
 const username=document.getElementById('inputUsername').value.trim();const role=document.getElementById('inputRole').value;
 if(!username||!role){Swal.fire('Peringatan','Username dan Role wajib diisi.','warning');return;}
 const data=getData();const id=document.getElementById('editId').value;
-const obj={id:id?parseInt(id):Date.now(),username,roleGroup:role,email:document.getElementById('inputEmail').value.trim(),telepon:document.getElementById('inputTelepon').value.trim(),namaKaryawan:document.getElementById('inputNamaKaryawan').value.trim(),status:document.getElementById('inputStatus').value};
-if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
+const obj={id:id?(isNaN(id)?id:parseInt(id)):Date.now(),username,roleGroup:role,email:document.getElementById('inputEmail').value.trim(),telepon:document.getElementById('inputTelepon').value.trim(),namaKaryawan:document.getElementById('inputNamaKaryawan').value.trim(),status:document.getElementById('inputStatus').value};
+if(id){const idx=data.findIndex(d=>String(d.id)===String(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
 saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
 Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false});
 }
-function del(id,username){Swal.fire({title:`Hapus Akun "${username}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
+function del(id,username){Swal.fire({title:`Hapus Akun "${username}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>String(d.id)!==String(id)));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
 $(document).ready(loadData);
-window.openModal = openModal; window.del = del; window.editItem = editItem;
+window.openModal = openModal; window.del = del; window.editItem = editItem; window.saveItem = saveItem;
         });
     </script>
 </body>

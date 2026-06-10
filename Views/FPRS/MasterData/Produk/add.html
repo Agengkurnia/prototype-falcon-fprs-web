@@ -157,7 +157,7 @@ function checkEditMode() {
         document.getElementById('editId').value = editId;
         
         const dataList = getLocalData();
-        const item = dataList.find(d => d.id === parseInt(editId));
+        const item = dataList.find(d => String(d.id)===String(editId));
         if (item) {
             document.getElementById('kode').value = item.kode || '';
             document.getElementById('nama').value = item.nama || '';
@@ -227,7 +227,7 @@ function saveDataForm(event) {
         firstError = firstError || 'kode';
     } else {
         // Uniqueness check
-        const duplicate = dataList.find(d => d.kode === kode && (!editId || d.id !== parseInt(editId)));
+        const duplicate = dataList.find(d => d.kode === kode && (!editId || String(d.id)!==String(editId)));
         if (duplicate) {
             showFieldError('kode', `Kode "${kode}" sudah digunakan oleh produk lain.`);
             firstError = firstError || 'kode';
@@ -293,7 +293,7 @@ function saveDataForm(event) {
     }
     
     const newObj = {
-        id: editId ? parseInt(editId) : Date.now(),
+        id: editId?(isNaN(editId)?editId:parseInt(editId)):Date.now(),
         kode: kode,
         nama: nama,
         kategori: kategori,
@@ -312,7 +312,7 @@ function saveDataForm(event) {
     };
     
     if (editId) {
-        const idx = dataList.findIndex(d => d.id === parseInt(editId));
+        const idx = dataList.findIndex(d => String(d.id)===String(editId));
         if (idx > -1) {
             dataList[idx] = newObj;
         }
@@ -336,6 +336,7 @@ function saveDataForm(event) {
 $(document).ready(function() {
     checkEditMode();
 });
+window.saveDataForm = saveDataForm;
 
         });
     </script>

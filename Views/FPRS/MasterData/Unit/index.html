@@ -54,6 +54,40 @@
                         </div>
                     </div>
                 </div>
+<div class="modal fade" id="modalUnit" tabindex="-1" aria-labelledby="modalUnitLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUnitLabel">Tambah Unit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId" />
+                <div class="mb-3">
+                    <label class="form-label">Nama <span class="required-mark">*</span></label>
+                    <input type="text" class="form-control" id="inputNama" placeholder="Contoh: PCS" maxlength="95" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="inputDeskripsi" rows="2" placeholder="Deskripsi unit..." maxlength="250"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">UoM Pajak</label>
+                    <select class="form-select" id="inputUomPajak">
+                        <option value="">-- Pilih UoM Pajak --</option>
+                        <option>PCS</option>
+                        <option>BOX</option>
+                        <option>KARTON</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-success" onclick="saveUnit()"><i class="fa fa-save me-1"></i> Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
@@ -84,8 +118,8 @@ function renderTable() {
             <td>${item.deskripsi || '-'}</td>
             <td>${item.uomPajak || '-'}</td>
             <td><div class="row-actions">
-                <button class="btn-action btn-action-edit" onclick="editItem(${item.id})" title="Edit"><i class="fa fa-pen"></i></button>
-                <button class="btn-action btn-action-delete" onclick="deleteItem(${item.id})" title="Hapus"><i class="fa fa-trash"></i></button>
+                <button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button>
+                <button class="btn-action btn-action-delete" onclick="deleteItem('${item.id}')" title="Hapus"><i class="fa fa-trash"></i></button>
             </div></td>
         </tr>`);
     });
@@ -102,7 +136,7 @@ function openModal(item = null) {
 }
 
 function editItem(id) {
-    const item = getData().find(d => d.id === id);
+    const item = getData().find(d => String(d.id)===String(id));
     if (item) openModal(item);
 }
 
@@ -111,9 +145,9 @@ function saveUnit() {
     if (!nama) { Swal.fire('Peringatan', 'Nama unit wajib diisi.', 'warning'); return; }
     const data = getData();
     const id = document.getElementById('editId').value;
-    const obj = { id: id ? parseInt(id) : Date.now(), nama, deskripsi: document.getElementById('inputDeskripsi').value.trim(), uomPajak: document.getElementById('inputUomPajak').value, partnerId: '' };
+    const obj = { id: id?(isNaN(id)?id:parseInt(id)):Date.now(), nama, deskripsi: document.getElementById('inputDeskripsi').value.trim(), uomPajak: document.getElementById('inputUomPajak').value, partnerId: '' };
     if (id) {
-        const idx = data.findIndex(d => d.id === parseInt(id));
+        const idx = data.findIndex(d => String(d.id)===String(id));
         if (idx > -1) data[idx] = obj;
     } else { data.push(obj); }
     saveData(data);
@@ -123,10 +157,10 @@ function saveUnit() {
 }
 
 function deleteItem(id) {
-    const item = getData().find(d => d.id === id);
+    const item = getData().find(d => String(d.id)===String(id));
     Swal.fire({ title:`Hapus Unit "${item.nama}"?`, text:'Tindakan ini tidak dapat dibatalkan.', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33', cancelButtonColor:'#6c757d', confirmButtonText:'Ya, Hapus', cancelButtonText:'Batal' }).then(r => {
         if (r.isConfirmed) {
-            saveData(getData().filter(d => d.id !== id));
+            saveData(getData().filter(d => String(d.id)!==String(id)));
             renderTable();
             Swal.fire({ icon:'success', title:'Dihapus!', timer:1200, showConfirmButton:false });
         }
@@ -134,7 +168,7 @@ function deleteItem(id) {
 }
 
 $(document).ready(loadData);
-window.openModal = openModal; window.editItem = editItem; window.deleteItem = deleteItem;
+window.openModal = openModal; window.editItem = editItem; window.deleteItem = deleteItem; window.saveUnit = saveUnit;
         });
     </script>
 </body>

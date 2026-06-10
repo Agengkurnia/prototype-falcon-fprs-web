@@ -22,6 +22,19 @@
                     <tbody id="tblBody"></tbody>
                 </table>
             </div></div></div>
+<div class="modal fade" id="modalForm" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Pajak</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="editId" />
+            <div class="mb-3"><label class="form-label">Kode Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputKode" placeholder="Contoh: PPN" maxlength="20" /></div>
+            <div class="mb-3"><label class="form-label">Nama Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama pajak..." maxlength="95" /></div>
+            <div class="mb-3"><label class="form-label">Persentase (%) <span class="required-mark">*</span></label><input type="number" class="form-control" id="inputPersen" placeholder="0" min="0" max="100" step="0.01" /></div>
+            <div class="mb-3"><label class="form-label">Nilai DPP</label><input type="text" class="form-control" id="inputDpp" placeholder="Nilai DPP (opsional)" /></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
+    </div></div>
+</div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
@@ -34,7 +47,7 @@ function loadData(){if(!localStorage.getItem(KEY)){fetch('../../../../wwwroot/da
 function render(){
     if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
     $('#tblBody').empty();
-    getData().forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.kodePajak}</strong></td><td>${item.namaPajak}</td><td>${item.persentase}%</td><td>${item.nilaiDpp||'-'}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem(${item.id})" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.namaPajak}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
+    getData().forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.kodePajak}</strong></td><td>${item.namaPajak}</td><td>${item.persentase}%</td><td>${item.nilaiDpp||'-'}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.namaPajak}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
     $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[5]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
 }
 function openModal(item=null){
@@ -46,20 +59,20 @@ function openModal(item=null){
     document.getElementById('modalTitle').textContent=item?'Ubah Pajak':'Tambah Pajak';
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
-function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
+function editItem(id){const item=getData().find(d=>String(d.id)===String(id));if(item)openModal(item);}
 function saveItem(){
     const kode=document.getElementById('inputKode').value.trim();
     const nama=document.getElementById('inputNama').value.trim();
     if(!kode||!nama){Swal.fire('Peringatan','Kode dan Nama pajak wajib diisi.','warning');return;}
     const data=getData();const id=document.getElementById('editId').value;
-    const obj={id:id?parseInt(id):Date.now(),kodePajak:kode,namaPajak:nama,persentase:parseFloat(document.getElementById('inputPersen').value)||0,nilaiDpp:document.getElementById('inputDpp').value.trim(),partnerId:''};
-    if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
+    const obj={id:id?(isNaN(id)?id:parseInt(id)):Date.now(),kodePajak:kode,namaPajak:nama,persentase:parseFloat(document.getElementById('inputPersen').value)||0,nilaiDpp:document.getElementById('inputDpp').value.trim(),partnerId:''};
+    if(id){const idx=data.findIndex(d=>String(d.id)===String(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
     saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
     Swal.fire({icon:'success',title:'Berhasil!',text:`Pajak "${nama}" telah disimpan.`,timer:1500,showConfirmButton:false});
 }
-function del(id,nama){Swal.fire({title:`Hapus Pajak "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
+function del(id,nama){Swal.fire({title:`Hapus Pajak "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>String(d.id)!==String(id)));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
 $(document).ready(loadData);
-window.openModal = openModal; window.del = del; window.editItem = editItem;
+window.openModal = openModal; window.del = del; window.editItem = editItem; window.saveItem = saveItem;
         });
     </script>
 </body>

@@ -142,7 +142,7 @@ function checkEditMode() {
         document.getElementById('editId').value = editId;
         
         const dataList = getLocalData();
-        const item = dataList.find(d => d.id === parseInt(editId));
+        const item = dataList.find(d => String(d.id)===String(editId));
         if (item) {
             document.getElementById('kode').value = item.kode || '';
             document.getElementById('nama').value = item.nama || '';
@@ -180,7 +180,7 @@ function saveDataForm(event) {
     }
     
     const newObj = {
-        id: editId ? parseInt(editId) : Date.now(),
+        id: editId?(isNaN(editId)?editId:parseInt(editId)):Date.now(),
         kode: kode,
         nama: nama,
         telepon: document.getElementById('telepon').value.trim(),
@@ -191,13 +191,13 @@ function saveDataForm(event) {
         employee: document.getElementById('employee').value,
         salesman: document.getElementById('employee').value,
         status: document.getElementById('status').value,
-        kunjunganTerakhir: editId ? (dataList.find(d => d.id === parseInt(editId))?.kunjunganTerakhir || '-') : '-',
-        transaksiTerakhir: editId ? (dataList.find(d => d.id === parseInt(editId))?.transaksiTerakhir || '-') : '-',
+        kunjunganTerakhir: editId ? (dataList.find(d => String(d.id)===String(editId))?.kunjunganTerakhir || '-') : '-',
+        transaksiTerakhir: editId ? (dataList.find(d => String(d.id)===String(editId))?.transaksiTerakhir || '-') : '-',
         partnerId: ''
     };
     
     if (editId) {
-        const idx = dataList.findIndex(d => d.id === parseInt(editId));
+        const idx = dataList.findIndex(d => String(d.id)===String(editId));
         if (idx > -1) {
             dataList[idx] = newObj;
         }
@@ -221,6 +221,7 @@ function saveDataForm(event) {
 $(document).ready(function() {
     checkEditMode();
 });
+window.saveDataForm = saveDataForm;
 
         });
     </script>

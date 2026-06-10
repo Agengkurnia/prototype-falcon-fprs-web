@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "scrape:master-data": "node scripts/scrape-master-data-crud.js",
+    "scrape:visual": "node scripts/scrape-master-data-visual.js",
+    "scrape:visual:open": "node scripts/scrape-master-data-visual.js --keep-open"
+  },
   "devDependencies": {
-    "fast-check": "^4.8.0"
+    "fast-check": "^4.8.0",
+    "playwright": "^1.60.0"
   }
 }

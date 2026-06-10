@@ -29,6 +29,17 @@
                     <tbody id="tblBody"></tbody>
                 </table>
             </div></div></div>
+<div class="modal fade" id="modalForm" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Kategori Produk</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="editId" />
+            <div class="mb-3"><label class="form-label">Nama <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama kategori..." maxlength="95" /></div>
+            <div class="mb-3"><label class="form-label">Parent Kategori</label><select class="form-select" id="inputParent"><option value="">-- Tidak ada (Root) --</option></select></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
+    </div></div>
+</div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
@@ -44,7 +55,7 @@ function render(){
     // populate parent dropdown
     const sel=$('#inputParent');sel.find('option:not(:first)').remove();
     data.forEach(d=>sel.append(`<option value="${d.nama}">${d.nama}</option>`));
-    data.forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td>${item.parentKategori||'-'}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem(${item.id})" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del(${item.id},'${item.nama}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
+    data.forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td>${item.parentKategori||'-'}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.nama}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
     $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[3]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
 }
 function openModal(item=null){
@@ -54,19 +65,19 @@ function openModal(item=null){
     document.getElementById('modalTitle').textContent=item?'Ubah Kategori Produk':'Tambah Kategori Produk';
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
-function editItem(id){const item=getData().find(d=>d.id===id);if(item)openModal(item);}
+function editItem(id){const item=getData().find(d=>String(d.id)===String(id));if(item)openModal(item);}
 function saveItem(){
     const nama=document.getElementById('inputNama').value.trim();
     if(!nama){Swal.fire('Peringatan','Nama kategori wajib diisi.','warning');return;}
     const data=getData();const id=document.getElementById('editId').value;
-    const obj={id:id?parseInt(id):Date.now(),nama,parentKategori:document.getElementById('inputParent').value};
-    if(id){const idx=data.findIndex(d=>d.id===parseInt(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
+    const obj={id:id?(isNaN(id)?id:parseInt(id)):Date.now(),nama,parentKategori:document.getElementById('inputParent').value};
+    if(id){const idx=data.findIndex(d=>String(d.id)===String(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
     saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
     Swal.fire({icon:'success',title:'Berhasil!',text:`Kategori "${nama}" telah disimpan.`,timer:1500,showConfirmButton:false});
 }
-function del(id,nama){Swal.fire({title:`Hapus "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>d.id!==id));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
+function del(id,nama){Swal.fire({title:`Hapus "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>String(d.id)!==String(id)));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
 $(document).ready(loadData);
-window.openModal = openModal; window.del = del; window.editItem = editItem;
+window.openModal = openModal; window.del = del; window.editItem = editItem; window.saveItem = saveItem;
         });
     </script>
 </body>
