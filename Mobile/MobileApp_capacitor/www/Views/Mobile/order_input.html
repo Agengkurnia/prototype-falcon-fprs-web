@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Input Sales Order - Falcon SFA Mobile</title>
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .order-bg {
+            background-color: #f7f9fa;
+        }
+
+        /* Tabs Header */
+        .order-tabs {
+            display: flex;
+            background-color: #fff;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 56px;
+            z-index: 100;
+        }
+
+        .order-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-gray);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .order-tab.active {
+            color: var(--color-primary);
+        }
+
+        .order-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 3px;
+            background-color: var(--color-primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Category Filter Scroll */
+        .category-scroll {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            background-color: #fff;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--color-border);
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        .category-chip {
+            padding: 6px 14px;
+            background-color: var(--color-gray-light);
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-gray);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .category-chip.active {
+            background-color: var(--color-bg-light);
+            color: var(--color-primary);
+            border-color: rgba(0, 93, 65, 0.2);
+        }
+
+        /* Product Catalog Cards */
+        .product-card {
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .product-img-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background-color: #f0f4f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-code {
+            font-size: 10px;
+            color: var(--color-gray);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .product-price-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+        }
+
+        .product-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #dc3545;
+        }
+
+        /* Qty Picker Controls */
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border);
+            background-color: #fff;
+            color: var(--color-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .qty-btn:active {
+            background-color: var(--color-gray-light);
+        }
+
+        .qty-val {
+            font-size: 14px;
+            font-weight: 700;
+            width: 24px;
+            text-align: center;
+        }
+
+        .uom-badge-toggle {
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: var(--color-gray-light);
+            border-radius: 4px;
+            font-weight: 700;
+            color: var(--color-gray);
+            cursor: pointer;
+            margin-left: 6px;
+        }
+
+        .uom-badge-toggle.active {
+            background-color: var(--color-primary);
+            color: #fff;
+        }
+
+        /* Cart Float Bar */
+        .cart-float-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px;
+            background-color: #fff;
+            border-top: 1px solid var(--color-border);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .cart-float-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-float-count {
+            font-size: 11px;
+            color: var(--color-gray);
+            font-weight: 600;
+        }
+
+        .cart-float-total {
+            font-size: 16px;
+            font-weight: 700;
+            color: #dc3545;
+        }
+
+        .cart-float-btn {
+            background-color: #78B500;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 4px 8px rgba(120, 181, 0, 0.25);
+            cursor: pointer;
+        }
+
+        /* Cart Items Tab Specifics */
+        .cart-summary-section {
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .promo-banner-alert {
+            background-color: #eaf6ea;
+            border: 1px solid #c7e9c7;
+            color: #2b702b;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body class="order-bg">
+
+    <div class="mobile-wrapper">
+        <!-- Header -->
+        <div class="mobile-header">
+            <button class="header-action" onclick="goBack()" aria-label="Kembali">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <span class="header-title">Input Order</span>
+            <span class="header-action" style="font-size: 11px; font-weight: 700; color: #fff;" id="outletTag">OL-10283</span>
+        </div>
+
+        <!-- Order Tabs -->
+        <div class="order-tabs">
+            <div class="order-tab active" id="tabCatalogBtn" onclick="switchTab('catalog')">Katalog Produk</div>
+            <div class="order-tab" id="tabCartBtn" onclick="switchTab('cart')">Keranjang (<span id="cartCountHeader">0</span>)</div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="mobile-content" style="padding-bottom: 80px;">
+            
+            <!-- TAB 1: CATALOG VIEW -->
+            <div id="catalogTab">
+                <!-- Search bar -->
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="prdSearch" placeholder="Cari nama atau kode produk..." onkeyup="filterProducts()"/>
+                    </div>
+                </div>
+
+                <!-- Category chip scroll -->
+                <div class="category-scroll">
+                    <div class="category-chip active" id="catAll" onclick="filterCategory('All')">Semua</div>
+                    <div class="category-chip" id="catMinuman" onclick="filterCategory('Minuman Kesehatan')">Minuman</div>
+                    <div class="category-chip" id="catSusu" onclick="filterCategory('Susu Formula')">Susu Formula</div>
+                    <div class="category-chip" id="catAnak" onclick="filterCategory('Susu Anak')">Susu Anak</div>
+                    <div class="category-chip" id="catBayi" onclick="filterCategory('Makanan Bayi')">Makanan Bayi</div>
+                </div>
+
+                <!-- Product Catalog List -->
+                <div class="p-16" id="productCatalogContainer">
+                    <!-- Products will be dynamically populated -->
+                </div>
+            </div>
+
+            <!-- TAB 2: SHOPPING CART VIEW -->
+            <div id="cartTab" class="d-none p-16">
+                <!-- Selected Products List -->
+                <div class="section-header px-0">
+                    <h3>Daftar Pesanan</h3>
+                </div>
+                <div id="cartItemsContainer">
+                    <!-- Cart items will be dynamically populated -->
+                </div>
+
+                <!-- Promos Applied Section -->
+                <div class="promo-banner-alert" id="promoAlert" style="display: none;">
+                    <i class="fas fa-percentage"></i>
+                    <span><strong>Promo Terpasang:</strong> Potongan harga 5% karena total belanja melampaui Rp 200.000!</span>
+                </div>
+
+                <!-- Order Details Form -->
+                <div class="section-header px-0 mt-4">
+                    <h3>Detail Pengiriman</h3>
+                </div>
+                <div class="mobile-card">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold fs-7 text-muted">Tanggal Pengiriman</label>
+                        <input type="date" class="form-control fs-7" id="deliveryDate" required/>
+                    </div>
+                    <div class="mb-1">
+                        <label class="form-label fw-bold fs-7 text-muted">Catatan Salesman</label>
+                        <textarea class="form-control fs-7" id="salesNote" placeholder="Tulis instruksi khusus pengiriman..." rows="2"></textarea>
+                    </div>
+                </div>
+
+                <!-- Calculation Summary Card -->
+                <div class="cart-summary-section mt-3">
+                    <h4 class="fs-6 fw-bold mb-3"><i class="fas fa-receipt me-2 text-primary"></i>Rincian Pembayaran</h4>
+                    <div class="info-row">
+                        <span class="info-label">Total Kotor (Gross)</span>
+                        <span class="info-value" id="summaryGross">Rp 0</span>
+                    </div>
+                    <div class="info-row text-success">
+                        <span class="info-label text-success">Potongan Promo</span>
+                        <span class="info-value text-success" id="summaryDiscount">- Rp 0</span>
+                    </div>
+                    <hr style="border-style: dashed; margin: 12px 0;"/>
+                    <div class="info-row mb-0">
+                        <span class="info-label fw-bold text-dark">Total Netto</span>
+                        <span class="info-value fw-bold text-danger fs-5" id="summaryNet">Rp 0</span>
+                    </div>
+                </div>
+
+                <button class="btn-mobile-primary" onclick="submitSalesOrder()">
+                    <i class="fas fa-file-invoice me-2"></i>Simpan & Proses Order
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Floating Cart Bar (Only visible in Catalog view if items selected) -->
+        <div class="cart-float-bar" id="cartFloatBar" style="display: none;">
+            <div class="cart-float-info">
+                <span class="cart-float-count" id="cartFloatCount">1 Item Terpilih</span>
+                <span class="cart-float-total" id="cartFloatTotal">Rp 120.000</span>
+            </div>
+            <button class="cart-float-btn" onclick="switchTab('cart')">Keranjang <i class="fas fa-chevron-right ms-1"></i></button>
+        </div>
+
+    </div>
+
+    <!-- JS Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Mock Products list from produk.json
+        const products = [
+            { code: "ZSRTD", name: "ZEE RTD STRAWBERRY 185 ML", price: 6000, category: "Minuman Kesehatan", icon: "fa-bottle-water", conversion: 40 },
+            { code: "ZSIZC", name: "ZEE SACHET SWIZZ COK 38 G", price: 3500, category: "Susu Anak", icon: "fa-box", conversion: 60 },
+            { code: "ZRIZV", name: "ZEE SACHET VAN TWIST 38 G", price: 3500, category: "Susu Anak", icon: "fa-box", conversion: 60 },
+            { code: "HCOCO500", name: "HYDRO COCO 500 ML", price: 7000, category: "Minuman Kesehatan", icon: "fa-whiskey-glass", conversion: 24 },
+            { code: "HCOCO250", name: "HYDRO COCO 250 ML", price: 4000, category: "Minuman Kesehatan", icon: "fa-whiskey-glass", conversion: 40 },
+            { code: "ENTSG", name: "ENTRASOL GOLD 185 G", price: 55000, category: "Susu Formula", icon: "fa-cookie", conversion: 20 },
+            { code: "ENTACT", name: "ENTRASOL ACTIVE 185 G", price: 57000, category: "Susu Formula", icon: "fa-cookie", conversion: 20 },
+            { code: "ENTSEL", name: "ENTRASOL SELECT 185 G", price: 60000, category: "Susu Formula", icon: "fa-cookie", conversion: 20 },
+            { code: "CHILGO200", name: "CHIL GO COKLAT 200 ML", price: 5000, category: "Minuman Kesehatan", icon: "fa-bottle-droplet", conversion: 36 },
+            { code: "CHILGO200S", name: "CHIL GO STROBERI 200 ML", price: 5000, category: "Minuman Kesehatan", icon: "fa-bottle-droplet", conversion: 36 },
+            { code: "BCOL200", name: "BENECOL 200 ML PLAIN", price: 15000, category: "Minuman Kesehatan", icon: "fa-heart-pulse", conversion: 24 },
+            { code: "DBTSL400", name: "DIABETASOL 400 G VANILLA", price: 110000, category: "Susu Formula", icon: "fa-kit-medical", conversion: 12 },
+            { code: "PRNG400", name: "PRENAGEN EMESIS 400 G", price: 125000, category: "Susu Ibu Hamil", icon: "fa-baby-carriage", conversion: 12 },
+            { code: "MILBIS120", name: "MILNA BISCUIT RASA PISANG 120 G", price: 18000, category: "Makanan Bayi", icon: "fa-cookie-bite", conversion: 24 }
+        ];
+
+        let currentOutletId = "OL-10283";
+        let cart = {}; // maps productCode -> { qty: Number, uom: 'PCS'|'KARTON' }
+        let currentCategory = 'All';
+
+        $(document).ready(function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('outletId');
+            if (id) {
+                currentOutletId = id;
+                $('#outletTag').text(id);
+            }
+
+            // Set default delivery date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#deliveryDate').val(tomorrow.toISOString().split('T')[0]);
+
+            renderCatalog();
+            updateCartSummary();
+        });
+
+        function switchTab(tab) {
+            $('.order-tab').removeClass('active');
+            if (tab === 'catalog') {
+                $('#tabCatalogBtn').addClass('active');
+                $('#catalogTab').removeClass('d-none');
+                $('#cartTab').addClass('d-none');
+                updateCartSummary(); // updates floating bar
+            } else {
+                $('#tabCartBtn').addClass('active');
+                $('#catalogTab').addClass('d-none');
+                $('#cartTab').removeClass('d-none');
+                $('#cartFloatBar').hide(); // hide float bar on cart tab
+                renderCart();
+            }
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            $('.category-chip').removeClass('active');
+            if (cat === 'All') $('#catAll').addClass('active');
+            if (cat === 'Minuman Kesehatan') $('#catMinuman').addClass('active');
+            if (cat === 'Susu Formula') $('#catSusu').addClass('active');
+            if (cat === 'Susu Anak') $('#catAnak').addClass('active');
+            if (cat === 'Makanan Bayi') $('#catBayi').addClass('active');
+            renderCatalog();
+        }
+
+        function filterProducts() {
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            const query = $('#prdSearch').val().toLowerCase();
+            const container = $('#productCatalogContainer');
+            container.empty();
+
+            const filtered = products.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query);
+                const matchesCategory = currentCategory === 'All' || p.category === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                container.append('<div class="text-center py-5 text-muted"><i class="fas fa-search-minus fs-2 mb-2 d-block"></i>Produk tidak ditemukan.</div>');
+                return;
+            }
+
+            filtered.forEach(p => {
+                const item = cart[p.code] || { qty: 0, uom: 'PCS' };
+                const isPcsActive = item.uom === 'PCS' ? 'active' : '';
+                const isKtnActive = item.uom === 'KARTON' ? 'active' : '';
+
+                const prdHtml = `
+                    <div class="product-card">
+                        <div class="product-img-box">
+                            <i class="fa-solid ${p.icon}"></i>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-name">${p.name}</span>
+                            <span class="product-code">${p.code} • ${p.category}</span>
+                            <div class="product-price-row">
+                                <span class="product-price">Rp ${new Intl.NumberFormat('id-ID').format(p.price)}</span>
+                                <div class="qty-controls">
+                                    <span class="uom-badge-toggle ${isPcsActive}" onclick="setUOM('${p.code}', 'PCS')">Pcs</span>
+                                    <span class="uom-badge-toggle ${isKtnActive}" onclick="setUOM('${p.code}', 'KARTON')">Karton</span>
+                                    <button class="qty-btn" onclick="updateQty('${p.code}', -1)">-</button>
+                                    <span class="qty-val" id="qty_${p.code}">${item.qty}</span>
+                                    <button class="qty-btn" onclick="updateQty('${p.code}', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.append(prdHtml);
+            });
+        }
+
+        function setUOM(code, uom) {
+            if (!cart[code]) {
+                cart[code] = { qty: 0, uom: uom };
+            } else {
+                cart[code].uom = uom;
+            }
+            renderCatalog();
+            updateCartSummary();
+        }
+
+        function updateQty(code, change) {
+            if (!cart[code]) {
+                cart[code] = { qty: 0, uom: 'PCS' };
+            }
+            cart[code].qty = Math.max(0, cart[code].qty + change);
+            if (cart[code].qty === 0) {
+                delete cart[code];
+            }
+            
+            const qtyText = cart[code] ? cart[code].qty : 0;
+            $(`#qty_${code}`).text(qtyText);
+
+            updateCartSummary();
+        }
+
+        function calculateCartTotals() {
+            let totalItems = 0;
+            let totalGross = 0;
+
+            for (const code in cart) {
+                const prod = products.find(p => p.code === code);
+                if (prod) {
+                    const item = cart[code];
+                    let multiply = item.qty;
+                    if (item.uom === 'KARTON') {
+                        multiply = item.qty * prod.conversion;
+                    }
+                    totalItems += item.qty;
+                    totalGross += multiply * prod.price;
+                }
+            }
+
+            // Simple Promo rule: 5% discount if total order > Rp 200,000
+            let discount = 0;
+            if (totalGross > 200000) {
+                discount = Math.round(totalGross * 0.05);
+            }
+
+            const totalNet = totalGross - discount;
+
+            return { totalItems, totalGross, discount, totalNet };
+        }
+
+        function updateCartSummary() {
+            const { totalItems, totalGross, discount, totalNet } = calculateCartTotals();
+
+            // Update Header Tab counter
+            $('#cartCountHeader').text(totalItems);
+
+            // Update Floating bottom bar
+            if (totalItems > 0) {
+                $('#cartFloatCount').text(`${totalItems} Item Terpilih`);
+                $('#cartFloatTotal').text(`Rp ${new Intl.NumberFormat('id-ID').format(totalNet)}`);
+                $('#cartFloatBar').fadeIn(200);
+            } else {
+                $('#cartFloatBar').fadeOut(200);
+            }
+        }
+
+        function renderCart() {
+            const container = $('#cartItemsContainer');
+            container.empty();
+
+            const { totalItems, totalGross, discount, totalNet } = calculateCartTotals();
+
+            if (totalItems === 0) {
+                container.append('<div class="text-center py-5 text-muted"><i class="fas fa-shopping-basket fs-2 mb-2 d-block"></i>Keranjang Anda kosong.</div>');
+                // clear summary details
+                $('#summaryGross').text('Rp 0');
+                $('#summaryDiscount').text('- Rp 0');
+                $('#summaryNet').text('Rp 0');
+                $('#promoAlert').hide();
+                return;
+            }
+
+            for (const code in cart) {
+                const prod = products.find(p => p.code === code);
+                const item = cart[code];
+                let itemTotal = item.qty * prod.price;
+                if (item.uom === 'KARTON') {
+                    itemTotal = item.qty * prod.conversion * prod.price;
+                }
+
+                const itemHtml = `
+                    <div class="product-card">
+                        <div class="product-img-box">
+                            <i class="fa-solid ${prod.icon}"></i>
+                        </div>
+                        <div class="product-info">
+                            <span class="product-name">${prod.name}</span>
+                            <span class="product-code">${code} • ${item.uom} (1 Ktn = ${prod.conversion} Pcs)</span>
+                            <div class="product-price-row">
+                                <span class="product-price">Rp ${new Intl.NumberFormat('id-ID').format(itemTotal)}</span>
+                                <div class="qty-controls">
+                                    <button class="qty-btn" onclick="updateCartItemQty('${code}', -1)">-</button>
+                                    <span class="qty-val">${item.qty}</span>
+                                    <button class="qty-btn" onclick="updateCartItemQty('${code}', 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.append(itemHtml);
+            }
+
+            // Promo banner alert
+            if (discount > 0) {
+                $('#promoAlert').show();
+            } else {
+                $('#promoAlert').hide();
+            }
+
+            // Set dynamic summary info
+            $('#summaryGross').text(`Rp ${new Intl.NumberFormat('id-ID').format(totalGross)}`);
+            $('#summaryDiscount').text(`- Rp ${new Intl.NumberFormat('id-ID').format(discount)}`);
+            $('#summaryNet').text(`Rp ${new Intl.NumberFormat('id-ID').format(totalNet)}`);
+        }
+
+        function updateCartItemQty(code, change) {
+            if (cart[code]) {
+                cart[code].qty = Math.max(0, cart[code].qty + change);
+                if (cart[code].qty === 0) {
+                    delete cart[code];
+                }
+            }
+            renderCart();
+            updateCartSummary();
+        }
+
+        function submitSalesOrder() {
+            const { totalItems, totalGross, discount, totalNet } = calculateCartTotals();
+
+            if (totalItems === 0) {
+                Swal.fire('Keranjang Kosong', 'Harap masukkan minimal 1 produk terlebih dahulu!', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Konfirmasi Order?',
+                text: `Kirim sales order sebesar Rp ${new Intl.NumberFormat('id-ID').format(totalNet)} ke database?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Kirim Order',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Mengirim order...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    setTimeout(() => {
+                        // Persist in localStorage visit state
+                        const savedState = localStorage.getItem(`visit_state_${currentOutletId}`);
+                        let state = {};
+                        if (savedState) {
+                            state = JSON.parse(savedState);
+                        } else {
+                            // Checked-in default fallback
+                            const now = new Date();
+                            state = {
+                                status: 'checked_in',
+                                time: now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB',
+                                reason: 'Dalam Radius Outlet'
+                            };
+                        }
+
+                        state.hasOrder = true;
+                        state.orderAmount = totalNet;
+                        state.hasNoOrderReason = false;
+                        state.noOrderReason = "";
+
+                        localStorage.setItem(`visit_state_${currentOutletId}`, JSON.stringify(state));
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Berhasil Dikirim',
+                            text: 'Sales Order disimpan dalam antrean offline database.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Redirect back to detail kunjungan
+                            window.location.href = `visit_detail.html?id=${currentOutletId}`;
+                        });
+
+                    }, 1500);
+                }
+            });
+        }
+
+        function goBack() {
+            window.location.href = `visit_detail.html?id=${currentOutletId}`;
+        }
+    </script>
+</body>
+</html>

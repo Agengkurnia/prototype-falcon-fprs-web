@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Beranda - Falcon SFA Mobile</title>
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        /* Specific Styles to Replicate the Beranda Screenshot */
+        .home-bg {
+            background-color: #f7f9fa;
+        }
+
+        /* Top Profile Banner (Kalbe Genoa Green Gradient) */
+        .profile-banner {
+            background: linear-gradient(135deg, #004d35 0%, #005D41 100%);
+            color: #fff;
+            padding: 24px 20px 50px 20px;
+            position: relative;
+        }
+
+        .header-date {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .header-greeting {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.95;
+            margin-bottom: 2px;
+        }
+
+        .header-username {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .header-role-text {
+            font-size: 13px;
+            opacity: 0.95;
+            margin-bottom: 14px;
+        }
+
+        /* Canvas Info Banner inside header */
+        .canvas-banner {
+            background-color: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .canvas-banner .badge-new {
+            background-color: #78B500;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        /* Floating KPI Summary Card */
+        .float-kpi-card {
+            margin: -30px 16px 16px 16px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 93, 65, 0.08);
+            border: 1px solid var(--color-border);
+            z-index: 10;
+            position: relative;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-column {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .kpi-column:last-child {
+            border-right: none;
+        }
+
+        .kpi-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-black);
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+
+        .kpi-lbl {
+            font-size: 11px;
+            color: #7B6F72;
+            line-height: 1.2;
+        }
+
+        /* Progress Bar in KPI Card */
+        .kpi-progress-bar-container {
+            width: 100%;
+            height: 5px;
+            background-color: #E9EFEF;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .kpi-progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background-color: #78B500; /* Kalbe Accent Lime */
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Sync Status & Collapse Section */
+        .sync-section {
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .last-sync-text {
+            font-size: 11px;
+            color: #7B6F72;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .sync-accordion-bar {
+            background-color: #F8F9FA;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .sync-accordion-bar:active {
+            background-color: #EAEAEA;
+        }
+
+        .sync-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-black);
+        }
+
+        .sync-icon-rotate {
+            color: var(--color-primary);
+        }
+
+        .sync-bar-right {
+            color: #7B6F72;
+        }
+
+        /* Accordion Content */
+        .sync-details {
+            display: none;
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-top: none;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+        }
+
+        .sync-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .sync-detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Circular Menu Grid (Replicating Screenshot Layout) */
+        .menu-circle-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            row-gap: 20px;
+            column-gap: 10px;
+            padding: 10px 16px;
+            margin-bottom: 30px;
+        }
+
+        .menu-circle-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+        }
+
+        .circle-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: #F1F7E5; /* Light Mint Green */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            border: 1px solid #DDE8C1;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .circle-icon-wrapper i {
+            font-size: 22px;
+            color: var(--color-primary);
+        }
+
+        .menu-circle-card:active .circle-icon-wrapper {
+            transform: scale(0.92);
+            background-color: #DDE8C1;
+        }
+
+        .circle-menu-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--color-black);
+            line-height: 1.2;
+            word-wrap: break-word;
+            max-width: 80px;
+        }
+
+        /* Badge on Top of Menu Circular Items (e.g. Canvasser) */
+        .circle-menu-badge {
+            position: absolute;
+            top: -10px;
+            background-color: #FFF2CC;
+            border: 1px solid #FFE599;
+            color: #B25900;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+            white-space: nowrap;
+            z-index: 2;
+        }
+
+        /* Custom icons for the bottom nav bar */
+        .mobile-nav-item svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
+            fill: none;
+            stroke: var(--color-gray);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.2s;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        .mobile-nav-item.active svg {
+            stroke: var(--color-primary);
+            fill: none;
+        }
+    </style>
+</head>
+<body class="home-bg">
+
+    <div class="mobile-wrapper">
+        <div class="mobile-content">
+            
+            <!-- Header Section (Canvasser Theme) -->
+            <div class="profile-banner">
+                <div class="header-date" id="todayDate">Kamis, 11 Juni 2026</div>
+                <div class="header-greeting">Selamat Siang,</div>
+                <div class="header-username" id="userName">SINGARAJA</div>
+                <div class="header-role-text">Anda sekarang bekerja sebagai <strong id="userRole">canvasser</strong></div>
+
+                <!-- Canvas Running Banner -->
+                <div class="canvas-banner">
+                    <span>Kanvas sedang berjalan | 13 Jan 2026 - 01 Jan 2027</span>
+                    <span class="badge-new">New</span>
+                </div>
+            </div>
+
+            <!-- Floating KPI Card -->
+            <div class="float-kpi-card">
+                <div class="kpi-grid">
+                    <!-- Column 1 -->
+                    <div class="kpi-column">
+                        <span class="kpi-val" id="kpiEfektif">0</span>
+                        <span class="kpi-lbl">K. Efektif</span>
+                    </div>
+                    <!-- Column 2 -->
+                    <div class="kpi-column">
+                        <span class="kpi-val" id="kpiKunjungan">0</span>
+                        <span class="kpi-lbl">Kunjungan</span>
+                    </div>
+                    <!-- Column 3 -->
+                    <div class="kpi-column">
+                        <span class="kpi-val" id="kpiTotalFaktur">Rp0</span>
+                        <span class="kpi-lbl">Total Faktur</span>
+                    </div>
+                </div>
+
+                <!-- Progress Track Bar -->
+                <div class="kpi-progress-bar-container">
+                    <div class="kpi-progress-bar-fill" id="kpiProgressBar" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Sync Section -->
+            <div class="sync-section">
+                <div class="last-sync-text">
+                    Terakhir disinkronkan: <span id="syncTimestamp">11 Jun 2026 | 11:12:18</span>
+                </div>
+
+                <!-- Collapse Bar -->
+                <div class="sync-accordion-bar" onclick="toggleSyncDetails()">
+                    <div class="sync-bar-left">
+                        <i class="fas fa-sync sync-icon-rotate"></i>
+                        <span>Sinkronisasi Data</span>
+                    </div>
+                    <div class="sync-bar-right">
+                        <i class="fas fa-chevron-down" id="accordionChevron"></i>
+                    </div>
+                </div>
+
+                <!-- Accordion Content -->
+                <div class="sync-details" id="syncDetailsPanel">
+                    <div class="sync-detail-row">
+                        <span>Data Master</span>
+                        <span class="badge-mobile badge-mobile-success">Selesai</span>
+                    </div>
+                    <div class="sync-detail-row">
+                        <span>Data Pelanggan</span>
+                        <span class="badge-mobile badge-mobile-success">Selesai</span>
+                    </div>
+                    <div class="sync-detail-row">
+                        <span>Transaksi Offline</span>
+                        <span class="badge-mobile badge-mobile-info" id="offlineCount">0 Pending</span>
+                    </div>
+                    <button class="btn-mobile-primary mt-8" onclick="triggerSyncProcess()">Sinkronisasikan Sekarang</button>
+                </div>
+            </div>
+
+            <!-- Menu Circular Grid (Exact Screenshot Replica) -->
+            <div class="menu-circle-grid">
+                <!-- 1. Faktur Penjualan -->
+                <a href="../Penjualan/Faktur/index.html" class="menu-circle-card">
+                    <span class="circle-menu-badge">Canvasser</span>
+                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
+                        <i class="fas fa-file-invoice-dollar" style="color: #DC3545;"></i>
+                    </div>
+                    <span class="circle-menu-label">Faktur Penjualan</span>
+                </a>
+
+                <!-- 2. Pembayaran Pelanggan -->
+                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Pembayaran Pelanggan')">
+                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
+                        <i class="fas fa-hand-holding-usd" style="color: #DC3545;"></i>
+                    </div>
+                    <span class="circle-menu-label">Pembayaran Pelanggan</span>
+                </a>
+
+                <!-- 3. Geo Tag -->
+                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Geo Tag')">
+                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
+                        <i class="fas fa-map-marked-alt" style="color: #DC3545;"></i>
+                    </div>
+                    <span class="circle-menu-label">Geo Tag</span>
+                </a>
+
+                <!-- 4. Pelanggan -->
+                <a href="visit_list.html" class="menu-circle-card">
+                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
+                        <i class="fas fa-users" style="color: #DC3545;"></i>
+                    </div>
+                    <span class="circle-menu-label">Pelanggan</span>
+                </a>
+
+                <!-- 5. Produk -->
+                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Produk')">
+                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
+                        <i class="fas fa-boxes" style="color: #DC3545;"></i>
+                    </div>
+                    <span class="circle-menu-label">Produk</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Bar (Matching Screenshot Tabs) -->
+        <div class="mobile-nav">
+            <a href="dasbor.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                    <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                    <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                </svg>
+                <span>Dasbor</span>
+            </a>
+            <a href="home.html" class="mobile-nav-item active">
+                <svg viewBox="0 0 24 24" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+                <span>Beranda</span>
+            </a>
+            <a href="javascript:void(0)" class="mobile-nav-item" onclick="triggerLogout()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- JS Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Load session data
+        $(document).ready(function() {
+            let userSession = localStorage.getItem('sfa_user');
+            if (userSession) {
+                const user = JSON.parse(userSession);
+                $('#userName').text(user.name.toUpperCase());
+                $('#userRole').text(user.role);
+            } else {
+                // Fallback to default
+                const defaultUser = {
+                    username: 'SINGARAJA',
+                    name: 'SINGARAJA',
+                    role: 'canvasser',
+                    branch: 'Jakarta Pusat',
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('sfa_user', JSON.stringify(defaultUser));
+            }
+
+            // Set current date
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', dateOptions);
+            $('#todayDate').text(todayStr);
+
+            // Read transaction numbers from localStorage to update KPI
+            updateKPIFromStorage();
+        });
+
+        function updateKPIFromStorage() {
+            // Count effective visits and invoices from localStorage
+            let visitsData = localStorage.getItem('sfa_visits') ? JSON.parse(localStorage.getItem('sfa_visits')) : [];
+            let invoiceCount = 0;
+            let effectiveCount = 0;
+            let totalVal = 0;
+
+            // Load canvassing/faktur data if exists
+            let canvassingData = localStorage.getItem('canvassing_records') ? JSON.parse(localStorage.getItem('canvassing_records')) : [];
+            if (canvassingData.length > 0) {
+                // Mock dashboard values based on canvassing data
+                effectiveCount = canvassingData.filter(c => c.status === 'Selesai (Efektif)').length;
+                invoiceCount = canvassingData.length;
+                
+                canvassingData.forEach(c => {
+                    let val = parseFloat(c.totalOrder || 0) || parseFloat(c.grandTotal || 0) || 0;
+                    totalVal += val;
+                });
+            }
+
+            // Fallbacks if zero
+            if (effectiveCount > 0) $('#kpiEfektif').text(effectiveCount);
+            if (invoiceCount > 0) $('#kpiKunjungan').text(invoiceCount);
+            if (totalVal > 0) {
+                $('#kpiTotalFaktur').text('Rp' + totalVal.toLocaleString('id-ID'));
+                // Set progress bar width to 60% as demonstration
+                $('#kpiProgressBar').css('width', '60%');
+            } else {
+                $('#kpiEfektif').text('0');
+                $('#kpiKunjungan').text('0');
+                $('#kpiTotalFaktur').text('Rp0');
+                $('#kpiProgressBar').css('width', '0%');
+            }
+        }
+
+        function toggleSyncDetails() {
+            const panel = $('#syncDetailsPanel');
+            const chevron = $('#accordionChevron');
+            panel.slideToggle(200);
+            
+            if (chevron.hasClass('fa-chevron-down')) {
+                chevron.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            } else {
+                chevron.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            }
+        }
+
+        function triggerSyncProcess() {
+            Swal.fire({
+                title: 'Sinkronisasi...',
+                text: 'Mengunduh data pelanggan & mengunggah transaksi offline',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            setTimeout(() => {
+                const now = new Date();
+                const timeStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ' | ' + 
+                                now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                $('#syncTimestamp').text(timeStr);
+                $('#offlineCount').text('0 Pending');
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Sinkron',
+                    text: 'Data master, rute, dan faktur berhasil diperbarui.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                
+                toggleSyncDetails();
+            }, 2000);
+        }
+
+        function alertUnderDevelopment(featureName) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Modul Simulasi',
+                text: `Modul '${featureName}' berada di bawah kategori Canvasser dan sedang disimulasikan. Hubungkan dengan API SFA untuk integrasi data nyata.`,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Mengerti'
+            });
+        }
+
+        function triggerLogout() {
+            Swal.fire({
+                title: 'Keluar Aplikasi?',
+                text: 'Anda harus login kembali untuk mengakses data SFA.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#005D41',
+                cancelButtonColor: '#ADA4A5',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('sfa_user');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+/* =============================================
+   Master Data — Shared Styles
+   Falcon FPRS Prototype
+   ============================================= */
+
+/* --- Reuse badge-status from canvassing --- */
+.badge-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-active   { background: #e8f5e9; color: #2e7d32; }
+.badge-inactive { background: #fce4ec; color: #c62828; }
+.badge-unverified { background: #fff3e0; color: #e65100; }
+
+/* --- Tabel icon aksi --- */
+.row-actions { display: flex; gap: 6px; justify-content: center; }
+.btn-action { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.78rem; transition: all .15s; text-decoration: none; }
+.btn-action-edit   { background: #e3f2fd; color: #1565c0; }
+.btn-action-delete { background: #fce4ec; color: #c62828; }
+.btn-action-view   { background: #e8f5e9; color: #2e7d32; }
+.btn-action:hover  { filter: brightness(0.92); transform: translateY(-1px); }
+
+/* --- Form cards --- */
+.form-section { background: #fff; border-radius: 8px; border: 1px solid #eef1f6; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+.form-section-title { font-size: 0.9rem; font-weight: 700; color: #005d41; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #e8f5e9; display: flex; align-items: center; gap: 8px; }
+
+/* --- Required marker --- */
+.required-mark { color: #c62828; margin-left: 2px; }
+
+/* --- Toggle switch --- */
+.toggle-wrapper { display: flex; align-items: center; gap: 10px; }
+.toggle-label { font-size: 0.85rem; color: #546e7a; }
+.form-check-input:checked { background-color: #005d41; border-color: #005d41; }
+
+/* --- Checkbox in table --- */
+td .fa-check-circle { color: #2e7d32; }
+td .fa-times-circle { color: #9e9e9e; }
+
+/* --- Upload area --- */
+.upload-area { border: 2px dashed #b0bec5; border-radius: 8px; padding: 2rem; text-align: center; background: #f8fafc; cursor: pointer; transition: border-color .2s; }
+.upload-area:hover { border-color: #005d41; }
+.upload-area i { font-size: 2rem; color: #b0bec5; margin-bottom: 0.5rem; }
+.upload-area p { font-size: 0.8rem; color: #90a4ae; margin: 0; }
+
+/* --- Form footer actions --- */
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; padding: 1rem 0 0; border-top: 1px solid #eef1f6; margin-top: 1rem; }
+.form-actions .btn-danger { margin-right: auto; }

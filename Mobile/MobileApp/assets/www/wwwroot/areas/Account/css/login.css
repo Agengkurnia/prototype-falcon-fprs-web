@@ -1,0 +1,155 @@
+﻿body,
+html {
+    background-color: #F1F7E5;
+    height: 100%;
+}
+
+.form-label {
+    font: 400 13.07px/19.62px 'Kalbe Geometric';
+}
+
+.container {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+    .container div.green-background {
+        background-color: #006548;
+        color: white;
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 35px;
+    }
+
+    .container div.login-form {
+        flex: 1.8;
+        padding: 50px;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+    }
+
+.kt-title {
+    margin-top: 100px;
+}
+
+.half-circle {
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 90px;
+    background-color: #7FBC41;
+    margin-right: 30px;
+    border-radius: 100px 100px 0 0;
+}
+
+.container div.login-form div.kt-box {
+    width: 320px;
+    margin: auto;
+}
+
+.btn-block {
+    width: 100%;
+    display: block;
+}
+
+.kt-box-pass {
+    display: flex;
+    flex-direction: column;
+}
+
+.kt-box-password {
+    display: flex;
+    justify-content: space-between;
+}
+
+.password-container {
+    width: 100%;
+    position: relative;
+}
+
+    .password-container input[type="password"],
+    .password-container input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+.typcn-eye-outline {
+    position: absolute;
+    top: 10%;
+    right: 4%;
+    cursor: pointer;
+    color: grey;
+    z-index: 1200;
+}
+
+.toaster,
+.toaster * {
+    box-sizing: border-box;
+}
+
+.toaster {
+    background: var(--theme-danger, #dc3545);
+    border-radius: 6px;
+    padding: 8px 32px 8px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.toastsuccess,
+.toastsuccess * {
+    box-sizing: border-box;
+}
+
+.toastsuccess {
+    background: var(--theme-success, green);
+    border-radius: 6px;
+    padding: 8px 32px 8px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.account-security-notification {
+    color: var(--white, #ffffff);
+    text-align: center;
+    font: var(--body-text-3-bold, 700 14px "Calibri", sans-serif);
+    position: relative;
+}
+
+.try-again {
+    color: var(--white, #ffffff);
+    text-align: center;
+    font: var(--body-text-3-light, 300 12px "Calibri", sans-serif);
+    position: relative;
+}
+
+@media(min-width:650px) {
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .container div.login-form div.kt-box {
+            width: 350px;
+        }
+}

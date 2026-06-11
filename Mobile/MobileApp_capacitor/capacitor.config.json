@@ -1,0 +1,6 @@
+{
+  "appId": "com.simplidots.sfa.prototype",
+  "appName": "Falcon SFA Prototype",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

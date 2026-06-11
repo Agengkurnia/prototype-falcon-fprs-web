@@ -1,0 +1,101 @@
+﻿.btn {
+    padding: 0.575rem 0.75rem !important;
+}
+
+    .btn.btn-add {
+        padding: 0.125rem 0.7rem !important;
+    }
+
+.showfilebox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+    padding: 10px 10px;
+    box-shadow: #0000000d 0px 0px 0px 1px, #d1d5db3d 0px 0px 0px 1px inset;
+}
+
+    .showfilebox .left {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+.filetype {
+    background: #005d41;
+    color: #fff;
+    padding: 5px 15px;
+    font-size: 20px;
+    text-transform: capitalize;
+    font-weight: 700;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+}
+
+.left h3 {
+    font-weight: 500;
+    font-size: 13px;
+    color: green;
+    margin: 0;
+    cursor: pointer;
+}
+
+.right span {
+    background: #005d41;
+    color: #fff;
+    width: 25px;
+    height: 25px;
+    font-size: 25px;
+    line-height: 25px;
+    display: inline-block;
+    text-align: center;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
+}
+
+label.berkas {
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-family: 'Helvetica', sans-serif;
+    transition: .5s;
+}
+
+    label.berkas:hover {
+        background-color: #005d41;
+    }
+
+    label.berkas.isdisabled {
+        background-color: #7B6F72;
+        border-color: #7B6F72;
+    }
+
+        label.berkas.isdisabled:hover {
+            background-color: #7B6F72;
+            border-color: #7B6F72;
+        }
+
+.imgtype {
+    width: auto;
+    height: 60px;
+}
+
+.icon-trash {
+    color: red;
+    font-size: 16px;
+}
+
+    .icon-trash.isdisabled {
+        color: grey;
+        font-size: 16px;
+        pointer-events: none;
+    }

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Beranda - Falcon SFA Mobile</title>
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        /* Specific Styles for SFA Home Screen */
+        .home-bg {
+            background-color: #f7f9fa;
+        }
+
+        /* Top Profile Banner */
+        .profile-banner {
+            background-color: var(--color-primary);
+            color: #fff;
+            padding: 24px 20px 60px 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            position: relative;
+        }
+
+        .profile-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--color-accent);
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 2px;
+        }
+
+        .btn-notification {
+            background: none;
+            border: none;
+            color: #fff;
+            position: relative;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 20px;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 4px; right: 4px;
+            width: 8px; height: 8px;
+            background-color: #dc3545;
+            border-radius: 50%;
+            border: 1px solid var(--color-primary);
+        }
+
+        /* Float Dashboard Card */
+        .float-dashboard-card {
+            margin: -40px 16px 16px 16px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 93, 65, 0.08);
+            border: 1px solid var(--color-border);
+            z-index: 10;
+            position: relative;
+        }
+
+        .dashboard-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-title-row h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dashboard-date {
+            font-size: 12px;
+            color: var(--color-gray);
+        }
+
+        .dashboard-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 16px;
+            margin-bottom: 14px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            color: var(--color-gray);
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        .invoice-sum-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .invoice-sum-lbl {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-black);
+        }
+
+        .invoice-sum-val {
+            font-size: 16px;
+            font-weight: 700;
+            color: #DC3545; /* Crimson red for money values */
+        }
+
+        /* Menu Grid (3 Columns) */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 0 16px;
+            margin-bottom: 24px;
+        }
+
+        .menu-grid-card {
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 16px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-grid-card:active {
+            transform: scale(0.96);
+            background-color: var(--color-bg-light);
+            border-color: var(--color-primary);
+        }
+
+        .menu-card-icon {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 10px;
+        }
+
+        .menu-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-black);
+            line-height: 1.3;
+        }
+
+        /* Section Title */
+        .section-header {
+            padding: 0 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-black);
+            margin: 0;
+        }
+
+        .section-header a {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        /* List of Visits Today */
+        .visit-list {
+            padding: 0 16px;
+            margin-bottom: 24px;
+        }
+
+        .visit-item-card {
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+        }
+
+        .visit-outlet-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .visit-outlet-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .visit-outlet-code {
+            font-size: 11px;
+            color: var(--color-gray);
+        }
+
+        .visit-outlet-address {
+            font-size: 12px;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 240px;
+        }
+
+        .visit-status-badge {
+            flex-shrink: 0;
+        }
+
+        /* Synchronization Status Banner */
+        .sync-banner {
+            background-color: #FFF2CC;
+            border: 1px solid #FFE599;
+            border-radius: 8px;
+            margin: 0 16px 20px 16px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #7F6000;
+        }
+
+        .sync-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sync-banner-btn {
+            background-color: #78B500;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="home-bg">
+
+    <div class="mobile-wrapper">
+        <div class="mobile-content">
+            
+            <!-- Profile Banner -->
+            <div class="profile-banner">
+                <div class="profile-header-row">
+                    <!-- User Meta info -->
+                    <div class="user-info">
+                        <div class="user-avatar-circle" id="userInitial">BS</div>
+                        <div class="user-meta">
+                            <span class="user-name" id="userName">Budi Santoso</span>
+                            <span class="user-role" id="userRoleBranch">Sales Rep | Jakarta Pusat</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Bell Notification -->
+                    <button class="btn-notification" aria-label="Notifikasi">
+                        <i class="far fa-bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Floating Dashboard Summary Card -->
+            <div class="float-dashboard-card">
+                <div class="dashboard-title-row">
+                    <h4>Pencapaian Hari Ini</h4>
+                    <span class="dashboard-date" id="todayDate">11 Juni 2026</span>
+                </div>
+
+                <div class="dashboard-stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val" id="statRencana">15</span>
+                        <span class="stat-lbl">Rencana Kunjungan</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="statRealisasi" style="color: #78B500;">9</span>
+                        <span class="stat-lbl">Realisasi (60%)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="statEffective">6</span>
+                        <span class="stat-lbl">Effective Call</span>
+                    </div>
+                </div>
+
+                <div class="invoice-sum-row">
+                    <span class="invoice-sum-lbl">Total Faktur Hari Ini</span>
+                    <span class="invoice-sum-val" id="totalFaktur">Rp 12.450.000</span>
+                </div>
+            </div>
+
+            <!-- Sync Banner Notification -->
+            <div class="sync-banner">
+                <div class="sync-banner-left">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Terdapat 3 data offline belum dikirim.</span>
+                </div>
+                <button class="sync-banner-btn" onclick="syncData()">Sync</button>
+            </div>
+
+            <!-- Quick Action Grid (3 columns) -->
+            <div class="section-header">
+                <h3>Menu Transaksi SFA</h3>
+            </div>
+
+            <div class="menu-grid">
+                <!-- Rute / Kunjungan -->
+                <a href="visit_list.html" class="menu-grid-card">
+                    <img src="../../wwwroot/assets/images/icons/ic_location.svg" class="menu-card-icon" alt="Visit"/>
+                    <span class="menu-card-title">Rute Kunjungan</span>
+                </a>
+
+                <!-- Input Order -->
+                <a href="javascript:void(0)" class="menu-grid-card">
+                    <img src="../../wwwroot/assets/images/icons/ic_clipboard_list.svg" class="menu-card-icon" alt="Order"/>
+                    <span class="menu-card-title">Sales Order</span>
+                </a>
+
+                <!-- Penagihan / Collection -->
+                <a href="javascript:void(0)" class="menu-grid-card">
+                    <img src="../../wwwroot/assets/images/icons/ic_payment.svg" class="menu-card-icon" alt="Payment"/>
+                    <span class="menu-card-title">Penagihan</span>
+                </a>
+
+                <!-- Promo -->
+                <a href="javascript:void(0)" class="menu-grid-card">
+                    <img src="../../wwwroot/assets/images/icons/ic_faq.svg" class="menu-card-icon" alt="Promo"/>
+                    <span class="menu-card-title">Promo Aktif</span>
+                </a>
+
+                <!-- Outlet -->
+                <a href="javascript:void(0)" class="menu-grid-card">
+                    <img src="../../wwwroot/assets/images/icons/ic_outlet.svg" class="menu-card-icon" alt="Outlet"/>
+                    <span class="menu-card-title">Data Outlet</span>
+                </a>
+
+                <!-- Sync -->
+                <a href="javascript:void(0)" class="menu-grid-card" onclick="syncData()">
+                    <img src="../../wwwroot/assets/images/icons/ic_sync.svg" class="menu-card-icon" alt="Sync"/>
+                    <span class="menu-card-title">Sinkronisasi</span>
+                </a>
+            </div>
+
+            <!-- Active Visit List Section -->
+            <div class="section-header">
+                <h3>Rute Kunjungan Aktif</h3>
+                <a href="visit_list.html">Lihat Semua</a>
+            </div>
+
+            <div class="visit-list">
+                <!-- Outlet 1 -->
+                <div class="visit-item-card">
+                    <div class="visit-outlet-info">
+                        <span class="visit-outlet-name">Apotek Senen Medika</span>
+                        <span class="visit-outlet-code">OL-10492 • Outlet Star</span>
+                        <span class="visit-outlet-address">Jl. Kramat Raya No.42, Senen, Jakarta Pusat</span>
+                    </div>
+                    <span class="badge-mobile badge-mobile-success visit-status-badge">Selesai</span>
+                </div>
+
+                <!-- Outlet 2 -->
+                <div class="visit-item-card">
+                    <div class="visit-outlet-info">
+                        <span class="visit-outlet-name">Kimia Farma Cikini</span>
+                        <span class="visit-outlet-code">OL-10511 • Outlet Prime</span>
+                        <span class="visit-outlet-address">Jl. Cikini Raya No.78, Menteng, Jakarta Pusat</span>
+                    </div>
+                    <span class="badge-mobile badge-mobile-success visit-status-badge">Selesai</span>
+                </div>
+
+                <!-- Outlet 3 -->
+                <div class="visit-item-card">
+                    <div class="visit-outlet-info">
+                        <span class="visit-outlet-name">Apotek Roxy Salemba</span>
+                        <span class="visit-outlet-code">OL-10283 • Outlet Regular</span>
+                        <span class="visit-outlet-address">Jl. Salemba Raya No.15, Jakarta Pusat</span>
+                    </div>
+                    <span class="badge-mobile badge-mobile-warning visit-status-badge">Kunjungan</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div class="mobile-nav">
+            <a href="home.html" class="mobile-nav-item active">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Beranda</span>
+            </a>
+            <a href="visit_list.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <span>Rute</span>
+            </a>
+            <a href="javascript:void(0)" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.55 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                <span>Riwayat</span>
+            </a>
+            <a href="javascript:void(0)" class="mobile-nav-item" onclick="logout()">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Profil</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- JS Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Load User Session from localStorage
+        $(document).ready(function() {
+            const userSession = localStorage.getItem('sfa_user');
+            if (userSession) {
+                const user = JSON.parse(userSession);
+                $('#userName').text(user.name);
+                $('#userRoleBranch').text(`${user.role} | ${user.branch}`);
+                
+                // Get initials
+                const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                $('#userInitial').text(initials);
+            }
+
+            // Set dynamic date formatting
+            const dateOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+            const todayStr = new Date().toLocaleDateString('id-ID', dateOptions);
+            $('#todayDate').text(todayStr);
+        });
+
+        function syncData() {
+            Swal.fire({
+                title: 'Sinkronisasi...',
+                text: 'Mengirimkan data penjualan offline ke server',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            setTimeout(() => {
+                $('.sync-banner').fadeOut(300);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sinkronisasi Selesai',
+                    text: 'Seluruh data transaksi dan rute berhasil disinkronkan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }, 2000);
+        }
+
+        function logout() {
+            Swal.fire({
+                title: 'Keluar Aplikasi?',
+                text: 'Anda harus login kembali untuk mengakses data SFA.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#005D41',
+                cancelButtonColor: '#ADA4A5',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.removeItem('sfa_user');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

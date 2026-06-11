@@ -1,0 +1,10 @@
+[
+  { "id": 1, "nama": "Salah Pengiriman", "deskripsi": "Produk yang dikirim salah, baik dari sisi item atau alamat pengiriman.", "tipe": "Return" },
+  { "id": 2, "nama": "Promosi atau Diskon yang Salah", "deskripsi": "Produk dikirim dengan harga atau promosi yang salah, yang memicu retur untuk penyesuaian.", "tipe": "Return" },
+  { "id": 3, "nama": "Produk Tidak Diperlukan Lagi", "deskripsi": "Kebutuhan pelanggan berubah atau produk sudah tidak relevan.", "tipe": "Return" },
+  { "id": 4, "nama": "Produk Rusak", "deskripsi": "Produk mengalami kerusakan saat pengiriman atau saat di toko.", "tipe": "Return" },
+  { "id": 5, "nama": "Produk Kadaluarsa", "deskripsi": "Produk mendekati atau sudah melewati tanggal kadaluarsa.", "tipe": "Return" },
+  { "id": 6, "nama": "Pelanggan Tidak Hadir", "deskripsi": "Toko tutup atau pelanggan tidak berada di tempat saat kunjungan.", "tipe": "Kunjungan" },
+  { "id": 7, "nama": "Akses Ditolak", "deskripsi": "Pelanggan tidak mengizinkan salesman masuk.", "tipe": "Kunjungan" },
+  { "id": 8, "nama": "Stok Penuh", "deskripsi": "Pelanggan menolak order karena stok masih banyak.", "tipe": "Order" }
+]

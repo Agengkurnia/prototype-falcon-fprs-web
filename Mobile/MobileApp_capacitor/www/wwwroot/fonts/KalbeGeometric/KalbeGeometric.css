@@ -1,0 +1,49 @@
+@charset 'UTF-8';
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('KalbeGeometric-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('KalbeGeometric-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('KalbeGeometric-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('KalbeGeometric-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('KalbeGeometric-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Kalbe Geometric';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('KalbeGeometric-Black.woff2') format('woff2');
+}

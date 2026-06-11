@@ -1,0 +1,6 @@
+[
+  { "id": 1, "nama": "Inc Pajak", "isDefault": true, "isInclusiveTax": true },
+  { "id": 2, "nama": "Harga Normal", "isDefault": false, "isInclusiveTax": false },
+  { "id": 3, "nama": "Harga Distributor", "isDefault": false, "isInclusiveTax": false },
+  { "id": 4, "nama": "Harga Modern Trade", "isDefault": false, "isInclusiveTax": true }
+]

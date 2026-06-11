@@ -1,0 +1,10 @@
+[
+  { "id": 1, "nama": "Susu Formula", "parentKategori": "" },
+  { "id": 2, "nama": "Minuman Kesehatan", "parentKategori": "" },
+  { "id": 3, "nama": "Suplemen", "parentKategori": "" },
+  { "id": 4, "nama": "Makanan Bayi", "parentKategori": "" },
+  { "id": 5, "nama": "Susu Anak", "parentKategori": "Susu Formula" },
+  { "id": 6, "nama": "Susu Ibu Hamil", "parentKategori": "Susu Formula" },
+  { "id": 7, "nama": "Minuman Isotonik", "parentKategori": "Minuman Kesehatan" },
+  { "id": 8, "nama": "Jus Kelapa", "parentKategori": "Minuman Kesehatan" }
+]

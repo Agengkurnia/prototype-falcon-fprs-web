@@ -1,0 +1,139 @@
+﻿table.dataTable {
+    width: 100% !important;
+}
+
+.container-title {
+    display: flex;
+}
+
+@media only screen and (max-width : 480px) {
+    .container-title {
+        width: 100%;
+    }
+}
+
+@media only screen and (min-width: 480px) and (max-width : 780px) {
+    .container-title {
+        width: 75%;
+    }
+}
+
+@media only screen and (min-width : 780px) {
+    .container-title {
+        width: 43%;
+    }
+}
+
+.card {
+    margin-top: 15px;
+}
+
+    .card .card-body {
+        padding: 0;
+    }
+
+
+.form-search {
+    flex: 4;
+    height: calc(1.5em + .5rem + 2px) !important;
+}
+
+.table th {
+    padding: 0.6rem 1rem;
+}
+
+.table thead th {
+    font-size: 0.87rem;
+    vertical-align: middle;
+    text-align: left;
+    line-height: 1.2;
+}
+
+.btn {
+    padding: 0.125rem 0.7rem !important;
+}
+
+    .btn.btn-mdl {
+        padding: 0.875rem 1.5rem !important;
+    }
+
+.btn-light {
+    background-color: whitesmoke;
+    width: 90px;
+    margin-left: 20px;
+}
+
+.form-control-sm {
+    height: calc(1.5em + .5rem + 2px) !important;
+}
+
+.input-group-text {
+    height: calc(1.5em + .5rem + 2px) !important;
+}
+
+.card-title-list {
+    display: flex;
+    margin-bottom: 10px;
+    margin: 1.1rem 1.1rem;
+}
+
+    .card-title-list div.title-box {
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+.slideon input:checked ~ .slideon-slider {
+    background-color: #005d41;
+}
+
+div.dataTables_wrapper div.dataTables_filter label {
+    display: none;
+}
+
+.pagination .page-item.active .page-link {
+    background: #005d41;
+    border-color: #005d41
+}
+
+.input-group-text {
+    height: calc(1.5em + .5rem + 2px) !important;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    font-size: 0.8rem !important;
+}
+
+ul li.select2-selection__choice {
+    line-height: 2 !important;
+}
+
+div.dataTables_wrapper div.dataTables_processing {
+    top: 70% !important;
+    padding-top: 10px;
+}
+
+.table-responsive {
+    min-height: 90px;
+}
+
+.badge {
+    font-weight: bold !important;
+}
+
+.ic-info {
+    margin-left: 5px;
+    margin-right: 12px !important;
+}
+
+
+.divhistoryskp {
+    text-align: center;
+    border-bottom: 1px solid grey;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}

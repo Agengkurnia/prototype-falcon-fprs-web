@@ -1,0 +1,19 @@
+﻿.boxhead {
+    display: flex;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.titlebox {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.btn-save {
+    height: 35px;
+    padding: 0.375rem 0.8rem !important;
+}
+
+.swal2-modal {
+    min-height: 200px;
+}

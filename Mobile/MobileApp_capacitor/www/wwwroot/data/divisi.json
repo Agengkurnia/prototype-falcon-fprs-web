@@ -1,0 +1,7 @@
+[
+  { "id": 1, "nama": "Sales", "deskripsi": "" },
+  { "id": 2, "nama": "Ethical", "deskripsi": "Divisi produk ethical / resep dokter" },
+  { "id": 3, "nama": "OTC", "deskripsi": "Divisi produk over the counter" },
+  { "id": 4, "nama": "Consumer Health", "deskripsi": "Produk kesehatan konsumen" },
+  { "id": 5, "nama": "Nutritionals", "deskripsi": "Produk nutrisi Kalbe" }
+]

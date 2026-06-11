@@ -1,0 +1,358 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+:root {
+    --primary-color: #1b6ec2;
+    /* IDC Blue */
+    --primary-dark: #1861ac;
+    --primary-light: #e7f1ff;
+    --text-color: #566a7f;
+    /* Vuexy Text Color */
+    --heading-color: #3b4b5f;
+    --bg-color: #f5f5f9;
+    /* Vuexy Gray BG */
+    --card-bg: #ffffff;
+    --border-color: #d9dee3;
+    --sidebar-width: 260px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.53;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--heading-color);
+    font-weight: 600;
+    margin-top: 0;
+}
+
+a {
+    color: #0077cc;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #005a9c;
+}
+
+/* Layout handled by Vuexy core.css */
+
+/* Form Wizard Container */
+.card-wizard {
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 0.25rem 1.125rem rgba(75, 70, 92, 0.1);
+    border: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Header within Form */
+.wizard-header {
+    background: #fff;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.wizard-header h3 {
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.wizard-header p {
+    color: #a1acb8;
+    margin: 0;
+}
+
+/* Steps */
+.bs-stepper-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    /* Reduced from 24px */
+    border-bottom: 1px solid var(--border-color);
+}
+
+.line {
+    flex: 1;
+    min-width: 0;
+    height: 1px;
+    margin: auto 1rem;
+    background-color: #d9dee3;
+}
+
+.form-section {
+    display: none;
+    animation: fadeIn 0.3s;
+}
+
+.form-section.active {
+    display: block;
+}
+
+.step-trigger {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.bs-stepper-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #f2f2f3;
+    color: #a1acb8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-right: 12px;
+    transition: all 0.3s;
+}
+
+.step.active .bs-stepper-circle {
+    background: #28c76f;
+    /* Emerald Green */
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(40, 199, 111, 0.4);
+    /* Soft shadow using RGB */
+}
+
+.step.completed .bs-stepper-circle {
+    background: #28c76f;
+    color: #fff;
+    opacity: 1;
+}
+
+.bs-stepper-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.bs-stepper-title {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.bs-stepper-subtitle {
+    font-size: 0.75rem;
+    color: #a1acb8;
+}
+
+.step.active .bs-stepper-title {
+    color: var(--primary-color);
+}
+
+/* Form Content */
+.card-body {
+    padding: 1.5rem;
+    /* Reduced from 24px */
+    min-height: auto;
+    /* Remove fixed height */
+}
+
+/* Expandable / Accordion - Handled by Bootstrap */
+
+/* Form elements handled by Bootstrap */
+
+/* Buttons */
+.btn-primary {
+    background-color: #1b6ec2 !important;
+    border-color: #1b6ec2 !important;
+    color: #fff !important;
+}
+
+.btn-primary:hover {
+    background-color: #1861ac !important;
+    border-color: #1861ac !important;
+}
+
+.btn-success {
+    background-color: #28c76f !important;
+    border-color: #28c76f !important;
+    color: #fff !important;
+    box-shadow: 0 0.125rem 0.25rem 0 rgba(40, 199, 111, 0.4);
+}
+
+.btn-success:hover {
+    background-color: #23b363 !important;
+    border-color: #23b363 !important;
+}
+
+/* Ensure Bootstrap defaults apply for others (Warning, Danger, Info, Secondary) */
+
+
+/* Tables handled by Bootstrap */
+
+.form-actions {
+    padding: 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* Utils */
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1rem;
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1199.98px) {
+    /* NOTE: .layout-menu visibility on mobile is handled via transform in layout.js
+       DO NOT set display:none here — it breaks the hamburger toggle system */
+    .layout-page {
+        padding-left: 0 !important;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Ensure overlay shows when menu is expanded */
+    .layout-wrapper.layout-menu-expanded .layout-overlay {
+        display: block !important;
+    }
+}
+
+/* Info Alert */
+.alert-info {
+    color: #0077cc;
+    background-color: #e7f1ff;
+    border-color: #dbe9fe;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+}
+
+/* Custom Overrides from User Request */
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+a {
+    color: #0077cc;
+}
+
+/* Checkbox grid handled by Bootstrap */
+
+/* Custom Accordion Styles (User Request - Green Theme) */
+.accordion-item {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem !important;
+    margin-bottom: 1rem !important;
+    /* Spacing between items */
+    overflow: hidden;
+}
+
+.accordion-button {
+    background-color: #28c76f !important;
+    /* Vuexy Emerald */
+    color: #fff !important;
+    box-shadow: none !important;
+    font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #23b363 !important;
+    /* Darker Emerald */
+    color: #fff !important;
+    box-shadow: none !important;
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(1) !important;
+    /* White icon */
+    background-size: 1.25rem;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+    /* Increased padding */
+    background-color: #fff;
+}
+
+/* Fix for Grey/Invisible Buttons */
+.btn-label-secondary {
+    background-color: #fff;
+    color: #8592a3;
+    border-color: #8592a3;
+}
+
+.btn-label-secondary:hover {
+    background-color: #eaeef3;
+    color: #5d6878;
+}
+
+/* Footer Spacing */
+.card-footer {
+    padding: 1.5rem !important;
+    gap: 1rem;
+}
+
+
+/* ===== Sidebar Scrollable Fix ===== */
+.layout-menu {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+.layout-menu .menu-inner {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: calc(100vh - 100px) !important;
+}
+.layout-menu::-webkit-scrollbar,
+.layout-menu .menu-inner::-webkit-scrollbar {
+    width: 4px;
+}
+.layout-menu::-webkit-scrollbar-track,
+.layout-menu .menu-inner::-webkit-scrollbar-track {
+    background: transparent;
+}
+.layout-menu::-webkit-scrollbar-thumb,
+.layout-menu .menu-inner::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 4px;
+}

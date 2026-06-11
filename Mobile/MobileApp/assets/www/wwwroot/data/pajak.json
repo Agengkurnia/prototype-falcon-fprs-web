@@ -1,0 +1,4 @@
+[
+  { "id": 1, "kodePajak": "PPN", "partnerId": "", "namaPajak": "PPN", "persentase": 12, "nilaiDpp": "" },
+  { "id": 2, "kodePajak": "NoPPN", "partnerId": "", "namaPajak": "NoPPN", "persentase": 0, "nilaiDpp": "" }
+]

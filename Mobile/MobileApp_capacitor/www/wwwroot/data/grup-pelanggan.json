@@ -1,0 +1,8 @@
+[
+  { "id": 1, "nama": "BANDUNG", "totalPelanggan": 12, "tipeGrup": "Channel", "estimasiWaktu": "" },
+  { "id": 2, "nama": "Modern Trade", "totalPelanggan": 45, "tipeGrup": "Channel", "estimasiWaktu": "15 menit" },
+  { "id": 3, "nama": "General Trade", "totalPelanggan": 320, "tipeGrup": "Channel", "estimasiWaktu": "10 menit" },
+  { "id": 4, "nama": "Apotek", "totalPelanggan": 88, "tipeGrup": "Channel", "estimasiWaktu": "20 menit" },
+  { "id": 5, "nama": "Klinik & RS", "totalPelanggan": 34, "tipeGrup": "Channel", "estimasiWaktu": "30 menit" },
+  { "id": 6, "nama": "Online", "totalPelanggan": 15, "tipeGrup": "Channel", "estimasiWaktu": "" }
+]

@@ -1,0 +1,6 @@
+[
+  { "id": 1, "nama": "Cash", "otomatisDikonfirmasi": true, "isDefault": true },
+  { "id": 2, "nama": "Transfer Bank", "otomatisDikonfirmasi": false, "isDefault": false },
+  { "id": 3, "nama": "Giro", "otomatisDikonfirmasi": false, "isDefault": false },
+  { "id": 4, "nama": "Cek", "otomatisDikonfirmasi": false, "isDefault": false }
+]

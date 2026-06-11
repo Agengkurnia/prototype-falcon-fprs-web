@@ -1,0 +1,470 @@
+name: mobileapp
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+  webview_flutter: ^4.13.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+  assets:
+    - assets/www/Views/Mobile/
+    - assets/www/wwwroot/areas/Account/css/
+    - assets/www/wwwroot/areas/Account/js/
+    - assets/www/wwwroot/areas/FAQ/css/
+    - assets/www/wwwroot/areas/FAQ/js/
+    - assets/www/wwwroot/areas/Kwitansi/css/
+    - assets/www/wwwroot/areas/Kwitansi/js/
+    - assets/www/wwwroot/areas/LandingPage/css/
+    - assets/www/wwwroot/areas/LandingPage/js/
+    - assets/www/wwwroot/areas/Master/css/
+    - assets/www/wwwroot/areas/Master/js/
+    - assets/www/wwwroot/areas/Notification/css/
+    - assets/www/wwwroot/areas/Notification/js/
+    - assets/www/wwwroot/areas/OCRKwitansi/css/
+    - assets/www/wwwroot/areas/OCRKwitansi/js/
+    - assets/www/wwwroot/areas/PoA/css/
+    - assets/www/wwwroot/areas/PoA/js/
+    - assets/www/wwwroot/areas/ReleaseLogin/js/
+    - assets/www/wwwroot/areas/SKP/css/
+    - assets/www/wwwroot/areas/SKP/js/
+    - assets/www/wwwroot/assets/css/
+    - assets/www/wwwroot/assets/images/icons/
+    - assets/www/wwwroot/assets/images/
+    - assets/www/wwwroot/assets/js/
+    - assets/www/wwwroot/css/maps/vertical-layout-light/
+    - assets/www/wwwroot/css/vertical-layout-light/
+    - assets/www/wwwroot/css/
+    - assets/www/wwwroot/data/
+    - assets/www/wwwroot/fonts/KalbeGeometric/
+    - assets/www/wwwroot/fonts/Karla/
+    - assets/www/wwwroot/fonts/Roboto/
+    - assets/www/wwwroot/fonts/_KalbeHelix/
+    - assets/www/wwwroot/fonts/
+    - assets/www/wwwroot/img/
+    - assets/www/wwwroot/js/
+    - assets/www/wwwroot/lib/bootstrap/dist/css/
+    - assets/www/wwwroot/lib/bootstrap/dist/js/
+    - assets/www/wwwroot/lib/bootstrap/
+    - assets/www/wwwroot/lib/fonts/kalbefonts/
+    - assets/www/wwwroot/lib/fonts/
+    - assets/www/wwwroot/lib/jquery/dist/
+    - assets/www/wwwroot/lib/jquery/
+    - assets/www/wwwroot/lib/jquery-validation/dist/
+    - assets/www/wwwroot/lib/jquery-validation/
+    - assets/www/wwwroot/lib/jquery-validation-unobtrusive/
+    - assets/www/wwwroot/lib/microsoft/signalr/dist/browser/
+    - assets/www/wwwroot/lib/vuexy/css/core/colors/
+    - assets/www/wwwroot/lib/vuexy/css/core/menu/menu-types/
+    - assets/www/wwwroot/lib/vuexy/css/core/mixins/
+    - assets/www/wwwroot/lib/vuexy/css/pages/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/charts/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/extensions/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/forms/pickers/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/forms/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/maps/
+    - assets/www/wwwroot/lib/vuexy/css/plugins/ui/
+    - assets/www/wwwroot/lib/vuexy/css/themes/
+    - assets/www/wwwroot/lib/vuexy/css/
+    - assets/www/wwwroot/lib/vuexy/img/avatars/
+    - assets/www/wwwroot/lib/vuexy/img/backgrounds/
+    - assets/www/wwwroot/lib/vuexy/img/elements/
+    - assets/www/wwwroot/lib/vuexy/img/icons/brands/
+    - assets/www/wwwroot/lib/vuexy/img/icons/misc/
+    - assets/www/wwwroot/lib/vuexy/img/icons/payments/
+    - assets/www/wwwroot/lib/vuexy/img/illustrations/
+    - assets/www/wwwroot/lib/vuexy/img/layouts/
+    - assets/www/wwwroot/lib/vuexy/img/pages/eCommerce/
+    - assets/www/wwwroot/lib/vuexy/img/pages/login/
+    - assets/www/wwwroot/lib/vuexy/img/pages/
+    - assets/www/wwwroot/lib/vuexy/img/products/
+    - assets/www/wwwroot/lib/vuexy/js/core/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/cards/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/charts/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/components/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/extensions/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/forms/pickers/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/forms/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/maps/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/pages/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/pagination/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/tables/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/ui/
+    - assets/www/wwwroot/lib/vuexy/js/scripts/
+    - assets/www/wwwroot/lib/vuexy/js/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/animate/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/calendars/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/charts/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/editors/quill/fonts/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/editors/quill/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/extensions/dd-icon/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/extensions/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/feather-icons/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/file-uploaders/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/flag-icons/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/forms/select/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/forms/spinner/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/forms/toggle/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/forms/wizard/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/jkanban/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/maps/images/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/maps/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/modal/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/pace/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/pages/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/perfect-scrollbar/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/pickers/flatpickr/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/pickers/pickadate/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/rtl/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/tables/datatable/extensions/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/tables/datatable/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/ui/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/waves/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/weather-icons/
+    - assets/www/wwwroot/lib/vuexy/vendor/css/
+    - assets/www/wwwroot/lib/vuexy/vendor/fonts/flags/1x1/
+    - assets/www/wwwroot/lib/vuexy/vendor/fonts/flags/4x3/
+    - assets/www/wwwroot/lib/vuexy/vendor/fonts/fontawesome/
+    - assets/www/wwwroot/lib/vuexy/vendor/fonts/tabler/
+    - assets/www/wwwroot/lib/vuexy/vendor/fonts/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/blockui/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/bootstrap/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/calendar/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/charts/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/assets/bubble/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/assets/icons/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/assets/snow/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/assets/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/themes/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/ui/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/editors/quill/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/extensions/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/feather-icons/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/file-uploaders/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/cleave/addons/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/cleave/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/extended/typeahead/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/repeater/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/select/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/spinner/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/toggle/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/validation/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/forms/wizard/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/hammer/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/internationalization/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/jkanban/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/jquery/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/maps/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/pace/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/pagination/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/perfectscrollbar/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/pickers/flatpickr/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/pickers/pickadate/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/popper/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/promises/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/tables/datatable/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/ui/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/unison-js/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/waves/
+    - assets/www/wwwroot/lib/vuexy/vendor/js/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/animate-css/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/animate-on-scroll/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/apex-charts/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/autosize/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/block-ui/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bloodhound/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bootstrap-datepicker/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bootstrap-daterangepicker/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bootstrap-maxlength/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bootstrap-select/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/bs-stepper/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/chartjs/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/cleavejs/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/clipboard/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-buttons-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-checkboxes-jquery/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-fixedcolumns-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-fixedheader-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-responsive-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-rowgroup-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-scroller-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/datatables-select-bs5/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/dropzone/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/flatpickr/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/formvalidation/dist/css/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/formvalidation/dist/js/plugins/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/formvalidation/dist/js/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/fullcalendar/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/hammer/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/i18n/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/idletimer/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jkanban/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jquery/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jquery-repeater/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jquery-sticky/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jquery-timepicker/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jstree/themes/default/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jstree/themes/default-dark/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/jstree/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/leaflet/images/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/leaflet/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/masonry/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/moment/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/node-waves/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/nouislider/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/numeral/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/perfect-scrollbar/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/pickr/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/plyr/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/popper/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/quill/fonts/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/quill/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/rateyo/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/select2/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/shepherd/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/sortablejs/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/spinkit/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/sweetalert2/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/swiper/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/tagify/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/toastr/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/typeahead-js/
+    - assets/www/wwwroot/lib/vuexy/vendor/libs/
+    - assets/www/wwwroot/lib/vuexy/
+    - assets/www/wwwroot/vendors/ace-builds/src-min/snippets/
+    - assets/www/wwwroot/vendors/ace-builds/src-min/
+    - assets/www/wwwroot/vendors/bootstrap-datepicker/
+    - assets/www/wwwroot/vendors/bootstrap-maxlength/
+    - assets/www/wwwroot/vendors/c3/
+    - assets/www/wwwroot/vendors/chart.js/
+    - assets/www/wwwroot/vendors/chartist/
+    - assets/www/wwwroot/vendors/clipboard/
+    - assets/www/wwwroot/vendors/codemirror/
+    - assets/www/wwwroot/vendors/colcade/
+    - assets/www/wwwroot/vendors/css/
+    - assets/www/wwwroot/vendors/d3/
+    - assets/www/wwwroot/vendors/datatables/css/
+    - assets/www/wwwroot/vendors/datatables/images/
+    - assets/www/wwwroot/vendors/datatables/js/
+    - assets/www/wwwroot/vendors/dragula/
+    - assets/www/wwwroot/vendors/dropify/
+    - assets/www/wwwroot/vendors/dropzone/
+    - assets/www/wwwroot/vendors/flag-icon-css/css/
+    - assets/www/wwwroot/vendors/flag-icon-css/flags/1x1/
+    - assets/www/wwwroot/vendors/flag-icon-css/flags/4x3/
+    - assets/www/wwwroot/vendors/flot/
+    - assets/www/wwwroot/vendors/font-awesome/css/
+    - assets/www/wwwroot/vendors/font-awesome/fonts/
+    - assets/www/wwwroot/vendors/fullcalendar/
+    - assets/www/wwwroot/vendors/inputmask/
+    - assets/www/wwwroot/vendors/ion-rangeslider/css/
+    - assets/www/wwwroot/vendors/ion-rangeslider/img/
+    - assets/www/wwwroot/vendors/ion-rangeslider/js/
+    - assets/www/wwwroot/vendors/jquery-asColor/
+    - assets/www/wwwroot/vendors/jquery-asColorPicker/css/
+    - assets/www/wwwroot/vendors/jquery-asColorPicker/images/
+    - assets/www/wwwroot/vendors/jquery-asColorPicker/
+    - assets/www/wwwroot/vendors/jquery-asGradient/
+    - assets/www/wwwroot/vendors/jquery-bar-rating/
+    - assets/www/wwwroot/vendors/jquery-contextmenu/
+    - assets/www/wwwroot/vendors/jquery-file-upload/
+    - assets/www/wwwroot/vendors/jquery-mapael/
+    - assets/www/wwwroot/vendors/jquery-sparkline/
+    - assets/www/wwwroot/vendors/jquery-steps/
+    - assets/www/wwwroot/vendors/jquery-tags-input/
+    - assets/www/wwwroot/vendors/jquery-toast-plugin/
+    - assets/www/wwwroot/vendors/jquery-validation/
+    - assets/www/wwwroot/vendors/jquery.avgrund/
+    - assets/www/wwwroot/vendors/jquery.repeater/
+    - assets/www/wwwroot/vendors/js/
+    - assets/www/wwwroot/vendors/jsgrid/
+    - assets/www/wwwroot/vendors/justgage/
+    - assets/www/wwwroot/vendors/jvectormap/
+    - assets/www/wwwroot/vendors/lightgallery/css/
+    - assets/www/wwwroot/vendors/lightgallery/fonts/
+    - assets/www/wwwroot/vendors/lightgallery/img/
+    - assets/www/wwwroot/vendors/lightgallery/js/
+    - assets/www/wwwroot/vendors/mdi/css/
+    - assets/www/wwwroot/vendors/mdi/fonts/
+    - assets/www/wwwroot/vendors/moment/
+    - assets/www/wwwroot/vendors/morris.js/
+    - assets/www/wwwroot/vendors/nouislider/
+    - assets/www/wwwroot/vendors/owl-carousel-2/
+    - assets/www/wwwroot/vendors/progressbar.js/
+    - assets/www/wwwroot/vendors/pwstabs/
+    - assets/www/wwwroot/vendors/quill/
+    - assets/www/wwwroot/vendors/raphael/
+    - assets/www/wwwroot/vendors/select2/
+    - assets/www/wwwroot/vendors/select2-bootstrap-theme/
+    - assets/www/wwwroot/vendors/simple-line-icons/css/
+    - assets/www/wwwroot/vendors/simple-line-icons/fonts/
+    - assets/www/wwwroot/vendors/simplemde/
+    - assets/www/wwwroot/vendors/slideon-main/docs/
+    - assets/www/wwwroot/vendors/slideon-main/
+    - assets/www/wwwroot/vendors/summernote/dist/font/
+    - assets/www/wwwroot/vendors/summernote/dist/lang/
+    - assets/www/wwwroot/vendors/summernote/dist/
+    - assets/www/wwwroot/vendors/sweetalert/
+    - assets/www/wwwroot/vendors/sweetalert2/dist/
+    - assets/www/wwwroot/vendors/sweetalert2/src/enhancers/
+    - assets/www/wwwroot/vendors/sweetalert2/src/instanceMethods/
+    - assets/www/wwwroot/vendors/sweetalert2/src/staticMethods/
+    - assets/www/wwwroot/vendors/sweetalert2/src/utils/dom/renderers/
+    - assets/www/wwwroot/vendors/sweetalert2/src/utils/dom/
+    - assets/www/wwwroot/vendors/sweetalert2/src/utils/
+    - assets/www/wwwroot/vendors/sweetalert2/src/
+    - assets/www/wwwroot/vendors/sweetalert2/
+    - assets/www/wwwroot/vendors/tempusdominus-bootstrap-4/
+    - assets/www/wwwroot/vendors/ti-icons/css/
+    - assets/www/wwwroot/vendors/ti-icons/fonts/
+    - assets/www/wwwroot/vendors/tinymce/plugins/advlist/
+    - assets/www/wwwroot/vendors/tinymce/plugins/anchor/
+    - assets/www/wwwroot/vendors/tinymce/plugins/autolink/
+    - assets/www/wwwroot/vendors/tinymce/plugins/autoresize/
+    - assets/www/wwwroot/vendors/tinymce/plugins/autosave/
+    - assets/www/wwwroot/vendors/tinymce/plugins/bbcode/
+    - assets/www/wwwroot/vendors/tinymce/plugins/charmap/
+    - assets/www/wwwroot/vendors/tinymce/plugins/code/
+    - assets/www/wwwroot/vendors/tinymce/plugins/codesample/css/
+    - assets/www/wwwroot/vendors/tinymce/plugins/codesample/
+    - assets/www/wwwroot/vendors/tinymce/plugins/colorpicker/
+    - assets/www/wwwroot/vendors/tinymce/plugins/contextmenu/
+    - assets/www/wwwroot/vendors/tinymce/plugins/directionality/
+    - assets/www/wwwroot/vendors/tinymce/plugins/emoticons/img/
+    - assets/www/wwwroot/vendors/tinymce/plugins/emoticons/
+    - assets/www/wwwroot/vendors/tinymce/plugins/fullpage/
+    - assets/www/wwwroot/vendors/tinymce/plugins/fullscreen/
+    - assets/www/wwwroot/vendors/tinymce/plugins/help/img/
+    - assets/www/wwwroot/vendors/tinymce/plugins/help/
+    - assets/www/wwwroot/vendors/tinymce/plugins/hr/
+    - assets/www/wwwroot/vendors/tinymce/plugins/image/
+    - assets/www/wwwroot/vendors/tinymce/plugins/imagetools/
+    - assets/www/wwwroot/vendors/tinymce/plugins/importcss/
+    - assets/www/wwwroot/vendors/tinymce/plugins/insertdatetime/
+    - assets/www/wwwroot/vendors/tinymce/plugins/legacyoutput/
+    - assets/www/wwwroot/vendors/tinymce/plugins/link/
+    - assets/www/wwwroot/vendors/tinymce/plugins/lists/
+    - assets/www/wwwroot/vendors/tinymce/plugins/media/
+    - assets/www/wwwroot/vendors/tinymce/plugins/nonbreaking/
+    - assets/www/wwwroot/vendors/tinymce/plugins/noneditable/
+    - assets/www/wwwroot/vendors/tinymce/plugins/pagebreak/
+    - assets/www/wwwroot/vendors/tinymce/plugins/paste/
+    - assets/www/wwwroot/vendors/tinymce/plugins/preview/
+    - assets/www/wwwroot/vendors/tinymce/plugins/print/
+    - assets/www/wwwroot/vendors/tinymce/plugins/save/
+    - assets/www/wwwroot/vendors/tinymce/plugins/searchreplace/
+    - assets/www/wwwroot/vendors/tinymce/plugins/spellchecker/
+    - assets/www/wwwroot/vendors/tinymce/plugins/tabfocus/
+    - assets/www/wwwroot/vendors/tinymce/plugins/table/
+    - assets/www/wwwroot/vendors/tinymce/plugins/template/
+    - assets/www/wwwroot/vendors/tinymce/plugins/textcolor/
+    - assets/www/wwwroot/vendors/tinymce/plugins/textpattern/
+    - assets/www/wwwroot/vendors/tinymce/plugins/toc/
+    - assets/www/wwwroot/vendors/tinymce/plugins/visualblocks/css/
+    - assets/www/wwwroot/vendors/tinymce/plugins/visualblocks/
+    - assets/www/wwwroot/vendors/tinymce/plugins/visualchars/
+    - assets/www/wwwroot/vendors/tinymce/plugins/wordcount/
+    - assets/www/wwwroot/vendors/tinymce/skins/lightgray/fonts/
+    - assets/www/wwwroot/vendors/tinymce/skins/lightgray/img/
+    - assets/www/wwwroot/vendors/tinymce/skins/lightgray/
+    - assets/www/wwwroot/vendors/tinymce/themes/inlite/
+    - assets/www/wwwroot/vendors/tinymce/themes/modern/
+    - assets/www/wwwroot/vendors/tinymce/
+    - assets/www/wwwroot/vendors/toastr/build/
+    - assets/www/wwwroot/vendors/toastr/nuget/content/content/
+    - assets/www/wwwroot/vendors/toastr/nuget/content/scripts/
+    - assets/www/wwwroot/vendors/toastr/nuget/
+    - assets/www/wwwroot/vendors/toastr/tests/qunit/
+    - assets/www/wwwroot/vendors/toastr/tests/unit/
+    - assets/www/wwwroot/vendors/toastr/tests/
+    - assets/www/wwwroot/vendors/toastr/
+    - assets/www/wwwroot/vendors/twbs-pagination/
+    - assets/www/wwwroot/vendors/typeahead.js/
+    - assets/www/wwwroot/vendors/typicons.font/font/
+    - assets/www/wwwroot/vendors/x-editable/
+    - assets/www/wwwroot/vendors/
+    - assets/www/wwwroot/
+    - assets/www/
+
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
