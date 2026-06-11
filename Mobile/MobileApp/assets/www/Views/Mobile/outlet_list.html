@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Geo Tag Outlet - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .search-container {
+            padding: 12px 16px;
+            background: #fff;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 56px;
+            z-index: 89;
+        }
+        .search-box {
+            background: var(--color-gray-light);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+        }
+        .search-box input {
+            border: none; background: transparent;
+            padding: 10px 8px; width: 100%;
+            font-size: 14px; outline: none;
+        }
+        .filter-chips {
+            display: flex; gap: 8px;
+            padding: 10px 16px;
+            overflow-x: auto; scrollbar-width: none;
+            background: #fff;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .filter-chips::-webkit-scrollbar { display: none; }
+        .chip {
+            padding: 5px 14px; border-radius: 16px;
+            font-size: 12px; font-weight: 600;
+            border: 1px solid var(--color-border);
+            background: #fff; color: var(--color-gray);
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
+        }
+        .chip.active {
+            background: var(--color-primary);
+            color: #fff; border-color: var(--color-primary);
+        }
+        .outlet-card {
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px; display: block;
+            text-decoration: none; color: inherit;
+            transition: transform 0.1s;
+        }
+        .outlet-card:active { transform: scale(0.98); }
+        .outlet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .outlet-name { font-size: 14px; font-weight: 700; }
+        .outlet-meta { font-size: 12px; color: var(--color-gray); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+        .gps-badge {
+            font-size: 10px; font-weight: 700;
+            padding: 2px 7px; border-radius: 8px;
+        }
+        .gps-ok { background: #e2f0d9; color: #385723; }
+        .gps-missing { background: #FFF2CC; color: #B25900; }
+
+        .fab {
+            position: fixed;
+            bottom: 80px; right: calc(50% - 225px + 16px);
+            width: 52px; height: 52px;
+            background: var(--color-accent);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(120,181,0,0.35);
+            cursor: pointer; z-index: 200;
+            text-decoration: none; color: #fff;
+            font-size: 22px;
+        }
+        @media (max-width: 480px) {
+            .fab { right: 16px; }
+        }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title" id="pageTitle">Geo Tag Outlet</span>
+        <div style="width:36px;"></div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-container" style="top:56px;">
+        <div class="search-box">
+            <i class="fas fa-search" style="color:var(--color-gray);"></i>
+            <input type="text" id="searchInput" placeholder="Cari nama atau kode outlet..." oninput="renderList()"/>
+        </div>
+    </div>
+
+    <!-- Filter Chips -->
+    <div class="filter-chips">
+        <div class="chip active" id="chipSemua" onclick="setFilter('semua')">Semua</div>
+        <div class="chip" id="chipAktif" onclick="setFilter('Aktif')">Aktif</div>
+        <div class="chip" id="chipPotential" onclick="setFilter('Potential')">Potential</div>
+        <div class="chip" id="chipNoGps" onclick="setFilter('nogps')">⚠️ Belum GPS</div>
+    </div>
+
+    <div class="mobile-content" style="padding-bottom:80px;">
+        <div class="p-16" id="listContainer"></div>
+    </div>
+
+    <div class="mobile-nav">
+        <a href="home.html" class="mobile-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Beranda</span>
+        </a>
+        <a href="outlet_list.html" class="mobile-nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Geo Tag</span>
+        </a>
+        <a href="profil.html" class="mobile-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profil</span>
+        </a>
+    </div>
+</div>
+
+<!-- FAB: Tambah Outlet Baru -->
+<a href="outlet_add.html" class="fab" title="Tambah Outlet Baru">
+    <i class="fas fa-plus"></i>
+</a>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    let currentFilter = 'semua';
+    let isGeoTagMode = false;
+
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        isGeoTagMode = params.get('mode') === 'geotag';
+        if (isGeoTagMode) {
+            $('#pageTitle').text('Geo Tag Outlet');
+            setFilter('nogps');
+        }
+        renderList();
+    });
+
+    function setFilter(f) {
+        currentFilter = f;
+        $('.chip').removeClass('active');
+        const map = { semua: 'chipSemua', Aktif: 'chipAktif', Potential: 'chipPotential', nogps: 'chipNoGps' };
+        $(`#${map[f] || 'chipSemua'}`).addClass('active');
+        renderList();
+    }
+
+    function renderList() {
+        const query = $('#searchInput').val().toLowerCase();
+        const customers = SfaStore.getCustomers();
+        const container = $('#listContainer');
+        container.empty();
+
+        const filtered = customers.filter(c => {
+            const matchSearch = c.name.toLowerCase().includes(query) || c.id.toLowerCase().includes(query);
+            if (!matchSearch) return false;
+            if (currentFilter === 'Aktif') return c.status === 'Aktif';
+            if (currentFilter === 'Potential') return c.status === 'Potential';
+            if (currentFilter === 'nogps') return !c.hasGps;
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            container.html('<div class="text-center py-5 text-muted"><i class="fas fa-map-marker-slash fs-2 d-block mb-2"></i>Tidak ada outlet ditemukan.</div>');
+            return;
+        }
+
+        filtered.forEach(c => {
+            const gpsBadge = c.hasGps
+                ? `<span class="gps-badge gps-ok"><i class="fas fa-check-circle me-1"></i>GPS OK</span>`
+                : `<span class="gps-badge gps-missing"><i class="fas fa-exclamation-triangle me-1"></i>Belum GPS</span>`;
+
+            const statusBadge = c.status === 'Aktif'
+                ? `<span class="badge-mobile badge-mobile-success">${c.status}</span>`
+                : `<span class="badge-mobile badge-mobile-warning">${c.status}</span>`;
+
+            container.append(`
+                <a href="outlet_detail.html?id=${c.id}" class="outlet-card">
+                    <div class="outlet-header">
+                        <div>
+                            <div class="outlet-name">${c.name}</div>
+                            <div class="outlet-meta">
+                                <span>${c.id}</span> •
+                                <span>${c.channel || 'GT'}</span>
+                            </div>
+                        </div>
+                        <div class="text-end d-flex flex-column gap-1 align-items-end">
+                            ${statusBadge}
+                            ${gpsBadge}
+                        </div>
+                    </div>
+                    <div class="outlet-meta">
+                        <i class="fas fa-map-marker-alt" style="color:var(--color-primary);"></i>
+                        ${c.kecamatan}, ${c.kota}
+                    </div>
+                </a>
+            `);
+        });
+    }
+</script>
+</body>
+</html>

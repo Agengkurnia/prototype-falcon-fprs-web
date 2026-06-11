@@ -368,49 +368,49 @@
                         <span>Transaksi Offline</span>
                         <span class="badge-mobile badge-mobile-info" id="offlineCount">0 Pending</span>
                     </div>
-                    <button class="btn-mobile-primary mt-8" onclick="triggerSyncProcess()">Sinkronisasikan Sekarang</button>
+                    <button class="btn-mobile-primary mt-8" onclick="window.location.href='sync_detail.html'">Sinkronisasikan Sekarang</button>
                 </div>
             </div>
 
             <!-- Menu Circular Grid (Exact Screenshot Replica) -->
             <div class="menu-circle-grid">
                 <!-- 1. Faktur Penjualan -->
-                <a href="../Penjualan/Faktur/index.html" class="menu-circle-card">
+                <a href="visit_list.html" class="menu-circle-card">
                     <span class="circle-menu-badge">Canvasser</span>
-                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
-                        <i class="fas fa-file-invoice-dollar" style="color: #DC3545;"></i>
+                    <div class="circle-icon-wrapper" style="background-color: #E6F2ED; border-color: #C6E2D6;">
+                        <i class="fas fa-file-invoice-dollar" style="color: #005D41;"></i>
                     </div>
                     <span class="circle-menu-label">Faktur Penjualan</span>
                 </a>
 
                 <!-- 2. Pembayaran Pelanggan -->
-                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Pembayaran Pelanggan')">
-                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
-                        <i class="fas fa-hand-holding-usd" style="color: #DC3545;"></i>
+                <a href="collection_list.html" class="menu-circle-card">
+                    <div class="circle-icon-wrapper" style="background-color: #F1F7E5; border-color: #DDE8C1;">
+                        <i class="fas fa-hand-holding-usd" style="color: #78B500;"></i>
                     </div>
                     <span class="circle-menu-label">Pembayaran Pelanggan</span>
                 </a>
 
                 <!-- 3. Geo Tag -->
-                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Geo Tag')">
-                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
-                        <i class="fas fa-map-marked-alt" style="color: #DC3545;"></i>
+                <a href="outlet_list.html?mode=geotag" class="menu-circle-card">
+                    <div class="circle-icon-wrapper" style="background-color: #E6F5F0; border-color: #C6ECD9;">
+                        <i class="fas fa-map-marked-alt" style="color: #008B5B;"></i>
                     </div>
                     <span class="circle-menu-label">Geo Tag</span>
                 </a>
 
                 <!-- 4. Pelanggan -->
                 <a href="visit_list.html" class="menu-circle-card">
-                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
-                        <i class="fas fa-users" style="color: #DC3545;"></i>
+                    <div class="circle-icon-wrapper" style="background-color: #F6FAED; border-color: #E4F0CD;">
+                        <i class="fas fa-users" style="color: #5E8E00;"></i>
                     </div>
                     <span class="circle-menu-label">Pelanggan</span>
                 </a>
 
                 <!-- 5. Produk -->
-                <a href="javascript:void(0)" class="menu-circle-card" onclick="alertUnderDevelopment('Produk')">
-                    <div class="circle-icon-wrapper" style="background-color: #FFF0F1; border-color: #FCE4D6;">
-                        <i class="fas fa-boxes" style="color: #DC3545;"></i>
+                <a href="product_catalog.html" class="menu-circle-card">
+                    <div class="circle-icon-wrapper" style="background-color: #EBF8F4; border-color: #C2ECE0;">
+                        <i class="fas fa-boxes" style="color: #009E73;"></i>
                     </div>
                     <span class="circle-menu-label">Produk</span>
                 </a>
@@ -450,68 +450,40 @@
     <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
         // Load session data
         $(document).ready(function() {
-            let userSession = localStorage.getItem('sfa_user');
-            if (userSession) {
-                const user = JSON.parse(userSession);
-                $('#userName').text(user.name.toUpperCase());
-                $('#userRole').text(user.role);
-            } else {
-                // Fallback to default
-                const defaultUser = {
-                    username: 'SINGARAJA',
-                    name: 'SINGARAJA',
-                    role: 'canvasser',
-                    branch: 'Jakarta Pusat',
-                    loginTime: new Date().toISOString()
-                };
-                localStorage.setItem('sfa_user', JSON.stringify(defaultUser));
-            }
+            const user = SfaStore.getUser();
+            $('#userName').text(user.name.toUpperCase());
+            $('#userRole').text(user.role);
 
             // Set current date
             const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const todayStr = new Date().toLocaleDateString('id-ID', dateOptions);
-            $('#todayDate').text(todayStr);
+            $('#todayDate').text(new Date().toLocaleDateString('id-ID', dateOptions));
 
-            // Read transaction numbers from localStorage to update KPI
+            // KPI dari SfaStore
             updateKPIFromStorage();
+
+            // Badge pending sync
+            updateSyncBadge();
         });
 
         function updateKPIFromStorage() {
-            // Count effective visits and invoices from localStorage
-            let visitsData = localStorage.getItem('sfa_visits') ? JSON.parse(localStorage.getItem('sfa_visits')) : [];
-            let invoiceCount = 0;
-            let effectiveCount = 0;
-            let totalVal = 0;
+            const kpi = SfaStore.getTodayKpi();
 
-            // Load canvassing/faktur data if exists
-            let canvassingData = localStorage.getItem('canvassing_records') ? JSON.parse(localStorage.getItem('canvassing_records')) : [];
-            if (canvassingData.length > 0) {
-                // Mock dashboard values based on canvassing data
-                effectiveCount = canvassingData.filter(c => c.status === 'Selesai (Efektif)').length;
-                invoiceCount = canvassingData.length;
-                
-                canvassingData.forEach(c => {
-                    let val = parseFloat(c.totalOrder || 0) || parseFloat(c.grandTotal || 0) || 0;
-                    totalVal += val;
-                });
-            }
+            $('#kpiEfektif').text(kpi.efektif);
+            $('#kpiKunjungan').text(kpi.kunjungan);
+            $('#kpiTotalFaktur').text(SfaStore.formatRupiah(kpi.totalRupiah));
 
-            // Fallbacks if zero
-            if (effectiveCount > 0) $('#kpiEfektif').text(effectiveCount);
-            if (invoiceCount > 0) $('#kpiKunjungan').text(invoiceCount);
-            if (totalVal > 0) {
-                $('#kpiTotalFaktur').text('Rp' + totalVal.toLocaleString('id-ID'));
-                // Set progress bar width to 60% as demonstration
-                $('#kpiProgressBar').css('width', '60%');
-            } else {
-                $('#kpiEfektif').text('0');
-                $('#kpiKunjungan').text('0');
-                $('#kpiTotalFaktur').text('Rp0');
-                $('#kpiProgressBar').css('width', '0%');
-            }
+            // Progress bar: efektif / pelanggan aktif
+            const pct = kpi.pelanggan > 0 ? Math.round((kpi.kunjungan / kpi.pelanggan) * 100) : 0;
+            $('#kpiProgressBar').css('width', Math.min(pct, 100) + '%');
+        }
+
+        function updateSyncBadge() {
+            const pending = SfaStore.getSyncQueue().filter(q => q.status === 'pending' || q.status === 'failed').length;
+            $('#offlineCount').text(pending + ' Pending');
         }
 
         function toggleSyncDetails() {
@@ -578,7 +550,7 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem('sfa_user');
+                    SfaStore.clearUser();
                     window.location.href = 'login.html';
                 }
             });

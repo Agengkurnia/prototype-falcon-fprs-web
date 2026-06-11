@@ -414,6 +414,12 @@
                     </div>
                 </div>
 
+                <!-- Link ke Target Detail -->
+                <a href="target.html" style="display:flex; align-items:center; justify-content:space-between; background:var(--color-bg-light); border:1px solid rgba(0,93,65,0.15); border-radius:10px; padding:10px 14px; text-decoration:none; margin-bottom:12px;">
+                    <span style="font-size:13px; font-weight:700; color:var(--color-primary);"><i class="fas fa-bullseye me-2"></i>Lihat Detail Target Harian</span>
+                    <i class="fas fa-chevron-right" style="color:var(--color-primary); font-size:12px;"></i>
+                </a>
+
                 <!-- Full Width Total Faktur Penjualan (Green) -->
                 <div class="full-stat-card">
                     <div class="stat-card-left">
@@ -466,55 +472,34 @@
     <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
         // Load session data
         $(document).ready(function() {
-            let userSession = localStorage.getItem('sfa_user');
-            if (userSession) {
-                const user = JSON.parse(userSession);
-                $('#userName').text(user.name.toUpperCase());
-                $('#userRole').text(user.role);
-            }
+            const user = SfaStore.getUser();
+            $('#userName').text(user.name.toUpperCase());
+            $('#userRole').text(user.role);
 
             // Set current date
             const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const todayStr = new Date().toLocaleDateString('id-ID', dateOptions);
-            $('#todayDate').text(todayStr);
+            $('#todayDate').text(new Date().toLocaleDateString('id-ID', dateOptions));
 
             // Set pager text dynamically
             const monthDayOptions = { day: 'numeric', month: 'short' };
             $('#pagerText').text(new Date().toLocaleDateString('id-ID', monthDayOptions));
 
-            // Load transaction numbers from localStorage to update Dashboard
+            // Load KPI dari SfaStore
             updateDashboardFromStorage();
         });
 
         function updateDashboardFromStorage() {
-            let canvassingData = localStorage.getItem('canvassing_records') ? JSON.parse(localStorage.getItem('canvassing_records')) : [];
-            
-            let pelangganTotal = 12; // Standard default mock
-            let kunjunganTotal = 0;
-            let efektifTotal = 0;
-            let fakturTotal = 0;
-            let rupiahTotal = 0;
+            const kpi = SfaStore.getTodayKpi();
 
-            if (canvassingData.length > 0) {
-                kunjunganTotal = canvassingData.length;
-                efektifTotal = canvassingData.filter(c => c.status === 'Selesai (Efektif)').length;
-                fakturTotal = canvassingData.length;
-                
-                canvassingData.forEach(c => {
-                    let val = parseFloat(c.totalOrder || 0) || parseFloat(c.grandTotal || 0) || 0;
-                    rupiahTotal += val;
-                });
-            }
-
-            // Set values
-            $('#valPelanggan').text(pelangganTotal);
-            $('#valKunjungan').text(kunjunganTotal);
-            $('#valEfektif').text(efektifTotal);
-            $('#valFaktur').text(fakturTotal);
-            $('#valTotalFaktur').text('Rp' + rupiahTotal.toLocaleString('id-ID'));
+            $('#valPelanggan').text(kpi.pelanggan);
+            $('#valKunjungan').text(kpi.kunjungan);
+            $('#valEfektif').text(kpi.efektif);
+            $('#valFaktur').text(kpi.fakturCount);
+            $('#valTotalFaktur').text(SfaStore.formatRupiah(kpi.totalRupiah));
         }
 
         function triggerServerToggle() {
@@ -607,7 +592,7 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem('sfa_user');
+                    SfaStore.clearUser();
                     window.location.href = 'login.html';
                 }
             });

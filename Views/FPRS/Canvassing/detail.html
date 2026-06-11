@@ -8,169 +8,369 @@
 </head>
 <body>
     <div id="app-content">
-<nav aria-label="breadcrumb" class="mb-3">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="../../../index.html" class="a-breadcrumb">Home</a></li>
-                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">CVS-260500194</li>
-                    </ol>
-                </nav>
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="../../../index.html" class="a-breadcrumb">Home</a></li>
+                <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Canvassing</a></li>
+                <li class="breadcrumb-item active" aria-current="page" id="breadcrumbId">-</li>
+            </ol>
+        </nav>
 
-                <!-- COMPACT HEADER V2 -->
-                <div class="detail-header-compact">
-                    <div class="detail-header-top">
-                        <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i></a>
-                        <h2 class="detail-header-title">CVS-260500194</h2>
-                        <span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>
-                        
-                        <div class="ms-auto d-flex gap-2">
-                            <button class="btn btn-outline-success"><i class="fa fa-plus me-1"></i> Tambah Stok</button>
-                            <div class="dropdown dropdown-selesaikan">
-                                <button class="btn btn-selesaikan dropdown-toggle" data-bs-toggle="dropdown">Selesaikan Stok</button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item btn-status-complete" href="#"><i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok</a></li>
-                                    <li><a class="dropdown-item text-danger btn-status-cancel" href="#"><i class="fa fa-times-circle me-2"></i>Batalkan Canvassing</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="detail-header-info">
-                        <div class="info-item" title="Driver"><i class="fa fa-user"></i> <strong>EMP-260500040</strong> (JAMBI)</div>
-                        <div class="info-item" title="Jadwal"><i class="fa fa-calendar-alt"></i> 11 Mei 2026 – 01 Jan 2027</div>
-                        <div class="info-item" title="Gudang"><i class="fa fa-warehouse"></i> <strong>JAMBI</strong></div>
-                        <div class="info-item" title="Durasi"><i class="fa fa-clock"></i> 235 Hari</div>
-                        <div class="info-item" style="flex:1; min-width:200px;">
-                            <div class="periode-progress-container w-100">
-                                <div class="periode-progress-text"><span>Progress Waktu</span><span>45%</span></div>
-                                <div class="periode-progress"><div class="periode-progress-bar" style="width: 45%;"></div></div>
-                            </div>
-                        </div>
+        <!-- COMPACT HEADER V2 — populated by JS -->
+        <div class="detail-header-compact">
+            <div class="detail-header-top">
+                <a href="index.html" class="btn-back"><i class="fa fa-arrow-left"></i></a>
+                <h2 class="detail-header-title" id="detailTitle">-</h2>
+                <span id="detailStatusBadge"></span>
+
+                <div class="ms-auto d-flex gap-2" id="detailActions">
+                    <button class="btn btn-outline-success" id="btnTambahStok"><i class="fa fa-plus me-1"></i> Tambah Stok</button>
+                    <div class="dropdown dropdown-selesaikan" id="dropdownSelesaikan">
+                        <button class="btn btn-selesaikan dropdown-toggle" data-bs-toggle="dropdown">Selesaikan Stok</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item btn-status-complete" href="#"><i class="fa fa-check-circle me-2 text-success"></i>Selesaikan Stok</a></li>
+                            <li><a class="dropdown-item text-danger btn-status-cancel" href="#"><i class="fa fa-times-circle me-2"></i>Batalkan Canvassing</a></li>
+                        </ul>
                     </div>
                 </div>
-
-                <!-- TABS -->
-                <div class="cvs-tabs">
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#panelStok">Stok Produk</button></li>
-                        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#panelPelanggan">Pelanggan</button></li>
-                    </ul>
-
-                    <div class="tab-content">
-                        <!-- TAB STOK PRODUK V2 -->
-                        <div class="tab-pane fade show active" id="panelStok">
-                            <div class="d-flex justify-content-end mb-3">
-                                <div class="input-group input-group-sm" style="max-width:300px;">
-                                    <input type="text" class="form-control" placeholder="Cari nama atau kode produk...">
-                                    <span class="input-group-text"><i class="fa fa-search"></i></span>
-                                </div>
-                            </div>
-
-                            <!-- Product Cards Grid instead of Table -->
-                            <div class="product-cards-grid">
-                                
-                                <!-- Card 1 -->
-                                <div class="product-card">
-                                    <div class="product-card-header">
-                                        <div>
-                                            <div class="product-card-title">BENECOL STRAW 100ML</div>
-                                            <div class="product-card-code">NBE14</div>
-                                        </div>
-                                        <button class="btn btn-sm btn-light" title="Riwayat" data-bs-toggle="modal" data-bs-target="#modalRiwayat" onclick="$('#riwayatProdName').text('BENECOL STRAW 100ML'); $('#riwayatProdCode').text('NBE14');"><i class="fa fa-history"></i></button>
-                                    </div>
-                                    <div class="product-card-body">
-                                        <div class="stock-grid">
-                                            <div class="stock-item">
-                                                <span class="stock-label">Awal</span>
-                                                <span class="stock-val-main">99999</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Terjual</span>
-                                                <span class="stock-val-main text-success">0</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Kembali</span>
-                                                <span class="stock-val-main text-warning">0</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Hilang</span>
-                                                <span class="stock-val-main text-danger">0</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item highlight">
-                                                <span class="stock-label">Sisa</span>
-                                                <span class="stock-val-main">99999</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Card 2 -->
-                                <div class="product-card">
-                                    <div class="product-card-header">
-                                        <div>
-                                            <div class="product-card-title">FITBAR CHOCOLATE</div>
-                                            <div class="product-card-code">FIT01</div>
-                                        </div>
-                                        <button class="btn btn-sm btn-light" title="Riwayat" data-bs-toggle="modal" data-bs-target="#modalRiwayat" onclick="$('#riwayatProdName').text('FITBAR CHOCOLATE'); $('#riwayatProdCode').text('FIT01');"><i class="fa fa-history"></i></button>
-                                    </div>
-                                    <div class="product-card-body">
-                                        <div class="stock-grid">
-                                            <div class="stock-item">
-                                                <span class="stock-label">Awal</span>
-                                                <span class="stock-val-main">500</span>
-                                                <span class="stock-val-sub">12 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Terjual</span>
-                                                <span class="stock-val-main text-success">45</span>
-                                                <span class="stock-val-sub">3 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Kembali</span>
-                                                <span class="stock-val-main text-warning">2</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item">
-                                                <span class="stock-label">Hilang</span>
-                                                <span class="stock-val-main text-danger">0</span>
-                                                <span class="stock-val-sub">0 B | 0 P</span>
-                                            </div>
-                                            <div class="stock-item highlight">
-                                                <span class="stock-label">Sisa</span>
-                                                <span class="stock-val-main">453</span>
-                                                <span class="stock-val-sub">9 B | 0 P</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- TAB PELANGGAN -->
-                        <div class="tab-pane fade" id="panelPelanggan">
-                            <!-- ... existing simplified customer tab ... -->
-                            <div class="text-center py-5 text-muted">
-                                <i class="fa fa-users fa-3x d-block mb-3" style="color:#C8E099;"></i>
-                                Belum ada kunjungan pelanggan.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+            <div class="detail-header-info">
+                <div class="info-item" id="infoDriver"><i class="fa fa-user"></i> -</div>
+                <div class="info-item" id="infoJadwal"><i class="fa fa-calendar-alt"></i> -</div>
+                <div class="info-item" id="infoGudang"><i class="fa fa-warehouse"></i> -</div>
+                <div class="info-item" id="infoDurasi"><i class="fa fa-clock"></i> -</div>
+                <div class="info-item" style="flex:1; min-width:200px;">
+                    <div class="periode-progress-container w-100">
+                        <div class="periode-progress-text">
+                            <span>Progress Waktu</span>
+                            <span id="progressPctText">0%</span>
+                        </div>
+                        <div class="periode-progress">
+                            <div class="periode-progress-bar" id="progressBar" style="width:0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="cvs-tabs">
+            <ul class="nav nav-tabs">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#panelStok">Stok Produk</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#panelPelanggan">Pelanggan</button></li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- TAB STOK PRODUK -->
+                <div class="tab-pane fade show active" id="panelStok">
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="input-group input-group-sm" style="max-width:300px;">
+                            <input type="text" class="form-control" id="searchProduk" placeholder="Cari nama atau kode produk...">
+                            <span class="input-group-text"><i class="fa fa-search"></i></span>
+                        </div>
+                    </div>
+                    <div class="product-cards-grid" id="productCardsGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- TAB PELANGGAN -->
+                <div class="tab-pane fade" id="panelPelanggan">
+                    <div class="text-center py-5 text-muted">
+                        <i class="fa fa-users fa-3x d-block mb-3" style="color:#C8E099;"></i>
+                        Belum ada kunjungan pelanggan.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Riwayat Stok -->
+    <div class="modal fade" id="modalRiwayat" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        Riwayat Stok — <span id="riwayatProdName"></span>
+                        <small class="text-muted ms-1" id="riwayatProdCode"></small>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tanggal & Waktu</th>
+                                    <th>Keterangan</th>
+                                    <th class="text-end">Karton</th>
+                                    <th class="text-end">Box</th>
+                                    <th class="text-end">Pcs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riwayatTbody">
+                                <tr><td colspan="5" class="text-center text-muted py-4">Tidak ada riwayat.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="../../../wwwroot/js/canvassing-store.js"></script>
     <script src="../../../wwwroot/js/layout.js"></script>
     <script>
         document.addEventListener('layoutReady', () => {
 
-    var id = new URLSearchParams(window.location.search).get('id');
-    if (!id) {
+            var id = new URLSearchParams(window.location.search).get('id');
+            if (!id) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'ID Canvassing tidak ditemukan di URL.' })
+                    .then(() => { window.location.href = 'index.html'; });
+                return;
+            }
+
+            var item = CanvassingStore.getById(id);
+            if (!item) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Data canvassing tidak ditemukan.' })
+                    .then(() => { window.location.href = 'index.html'; });
+                return;
+            }
+
+            // ── Helper ──────────────────────────────────────────────
+            var MONTHS = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+
+            function formatDate(isoStr) {
+                if (!isoStr) return '-';
+                var d = new Date(isoStr);
+                return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+            }
+
+            function formatDateTime(isoStr) {
+                if (!isoStr) return '-';
+                var d = new Date(isoStr);
+                var hh = String(d.getHours()).padStart(2,'0');
+                var mm = String(d.getMinutes()).padStart(2,'0');
+                return formatDate(isoStr) + ' ' + hh + ':' + mm;
+            }
+
+            var STATUS_BADGES = {
+                'Ongoing':   '<span class="badge-status badge-ongoing"><i class="fa fa-clock"></i> Ongoing</span>',
+                'Completed': '<span class="badge-status badge-completed"><i class="fa fa-check"></i> Completed</span>',
+                'Cancelled': '<span class="badge-status badge-cancelled"><i class="fa fa-times"></i> Cancelled</span>',
+                'Draft':     '<span class="badge-status badge-draft"><i class="fa fa-file"></i> Draft</span>'
+            };
+
+            // ── Populate Header ──────────────────────────────────────
+            function populateHeader(data) {
+                $('#breadcrumbId').text(data.id);
+                $('#detailTitle').text(data.id);
+                $('#detailStatusBadge').html(STATUS_BADGES[data.status] || STATUS_BADGES['Draft']);
+
+                $('#infoDriver').html('<i class="fa fa-user me-1"></i> <strong>' + (data.driverCode || '-') + '</strong> (' + (data.driverName || '-') + ')');
+                $('#infoJadwal').html('<i class="fa fa-calendar-alt me-1"></i> ' + formatDate(data.tanggalMulai) + ' – ' + formatDate(data.tanggalSelesai));
+                $('#infoGudang').html('<i class="fa fa-warehouse me-1"></i> <strong>' + (data.gudang || '-') + '</strong>');
+                $('#infoDurasi').html('<i class="fa fa-clock me-1"></i> ' + (data.durationDays || 0) + ' Hari');
+
+                var pct = data.progressPct || 0;
+                $('#progressPctText').text(pct + '%');
+                $('#progressBar').css('width', pct + '%');
+                if (pct === 100) $('#progressBar').addClass('bg-success');
+
+                // Sembunyikan aksi jika sudah Completed/Cancelled
+                if (data.status === 'Completed' || data.status === 'Cancelled') {
+                    $('#btnTambahStok, #dropdownSelesaikan').hide();
+                } else {
+                    $('#btnTambahStok').on('click', function() {
+                        window.location.href = 'add.html?id=' + data.id;
+                    });
+                }
+            }
+
+            // ── Render Product Cards ─────────────────────────────────
+            function renderProductCards(items, filterText) {
+                var grid = $('#productCardsGrid');
+                grid.empty();
+                filterText = (filterText || '').toLowerCase();
+
+                if (!items || items.length === 0) {
+                    grid.html('<div class="text-center w-100 py-5 text-muted"><i class="fa fa-boxes fa-3x d-block mb-3"></i>Belum ada stok produk terdaftar.</div>');
+                    return;
+                }
+
+                var filtered = items.filter(function(p) {
+                    if (!filterText) return true;
+                    return (p.produkName || '').toLowerCase().includes(filterText) ||
+                           (p.produkCode || '').toLowerCase().includes(filterText);
+                });
+
+                if (filtered.length === 0) {
+                    grid.html('<div class="text-center w-100 py-5 text-muted"><i class="fa fa-search fa-2x d-block mb-2"></i>Produk tidak ditemukan.</div>');
+                    return;
+                }
+
+                filtered.forEach(function(p) {
+                    var aK = p.karton || 0, aB = p.box || 0, aP = p.pcs || 0;
+                    var sK = p.soldKarton || 0, sB = p.soldBox || 0, sP = p.soldPcs || 0;
+                    var rK = p.retKarton || 0, rB = p.retBox || 0, rP = p.retPcs || 0;
+                    var lK = p.lostKarton || 0, lB = p.lostBox || 0, lP = p.lostPcs || 0;
+                    var ssK = aK - sK + rK - lK;
+                    var ssB = aB - sB + rB - lB;
+                    var ssP = aP - sP + rP - lP;
+
+                    grid.append(
+                        '<div class="product-card">' +
+                            '<div class="product-card-header">' +
+                                '<div>' +
+                                    '<div class="product-card-title">' + p.produkName + '</div>' +
+                                    '<div class="product-card-code">' + p.produkCode + '</div>' +
+                                '</div>' +
+                                '<button class="btn btn-sm btn-light btn-riwayat-stok" title="Riwayat"' +
+                                    ' data-bs-toggle="modal" data-bs-target="#modalRiwayat"' +
+                                    ' data-name="' + p.produkName + '" data-code="' + p.produkCode + '">' +
+                                    '<i class="fa fa-history"></i>' +
+                                '</button>' +
+                            '</div>' +
+                            '<div class="product-card-body">' +
+                                '<div class="stock-grid">' +
+                                    '<div class="stock-item"><span class="stock-label">Awal</span>' +
+                                        '<span class="stock-val-main">' + aK + '</span>' +
+                                        '<span class="stock-val-sub">' + aB + ' B | ' + aP + ' P</span></div>' +
+                                    '<div class="stock-item"><span class="stock-label">Terjual</span>' +
+                                        '<span class="stock-val-main text-success">' + sK + '</span>' +
+                                        '<span class="stock-val-sub">' + sB + ' B | ' + sP + ' P</span></div>' +
+                                    '<div class="stock-item"><span class="stock-label">Kembali</span>' +
+                                        '<span class="stock-val-main text-warning">' + rK + '</span>' +
+                                        '<span class="stock-val-sub">' + rB + ' B | ' + rP + ' P</span></div>' +
+                                    '<div class="stock-item"><span class="stock-label">Hilang</span>' +
+                                        '<span class="stock-val-main text-danger">' + lK + '</span>' +
+                                        '<span class="stock-val-sub">' + lB + ' B | ' + lP + ' P</span></div>' +
+                                    '<div class="stock-item highlight"><span class="stock-label">Sisa</span>' +
+                                        '<span class="stock-val-main">' + ssK + '</span>' +
+                                        '<span class="stock-val-sub">' + ssB + ' B | ' + ssP + ' P</span></div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+                });
+            }
+
+            // ── Modal Riwayat ────────────────────────────────────────
+            $(document).on('click', '.btn-riwayat-stok', function() {
+                var name = $(this).data('name');
+                var code = $(this).data('code');
+                $('#riwayatProdName').text(name);
+                $('#riwayatProdCode').text(code);
+
+                var tbody = $('#riwayatTbody');
+                tbody.empty();
+
+                var prod = item.items.find(function(i) { return i.produkCode === code; });
+                if (!prod) {
+                    tbody.html('<tr><td colspan="5" class="text-center text-muted py-3">Tidak ada data riwayat.</td></tr>');
+                    return;
+                }
+
+                // Baris stok awal
+                tbody.append(
+                    '<tr>' +
+                        '<td>' + formatDateTime(item.tanggalMulai) + '</td>' +
+                        '<td>Stok Awal</td>' +
+                        '<td class="text-end">' + (prod.karton || 0) + '</td>' +
+                        '<td class="text-end">' + (prod.box || 0) + '</td>' +
+                        '<td class="text-end">' + (prod.pcs || 0) + '</td>' +
+                    '</tr>'
+                );
+
+                // Penjualan
+                if ((prod.soldKarton || 0) > 0 || (prod.soldBox || 0) > 0) {
+                    tbody.append(
+                        '<tr>' +
+                            '<td>' + new Date().toLocaleDateString('id-ID') + ' 09:30</td>' +
+                            '<td><span class="text-success fw-bold">Penjualan</span></td>' +
+                            '<td class="text-end text-success">-' + (prod.soldKarton || 0) + '</td>' +
+                            '<td class="text-end text-success">-' + (prod.soldBox || 0) + '</td>' +
+                            '<td class="text-end text-success">-' + (prod.soldPcs || 0) + '</td>' +
+                        '</tr>'
+                    );
+                }
+
+                // Retur
+                if ((prod.retKarton || 0) > 0 || (prod.retBox || 0) > 0) {
+                    tbody.append(
+                        '<tr>' +
+                            '<td>' + new Date().toLocaleDateString('id-ID') + ' 15:15</td>' +
+                            '<td><span class="text-warning fw-bold">Pengembalian</span></td>' +
+                            '<td class="text-end text-warning">+' + (prod.retKarton || 0) + '</td>' +
+                            '<td class="text-end text-warning">+' + (prod.retBox || 0) + '</td>' +
+                            '<td class="text-end text-warning">+' + (prod.retPcs || 0) + '</td>' +
+                        '</tr>'
+                    );
+                }
+
+                if (tbody.children().length === 1) {
+                    // Hanya ada baris stok awal, tambahkan keterangan
+                    tbody.append('<tr><td colspan="5" class="text-center text-muted py-2" style="font-size:0.8rem;">Belum ada aktivitas penjualan/retur.</td></tr>');
+                }
+            });
+
+            // ── Search produk ────────────────────────────────────────
+            $('#searchProduk').on('input', function() {
+                renderProductCards(item.items, $(this).val());
+            });
+
+            // ── Status: Selesaikan ───────────────────────────────────
+            $(document).on('click', '.btn-status-complete', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Selesaikan Canvassing?',
+                    text: 'Status akan diubah menjadi Completed dan stok dikunci.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#005d41',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Selesaikan',
+                    cancelButtonText: 'Batal'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        CanvassingStore.updateStatus(id, 'Completed');
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Status berhasil diubah menjadi Completed.', showConfirmButton: false, timer: 1500 })
+                            .then(function() { window.location.reload(); });
+                    }
+                });
+            });
+
+            // ── Status: Batalkan ─────────────────────────────────────
+            $(document).on('click', '.btn-status-cancel', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Batalkan Canvassing?',
+                    text: 'Status akan diubah menjadi Cancelled.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Batalkan',
+                    cancelButtonText: 'Batal'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        CanvassingStore.updateStatus(id, 'Cancelled');
+                        Swal.fire({ icon: 'success', title: 'Dibatalkan!', showConfirmButton: false, timer: 1500 })
+                            .then(function() { window.location.href = 'index.html'; });
+                    }
+                });
+            });
+
+            // ── Init ─────────────────────────────────────────────────
+            populateHeader(item);
+            renderProductCards(item.items, '');
+
+        }); // end layoutReady
+    </script>
+</body>
+</html>
         Swal.fire({
             icon: 'error',
             title: 'Error',

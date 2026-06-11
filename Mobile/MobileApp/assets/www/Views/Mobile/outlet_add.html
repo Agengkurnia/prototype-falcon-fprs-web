@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Tambah Outlet - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .form-section-title {
+            font-size: 12px; font-weight: 700; color: var(--color-gray);
+            text-transform: uppercase; letter-spacing: 0.6px;
+            margin: 20px 0 10px;
+        }
+        .form-field { margin-bottom: 12px; }
+        .form-field label { font-size: 12px; font-weight: 600; color: var(--color-gray); margin-bottom: 4px; display: block; }
+        .form-field input, .form-field select, .form-field textarea {
+            width: 100%; border: 1.5px solid var(--color-border);
+            border-radius: 10px; padding: 11px 14px;
+            font-size: 14px; color: var(--color-black);
+            background: #fff; outline: none; transition: border-color 0.2s;
+        }
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+            border-color: var(--color-primary);
+        }
+        .photo-upload-box {
+            border: 2px dashed var(--color-border); border-radius: 12px;
+            min-height: 140px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: border-color 0.2s; overflow: hidden; background: var(--color-gray-light);
+        }
+        .photo-upload-box:active { border-color: var(--color-primary); }
+        .photo-upload-box img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; }
+        .photo-upload-box .placeholder { color: var(--color-gray); text-align: center; font-size: 13px; padding: 16px; }
+        .photo-upload-box .placeholder i { font-size: 36px; display: block; margin-bottom: 8px; }
+
+        .gps-input-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+        }
+        .btn-get-gps {
+            background: var(--color-primary); color: #fff;
+            border: none; border-radius: 20px; padding: 10px 16px;
+            font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; cursor: pointer; transition: background 0.2s; margin-bottom: 8px;
+        }
+        .btn-get-gps:active { background: var(--color-primary-dark); }
+        .gps-preview {
+            background: var(--color-bg-light); border: 1px solid rgba(0,93,65,0.15);
+            border-radius: 8px; padding: 10px 14px;
+            font-size: 12px; color: var(--color-primary); font-weight: 600;
+            display: none; margin-bottom: 12px;
+        }
+        .bottom-action {
+            position: sticky; bottom: 0; background: #fff;
+            border-top: 1px solid var(--color-border); padding: 14px 16px;
+        }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title" id="pageTitle">Tambah Outlet Baru</span>
+        <div style="width:36px;"></div>
+    </div>
+
+    <div class="mobile-content no-nav" style="padding-bottom:80px;">
+        <div class="p-16">
+
+            <!-- Foto Toko -->
+            <div class="form-section-title">Foto Toko</div>
+            <div class="photo-upload-box" id="photoBox" onclick="$('#fileInput').click()">
+                <div class="placeholder" id="photoPlaceholder">
+                    <i class="fas fa-camera"></i>
+                    Tap untuk ambil / upload foto toko
+                </div>
+                <img src="" id="photoPreview" class="d-none" alt="Foto Toko"/>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" capture="environment" class="d-none" onchange="onPhotoSelected(event)"/>
+
+            <!-- Data Toko -->
+            <div class="form-section-title">Data Toko</div>
+            <div class="form-field">
+                <label>Nama Toko *</label>
+                <input type="text" id="fieldName" placeholder="Contoh: Apotek Sehat Jaya"/>
+            </div>
+            <div class="form-field">
+                <label>Nama Pemilik *</label>
+                <input type="text" id="fieldOwner" placeholder="Contoh: H. Budi Santoso"/>
+            </div>
+            <div class="form-field">
+                <label>No. HP / WhatsApp</label>
+                <input type="tel" id="fieldPhone" placeholder="08xxxxxxxxxx"/>
+            </div>
+            <div class="form-field">
+                <label>NPWP</label>
+                <input type="text" id="fieldNpwp" placeholder="00.000.000.0-000.000"/>
+            </div>
+
+            <!-- Alamat -->
+            <div class="form-section-title">Alamat</div>
+            <div class="form-field">
+                <label>Alamat Lengkap *</label>
+                <textarea id="fieldAddress" rows="2" placeholder="Jl. Nama Jalan No. X"></textarea>
+            </div>
+            <div class="form-field">
+                <label>RT / RW</label>
+                <input type="text" id="fieldRtrw" placeholder="001/003"/>
+            </div>
+            <div class="form-field">
+                <label>Kelurahan</label>
+                <input type="text" id="fieldKelurahan" placeholder="Contoh: Menteng"/>
+            </div>
+            <div class="form-field">
+                <label>Kecamatan *</label>
+                <input type="text" id="fieldKecamatan" placeholder="Contoh: Senen"/>
+            </div>
+            <div class="form-field">
+                <label>Kota *</label>
+                <input type="text" id="fieldKota" placeholder="Contoh: Jakarta Pusat"/>
+            </div>
+
+            <!-- Klasifikasi -->
+            <div class="form-section-title">Klasifikasi</div>
+            <div class="form-field">
+                <label>Channel Distribusi *</label>
+                <select id="fieldChannel">
+                    <option value="">-- Pilih Channel --</option>
+                    <option value="GT">GT (General Trade)</option>
+                    <option value="MT">MT (Modern Trade)</option>
+                    <option value="HoReCa">HoReCa</option>
+                    <option value="Online">Online</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Status Outlet *</label>
+                <select id="fieldStatus">
+                    <option value="Aktif">Aktif</option>
+                    <option value="Potential">Potential</option>
+                    <option value="Tidak Aktif">Tidak Aktif</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Tipe Outlet</label>
+                <select id="fieldType">
+                    <option value="Outlet Regular">Outlet Regular</option>
+                    <option value="Outlet Prime">Outlet Prime</option>
+                    <option value="Outlet Star">Outlet Star</option>
+                </select>
+            </div>
+
+            <!-- Geo Tag -->
+            <div class="form-section-title">Lokasi GPS</div>
+            <button class="btn-get-gps" onclick="getGpsLocation()">
+                <i class="fas fa-crosshairs"></i> Tandai Lokasi GPS Sekarang
+            </button>
+            <div class="gps-preview" id="gpsPreview">
+                <i class="fas fa-check-circle me-1"></i>
+                Koordinat: <span id="gpsCoordDisplay">-</span>
+            </div>
+            <div class="gps-input-row">
+                <div class="form-field" style="margin-bottom:0;">
+                    <label>Latitude</label>
+                    <input type="number" id="fieldLat" placeholder="-6.1954" step="any"/>
+                </div>
+                <div class="form-field" style="margin-bottom:0;">
+                    <label>Longitude</label>
+                    <input type="number" id="fieldLng" placeholder="106.8231" step="any"/>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="bottom-action">
+        <button class="btn-mobile-primary" onclick="saveOutlet()">
+            <i class="fas fa-save me-2"></i>Simpan Outlet
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    let editId = null;
+    let photoData = null;
+    let gpsLat = null;
+    let gpsLng = null;
+
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        editId = params.get('id');
+
+        if (editId) {
+            $('#pageTitle').text('Edit Outlet');
+            const outlet = SfaStore.getCustomerById(editId);
+            if (outlet) prefillForm(outlet);
+        }
+    });
+
+    function prefillForm(o) {
+        $('#fieldName').val(o.name || '');
+        $('#fieldOwner').val(o.owner || '');
+        $('#fieldPhone').val(o.phone || '');
+        $('#fieldAddress').val(o.address || '');
+        $('#fieldKelurahan').val(o.kelurahan || '');
+        $('#fieldKecamatan').val(o.kecamatan || '');
+        $('#fieldKota').val(o.kota || '');
+        $('#fieldChannel').val(o.channel || '');
+        $('#fieldStatus').val(o.status || 'Aktif');
+        $('#fieldType').val(o.outletType || 'Outlet Regular');
+        if (o.lat) { $('#fieldLat').val(o.lat); gpsLat = o.lat; }
+        if (o.lng) { $('#fieldLng').val(o.lng); gpsLng = o.lng; }
+        if (o.hasGps) {
+            $('#gpsPreview').show();
+            $('#gpsCoordDisplay').text(`${o.lat}, ${o.lng}`);
+        }
+    }
+
+    function onPhotoSelected(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            photoData = e.target.result;
+            $('#photoPreview').attr('src', photoData).removeClass('d-none');
+            $('#photoPlaceholder').addClass('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function getGpsLocation() {
+        if (!navigator.geolocation) {
+            Swal.fire('Tidak Didukung', 'Browser ini tidak mendukung geolocation.', 'error');
+            return;
+        }
+
+        Swal.fire({
+            title: 'Mengambil GPS...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        navigator.geolocation.getCurrentPosition(
+            pos => {
+                gpsLat = pos.coords.latitude;
+                gpsLng = pos.coords.longitude;
+                $('#fieldLat').val(gpsLat.toFixed(6));
+                $('#fieldLng').val(gpsLng.toFixed(6));
+                $('#gpsPreview').show();
+                $('#gpsCoordDisplay').text(`${gpsLat.toFixed(6)}, ${gpsLng.toFixed(6)}`);
+                Swal.fire({ icon: 'success', title: 'GPS Diperoleh', timer: 1200, showConfirmButton: false });
+            },
+            () => {
+                // Simulasi untuk demo
+                gpsLat = -6.1954 + (Math.random() - 0.5) * 0.02;
+                gpsLng = 106.8231 + (Math.random() - 0.5) * 0.02;
+                $('#fieldLat').val(gpsLat.toFixed(6));
+                $('#fieldLng').val(gpsLng.toFixed(6));
+                $('#gpsPreview').show();
+                $('#gpsCoordDisplay').text(`${gpsLat.toFixed(6)}, ${gpsLng.toFixed(6)}`);
+                Swal.fire({ icon: 'info', title: 'GPS Simulasi', text: 'Koordinat disimulasikan karena izin GPS ditolak.', confirmButtonColor: '#005D41' });
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    function saveOutlet() {
+        const name = $('#fieldName').val().trim();
+        const owner = $('#fieldOwner').val().trim();
+        const address = $('#fieldAddress').val().trim();
+        const kecamatan = $('#fieldKecamatan').val().trim();
+        const kota = $('#fieldKota').val().trim();
+        const channel = $('#fieldChannel').val();
+
+        if (!name || !owner || !address || !kecamatan || !kota || !channel) {
+            Swal.fire('Form Tidak Lengkap', 'Harap isi semua field yang wajib (*).', 'warning');
+            return;
+        }
+
+        const lat = parseFloat($('#fieldLat').val()) || null;
+        const lng = parseFloat($('#fieldLng').val()) || null;
+
+        const obj = {
+            id: editId || null,
+            name: name,
+            owner: owner,
+            phone: $('#fieldPhone').val().trim(),
+            address: address,
+            kelurahan: $('#fieldKelurahan').val().trim(),
+            kecamatan: kecamatan,
+            kota: kota,
+            channel: channel,
+            status: $('#fieldStatus').val(),
+            outletType: $('#fieldType').val(),
+            lat: lat,
+            lng: lng,
+            hasGps: !!(lat && lng),
+            photo: photoData || null
+        };
+
+        const newId = SfaStore.saveCustomer(obj);
+
+        Swal.fire({
+            icon: 'success',
+            title: editId ? 'Outlet Diperbarui' : 'Outlet Baru Disimpan',
+            text: `${name} berhasil disimpan dan ditambahkan ke antrean sinkronisasi.`,
+            timer: 1800,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.href = `outlet_detail.html?id=${newId}`;
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Sinkronisasi Data - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .sync-summary-bar {
+            background: linear-gradient(135deg, #004d35, #005D41);
+            color: #fff; padding: 16px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+        }
+        .sync-kpi { text-align: center; }
+        .sync-kpi .n { font-size: 24px; font-weight: 700; }
+        .sync-kpi .l { font-size: 11px; opacity: 0.85; }
+        .sync-kpi.pending .n { color: #FFE57A; }
+        .sync-kpi.success .n { color: #A8E063; }
+        .sync-kpi.failed .n { color: #FF8A80; }
+
+        .queue-item {
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .queue-icon {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .icon-invoice { background: #FFF3E0; color: #FB8C00; }
+        .icon-collection { background: #FCE4D6; color: #C65911; }
+        .icon-visit { background: #EDE7F6; color: #5E35B1; }
+        .icon-geotag { background: #E8F5E9; color: #43A047; }
+        .icon-customer { background: #E3F2FD; color: #1E88E5; }
+
+        .queue-info { flex: 1; min-width: 0; }
+        .queue-type { font-size: 13px; font-weight: 700; color: var(--color-black); }
+        .queue-time { font-size: 11px; color: var(--color-gray); margin-top: 2px; }
+        .queue-retry { font-size: 10px; color: #dc3545; margin-top: 2px; }
+
+        .status-icon { font-size: 18px; flex-shrink: 0; }
+        .si-pending { color: #FB8C00; }
+        .si-uploading { color: #1E88E5; }
+        .si-success { color: #43A047; }
+        .si-failed { color: #dc3545; }
+
+        .btn-retry {
+            background: none; border: 1px solid #dc3545;
+            color: #dc3545; border-radius: 16px;
+            padding: 3px 10px; font-size: 11px; font-weight: 600;
+            cursor: pointer; flex-shrink: 0;
+        }
+
+        .progress-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .progress-card {
+            background: #fff; border-radius: 16px; padding: 24px;
+            width: 300px; text-align: center;
+        }
+        .progress-bar-wrap {
+            background: #e9efef; border-radius: 8px; height: 8px;
+            overflow: hidden; margin: 12px 0;
+        }
+        .progress-bar-fill {
+            height: 100%; background: var(--color-accent);
+            border-radius: 8px; transition: width 0.3s;
+        }
+        .bottom-action {
+            position: sticky; bottom: 0; background: #fff;
+            border-top: 1px solid var(--color-border); padding: 14px 16px;
+            display: flex; gap: 8px;
+        }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--color-gray); }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Sinkronisasi Data</span>
+        <div style="width:36px;"></div>
+    </div>
+
+    <!-- Summary -->
+    <div class="sync-summary-bar">
+        <div class="sync-kpi pending">
+            <div class="n" id="kpiPending">0</div>
+            <div class="l">Pending</div>
+        </div>
+        <div class="sync-kpi success">
+            <div class="n" id="kpiSuccess">0</div>
+            <div class="l">Berhasil</div>
+        </div>
+        <div class="sync-kpi failed">
+            <div class="n" id="kpiFailed">0</div>
+            <div class="l">Gagal</div>
+        </div>
+    </div>
+
+    <div class="mobile-content no-nav" style="padding-bottom:80px;">
+        <div class="p-16">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <span style="font-size:13px; font-weight:700; color:var(--color-gray);">ANTREAN SINKRONISASI</span>
+                <button onclick="clearDone()" style="background:none; border:none; font-size:12px; color:var(--color-primary); font-weight:600; cursor:pointer;">
+                    Hapus Selesai
+                </button>
+            </div>
+            <div id="queueList"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-action">
+        <button class="btn-mobile-secondary" style="flex:1;" onclick="addDemoItems()">
+            <i class="fas fa-plus me-1"></i>Demo Item
+        </button>
+        <button class="btn-mobile-primary" style="flex:2;" onclick="startSync()">
+            <i class="fas fa-sync me-2"></i>Sinkronisasi Semua
+        </button>
+    </div>
+</div>
+
+<!-- Progress Overlay -->
+<div class="progress-overlay d-none" id="progressOverlay">
+    <div class="progress-card">
+        <i class="fas fa-sync fa-spin fs-2 text-primary mb-3"></i>
+        <div style="font-size:15px; font-weight:700; margin-bottom:4px;">Menyinkronkan Data...</div>
+        <div style="font-size:12px; color:var(--color-gray);" id="progressLabel">Memproses item 0 dari 0</div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBarFill" style="width:0%;"></div>
+        </div>
+        <div style="font-size:11px; color:var(--color-gray);" id="progressCurrentItem">-</div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    $(document).ready(function() {
+        renderQueue();
+    });
+
+    function renderQueue() {
+        const queue = SfaStore.getSyncQueue();
+        const container = $('#queueList');
+        container.empty();
+
+        // Update summary
+        const pending = queue.filter(q => q.status === 'pending').length;
+        const success = queue.filter(q => q.status === 'success').length;
+        const failed = queue.filter(q => q.status === 'failed').length;
+        $('#kpiPending').text(pending);
+        $('#kpiSuccess').text(success);
+        $('#kpiFailed').text(failed);
+
+        if (queue.length === 0) {
+            container.html(`<div class="empty-state">
+                <i class="fas fa-check-circle fs-1 mb-3 text-success d-block"></i>
+                <div style="font-size:15px; font-weight:700; margin-bottom:4px;">Semua Data Tersinkron</div>
+                <div style="font-size:13px;">Tidak ada item dalam antrean.</div>
+            </div>`);
+            return;
+        }
+
+        // Sort: failed & pending first, then uploading, then success
+        const sorted = [...queue].sort((a, b) => {
+            const order = { failed: 0, pending: 1, uploading: 2, success: 3 };
+            return (order[a.status] || 0) - (order[b.status] || 0);
+        });
+
+        sorted.forEach(item => {
+            const iconClass = {
+                Invoice: 'icon-invoice', Collection: 'icon-collection',
+                Visit: 'icon-visit', GeoTag: 'icon-geotag', Customer: 'icon-customer'
+            }[item.type] || 'icon-visit';
+
+            const iconFA = {
+                Invoice: 'fa-file-invoice-dollar', Collection: 'fa-hand-holding-usd',
+                Visit: 'fa-map-marker-alt', GeoTag: 'fa-map-marked-alt', Customer: 'fa-user-plus'
+            }[item.type] || 'fa-database';
+
+            let statusIconHtml = '';
+            let retryBtn = '';
+            if (item.status === 'pending') statusIconHtml = `<i class="fas fa-clock status-icon si-pending"></i>`;
+            else if (item.status === 'uploading') statusIconHtml = `<i class="fas fa-spinner fa-spin status-icon si-uploading"></i>`;
+            else if (item.status === 'success') statusIconHtml = `<i class="fas fa-check-circle status-icon si-success"></i>`;
+            else if (item.status === 'failed') {
+                statusIconHtml = `<i class="fas fa-times-circle status-icon si-failed"></i>`;
+                retryBtn = `<button class="btn-retry" onclick="retryItem('${item.id}')"><i class="fas fa-redo me-1"></i>Retry</button>`;
+            }
+
+            const retryCount = item.retryCount > 0 ? `<div class="queue-retry"><i class="fas fa-exclamation-circle me-1"></i>${item.retryCount}x retry</div>` : '';
+
+            container.append(`
+                <div class="queue-item" id="qi_${item.id}">
+                    <div class="queue-icon ${iconClass}">
+                        <i class="fas ${iconFA}"></i>
+                    </div>
+                    <div class="queue-info">
+                        <div class="queue-type">${item.type}</div>
+                        <div class="queue-time">${SfaStore.formatDate(item.createdAt)} ${item.updatedAt ? '· Upd: ' + SfaStore.formatDate(item.updatedAt) : ''}</div>
+                        ${retryCount}
+                    </div>
+                    ${retryBtn}
+                    ${statusIconHtml}
+                </div>
+            `);
+        });
+    }
+
+    function retryItem(id) {
+        SfaStore.retryQueueItem(id);
+        renderQueue();
+    }
+
+    function clearDone() {
+        SfaStore.clearSuccessfulQueue();
+        renderQueue();
+    }
+
+    function startSync() {
+        const queue = SfaStore.getSyncQueue();
+        const pending = queue.filter(q => q.status === 'pending' || q.status === 'failed');
+
+        if (pending.length === 0) {
+            Swal.fire({
+                icon: 'info', title: 'Tidak Ada Pending',
+                text: 'Semua item sudah tersinkron.',
+                confirmButtonColor: '#005D41'
+            });
+            return;
+        }
+
+        $('#progressOverlay').removeClass('d-none');
+        $('#progressBarFill').css('width', '0%');
+
+        SfaStore.processQueue(
+            function onProgress(item, idx, total) {
+                const pct = Math.round((idx / total) * 100);
+                $('#progressBarFill').css('width', pct + '%');
+                $('#progressLabel').text(`Memproses item ${idx} dari ${total}`);
+                $('#progressCurrentItem').text(`${item ? item.type : ''} — ${item ? item.status : ''}`);
+                renderQueue();
+            },
+            function onComplete(successCount, failCount) {
+                $('#progressOverlay').addClass('d-none');
+                renderQueue();
+
+                Swal.fire({
+                    icon: failCount === 0 ? 'success' : 'warning',
+                    title: failCount === 0 ? 'Sinkronisasi Selesai' : 'Sinkronisasi Sebagian',
+                    html: `<b>${successCount}</b> berhasil dikirim${failCount > 0 ? `<br><b>${failCount}</b> gagal (coba retry)` : ''}`,
+                    confirmButtonColor: '#005D41'
+                });
+            }
+        );
+    }
+
+    function addDemoItems() {
+        SfaStore.addToSyncQueue('Invoice', { demo: true, amount: 450000 });
+        SfaStore.addToSyncQueue('Collection', { demo: true, amount: 200000 });
+        SfaStore.addToSyncQueue('Visit', { demo: true });
+        renderQueue();
+        Swal.fire({ icon: 'info', title: '3 item demo ditambahkan', timer: 1000, showConfirmButton: false });
+    }
+</script>
+</body>
+</html>

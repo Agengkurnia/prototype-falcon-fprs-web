@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Pembayaran Pelanggan - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .filter-tab-container {
+            display: flex;
+            background-color: #fff;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 56px;
+            z-index: 90;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filter-tab-container::-webkit-scrollbar { display: none; }
+        .filter-tab {
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+            padding: 12px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--color-gray);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+        .filter-tab.active { color: var(--color-primary); }
+        .filter-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 15%; right: 15%;
+            height: 3px;
+            background-color: var(--color-primary);
+            border-radius: 3px 3px 0 0;
+        }
+        .summary-bar {
+            background: linear-gradient(135deg, #004d35, #005D41);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-bar .lbl { font-size: 11px; opacity: 0.85; margin-bottom: 2px; }
+        .summary-bar .val { font-size: 18px; font-weight: 700; }
+        .customer-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .customer-card:active { transform: scale(0.98); background: #fafbfc; }
+        .customer-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .customer-name { font-size: 14px; font-weight: 700; color: var(--color-black); }
+        .ar-amount {
+            font-size: 15px; font-weight: 700; color: #dc3545;
+            background: #FCE4D6; padding: 3px 8px; border-radius: 8px;
+        }
+        .invoice-count { font-size: 12px; color: var(--color-gray); margin-top: 4px; }
+        .progress-mini {
+            height: 4px; background: #e9efef; border-radius: 4px; margin-top: 10px; overflow: hidden;
+        }
+        .progress-mini-fill { height: 100%; border-radius: 4px; background: #78B500; }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--color-gray); }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Pembayaran Pelanggan</span>
+        <button class="header-action"><i class="fas fa-search" style="font-size:16px;"></i></button>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar">
+        <div>
+            <div class="lbl">Total Outstanding Hari Ini</div>
+            <div class="val" id="totalOutstanding">Rp0</div>
+        </div>
+        <div style="text-align:right;">
+            <div class="lbl">Jumlah Pelanggan</div>
+            <div class="val" id="totalCustomers">0</div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tab-container">
+        <div class="filter-tab active" id="tabSemua" onclick="setFilter('semua')">Semua</div>
+        <div class="filter-tab" id="tabBelum" onclick="setFilter('belum')">Belum</div>
+        <div class="filter-tab" id="tabSebagian" onclick="setFilter('sebagian')">Sebagian</div>
+        <div class="filter-tab" id="tabLunas" onclick="setFilter('lunas')">Lunas</div>
+    </div>
+
+    <div class="mobile-content">
+        <div class="p-16" id="listContainer"></div>
+    </div>
+
+    <div class="mobile-nav">
+        <a href="home.html" class="mobile-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Beranda</span>
+        </a>
+        <a href="collection_list.html" class="mobile-nav-item active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <span>Penagihan</span>
+        </a>
+        <a href="profil.html" class="mobile-nav-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Profil</span>
+        </a>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    let currentFilter = 'semua';
+    let customerGroups = [];
+
+    $(document).ready(function() {
+        buildGroups();
+        renderList();
+        updateSummary();
+    });
+
+    function buildGroups() {
+        const collections = SfaStore.getCollections();
+        const customers = SfaStore.getCustomers();
+        const map = {};
+
+        collections.forEach(c => {
+            if (!map[c.customerId]) {
+                const cust = customers.find(x => x.id === c.customerId);
+                map[c.customerId] = {
+                    customerId: c.customerId,
+                    customerName: c.customerName || (cust ? cust.name : c.customerId),
+                    invoices: [],
+                    totalOutstanding: 0,
+                    totalPaid: 0,
+                    totalAmount: 0
+                };
+            }
+            map[c.customerId].invoices.push(c);
+            map[c.customerId].totalOutstanding += (c.balance || 0);
+            map[c.customerId].totalPaid += (c.paidAmount || 0);
+            map[c.customerId].totalAmount += (c.totalAmount || 0);
+        });
+
+        customerGroups = Object.values(map).filter(g => g.totalAmount > 0);
+    }
+
+    function updateSummary() {
+        const total = customerGroups.reduce((s, g) => s + g.totalOutstanding, 0);
+        $('#totalOutstanding').text(SfaStore.formatRupiah(total));
+        $('#totalCustomers').text(customerGroups.length);
+    }
+
+    function setFilter(f) {
+        currentFilter = f;
+        $('.filter-tab').removeClass('active');
+        $(`#tab${f.charAt(0).toUpperCase() + f.slice(1)}`).addClass('active');
+        renderList();
+    }
+
+    function getGroupStatus(g) {
+        if (g.totalOutstanding <= 0) return 'lunas';
+        if (g.totalPaid > 0) return 'sebagian';
+        return 'belum';
+    }
+
+    function renderList() {
+        const container = $('#listContainer');
+        container.empty();
+
+        const filtered = customerGroups.filter(g => {
+            if (currentFilter === 'semua') return true;
+            return getGroupStatus(g) === currentFilter;
+        });
+
+        if (filtered.length === 0) {
+            container.html(`<div class="empty-state"><i class="fas fa-check-circle fs-1 mb-3 text-success d-block"></i>Tidak ada data piutang untuk filter ini.</div>`);
+            return;
+        }
+
+        filtered.forEach(g => {
+            const status = getGroupStatus(g);
+            let badgeHtml = '';
+            if (status === 'lunas') badgeHtml = `<span class="badge-mobile badge-mobile-success">Lunas</span>`;
+            else if (status === 'sebagian') badgeHtml = `<span class="badge-mobile badge-mobile-warning">Terbayar Sebagian</span>`;
+            else badgeHtml = `<span class="badge-mobile badge-mobile-danger">Belum Dibayar</span>`;
+
+            const pct = g.totalAmount > 0 ? Math.round((g.totalPaid / g.totalAmount) * 100) : 0;
+            const invoiceCount = g.invoices.length;
+
+            container.append(`
+                <a href="collection_input.html?customerId=${g.customerId}" class="customer-card">
+                    <div class="customer-card-header">
+                        <div>
+                            <div class="customer-name">${g.customerName}</div>
+                            <div class="invoice-count">${invoiceCount} invoice • ${g.invoices.filter(i => i.balance > 0).length} belum lunas</div>
+                        </div>
+                        <div class="text-end">
+                            ${badgeHtml}
+                            <div class="ar-amount mt-1">${SfaStore.formatRupiah(g.totalOutstanding)}</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between" style="font-size:11px; color:var(--color-gray);">
+                        <span>Terbayar: ${SfaStore.formatRupiah(g.totalPaid)}</span>
+                        <span>${pct}%</span>
+                    </div>
+                    <div class="progress-mini">
+                        <div class="progress-mini-fill" style="width:${pct}%;"></div>
+                    </div>
+                </a>
+            `);
+        });
+    }
+</script>
+</body>
+</html>
