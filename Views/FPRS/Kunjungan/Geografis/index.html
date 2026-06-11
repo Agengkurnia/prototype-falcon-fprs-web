@@ -1,19 +1,37 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
+
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Geografis Kunjungan – Falcon FPRS</title>
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
     <style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2');
+        }
 
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 400; font-display: swap; src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 600; font-display: swap; src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2'); }
-        @font-face { font-family: 'Kalbe Geometric'; font-style: normal; font-weight: 700; font-display: swap; src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2'); }
-    
-</style>
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-SemiBold.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Kalbe Geometric';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2') format('woff2');
+        }
+    </style>
     <style>
-
         /* Specific Styles for Geografis Kunjungan Page */
         .content-wrapper-map {
             padding: 0;
@@ -32,7 +50,7 @@
             flex-direction: column;
             flex-shrink: 0;
             z-index: 5;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
         }
 
         /* Summary Indicators */
@@ -43,12 +61,14 @@
             background: #e9ecef;
             border-bottom: 1px solid #e9ecef;
         }
+
         .summary-header-item {
             background: #005d41;
             color: #fff;
             text-align: center;
             padding: 8px 4px;
         }
+
         .summary-header-item .lbl {
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -56,6 +76,7 @@
             margin-bottom: 2px;
             display: block;
         }
+
         .summary-header-item .val {
             font-size: 1rem;
             font-weight: 700;
@@ -83,6 +104,7 @@
             background: #f8f9fa;
             border-bottom: 1px solid #e9ecef;
         }
+
         .date-picker-row button {
             background: none;
             border: none;
@@ -90,9 +112,11 @@
             font-size: 1rem;
             cursor: pointer;
         }
+
         .date-picker-row button:hover {
             color: #343a40;
         }
+
         .date-picker-row span {
             font-weight: 600;
             font-size: 0.85rem;
@@ -114,10 +138,12 @@
             transition: all 0.2s;
             position: relative;
         }
+
         .sales-card:hover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
             border-color: #ced4da;
         }
+
         .sales-card.active-sales {
             border-left: 4px solid #005d41;
             background: #f1f7e5;
@@ -129,6 +155,7 @@
             align-items: center;
             margin-bottom: 8px;
         }
+
         .sales-card-title {
             font-weight: 700;
             color: #212529;
@@ -137,12 +164,14 @@
             align-items: center;
             gap: 6px;
         }
+
         .sales-card-metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
             margin-bottom: 8px;
         }
+
         .sales-metric-box {
             text-align: center;
             background: #f8f9fa;
@@ -150,14 +179,17 @@
             padding: 4px 2px;
             border: 1px solid #f1f3f5;
         }
+
         .sales-card.active-sales .sales-metric-box {
             background: #fff;
         }
+
         .sales-metric-label {
             font-size: 0.65rem;
             color: #6c757d;
             display: block;
         }
+
         .sales-metric-val {
             font-size: 0.75rem;
             font-weight: 700;
@@ -199,6 +231,7 @@
             position: relative;
             height: 100%;
         }
+
         #map {
             width: 100%;
             height: 100%;
@@ -213,10 +246,11 @@
             background: #fff;
             padding: 3px;
             border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
             display: flex;
             gap: 2px;
         }
+
         .btn-map-type {
             font-size: 0.75rem;
             font-weight: 600;
@@ -227,6 +261,7 @@
             cursor: pointer;
             color: #495057;
         }
+
         .btn-map-type.active-type {
             background: #005d41;
             color: #fff;
@@ -241,9 +276,10 @@
             flex-direction: column;
             flex-shrink: 0;
             z-index: 5;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
             transition: margin-right 0.3s ease;
         }
+
         .map-right-panel.collapsed {
             margin-right: -320px;
         }
@@ -256,12 +292,14 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .right-panel-header h5 {
             font-size: 0.9rem;
             font-weight: 700;
             margin: 0;
             color: #212529;
         }
+
         .right-panel-close {
             background: none;
             border: none;
@@ -283,9 +321,9 @@
             padding: 10px 12px;
             margin-bottom: 12px;
             position: relative;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
         }
-        
+
         .visit-seq-badge {
             position: absolute;
             top: 10px;
@@ -309,6 +347,7 @@
             margin-bottom: 4px;
             max-width: 85%;
         }
+
         .visit-meta-row {
             font-size: 0.72rem;
             color: #6c757d;
@@ -317,6 +356,7 @@
             align-items: center;
             gap: 6px;
         }
+
         .visit-metric-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -325,14 +365,17 @@
             border-top: 1px solid #f1f3f5;
             padding-top: 6px;
         }
+
         .visit-metric-item {
             text-align: center;
         }
+
         .visit-metric-lbl {
             font-size: 0.6rem;
             color: #868e96;
             display: block;
         }
+
         .visit-metric-val {
             font-size: 0.7rem;
             font-weight: 600;
@@ -352,231 +395,272 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: all 0.2s;
         }
+
         .custom-marker:hover {
             transform: scale(1.15);
             background: #d83f52;
             z-index: 999;
         }
-    
-</style>
+    </style>
 </head>
+
 <body>
     <div id="app-content">
-<div class="content-wrapper-map">
+        <div class="content-wrapper-map">
 
-                
-                <!-- LEFT PANEL (Employee / Salesman list) -->
-                <div class="map-left-panel">
-                    <div class="summary-header-grid">
-                        <div class="summary-header-item">
-                            <span class="lbl">Pegawai</span>
-                            <span class="val">46</span>
-                        </div>
-                        <div class="summary-header-item">
-                            <span class="lbl">Pesanan</span>
-                            <span class="val">0</span>
-                        </div>
-                        <div class="summary-header-item">
-                            <span class="lbl">Canvass</span>
-                            <span class="val">629</span>
-                        </div>
-                        <div class="summary-header-item">
-                            <span class="lbl">Visited</span>
-                            <span class="val">1147</span>
-                        </div>
+
+            <!-- LEFT PANEL (Employee / Salesman list) -->
+            <div class="map-left-panel">
+                <div class="summary-header-grid">
+                    <div class="summary-header-item">
+                        <span class="lbl">Pegawai</span>
+                        <span class="val">46</span>
                     </div>
-
-                    <div class="alert-marker-limit">
-                        <i class="fa fa-exclamation-triangle"></i>
-                        <span>Marker kunjungan melebihi batas (maks. 1000). Silakan pilih pegawai untuk melihat rute.</span>
+                    <div class="summary-header-item">
+                        <span class="lbl">Pesanan</span>
+                        <span class="val">0</span>
                     </div>
-
-                    <div class="date-picker-row">
-                        <button id="btnPrevDate"><i class="fa fa-chevron-left"></i></button>
-                        <span id="txtCurrentDate">05 Jun 2026</span>
-                        <button id="btnNextDate"><i class="fa fa-chevron-right"></i></button>
+                    <div class="summary-header-item">
+                        <span class="lbl">Canvass</span>
+                        <span class="val">629</span>
                     </div>
-
-                    <div class="sales-list-viewport" id="salesListContainer">
-                        <!-- Employee Cards will be injected here via JavaScript -->
-                    </div>
-
-                    <div class="sales-bottom-total">
-                        <span>Total Penjualan</span>
-                        <span id="lblGrandTotal">Rp. 51.834.500,00</span>
+                    <div class="summary-header-item">
+                        <span class="lbl">Visited</span>
+                        <span class="val">1147</span>
                     </div>
                 </div>
 
-                <!-- CENTER MAP -->
-                <div class="map-center-container">
-                    <div class="map-switcher-overlay">
-                        <button class="btn-map-type active-type" id="btnOSM">OpenStreetMap</button>
-                        <button class="btn-map-type" id="btnGmaps">Google Maps</button>
-                    </div>
-                    <div id="map"></div>
+                <div class="alert-marker-limit">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <span>Marker kunjungan melebihi batas (maks. 1000). Silakan pilih pegawai untuk melihat rute.</span>
                 </div>
 
-                <!-- RIGHT PANEL (Visit stores list timeline) -->
-                <div class="map-right-panel collapsed" id="rightPanel">
-                    <div class="right-panel-header">
-                        <h5 id="rightPanelTitle">Kunjungan: -</h5>
-                        <button class="right-panel-close" id="btnCloseRightPanel"><i class="fa fa-times"></i></button>
-                    </div>
-                    <div class="visit-timeline-viewport" id="visitTimelineContainer">
-                        <!-- Visit details will be loaded here dynamically -->
-                    </div>
+                <div class="date-picker-row">
+                    <button id="btnPrevDate"><i class="fa fa-chevron-left"></i></button>
+                    <span id="txtCurrentDate">05 Jun 2026</span>
+                    <button id="btnNextDate"><i class="fa fa-chevron-right"></i></button>
                 </div>
-    </div>
+
+                <div class="sales-list-viewport" id="salesListContainer">
+                    <!-- Employee Cards will be injected here via JavaScript -->
+                </div>
+
+                <div class="sales-bottom-total">
+                    <span>Total Penjualan</span>
+                    <span id="lblGrandTotal">Rp. 51.834.500,00</span>
+                </div>
+            </div>
+
+            <!-- CENTER MAP -->
+            <div class="map-center-container">
+                <div class="map-switcher-overlay">
+                    <button class="btn-map-type active-type" id="btnOSM">OpenStreetMap</button>
+                    <button class="btn-map-type" id="btnGmaps">Google Maps</button>
+                </div>
+                <div id="map"></div>
+            </div>
+
+            <!-- RIGHT PANEL (Visit stores list timeline) -->
+            <div class="map-right-panel collapsed" id="rightPanel">
+                <div class="right-panel-header">
+                    <h5 id="rightPanelTitle">Kunjungan: -</h5>
+                    <button class="right-panel-close" id="btnCloseRightPanel"><i class="fa fa-times"></i></button>
+                </div>
+                <div class="visit-timeline-viewport" id="visitTimelineContainer">
+                    <!-- Visit details will be loaded here dynamically -->
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
         document.addEventListener('layoutReady', () => {
 
-$(document).ready(function() {
-    // ----------------------------------------------------
-    // MOCK DATA: SALESMEN & VISITS COORDINATES
-    // ----------------------------------------------------
-// MOCK DATA: SALESMEN & VISITS COORDINATES BY DATE (June 2026 - Jakarta Area)
-    // ----------------------------------------------------
-    let SALES_DATA_BY_DATE = {};
+            $(document).ready(function () {
+                // ----------------------------------------------------
+                // MOCK DATA: SALESMEN & VISITS COORDINATES
+                // ----------------------------------------------------
+                // MOCK DATA: SALESMEN & VISITS COORDINATES BY DATE (June 2026 - Jakarta Area)
+                // ----------------------------------------------------
+                let SALES_DATA_BY_DATE = {};
 
-    let SALES_DATA = {};
-    
-    // Parse URL Parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const dateParam = urlParams.get('date'); // e.g. "2026-06-15"
-    const salesmanParam = urlParams.get('salesman'); // e.g. "106207"
+                let SALES_DATA = {};
 
-    let activeSalesId = salesmanParam || null;
-    let mapMarkers = [];
-    let currentDate = new Date(2026, 5, 5); // Default to June 5, 2026
-    
-    if (dateParam) {
-        const parts = dateParam.split('-');
-        if (parts.length === 3) {
-            currentDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-        }
-    }
+                // Parse URL Parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const dateParam = urlParams.get('date'); // e.g. "2026-06-15"
+                const salesmanParam = urlParams.get('salesman'); // e.g. "106207"
 
-    // ----------------------------------------------------
-    // INITIALIZE MAPLIBRE GL JS
-    // ----------------------------------------------------
-    const map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://tiles.openfreemap.org/styles/liberty', // Free high-performance OSM Vector Style
-        center: [106.8271, -6.1754], // Default center around Jakarta
-        zoom: 11
-    });
+                let activeSalesId = salesmanParam || null;
+                let mapMarkers = [];
+                let currentDate = new Date(); // Default to today's date
+                let isDataLoaded = false;
 
-    // Helper functions for date navigation and formatting
-    function formatDateForDisplay(date) {
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = months[date.getMonth()];
-        const y = date.getFullYear();
-        return `${d} ${m} ${y}`;
-    }
+                if (dateParam) {
+                    const parts = dateParam.split('-');
+                    if (parts.length === 3) {
+                        currentDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                    }
+                }
 
-    function formatDateKey(date) {
-        const d = String(date.getDate()).padStart(2, '0');
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const y = date.getFullYear();
-        return `${y}-${m}-${d}`;
-    }
+                // ----------------------------------------------------
+                // INITIALIZE MAPLIBRE GL JS
+                // ----------------------------------------------------
+                const map = new maplibregl.Map({
+                    container: 'map',
+                    style: 'https://tiles.openfreemap.org/styles/liberty', // Free high-performance OSM Vector Style
+                    center: [106.8271, -6.1754], // Default center around Jakarta
+                    zoom: 11
+                });
 
-    // Helper to calculate total active salesmen count for summary metrics
-    function updateSummaryMetrics(salesData) {
-        let activeSalesmenCount = Object.keys(salesData).length;
-        let totalOrders = 0;
-        let totalCanvass = 0;
-        let totalVisited = 0;
-        let grandTotal = 0;
+                // Helper functions for date navigation and formatting
+                function formatDateForDisplay(date) {
+                    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    const d = String(date.getDate()).padStart(2, '0');
+                    const m = months[date.getMonth()];
+                    const y = date.getFullYear();
+                    return `${d} ${m} ${y}`;
+                }
 
-        Object.keys(salesData).forEach(key => {
-            const s = salesData[key];
-            totalVisited += s.visits.length;
-            grandTotal += s.invoice;
-            
-            s.visits.forEach(v => {
-                if (v.invoice > 0) totalOrders++;
-                if (v.role === 'Canvasser') totalCanvass++;
-            });
-        });
+                function formatDateKey(date) {
+                    const d = String(date.getDate()).padStart(2, '0');
+                    const m = String(date.getMonth() + 1).padStart(2, '0');
+                    const y = date.getFullYear();
+                    return `${y}-${m}-${d}`;
+                }
 
-        // Update UI summary elements
-        $('.summary-header-grid .summary-header-item').eq(0).find('.val').text(activeSalesmenCount);
-        $('.summary-header-grid .summary-header-item').eq(1).find('.val').text(totalOrders);
-        $('.summary-header-grid .summary-header-item').eq(2).find('.val').text(totalCanvass);
-        $('.summary-header-grid .summary-header-item').eq(3).find('.val').text(totalVisited);
-        
-        $('#lblGrandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
-    }
+                // Helper to calculate total active salesmen count for summary metrics
+                function updateSummaryMetrics(salesData) {
+                    let activeSalesmenCount = Object.keys(salesData).length;
+                    let totalOrders = 0;
+                    let totalCanvass = 0;
+                    let totalVisited = 0;
+                    let grandTotal = 0;
 
-    function loadDateData() {
-        const dateKey = formatDateKey(currentDate);
-        $('#txtCurrentDate').text(formatDateForDisplay(currentDate));
-        
-        // Reset active salesman and details panel
-        activeSalesId = null;
-        $('#rightPanel').addClass('collapsed');
-        clearMap();
-        
-        // Get current date's data
-        SALES_DATA = SALES_DATA_BY_DATE[dateKey] || {};
-        
-        // Update center of map to first active salesman or default to Jakarta
-        let center = [106.8271, -6.1754];
-        const keys = Object.keys(SALES_DATA);
-        if (keys.length > 0) {
-            center = SALES_DATA[keys[0]].center;
-        }
-        
-        map.jumpTo({
-            center: center,
-            zoom: 11
-        });
-        
-        // Re-render components
-        renderSalesList();
-        updateSummaryMetrics(SALES_DATA);
-    }
+                    Object.keys(salesData).forEach(key => {
+                        const s = salesData[key];
+                        totalVisited += s.visits.length;
+                        grandTotal += s.invoice;
 
-    // Set up Date Picker Navigation Click Handlers
-    $('#btnPrevDate').on('click', function() {
-        // Constrain to June 2026
-        if (currentDate.getDate() > 1) {
-            currentDate.setDate(currentDate.getDate() - 1);
-            loadDateData();
-        }
-    });
+                        s.visits.forEach(v => {
+                            if (v.invoice > 0) totalOrders++;
+                            if (v.role === 'Canvasser') totalCanvass++;
+                        });
+                    });
 
-    $('#btnNextDate').on('click', function() {
-        // Constrain to June 2026
-        if (currentDate.getDate() < 30) {
-            currentDate.setDate(currentDate.getDate() + 1);
-            loadDateData();
-        }
-    });
+                    // Update UI summary elements
+                    $('.summary-header-grid .summary-header-item').eq(0).find('.val').text(activeSalesmenCount);
+                    $('.summary-header-grid .summary-header-item').eq(1).find('.val').text(totalOrders);
+                    $('.summary-header-grid .summary-header-item').eq(2).find('.val').text(totalCanvass);
+                    $('.summary-header-grid .summary-header-item').eq(3).find('.val').text(totalVisited);
 
-        map.addControl(new maplibregl.NavigationControl(), 'top-right');
+                    $('#lblGrandTotal').text('Rp ' + grandTotal.toLocaleString('id-ID'));
+                }
 
-    // ----------------------------------------------------
-    // RENDER SALES LIST
-    // ----------------------------------------------------
-    function renderSalesList() {
-        const container = $('#salesListContainer');
-        container.empty();
+                function updateClusterData() {
+                    const dateKey = formatDateKey(currentDate);
+                    SALES_DATA = SALES_DATA_BY_DATE[dateKey] || {};
 
-        Object.keys(SALES_DATA).forEach(key => {
-            const s = SALES_DATA[key];
-            const isActive = activeSalesId !== null && String(activeSalesId) === String(s.id);
-            
-            const cardHtml = `
+                    const features = [];
+                    Object.keys(SALES_DATA).forEach(salesId => {
+                        const s = SALES_DATA[salesId];
+                        s.visits.forEach(v => {
+                            features.push({
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Point',
+                                    coordinates: v.coords
+                                },
+                                properties: {
+                                    store: v.store,
+                                    code: v.code,
+                                    salesmanName: s.name,
+                                    salesmanId: s.id,
+                                    invoice: v.invoice,
+                                    inTime: v.inTime,
+                                    role: v.role
+                                }
+                            });
+                        });
+                    });
+
+                    const geojson = {
+                        type: 'FeatureCollection',
+                        features: features
+                    };
+
+                    const source = map.getSource('all-visits');
+                    if (source) {
+                        source.setData(geojson);
+                    }
+                }
+
+                function loadDateData() {
+                    const dateKey = formatDateKey(currentDate);
+                    $('#txtCurrentDate').text(formatDateForDisplay(currentDate));
+
+                    // Reset active salesman and details panel
+                    activeSalesId = null;
+                    $('#rightPanel').addClass('collapsed');
+                    clearMap();
+
+                    // Get current date's data
+                    SALES_DATA = SALES_DATA_BY_DATE[dateKey] || {};
+
+                    // Update center of map to first active salesman or default to Jakarta
+                    let center = [106.8271, -6.1754];
+                    const keys = Object.keys(SALES_DATA);
+                    if (keys.length > 0) {
+                        center = SALES_DATA[keys[0]].center;
+                    }
+
+                    map.jumpTo({
+                        center: center,
+                        zoom: 11
+                    });
+
+                    // Re-render components
+                    renderSalesList();
+                    updateSummaryMetrics(SALES_DATA);
+                    updateClusterData();
+                }
+
+                // Set up Date Picker Navigation Click Handlers
+                $('#btnPrevDate').on('click', function () {
+                    // Constrain to June 2026
+                    if (currentDate.getDate() > 1) {
+                        currentDate.setDate(currentDate.getDate() - 1);
+                        loadDateData();
+                    }
+                });
+
+                $('#btnNextDate').on('click', function () {
+                    // Constrain to June 2026
+                    if (currentDate.getDate() < 30) {
+                        currentDate.setDate(currentDate.getDate() + 1);
+                        loadDateData();
+                    }
+                });
+
+                map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+                // ----------------------------------------------------
+                // RENDER SALES LIST
+                // ----------------------------------------------------
+                function renderSalesList() {
+                    const container = $('#salesListContainer');
+                    container.empty();
+
+                    Object.keys(SALES_DATA).forEach(key => {
+                        const s = SALES_DATA[key];
+                        const isActive = activeSalesId !== null && String(activeSalesId) === String(s.id);
+
+                        const cardHtml = `
                 <div class="sales-card ${isActive ? 'active-sales' : ''}" data-id="${s.id}">
                     <div class="sales-card-header">
                         <span class="sales-card-title">
@@ -621,203 +705,373 @@ $(document).ready(function() {
                     </div>
                 </div>
             `;
-            container.append(cardHtml);
-        });
-    }
-
-    // Load external JSON data dynamically
-    $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function(data) {
-        SALES_DATA_BY_DATE = data;
-        loadDateData();
-        
-        if (salesmanParam && SALES_DATA[salesmanParam]) {
-            activeSalesId = salesmanParam;
-            // Short delay to ensure map canvas is loaded and ready
-            setTimeout(() => {
-                viewSalesRoute(salesmanParam);
-                renderSalesList();
-            }, 600);
-        }
-    }).fail(function(jqxhr, textStatus, error) {
-        console.error("Error loading sales data JSON:", textStatus, error);
-    });
-
-    // ----------------------------------------------------
-    // MAP INTERACTION & ROUTE RENDERING
-    // ----------------------------------------------------
-    function clearMap() {
-        // Remove existing markers
-        mapMarkers.forEach(m => m.remove());
-        mapMarkers = [];
-
-        // Remove route layers and source
-        if (map.getLayer('route-line')) map.removeLayer('route-line');
-        if (map.getLayer('route-casing')) map.removeLayer('route-casing');
-        if (map.getSource('route')) map.removeSource('route');
-    }
-
-    function viewSalesRoute(salesId) {
-        clearMap();
-        const s = SALES_DATA[salesId];
-        if (!s) return;
-
-        // Draw Route Line
-        const coordinates = s.visits.map(v => v.coords);
-
-        map.addSource('route', {
-            'type': 'geojson',
-            'data': {
-                'type': 'Feature',
-                'properties': {},
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': coordinates
+                        container.append(cardHtml);
+                    });
                 }
-            }
-        });
 
-        // Add Casing for cleaner road styling
-        map.addLayer({
-            'id': 'route-casing',
-            'type': 'line',
-            'source': 'route',
-            'layout': { 'line-join': 'round', 'line-cap': 'round' },
-            'paint': {
-                'line-color': '#fff',
-                'line-width': 8
-            }
-        });
+                // ----------------------------------------------------
+                // MAP LAYERS & CLUSTERING INITIALIZATION ON MAP LOAD
+                // ----------------------------------------------------
+                function setupAllVisitsSourceAndLayers() {
+                    if (!map.getSource('all-visits')) {
+                        map.addSource('all-visits', {
+                            type: 'geojson',
+                            data: { type: 'FeatureCollection', features: [] },
+                            cluster: true,
+                            clusterMaxZoom: 14,
+                            clusterRadius: 50
+                        });
+                    }
 
-        // Add Active Kalbe Green Polyline
-        map.addLayer({
-            'id': 'route-line',
-            'type': 'line',
-            'source': 'route',
-            'layout': { 'line-join': 'round', 'line-cap': 'round' },
-            'paint': {
-                'line-color': '#005d41',
-                'line-width': 4
-            }
-        });
+                    if (!map.getLayer('clusters')) {
+                        map.addLayer({
+                            id: 'clusters',
+                            type: 'circle',
+                            source: 'all-visits',
+                            filter: ['has', 'point_count'],
+                            paint: {
+                                'circle-color': [
+                                    'step',
+                                    ['get', 'point_count'],
+                                    '#3b82f6', 10,   // Blue for smaller clusters (< 10)
+                                    '#ec4899', 50,   // Magenta for medium clusters (10 - 50)
+                                    '#ef4444'        // Red for large clusters (> 50)
+                                ],
+                                'circle-radius': [
+                                    'step',
+                                    ['get', 'point_count'],
+                                    18, 10,
+                                    24, 50,
+                                    30
+                                ],
+                                'circle-stroke-width': 2,
+                                'circle-stroke-color': '#fff'
+                            }
+                        });
+                    }
 
-        // Add Custom Sequence Markers
-        s.visits.forEach(v => {
-            const el = document.createElement('div');
-            el.className = 'custom-marker';
-            el.innerText = v.aseq;
+                    if (!map.getLayer('cluster-count')) {
+                        map.addLayer({
+                            id: 'cluster-count',
+                            type: 'symbol',
+                            source: 'all-visits',
+                            filter: ['has', 'point_count'],
+                            layout: {
+                                'text-field': '{point_count_abbreviated}',
+                                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                                'text-size': 12
+                            },
+                            paint: {
+                                'text-color': '#ffffff'
+                            }
+                        });
+                    }
 
-            const marker = new maplibregl.Marker({ element: el })
-                .setLngLat(v.coords)
-                .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-                    <div style="font-family: 'Kalbe Geometric'; font-size: 0.8rem; padding: 4px;">
-                        <strong style="color: #005d41;">${v.store}</strong><br/>
-                        <span style="color:#6c757d;">Code: ${v.code}</span><br/>
-                        <span>Check In: ${v.inTime}</span><br/>
-                        <span>Faktur: Rp ${v.invoice.toLocaleString('id-ID')}</span>
-                    </div>
-                `))
-                .addTo(map);
+                    if (!map.getLayer('unclustered-point')) {
+                        map.addLayer({
+                            id: 'unclustered-point',
+                            type: 'symbol',
+                            source: 'all-visits',
+                            filter: ['!', ['has', 'point_count']],
+                            layout: {
+                                'icon-image': 'store-icon',
+                                'icon-size': 1.0,
+                                'icon-allow-overlap': true
+                            }
+                        });
+                    }
 
-            mapMarkers.push(marker);
-        });
+                    // Hide/Show cluster layers depending on if activeSalesId is set
+                    const visibility = activeSalesId ? 'none' : 'visible';
+                    if (map.getLayer('clusters')) map.setLayoutProperty('clusters', 'visibility', visibility);
+                    if (map.getLayer('cluster-count')) map.setLayoutProperty('cluster-count', 'visibility', visibility);
+                    if (map.getLayer('unclustered-point')) map.setLayoutProperty('unclustered-point', 'visibility', visibility);
 
-        // Auto Zoom & Fit Bounds to Route
-        const bounds = new maplibregl.LngLatBounds();
-        coordinates.forEach(c => bounds.extend(c));
-        map.fitBounds(bounds, { padding: 80, maxZoom: 14 });
+                    updateClusterData();
+                }
 
-        // Populate and open right panel
-        $('#rightPanelTitle').text(`Kunjungan: ${s.name}`);
-        const timeline = $('#visitTimelineContainer');
-        timeline.empty();
+                map.on('style.load', function() {
+                    const storeSVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="%23005d41"><path d="M547.6 103.8L490.3 13.1C485.2 5 476.1 0 466.4 0H109.6C99.9 0 90.8 5 85.7 13.1L28.4 103.8c-1.8 2.8-2.9 6.1-2.9 9.6v12.8c0 31.8 25.9 57.6 57.6 57.6 16.5 0 31.4-7 42.1-18.3 10.7 11.3 25.6 18.3 42.1 18.3 16.5 0 31.4-7 42.1-18.3 10.7 11.3 25.6 18.3 42.1 18.3 16.5 0 31.4-7 42.1-18.3 10.7 11.3 25.6 18.3 42.1 18.3 16.5 0 31.4-7 42.1-18.3 10.7 11.3 25.6 18.3 42.1 18.3 31.8 0 57.6-25.9 57.6-57.6v-12.8c0-3.5-1.1-6.8-2.9-9.6zM224 480v-96c0-17.7 14.3-32 32-32h64c17.7 0 32 14.3 32 32v96h128V224H96v256h128z"/></svg>`;
+                    const storeImage = new Image(28, 28);
+                    storeImage.onload = function() {
+                        if (!map.hasImage('store-icon')) {
+                            map.addImage('store-icon', storeImage);
+                        }
+                        setupAllVisitsSourceAndLayers();
+                    };
+                    storeImage.src = storeSVG;
 
-        s.visits.forEach(v => {
-            const itemHtml = `
-                <div class="visit-timeline-card">
-                    <span class="visit-seq-badge">${v.aseq}</span>
-                    <div class="visit-store-name">${v.store}</div>
-                    <div class="visit-meta-row" style="margin-top: 4px;">
-                        <span class="text-danger" style="font-weight:600;"><i class="fa fa-map-marker-alt"></i> ${v.dist}</span>
-                    </div>
-                    <div class="visit-meta-row">
-                        <span>in ${v.inTime} | out ${v.outTime} | <i class="fa fa-clock"></i> ${v.duration}</span>
-                    </div>
-                    <div class="visit-meta-row">
-                        <i class="fa fa-user-circle"></i> <span>${v.role}</span>
-                    </div>
-                    <div class="visit-metric-grid">
-                        <div class="visit-metric-item">
-                            <span class="visit-metric-lbl">Pseq</span>
-                            <span class="visit-metric-val">${v.pseq}</span>
-                        </div>
-                        <div class="visit-metric-item">
-                            <span class="visit-metric-lbl">Aseq</span>
-                            <span class="visit-metric-val">${v.aseq}</span>
-                        </div>
-                        <div class="visit-metric-item">
-                            <span class="visit-metric-lbl">Faktur Penjualan</span>
-                            <span class="visit-metric-val">Rp ${v.invoice.toLocaleString('id-ID')}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            timeline.append(itemHtml);
-        });
+                    // If style loaded but image is already there (e.g. style change)
+                    if (map.hasImage('store-icon')) {
+                        setupAllVisitsSourceAndLayers();
+                    }
 
-        $('#rightPanel').removeClass('collapsed');
-    }
+                    // Re-draw route if activeSalesId is set
+                    if (activeSalesId) {
+                        viewSalesRoute(activeSalesId);
+                    }
 
-    // Handle clicks on "Lihat Jarak" / "Sembunyikan Jarak"
-    $(document).on('click', '.btn-view-route', function(e) {
-        e.stopPropagation();
-        const id = String($(this).data('id'));
-        
-        if (String(activeSalesId) === String(id)) {
-            // Hide route
-            activeSalesId = null;
-            clearMap();
-            $('#rightPanel').addClass('collapsed');
-        } else {
-            // Show route
-            activeSalesId = id;
-            viewSalesRoute(id);
-        }
-        renderSalesList();
-    });
+                    if (!isDataLoaded) {
+                        // Load external JSON data dynamically
+                        $.getJSON('../../../../wwwroot/data/sales_data_by_date.json', function (data) {
+                            SALES_DATA_BY_DATE = data;
+                            isDataLoaded = true;
+                            loadDateData();
 
-    // Handle card clicks
-    $(document).on('click', '.sales-card', function() {
-        const id = String($(this).data('id'));
-        activeSalesId = id;
-        viewSalesRoute(id);
-        renderSalesList();
-    });
+                            if (salesmanParam && SALES_DATA[salesmanParam]) {
+                                activeSalesId = salesmanParam;
+                                // Short delay to ensure map canvas is loaded and ready
+                                setTimeout(() => {
+                                    viewSalesRoute(salesmanParam);
+                                    renderSalesList();
+                                }, 600);
+                            }
+                        }).fail(function (jqxhr, textStatus, error) {
+                            console.error("Error loading sales data JSON:", textStatus, error);
+                        });
+                    } else {
+                        // Just update the UI and cluster data
+                        updateClusterData();
+                    }
+                });
 
-    $('#btnCloseRightPanel').on('click', function() {
-        $('#rightPanel').addClass('collapsed');
-        activeSalesId = null;
-        clearMap();
-        renderSalesList();
-    });
+                // Handle cluster click to zoom in
+                map.on('click', 'clusters', function (e) {
+                    const features = map.queryRenderedFeatures(e.point, {
+                        layers: ['clusters']
+                    });
+                    const clusterId = features[0].properties.cluster_id;
+                    map.getSource('all-visits').getClusterExpansionZoom(
+                        clusterId,
+                        function (err, zoom) {
+                            if (err) return;
+                            map.easeTo({
+                                center: features[0].geometry.coordinates,
+                                zoom: zoom
+                            });
+                        }
+                    );
+                });
 
-    // ----------------------------------------------------
-    // MAP TYPE SWITCHER (OSM vs Google Maps mockup)
-    // ----------------------------------------------------
-    $('#btnOSM').on('click', function() {
-        $('.btn-map-type').removeClass('active-type');
-        $(this).addClass('active-type');
-        map.setStyle('https://tiles.openfreemap.org/styles/liberty');
-    });
+                // Handle click on unclustered point to show popup details
+                map.on('click', 'unclustered-point', function (e) {
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const props = e.features[0].properties;
 
-    $('#btnGmaps').on('click', function() {
-        $('.btn-map-type').removeClass('active-type');
-        $(this).addClass('active-type');
-        // Replicating Google Maps theme style in vector tiles
-        map.setStyle('https://tiles.openfreemap.org/styles/bright');
-    });
-});
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+
+                    new maplibregl.Popup({ offset: 10 })
+                        .setLngLat(coordinates)
+                        .setHTML(`
+                            <div style="font-family: 'Kalbe Geometric'; font-size: 0.8rem; padding: 4px;">
+                                <strong style="color: #005d41; display: block; margin-bottom: 2px;">${props.store}</strong>
+                                <span style="color:#6c757d; font-size: 0.72rem; display: block; margin-bottom: 4px;">Lokasi Pelanggan</span>
+                                <div style="border-top: 1px dashed #e9ecef; padding-top: 4px; margin-top: 4px; font-size: 0.72rem; color: #495057;">
+                                    <span>Pegawai: <strong>${props.salesmanName}</strong></span><br/>
+                                    <span>Jam Check In: <strong>${props.inTime}</strong></span><br/>
+                                    <span>Faktur: <strong style="color: #005d41;">Rp ${parseFloat(props.invoice).toLocaleString('id-ID')}</strong></span>
+                                </div>
+                            </div>
+                        `)
+                        .addTo(map);
+                });
+
+                // Toggle mouse cursor pointer for interactive layers
+                map.on('mouseenter', 'clusters', () => { map.getCanvas().style.cursor = 'pointer'; });
+                map.on('mouseleave', 'clusters', () => { map.getCanvas().style.cursor = ''; });
+                map.on('mouseenter', 'unclustered-point', () => { map.getCanvas().style.cursor = 'pointer'; });
+                map.on('mouseleave', 'unclustered-point', () => { map.getCanvas().style.cursor = ''; });
+
+                // ----------------------------------------------------
+                // MAP INTERACTION & ROUTE RENDERING
+                // ----------------------------------------------------
+                function clearMap() {
+                    // Remove existing markers
+                    mapMarkers.forEach(m => m.remove());
+                    mapMarkers = [];
+
+                    // Remove route layers and source
+                    if (map.getLayer('route-line')) map.removeLayer('route-line');
+                    if (map.getLayer('route-casing')) map.removeLayer('route-casing');
+                    if (map.getSource('route')) map.removeSource('route');
+
+                    // Make cluster layers visible again
+                    if (map.getLayer('clusters')) map.setLayoutProperty('clusters', 'visibility', 'visible');
+                    if (map.getLayer('cluster-count')) map.setLayoutProperty('cluster-count', 'visibility', 'visible');
+                    if (map.getLayer('unclustered-point')) map.setLayoutProperty('unclustered-point', 'visibility', 'visible');
+                }
+
+                function viewSalesRoute(salesId) {
+                    clearMap();
+
+                    // Hide cluster layers
+                    if (map.getLayer('clusters')) map.setLayoutProperty('clusters', 'visibility', 'none');
+                    if (map.getLayer('cluster-count')) map.setLayoutProperty('cluster-count', 'visibility', 'none');
+                    if (map.getLayer('unclustered-point')) map.setLayoutProperty('unclustered-point', 'visibility', 'none');
+
+                    const s = SALES_DATA[salesId];
+                    if (!s) return;
+
+                    // Draw Route Line
+                    const coordinates = s.visits.map(v => v.coords);
+
+                    map.addSource('route', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'properties': {},
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': coordinates
+                            }
+                        }
+                    });
+
+                    // Add Casing for cleaner road styling
+                    map.addLayer({
+                        'id': 'route-casing',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                        'paint': {
+                            'line-color': '#fff',
+                            'line-width': 8
+                        }
+                    });
+
+                    // Add Active Kalbe Green Polyline
+                    map.addLayer({
+                        'id': 'route-line',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': { 'line-join': 'round', 'line-cap': 'round' },
+                        'paint': {
+                            'line-color': '#005d41',
+                            'line-width': 4
+                        }
+                    });
+
+                    // Add Custom Sequence Markers
+                    s.visits.forEach(v => {
+                        const el = document.createElement('div');
+                        el.className = 'custom-marker';
+                        el.innerText = v.aseq;
+
+                        const marker = new maplibregl.Marker({ element: el })
+                            .setLngLat(v.coords)
+                            .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
+                                <div style="font-family: 'Kalbe Geometric'; font-size: 0.8rem; padding: 4px;">
+                                    <strong style="color: #005d41;">${v.store}</strong><br/>
+                                    <span style="color:#6c757d;">Code: ${v.code}</span><br/>
+                                    <span>Check In: ${v.inTime}</span><br/>
+                                    <span>Faktur: Rp ${v.invoice.toLocaleString('id-ID')}</span>
+                                </div>
+                            `))
+                            .addTo(map);
+
+                        mapMarkers.push(marker);
+                    });
+
+                    // Auto Zoom & Fit Bounds to Route
+                    const bounds = new maplibregl.LngLatBounds();
+                    coordinates.forEach(c => bounds.extend(c));
+                    map.fitBounds(bounds, { padding: 80, maxZoom: 14 });
+
+                    // Populate and open right panel
+                    $('#rightPanelTitle').text(`Kunjungan: ${s.name}`);
+                    const timeline = $('#visitTimelineContainer');
+                    timeline.empty();
+
+                    s.visits.forEach(v => {
+                        const itemHtml = `
+                            <div class="visit-timeline-card">
+                                <span class="visit-seq-badge">${v.aseq}</span>
+                                <div class="visit-store-name">${v.store}</div>
+                                <div class="visit-meta-row" style="margin-top: 4px;">
+                                    <span class="text-danger" style="font-weight:600;"><i class="fa fa-map-marker-alt"></i> ${v.dist}</span>
+                                </div>
+                                <div class="visit-meta-row">
+                                    <span>in ${v.inTime} | out ${v.outTime} | <i class="fa fa-clock"></i> ${v.duration}</span>
+                                </div>
+                                <div class="visit-meta-row">
+                                    <i class="fa fa-user-circle"></i> <span>${v.role}</span>
+                                </div>
+                                <div class="visit-metric-grid">
+                                    <div class="visit-metric-item">
+                                        <span class="visit-metric-lbl">Pseq</span>
+                                        <span class="visit-metric-val">${v.pseq}</span>
+                                    </div>
+                                    <div class="visit-metric-item">
+                                        <span class="visit-metric-lbl">Aseq</span>
+                                        <span class="visit-metric-val">${v.aseq}</span>
+                                    </div>
+                                    <div class="visit-metric-item">
+                                        <span class="visit-metric-lbl">Faktur Penjualan</span>
+                                        <span class="visit-metric-val">Rp ${v.invoice.toLocaleString('id-ID')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        timeline.append(itemHtml);
+                    });
+
+                    $('#rightPanel').removeClass('collapsed');
+                }
+
+                // Handle clicks on "Lihat Jarak" / "Sembunyikan Jarak"
+                $(document).on('click', '.btn-view-route', function (e) {
+                    e.stopPropagation();
+                    const id = String($(this).data('id'));
+
+                    if (String(activeSalesId) === String(id)) {
+                        // Hide route
+                        activeSalesId = null;
+                        clearMap();
+                        $('#rightPanel').addClass('collapsed');
+                    } else {
+                        // Show route
+                        activeSalesId = id;
+                        viewSalesRoute(id);
+                    }
+                    renderSalesList();
+                });
+
+                // Handle card clicks
+                $(document).on('click', '.sales-card', function () {
+                    const id = String($(this).data('id'));
+                    activeSalesId = id;
+                    viewSalesRoute(id);
+                    renderSalesList();
+                });
+
+                $('#btnCloseRightPanel').on('click', function () {
+                    $('#rightPanel').addClass('collapsed');
+                    activeSalesId = null;
+                    clearMap();
+                    renderSalesList();
+                });
+
+                // ----------------------------------------------------
+                // MAP TYPE SWITCHER (OSM vs Google Maps mockup)
+                // ----------------------------------------------------
+                $('#btnOSM').on('click', function () {
+                    $('.btn-map-type').removeClass('active-type');
+                    $(this).addClass('active-type');
+                    map.setStyle('https://tiles.openfreemap.org/styles/liberty');
+                });
+
+                $('#btnGmaps').on('click', function () {
+                    $('.btn-map-type').removeClass('active-type');
+                    $(this).addClass('active-type');
+                    // Replicating Google Maps theme style in vector tiles
+                    map.setStyle('https://tiles.openfreemap.org/styles/bright');
+                });
+            });
 
         });
     </script>
 </body>
+
 </html>

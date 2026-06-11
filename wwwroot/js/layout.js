@@ -132,13 +132,26 @@ class Layout {
                 display: none !important;
             }
 
+            /* ===== Layout and Transitions ===== */
+            .layout-menu {
+                transition: transform 0.3s ease-in-out, width 0.3s ease-in-out !important;
+            }
+            .layout-page {
+                transition: padding-left 0.3s ease-in-out !important;
+            }
+            .layout-navbar {
+                transition: width 0.3s ease-in-out !important;
+            }
+
+            /* Show hamburger trigger globally */
+            .layout-menu-toggle {
+                display: flex !important;
+                align-items: center;
+                cursor: pointer;
+            }
+
             /* ===== Mobile responsive ===== */
             @media (max-width: 1199.98px) {
-                .layout-menu-toggle {
-                    display: flex !important;
-                    align-items: center;
-                    cursor: pointer;
-                }
                 .layout-menu {
                     position: fixed !important;
                     top: 0;
@@ -176,11 +189,24 @@ class Layout {
                 }
             }
 
-            /* Show desktop hamburger trigger only on mobile */
+            /* ===== Desktop Collapse overriding standard mini-sidebar ===== */
             @media (min-width: 1200px) {
-                .layout-menu-toggle.d-xl-none {
-                    display: none !important;
+                html.layout-menu-collapsed .layout-menu {
+                    transform: translate3d(-100%, 0, 0) !important;
                 }
+                html.layout-menu-collapsed .layout-page {
+                    padding-left: 0 !important;
+                }
+                html.layout-menu-collapsed .layout-navbar {
+                    left: 0 !important;
+                    width: calc(100% - 48px) !important;
+                    margin: 16px 24px 0 !important;
+                }
+            }
+
+            /* Fix Vuexy layout-page:before overlay blocking clicks on navbar items */
+            .layout-navbar-fixed .layout-page:before {
+                pointer-events: none !important;
             }
         `;
         document.head.appendChild(style);
@@ -336,7 +362,7 @@ class Layout {
 
         const navbar = `
             <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme" id="layout-navbar">
-                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0">
                     <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
                         <i class="fas fa-bars"></i>
                     </a>
@@ -536,18 +562,26 @@ class Layout {
                 }
             }
 
-            // Mobile hamburger toggle — only the navbar hamburger button
+            // Hamburger toggle — for both mobile (overlay) and desktop (collapsing)
             const hamburger = e.target.closest('.layout-navbar .layout-menu-toggle, .layout-navbar [data-bs-toggle="menu"]');
             if (hamburger) {
                 e.preventDefault();
                 e.stopPropagation();
-                const wrapper = document.querySelector('.layout-wrapper');
-                if (wrapper) {
-                    if (wrapper.classList.contains('layout-menu-expanded')) {
-                        closeSidebar();
-                    } else {
-                        openSidebar();
+                if (window.innerWidth < 1200) {
+                    const wrapper = document.querySelector('.layout-wrapper');
+                    if (wrapper) {
+                        if (wrapper.classList.contains('layout-menu-expanded')) {
+                            closeSidebar();
+                        } else {
+                            openSidebar();
+                        }
                     }
+                } else {
+                    document.documentElement.classList.toggle('layout-menu-collapsed');
+                    // Dispatch window resize event so that elements (like maps, datatables) redraw/adjust
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                    }, 300);
                 }
                 return;
             }

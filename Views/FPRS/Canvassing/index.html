@@ -155,9 +155,9 @@
             var elapsedDays = Math.floor(pct / 100 * days);
             
             var act = '<div class="row-actions">' +
-                '<a href="detail.html?id=' + item.id + '" class="btn-action" title="Lihat Detail"><i class="fa fa-eye"></i></a>' +
-                (item.status === 'Ongoing' || item.status === 'Draft' ? '<a href="add.html?id=' + item.id + '" class="btn-action" title="Edit"><i class="fa fa-pen"></i></a>' : '') +
-                '<button class="btn-action text-danger btn-delete-canvassing" data-id="' + item.id + '" title="Hapus"><i class="fa fa-trash"></i></button>' +
+                '<a href="detail.html?id=' + item.id + '" class="btn-action btn-action-view" title="Lihat Detail"><i class="fa fa-eye"></i></a>' +
+                (item.status === 'Ongoing' || item.status === 'Draft' ? '<a href="add.html?id=' + item.id + '" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>' : '') +
+                '<button class="btn-action btn-action-delete btn-delete-canvassing" data-id="' + item.id + '" title="Hapus"><i class="fa fa-trash"></i></button>' +
                 '</div>';
                 
             var driverDisplay = item.driverName || 'Driver';
@@ -192,7 +192,7 @@
                 lengthMenu: '_MENU_ entri per halaman', 
                 info: 'Menampilkan _START_ - _END_ dari _TOTAL_', 
                 paginate: { previous: '‹', next: '›' }, 
-                zeroRecords: 'Tidak ada data' 
+                zeroRecords: '<div style="text-align:center;padding:2.5rem;color:#94a3b8;"><i class="fa fa-inbox fa-3x mb-3" style="color:#cbd5e1;"></i><br><strong style="color:#64748b;font-size:0.95rem;">Tidak ada data canvassing</strong><br><small class="text-muted" style="font-size:0.8rem;">Sesuaikan filter pencarian Anda atau tambah data baru.</small></div>'
             },
             pageLength: 10,
             columnDefs: [{ orderable: false, targets: [6] }],

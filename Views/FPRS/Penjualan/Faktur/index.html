@@ -89,64 +89,90 @@
 .filter-topbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
+    gap: 1rem;
     align-items: center;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #eef1f6;
-    background: #fafafa;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #edf2f7;
+    background: #f8fafc;
 }
 .filter-topbar label {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: #6c757d;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     white-space: nowrap;
 }
 .filter-topbar .filter-group {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.5rem;
 }
 .filter-topbar select, .filter-topbar input[type="date"] {
-    font-size: 0.82rem;
-    padding: 0.3rem 0.55rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    color: #495057;
-    background: #fff;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #334155;
+    background: #ffffff;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 .filter-topbar select:focus, .filter-topbar input[type="date"]:focus {
     outline: none;
     border-color: #005d41;
-    box-shadow: 0 0 0 2px rgba(0,93,65,0.1);
+    box-shadow: 0 0 0 3px rgba(0, 93, 65, 0.15);
 }
 .filter-topbar .btn-reset-filter {
-    background: none;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-size: 0.78rem;
-    color: #6c757d;
-    padding: 0.3rem 0.7rem;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #475569;
+    padding: 0.45rem 1rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.4rem;
 }
 .filter-topbar .btn-reset-filter:hover {
-    background: #f1f3f5;
-    color: #343a40;
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+.filter-topbar .btn-reset-filter:active {
+    transform: translateY(0);
+}
+
+/* Select2 overrides for premium styling */
+.filter-topbar .select2-container--default .select2-selection--single {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    height: 36px;
+    padding: 3px 6px;
+    font-size: 0.85rem;
+    background-color: #ffffff;
+}
+.filter-topbar .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 34px;
+}
+.filter-topbar .select2-container {
+    min-width: 180px;
 }
 
 /* Seller display in table */
 .sales-badge {
     display: inline-block;
-    background: #F1F7E5;
+    background: rgba(0, 93, 65, 0.06);
     color: #005d41;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 0.75rem;
-    font-weight: 600;
-    padding: 2px 7px;
+    font-weight: 700;
+    padding: 3px 8px;
+    letter-spacing: 0.02em;
 }
 
 /* Mobile: stack table as cards */
@@ -158,36 +184,52 @@
     }
     #tblFaktur thead { display: none !important; }
     #tblFaktur tr {
-        background: #fff;
-        border: 1px solid #eef1f6 !important;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-        padding: 0.75rem 1rem;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        background: #ffffff;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px;
+        margin-bottom: 1.25rem;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        position: relative;
+    }
+    #tblFaktur tr::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #005d41;
+        border-radius: 12px 0 0 12px;
     }
     #tblFaktur td {
         border: none !important;
-        padding: 0.4rem 0 !important;
+        padding: 0.5rem 0 !important;
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         text-align: right !important;
-        min-height: 30px;
+        min-height: 34px;
+        border-bottom: 1px dashed #f1f5f9 !important;
+    }
+    #tblFaktur td:last-child {
+        border-bottom: none !important;
     }
     #tblFaktur td::before {
         content: attr(data-label);
-        font-weight: 600;
-        color: #6c757d;
-        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        font-size: 0.72rem;
         text-transform: uppercase;
         text-align: left;
-        margin-right: 1rem;
+        margin-right: 1.5rem;
         flex-shrink: 0;
+        letter-spacing: 0.04em;
     }
     .filter-row { display: none !important; }
-    .filter-topbar { flex-direction: column; align-items: stretch; }
-    .filter-topbar .filter-group { flex-direction: column; align-items: stretch; }
-    .filter-topbar select, .filter-topbar input[type="date"] { width: 100%; }
+    .filter-topbar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
+    .filter-topbar .filter-group { flex-direction: column; align-items: stretch; gap: 0.25rem; }
+    .filter-topbar select, .filter-topbar input[type="date"], .filter-topbar .select2-container { width: 100% !important; }
 }
     </style>
 </head>
@@ -542,17 +584,58 @@
             syncCardFromStatus(status);
         }
 
-        ['filterTglMulai','filterTglAkhir','filterPelanggan','filterSales','filterStatus'].forEach(id => {
+        function initSelect2() {
+            if ($.fn.select2) {
+                try {
+                    $('#filterPelanggan').select2('destroy');
+                    $('#filterSales').select2('destroy');
+                    $('#filterStatus').select2('destroy');
+                } catch(e) {}
+
+                $('#filterPelanggan').select2({
+                    placeholder: 'Pelanggan: Semua',
+                    allowClear: true
+                });
+                $('#filterSales').select2({
+                    placeholder: 'Sales: Semua',
+                    allowClear: true
+                });
+                $('#filterStatus').select2({
+                    placeholder: 'Status: Semua',
+                    allowClear: true,
+                    minimumResultsForSearch: Infinity
+                });
+
+                $('#filterPelanggan, #filterSales, #filterStatus').on('change.select2', () => {
+                    applyTopbarFilters();
+                });
+            }
+        }
+
+        ['filterTglMulai','filterTglAkhir'].forEach(id => {
             document.getElementById(id).addEventListener('change', applyTopbarFilters);
         });
+
+        if (!$.fn.select2) {
+            ['filterPelanggan','filterSales','filterStatus'].forEach(id => {
+                document.getElementById(id).addEventListener('change', applyTopbarFilters);
+            });
+        }
 
         document.getElementById('btnResetFilter').addEventListener('click', () => {
             document.getElementById('filterTglMulai').value = '2026-06-01';
             document.getElementById('filterTglAkhir').value = '2026-06-30';
-            document.getElementById('filterPelanggan').value = '';
-            document.getElementById('filterSales').value = '';
-            document.getElementById('filterStatus').value = '';
-            applyTopbarFilters();
+            
+            if ($.fn.select2) {
+                $('#filterPelanggan').val('').trigger('change.select2');
+                $('#filterSales').val('').trigger('change.select2');
+                $('#filterStatus').val('').trigger('change.select2');
+            } else {
+                document.getElementById('filterPelanggan').value = '';
+                document.getElementById('filterSales').value = '';
+                document.getElementById('filterStatus').value = '';
+                applyTopbarFilters();
+            }
         });
 
         /* =========================================
@@ -567,10 +650,13 @@
         document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
             card.addEventListener('click', () => {
                 const filterVal = card.dataset.filter;
-                // Update top filter select
-                document.getElementById('filterStatus').value = filterVal;
-                // Re-apply all filters
-                applyTopbarFilters();
+                const filterStatus = document.getElementById('filterStatus');
+                filterStatus.value = filterVal;
+                if ($.fn.select2) {
+                    $('#filterStatus').val(filterVal).trigger('change.select2');
+                } else {
+                    applyTopbarFilters();
+                }
             });
         });
 
@@ -600,6 +686,7 @@
         ========================================= */
         function init() {
             populateFilters(allData);
+            initSelect2();
             renderTable(allData);
             initDataTable();
             updateSummaryCards(allData);
