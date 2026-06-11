@@ -238,61 +238,61 @@
     <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
-        // Mock Outlet Database
-        const outlets = [
-            { id: "OL-10492", name: "Apotek Senen Medika", type: "Outlet Star", address: "Jl. Kramat Raya No.42, Senen, Jakarta Pusat", distance: "0.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-10511", name: "Kimia Farma Cikini", type: "Outlet Prime", address: "Jl. Cikini Raya No.78, Menteng, Jakarta Pusat", distance: "0.6 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)" },
-            { id: "OL-10283", name: "Apotek Roxy Salemba", type: "Outlet Regular", address: "Jl. Salemba Raya No.15, Jakarta Pusat", distance: "1.1 km", arBalance: 3750000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10772", name: "Guardian Plaza Indonesia", type: "Outlet Star", address: "Plaza Indonesia Lt. Basement, Menteng", distance: "2.4 km", arBalance: 12500000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10819", name: "Watsons Grand Indonesia", type: "Outlet Prime", address: "Grand Indonesia Lt. Lower Ground", distance: "2.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10902", name: "Apotek K-24 Kenari", type: "Outlet Regular", address: "Jl. Kenari Mas No.12, Senen, Jakarta Pusat", distance: "0.8 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11002", name: "Century Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. LG, Jakarta Pusat", distance: "2.6 km", arBalance: 5000000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-11145", name: "Apotek Melawai Cikini", type: "Outlet Regular", address: "Jl. Cikini Raya No.14, Jakarta Pusat", distance: "0.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11239", name: "Apotek Rakyat Pasar Pramuka", type: "Outlet Regular", address: "Pasar Pramuka Lt. Dasar, Jakarta Timur", distance: "1.9 km", arBalance: 1450000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-11340", name: "Kimia Farma Matraman", type: "Outlet Prime", address: "Jl. Matraman Raya No.112, Jakarta Timur", distance: "2.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11451", name: "Apotek Salemba Medika", type: "Outlet Regular", address: "Jl. Salemba Tengah No.5, Jakarta Pusat", distance: "1.3 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11562", name: "Kimia Farma Salemba", type: "Outlet Prime", address: "Jl. Salemba Raya No.22, Jakarta Pusat", distance: "1.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11673", name: "Apotek Jaya Menteng", type: "Outlet Regular", address: "Jl. Menteng Raya No.9, Jakarta Pusat", distance: "1.5 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)" },
-            { id: "OL-11784", name: "Guardian Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. 3, Jakarta Pusat", distance: "2.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11895", name: "Apotek Hidup Baru", type: "Outlet Regular", address: "Jl. Kramat Pulo No.18, Jakarta Pusat", distance: "0.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi" }
-        ];
-
+        // Bangun daftar outlet dari SfaStore, gabung dengan status kunjungan hari ini
+        let outlets = [];
         let currentFilter = 'semua';
 
+        // Jarak simulasi berdasarkan urutan data (km)
+        const MOCK_DISTANCES = [0.2, 0.6, 1.1, 2.4, 2.5, 0.8, 2.6, 0.7, 1.9, 2.2, 1.3, 1.2, 1.5, 2.7, 0.5];
+
         $(document).ready(function() {
-            // Check state from localStorage if a check-in occurred
-            updateListFromStorageStates();
+            buildOutletList();
             renderList();
             updateCounts();
         });
 
-        // Sync local storage dynamic visit states
-        function updateListFromStorageStates() {
-            outlets.forEach(o => {
-                const checkedInState = localStorage.getItem(`visit_state_${o.id}`);
-                if (checkedInState) {
-                    const parsed = JSON.parse(checkedInState);
-                    if (parsed.status === 'checked_out') {
-                        if (parsed.hasOrder) {
-                            o.status = "selesai_efektif";
-                            o.statusText = "Selesai (Efektif)";
-                        } else {
-                            o.status = "selesai_tidak_efektif";
-                            o.statusText = "Selesai (Tidak Efektif)";
-                        }
-                    } else if (parsed.status === 'checked_in') {
-                        o.status = "belum";
-                        o.statusText = "Sedang Check-In";
+        function buildOutletList() {
+            const customers = SfaStore.getCustomers();
+
+            outlets = customers.map((c, idx) => {
+                const visit = SfaStore.getTodayVisitByCustomerId(c.id);
+                const ar = SfaStore.getOutstandingByCustomerId(c.id);
+
+                let status = 'belum';
+                let statusText = 'Belum Dikunjungi';
+
+                if (visit) {
+                    if (visit.status === 'checked_out') {
+                        status = visit.hasOrder ? 'selesai_efektif' : 'selesai_tidak_efektif';
+                        statusText = visit.hasOrder ? 'Selesai (Efektif)' : 'Selesai (Tidak Efektif)';
+                    } else if (visit.status === 'checked_in') {
+                        status = 'checkin';
+                        statusText = 'Sedang Check-In';
                     }
                 }
+
+                return {
+                    id: c.id,
+                    name: c.name,
+                    type: c.outletType || 'Outlet Regular',
+                    address: c.address + ', ' + c.kota,
+                    distance: (MOCK_DISTANCES[idx % MOCK_DISTANCES.length] || 1.0).toFixed(1) + ' km',
+                    arBalance: ar,
+                    status: status,
+                    statusText: statusText,
+                    // Badge tambahan
+                    hasInvoiceToday: visit && visit.hasOrder,
+                    hasAR: ar > 0
+                };
             });
         }
 
         function updateCounts() {
             const total = outlets.length;
             const pending = outlets.filter(o => o.status === 'belum').length;
-            const completed = outlets.filter(o => o.status.startsWith('selesai')).length;
+            const completed = outlets.filter(o => o.status === 'selesai_efektif' || o.status === 'selesai_tidak_efektif').length;
 
             $('#countSemua').text(total);
             $('#countBelum').text(pending);
@@ -314,14 +314,12 @@
             container.empty();
 
             const filtered = outlets.filter(o => {
-                // Apply search filter
                 const matchesSearch = o.name.toLowerCase().includes(query) || o.id.toLowerCase().includes(query);
                 if (!matchesSearch) return false;
 
-                // Apply status tab filter
                 if (currentFilter === 'semua') return true;
-                if (currentFilter === 'belum') return o.status === 'belum';
-                if (currentFilter === 'selesai') return o.status.startsWith('selesai');
+                if (currentFilter === 'belum') return o.status === 'belum' || o.status === 'checkin';
+                if (currentFilter === 'selesai') return o.status === 'selesai_efektif' || o.status === 'selesai_tidak_efektif';
                 return true;
             });
 
@@ -333,13 +331,17 @@
             filtered.forEach(o => {
                 let badgeClass = 'badge-mobile-warning';
                 if (o.status === 'selesai_efektif') badgeClass = 'badge-mobile-success';
-                if (o.status === 'selesai_tidak_efektif') badgeClass = 'badge-mobile-danger'; // Orange/red for no purchase
-                if (o.statusText === 'Sedang Check-In') badgeClass = 'badge-mobile-info';
+                if (o.status === 'selesai_tidak_efektif') badgeClass = 'badge-mobile-danger';
+                if (o.status === 'checkin') badgeClass = 'badge-mobile-info';
 
-                let arWarningHtml = '';
-                if (o.arBalance > 0) {
-                    const formattedAR = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(o.arBalance);
-                    arWarningHtml = `<div class="outlet-meta-item ar-warning"><i class="fas fa-file-invoice-dollar"></i>AR: ${formattedAR}</div>`;
+                // Badge indikator transaksi & AR
+                let indicatorHtml = '';
+                if (o.hasInvoiceToday) {
+                    indicatorHtml += `<span class="badge-mobile badge-mobile-success ms-1" style="font-size:10px;"><i class="fas fa-check-circle me-1"></i>Sudah Transaksi</span>`;
+                }
+                if (o.hasAR) {
+                    const formattedAR = SfaStore.formatRupiah(o.arBalance);
+                    indicatorHtml += `<div class="outlet-meta-item ar-warning mt-1"><i class="fas fa-file-invoice-dollar"></i>AR: ${formattedAR}</div>`;
                 }
 
                 const cardHtml = `
@@ -357,7 +359,7 @@
                             <i class="fas fa-map-marker-alt"></i>
                             <span>${o.distance} • ${o.address}</span>
                         </div>
-                        ${arWarningHtml}
+                        ${indicatorHtml}
                         <i class="fas fa-chevron-right visit-action-indicator"></i>
                     </a>
                 `;
@@ -379,7 +381,7 @@
                 confirmButtonText: 'Ya, Keluar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    localStorage.removeItem('sfa_user');
+                    SfaStore.clearUser();
                     window.location.href = 'login.html';
                 }
             });
