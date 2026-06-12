@@ -1,0 +1,10 @@
+[
+  { "id": 1, "nama": "BOX", "deskripsi": "Box", "uomPajak": "", "partnerId": "" },
+  { "id": 2, "nama": "KARTON", "deskripsi": "Karton", "uomPajak": "", "partnerId": "" },
+  { "id": 3, "nama": "PCS", "deskripsi": "Pcs", "uomPajak": "", "partnerId": "" },
+  { "id": 4, "nama": "RENCENG", "deskripsi": "Renceng", "uomPajak": "", "partnerId": "" },
+  { "id": 5, "nama": "LUSIN", "deskripsi": "Lusin (12 pcs)", "uomPajak": "", "partnerId": "" },
+  { "id": 6, "nama": "SACHET", "deskripsi": "Sachet", "uomPajak": "", "partnerId": "" },
+  { "id": 7, "nama": "BOTOL", "deskripsi": "Botol", "uomPajak": "", "partnerId": "" },
+  { "id": 8, "nama": "KALENG", "deskripsi": "Kaleng", "uomPajak": "", "partnerId": "" }
+]

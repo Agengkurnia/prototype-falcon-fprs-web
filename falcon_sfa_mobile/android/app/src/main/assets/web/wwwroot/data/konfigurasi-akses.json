@@ -1,0 +1,8 @@
+[
+  { "id": 1, "nama": "Admin" },
+  { "id": 2, "nama": "Customer" },
+  { "id": 3, "nama": "Driver" },
+  { "id": 4, "nama": "Salesman Canvassing (SI)" },
+  { "id": 5, "nama": "Salesman Order" },
+  { "id": 6, "nama": "Supervisor" }
+]

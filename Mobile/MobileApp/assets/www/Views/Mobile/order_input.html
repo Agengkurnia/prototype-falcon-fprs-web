@@ -260,6 +260,22 @@
             align-items: center;
             gap: 10px;
         }
+
+        .active-input-uom {
+            border: 2px solid var(--color-primary) !important;
+            border-radius: 6px;
+            background-color: var(--color-bg-light) !important;
+        }
+
+        .active-keypad-btn {
+            background-color: var(--color-primary) !important;
+            color: #fff !important;
+            border-color: var(--color-primary) !important;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="order-bg">
@@ -377,6 +393,7 @@
 
     <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
@@ -461,28 +478,33 @@
             }
 
             filtered.forEach(p => {
-                const item = cart[p.code] || { qty: 0, uom: 'PCS' };
-                const isPcsActive = item.uom === 'PCS' ? 'active' : '';
-                const isKtnActive = item.uom === 'KARTON' ? 'active' : '';
+                const item = cart[p.code];
+                let qtyBadgeText = '';
+                if (item) {
+                    let parts = [];
+                    if (item.qtyKarton > 0) parts.push(`${item.qtyKarton} Ktn`);
+                    if (item.qtyBox > 0) parts.push(`${item.qtyBox} Box`);
+                    if (item.qtyPcs > 0) parts.push(`${item.qtyPcs} Pcs`);
+                    if (parts.length > 0) {
+                        qtyBadgeText = `<span class="badge bg-success" style="font-size: 10px;">${parts.join(', ')}</span>`;
+                    }
+                }
                 const promoBadge = p.hasPromo ? `<span class="badge bg-danger ms-1" style="font-size:9px;">PROMO</span>` : '';
 
                 const prdHtml = `
-                    <div class="product-card">
+                    <div class="product-card" onclick="openSimplidotsModal('${p.code}')" style="cursor: pointer;">
                         <div class="product-img-box">
                             <i class="fa-solid ${p.icon || 'fa-box'}"></i>
                         </div>
                         <div class="product-info">
-                            <span class="product-name">${p.name}${promoBadge}</span>
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="product-name" style="max-width: 70%;">${p.name}${promoBadge}</span>
+                                ${qtyBadgeText}
+                            </div>
                             <span class="product-code">${p.code} • ${p.category}</span>
                             <div class="product-price-row">
-                                <span class="product-price">${SfaStore.formatRupiah(p.price)}</span>
-                                <div class="qty-controls">
-                                    <span class="uom-badge-toggle ${isPcsActive}" onclick="setUOM('${p.code}', 'PCS')">Pcs</span>
-                                    <span class="uom-badge-toggle ${isKtnActive}" onclick="setUOM('${p.code}', 'KARTON')">Karton</span>
-                                    <button class="qty-btn" onclick="updateQty('${p.code}', -1)">-</button>
-                                    <span class="qty-val" id="qty_${p.code}">${item.qty}</span>
-                                    <button class="qty-btn" onclick="updateQty('${p.code}', 1)">+</button>
-                                </div>
+                                <span class="product-price">${SfaStore.formatRupiah(p.pricePcs)}/Pcs</span>
+                                <span class="text-muted fs-8">Stok: ${p.stock || 12} Ktn</span>
                             </div>
                         </div>
                     </div>
@@ -492,7 +514,6 @@
         }
 
         function _buildCategoryChips() {
-            // Hanya build sekali
             if ($('#categoryChipsBuilt').length) return;
             const cats = SfaStore.getProductCategories();
             const scroll = $('.category-scroll');
@@ -504,28 +525,145 @@
             scroll.append(`<span id="categoryChipsBuilt" class="d-none"></span>`);
         }
 
-        function setUOM(code, uom) {
-            if (!cart[code]) {
-                cart[code] = { qty: 0, uom: uom };
+        let activeModalProductCode = null;
+        let activeModalUnit = 'KARTON'; // 'KARTON' | 'BOX' | 'PCS'
+        let modalQuantities = { KARTON: 0, BOX: 0, PCS: 0 };
+        let itemNotes = "";
+
+        function openSimplidotsModal(code) {
+            activeModalProductCode = code;
+            const prod = products.find(p => p.code === code);
+            if (!prod) return;
+
+            // Setup product detail
+            $('#modalPrdCode').text(prod.code);
+            $('#modalPrdName').text(prod.name);
+            $('#modalPrdIcon').attr('class', `fa-solid ${prod.icon || 'fa-box'} text-success`);
+
+            // Setup stock
+            const stockKtn = prod.stock || 12;
+            const stockBox = stockKtn * prod.boxPerCtn;
+            const stockPcs = stockKtn * prod.pcsPerCtn;
+            $('#modalStokKarton').text(stockKtn);
+            $('#modalStokBox').text(stockBox);
+            $('#modalStokPcs').text(stockPcs);
+
+            // Setup price
+            $('#modalHargaKarton').text(new Intl.NumberFormat('id-ID').format(prod.priceKarton));
+            $('#modalHargaBox').text(new Intl.NumberFormat('id-ID').format(prod.priceBox));
+            $('#modalHargaPcs').text(new Intl.NumberFormat('id-ID').format(prod.pricePcs));
+
+            // Load quantities from cart
+            const cartItem = cart[code] || { qtyKarton: 0, qtyBox: 0, qtyPcs: 0, notes: '' };
+            modalQuantities.KARTON = cartItem.qtyKarton || 0;
+            modalQuantities.BOX = cartItem.qtyBox || 0;
+            modalQuantities.PCS = cartItem.qtyPcs || 0;
+            itemNotes = cartItem.notes || '';
+
+            // Setup notes
+            $('#itemNotesInput').val(itemNotes);
+            if (itemNotes) {
+                $('#itemNotesInput').removeClass('d-none');
+                $('#btnShowNotes').addClass('d-none');
             } else {
-                cart[code].uom = uom;
+                $('#itemNotesInput').addClass('d-none');
+                $('#btnShowNotes').removeClass('d-none');
             }
+
+            // Set active input UOM
+            setActiveInputUom('KARTON');
+
+            // Render current values
+            updateModalInputValues();
+
+            // Show modal
+            const myModal = new bootstrap.Modal(document.getElementById('simplidotsAddPrdModal'));
+            myModal.show();
+        }
+
+        function setActiveInputUom(uom) {
+            activeModalUnit = uom;
+            
+            // Remove active style from all columns
+            $('#pesananKartonBox, #pesananBoxBox, #pesananPcsBox').removeClass('active-input-uom');
+            $('#keypadBtnKarton, #keypadBtnBox, #keypadBtnPcs').removeClass('active-keypad-btn').addClass('text-muted');
+
+            // Apply active class to selected column
+            if (uom === 'KARTON') {
+                $('#pesananKartonBox').addClass('active-input-uom');
+                $('#keypadBtnKarton').addClass('active-keypad-btn').removeClass('text-muted');
+            } else if (uom === 'BOX') {
+                $('#pesananBoxBox').addClass('active-input-uom');
+                $('#keypadBtnBox').addClass('active-keypad-btn').removeClass('text-muted');
+            } else {
+                $('#pesananPcsBox').addClass('active-input-uom');
+                $('#keypadBtnPcs').addClass('active-keypad-btn').removeClass('text-muted');
+            }
+
+            // Update keypad display based on the active unit value
+            $('#keypadDisplay').text(modalQuantities[uom]);
+        }
+
+        function updateModalInputValues() {
+            $('#valKarton').text(modalQuantities.KARTON);
+            $('#valBox').text(modalQuantities.BOX);
+            $('#valPcs').text(modalQuantities.PCS);
+            $('#keypadDisplay').text(modalQuantities[activeModalUnit]);
+        }
+
+        function toggleItemNotes() {
+            $('#itemNotesInput').removeClass('d-none').focus();
+            $('#btnShowNotes').addClass('d-none');
+        }
+
+        function pressKeypad(key) {
+            let currentValStr = String(modalQuantities[activeModalUnit]);
+
+            if (key === 'clear') {
+                modalQuantities[activeModalUnit] = 0;
+            } else if (key === 'backspace') {
+                if (currentValStr.length > 1) {
+                    modalQuantities[activeModalUnit] = parseInt(currentValStr.substring(0, currentValStr.length - 1)) || 0;
+                } else {
+                    modalQuantities[activeModalUnit] = 0;
+                }
+            } else { // It is a number 0-9
+                if (currentValStr === '0') {
+                    currentValStr = key;
+                } else {
+                    currentValStr += key;
+                }
+                modalQuantities[activeModalUnit] = parseInt(currentValStr) || 0;
+            }
+
+            updateModalInputValues();
+        }
+
+        function saveModalItem() {
+            const hasQty = modalQuantities.KARTON > 0 || modalQuantities.BOX > 0 || modalQuantities.PCS > 0;
+            
+            if (hasQty) {
+                cart[activeModalProductCode] = {
+                    qtyKarton: modalQuantities.KARTON,
+                    qtyBox: modalQuantities.BOX,
+                    qtyPcs: modalQuantities.PCS,
+                    notes: $('#itemNotesInput').val()
+                };
+            } else {
+                delete cart[activeModalProductCode];
+            }
+
+            // Close modal using bootstrap API
+            const modalEl = document.getElementById('simplidotsAddPrdModal');
+            const instance = bootstrap.Modal.getInstance(modalEl);
+            if (instance) instance.hide();
+
             renderCatalog();
             updateCartSummary();
         }
-
-        function updateQty(code, change) {
-            if (!cart[code]) {
-                cart[code] = { qty: 0, uom: 'PCS' };
-            }
-            cart[code].qty = Math.max(0, cart[code].qty + change);
-            if (cart[code].qty === 0) {
-                delete cart[code];
-            }
-
-            const qtyText = cart[code] ? cart[code].qty : 0;
-            $(`#qty_${code}`).text(qtyText);
-            updateCartSummary();
+        
+        function showProductDetailsLink() {
+            window.location.href = `product_detail.html?id=${activeModalProductCode}&backToOrder=1&outletId=${currentOutletId}`;
         }
 
         function calculateCartTotals() {
@@ -536,12 +674,12 @@
                 const prod = products.find(p => p.code === code);
                 if (prod) {
                     const item = cart[code];
-                    let multiply = item.qty;
-                    if (item.uom === 'KARTON') {
-                        multiply = item.qty * (prod.conversionCtn || prod.conversion || 1);
-                    }
-                    totalItems += item.qty;
-                    totalGross += multiply * prod.price;
+                    const itemKtn = item.qtyKarton || 0;
+                    const itemBox = item.qtyBox || 0;
+                    const itemPcs = item.qtyPcs || 0;
+
+                    totalItems += (itemKtn + itemBox + itemPcs);
+                    totalGross += (itemKtn * prod.priceKarton) + (itemBox * prod.priceBox) + (itemPcs * prod.pricePcs);
                 }
             }
 
@@ -587,26 +725,33 @@
                 const prod = products.find(p => p.code === code);
                 if (!prod) continue;
                 const item = cart[code];
-                const ctn = prod.conversionCtn || prod.conversion || 1;
-                let itemTotal = item.uom === 'KARTON'
-                    ? item.qty * ctn * prod.price
-                    : item.qty * prod.price;
+                
+                const itemKtn = item.qtyKarton || 0;
+                const itemBox = item.qtyBox || 0;
+                const itemPcs = item.qtyPcs || 0;
+
+                const itemTotal = (itemKtn * prod.priceKarton) + (itemBox * prod.priceBox) + (itemPcs * prod.pricePcs);
+
+                let breakdownStr = [];
+                if (itemKtn > 0) breakdownStr.push(`${itemKtn} Ktn`);
+                if (itemBox > 0) breakdownStr.push(`${itemBox} Box`);
+                if (itemPcs > 0) breakdownStr.push(`${itemPcs} Pcs`);
+                const breakdownLabel = breakdownStr.join(', ');
+
+                const notesBadge = item.notes ? `<div class="mt-1 text-muted fs-8 italic"><i class="far fa-sticky-note me-1"></i>"${item.notes}"</div>` : '';
 
                 const itemHtml = `
-                    <div class="product-card">
+                    <div class="product-card" onclick="openSimplidotsModal('${code}')" style="cursor: pointer;">
                         <div class="product-img-box">
                             <i class="fa-solid ${prod.icon || 'fa-box'}"></i>
                         </div>
                         <div class="product-info">
                             <span class="product-name">${prod.name}</span>
-                            <span class="product-code">${code} • ${item.uom} (1 Ktn = ${ctn} Pcs)</span>
-                            <div class="product-price-row">
+                            <span class="product-code">${code} • ${breakdownLabel}</span>
+                            ${notesBadge}
+                            <div class="product-price-row mt-1">
                                 <span class="product-price">${SfaStore.formatRupiah(itemTotal)}</span>
-                                <div class="qty-controls">
-                                    <button class="qty-btn" onclick="updateCartItemQty('${code}', -1)">-</button>
-                                    <span class="qty-val">${item.qty}</span>
-                                    <button class="qty-btn" onclick="updateCartItemQty('${code}', 1)">+</button>
-                                </div>
+                                <span class="badge bg-light text-primary border rounded-pill px-2 py-1 fs-9"><i class="fas fa-edit"></i> Edit</span>
                             </div>
                         </div>
                     </div>
@@ -623,15 +768,6 @@
             $('#summaryGross').text(SfaStore.formatRupiah(totalGross));
             $('#summaryDiscount').text('- ' + SfaStore.formatRupiah(discount));
             $('#summaryNet').text(SfaStore.formatRupiah(totalNet));
-        }
-
-        function updateCartItemQty(code, change) {
-            if (cart[code]) {
-                cart[code].qty = Math.max(0, cart[code].qty + change);
-                if (cart[code].qty === 0) delete cart[code];
-            }
-            renderCart();
-            updateCartSummary();
         }
 
         function submitSalesOrder() {
@@ -659,27 +795,48 @@
                     });
 
                     setTimeout(() => {
-                        // Bangun items array
-                        const items = Object.keys(cart).map(code => {
+                        const items = [];
+                        Object.keys(cart).forEach(code => {
                             const prod = products.find(p => p.code === code);
                             const item = cart[code];
-                            const ctn = prod.conversionCtn || prod.conversion || 1;
-                            const qtyPcs = item.uom === 'KARTON' ? item.qty * ctn : item.qty;
-                            return {
-                                code: code,
-                                name: prod.name,
-                                qty: item.qty,
-                                uom: item.uom,
-                                qtyPcs: qtyPcs,
-                                price: prod.price,
-                                subtotal: qtyPcs * prod.price
-                            };
+                            
+                            if (item.qtyKarton > 0) {
+                                items.push({
+                                    code: code,
+                                    name: `${prod.name} (Karton)`,
+                                    qty: item.qtyKarton,
+                                    uom: 'KARTON',
+                                    qtyPcs: item.qtyKarton * prod.pcsPerCtn,
+                                    price: prod.priceKarton,
+                                    subtotal: item.qtyKarton * prod.priceKarton
+                                });
+                            }
+                            if (item.qtyBox > 0) {
+                                items.push({
+                                    code: code,
+                                    name: `${prod.name} (Box)`,
+                                    qty: item.qtyBox,
+                                    uom: 'BOX',
+                                    qtyPcs: item.qtyBox * prod.pcsPerBox,
+                                    price: prod.priceBox,
+                                    subtotal: item.qtyBox * prod.priceBox
+                                });
+                            }
+                            if (item.qtyPcs > 0) {
+                                items.push({
+                                    code: code,
+                                    name: `${prod.name} (Pcs)`,
+                                    qty: item.qtyPcs,
+                                    uom: 'PCS',
+                                    qtyPcs: item.qtyPcs,
+                                    price: prod.pricePcs,
+                                    subtotal: item.qtyPcs * prod.pricePcs
+                                });
+                            }
                         });
 
-                        // Cari active visit
                         const activeVisit = SfaStore.getActiveVisitByCustomerId(currentOutletId);
 
-                        // Simpan invoice via SfaStore
                         const invoiceId = SfaStore.saveInvoice({
                             visitId: activeVisit ? activeVisit.id : null,
                             customerId: currentOutletId,
@@ -693,7 +850,6 @@
                             status: 'draft'
                         });
 
-                        // Langsung complete (bisa dipisah ke order_review nanti)
                         SfaStore.completeInvoice(invoiceId);
 
                         Swal.fire({
@@ -715,5 +871,122 @@
             window.location.href = `visit_detail.html?id=${currentOutletId}`;
         }
     </script>
+
+    <!-- MODAL: SimpliDOTS Style Tambah Item -->
+    <div class="modal fade" id="simplidotsAddPrdModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-end mx-auto" style="max-width: 450px; margin: 0 auto; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1050;">
+            <div class="modal-content border-0" style="border-radius: 20px 20px 0 0; box-shadow: 0 -8px 32px rgba(0,0,0,0.15);">
+                <!-- Header -->
+                <div class="modal-header border-0 bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                    <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="Close" style="font-size: 12px;"></button>
+                    <h5 class="modal-title fw-bold text-center" style="font-size: 15px; color: var(--color-black); flex: 1;">Tambah item</h5>
+                    <span class="badge text-white" id="modalPrdFocusBadge" style="background-color: var(--color-primary); font-size: 9px;">Product focus</span>
+                </div>
+                <div class="modal-body p-0 bg-white">
+                    <!-- Product details card -->
+                    <div class="p-3 d-flex gap-3 align-items-center border-bottom">
+                        <div class="product-img-box m-0" style="width: 52px; height: 52px; background-color: var(--color-gray-light);">
+                            <i class="fa-solid fa-box text-success" id="modalPrdIcon" style="font-size: 20px;"></i>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="text-muted fs-8" id="modalPrdCode" style="font-weight: 600;">KN-SF-001</div>
+                            <div class="fw-bold fs-7 text-dark text-truncate" id="modalPrdName">Morinaga Chil*Kid Gold</div>
+                            <a href="javascript:void(0)" class="text-primary fs-8 fw-semibold" onclick="showProductDetailsLink()">Lebih detail <i class="fas fa-chevron-right fs-9"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- UOM Table -->
+                    <div class="px-3 py-2 border-bottom">
+                        <table class="w-100 text-center fs-8" style="border-collapse: collapse;">
+                            <thead>
+                                <tr style="color: var(--color-gray); border-bottom: 1px solid var(--color-border);">
+                                    <th class="text-start pb-2" style="font-weight: 500;">Unit <i class="far fa-question-circle text-muted fs-9"></i></th>
+                                    <th class="pb-2" style="font-weight: 500;">KARTON</th>
+                                    <th class="pb-2" style="font-weight: 500;">BOX</th>
+                                    <th class="pb-2" style="font-weight: 500;">PCS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="color: #27AE60; font-weight: 700;">
+                                    <td class="text-start py-2">Stok</td>
+                                    <td id="modalStokKarton">9999</td>
+                                    <td id="modalStokBox">0</td>
+                                    <td id="modalStokPcs">0</td>
+                                </tr>
+                                <tr style="color: var(--color-black); font-weight: 700;">
+                                    <td class="text-start py-2">Harga</td>
+                                    <td id="modalHargaKarton">234.000</td>
+                                    <td id="modalHargaBox">39.000</td>
+                                    <td id="modalHargaPcs">6.500</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pesanan split box -->
+                    <div class="p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="fw-bold fs-7 text-dark">Pesanan</span>
+                            <div class="d-flex border rounded-3 overflow-hidden text-center" style="width: 240px; border-color: var(--color-border); height: 50px;">
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananKartonBox" onclick="setActiveInputUom('KARTON')" style="border-right: 1px solid var(--color-border); flex: 1;">
+                                    <div class="fw-bold fs-6" id="valKarton">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">KARTON</div>
+                                </div>
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananBoxBox" onclick="setActiveInputUom('BOX')" style="border-right: 1px solid var(--color-border); flex: 1;">
+                                    <div class="fw-bold fs-6" id="valBox">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">BOX</div>
+                                </div>
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananPcsBox" onclick="setActiveInputUom('PCS')" style="flex: 1;">
+                                    <div class="fw-bold fs-6" id="valPcs">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">PCS</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tambah catatan button/field -->
+                        <div id="notesContainer">
+                            <button class="btn btn-sm border rounded-pill px-3 py-1 fs-8 text-muted" id="btnShowNotes" onclick="toggleItemNotes()" style="font-weight: 600; border-color: var(--color-border); background-color: #fff;"><i class="far fa-edit me-1"></i> Tambah catatan</button>
+                            <textarea class="form-control mt-2 d-none fs-8" id="itemNotesInput" placeholder="Tulis catatan untuk item ini..." rows="1" style="border-radius: 8px;"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Custom Numeric Keypad -->
+                    <div style="background-color: #E9ECEF; padding: 10px;">
+                        <!-- Keypad Display bar -->
+                        <div class="d-flex justify-content-between align-items-center bg-white border rounded-3 px-3 py-2 mb-2" style="height: 40px;">
+                            <span class="fw-bold text-dark fs-6" id="keypadDisplay">0</span>
+                            <i class="fa-solid fa-backspace text-muted fs-5 cursor-pointer" onclick="pressKeypad('backspace')"></i>
+                        </div>
+
+                        <div class="row g-2 text-center">
+                            <!-- Row 1 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('1')">1</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('2')">2</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('3')">3</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border border-primary text-primary" id="keypadBtnKarton" onclick="setActiveInputUom('KARTON')" style="height: 100%;">KARTON</button></div>
+                            
+                            <!-- Row 2 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('4')">4</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('5')">5</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('6')">6</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border text-muted" id="keypadBtnBox" onclick="setActiveInputUom('BOX')" style="height: 100%;">BOX</button></div>
+                            
+                            <!-- Row 3 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('7')">7</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('8')">8</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('9')">9</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border text-muted" id="keypadBtnPcs" onclick="setActiveInputUom('PCS')" style="height: 100%;">PCS</button></div>
+                            
+                            <!-- Row 4 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-semibold fs-7 border" onclick="pressKeypad('clear')">Hapus</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('0')">0</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 border" onclick="pressKeypad('backspace')"><i class="fa-solid fa-arrow-left-long"></i></button></div>
+                            <div class="col-3"><button class="btn w-100 py-3 border text-white" onclick="saveModalItem()" style="background-color: var(--color-primary); height: 100%;"><i class="fa-solid fa-check fs-5"></i></button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

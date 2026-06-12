@@ -1,0 +1,10 @@
+[
+  { "id": 1, "username": "balikpapan", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567800", "email": "balikpapan@falcon.id", "namaKaryawan": "BALIKPAPAN", "status": "Active" },
+  { "id": 2, "username": "bandung1", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567898", "email": "bandung1@falcon.id", "namaKaryawan": "BANDUNG1", "status": "Active" },
+  { "id": 3, "username": "bandung2", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567899", "email": "bandung2@falcon.id", "namaKaryawan": "BANDUNG2", "status": "Active" },
+  { "id": 4, "username": "bekasi1", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567897", "email": "bekasi1@falcon.id", "namaKaryawan": "BEKASI1", "status": "Active" },
+  { "id": 5, "username": "bogor", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567894", "email": "bogor@falcon.id", "namaKaryawan": "BOGOR", "status": "Active" },
+  { "id": 6, "username": "jambi", "roleGroup": "Salesman Canvassing (SI)", "telepon": "081234567890", "email": "jambi@falcon.id", "namaKaryawan": "JAMBI", "status": "Active" },
+  { "id": 7, "username": "jakarta1", "roleGroup": "Salesman Order", "telepon": "081234567801", "email": "jakarta1@falcon.id", "namaKaryawan": "JAKARTA1", "status": "Active" },
+  { "id": 8, "username": "admin", "roleGroup": "Admin", "telepon": "081200000001", "email": "admin@falcon.id", "namaKaryawan": "Falcon Admin", "status": "Active" }
+]

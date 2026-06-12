@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Detail Faktur - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        :root {
+            --color-primary: #005D41;
+            --color-black: #231F20;
+            --color-gray: #ADA4A5;
+            --color-gray-light: #F6F6F6;
+            --color-border: #E9EFEF;
+        }
+        body { background: #f7f9fa; }
+        .mobile-header {
+            background: linear-gradient(135deg, #004d35, #005D41);
+            color: #fff;
+        }
+
+        .detail-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin: 12px 16px;
+            padding: 16px;
+        }
+
+        .inv-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .inv-title-no {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--color-black);
+        }
+        .inv-badge {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .inv-badge-paid { background: #E0F7F0; color: #00A76F; }
+        .inv-badge-unpaid { background: #FFF3E0; color: #FF8F00; }
+
+        .payment-summary {
+            display: flex;
+            background: var(--color-gray-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .payment-summary-item {
+            flex: 1;
+            padding: 10px 14px;
+        }
+        .payment-summary-item:first-child {
+            border-right: 1px solid var(--color-border);
+        }
+        .payment-summary-label {
+            font-size: 11px;
+            color: var(--color-gray);
+        }
+        .payment-summary-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-black);
+        }
+
+        .customer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .customer-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-black);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .customer-name i { color: #dc3545; font-size: 12px; }
+        .customer-code {
+            font-size: 12px;
+            color: var(--color-gray);
+            margin-left: 18px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .info-item:last-child { border-bottom: none; }
+        .info-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--color-gray-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+            color: var(--color-gray);
+        }
+        .info-icon.loc { color: #E85D5D; }
+        .info-icon.cal { color: #FF9800; }
+        .info-icon.pay { color: #4CAF50; }
+        .info-icon.due { color: #2196F3; }
+        .info-label { font-size: 12px; font-weight: 700; color: var(--color-black); }
+        .info-value { font-size: 12px; color: var(--color-gray); margin-top: 2px; }
+
+        /* Items Section */
+        .items-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .items-title { font-size: 14px; font-weight: 800; color: var(--color-black); }
+        .items-count { font-size: 12px; color: var(--color-gray); }
+
+        .item-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-num {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-gray);
+            min-width: 20px;
+        }
+        .item-img {
+            width: 40px; height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--color-gray-light);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .item-img img { width: 100%; height: 100%; object-fit: cover; }
+        .item-details { flex: 1; min-width: 0; }
+        .item-code { font-size: 11px; color: var(--color-gray); font-weight: 600; }
+        .item-name { font-size: 13px; font-weight: 700; color: var(--color-black); margin-top: 2px; }
+        .item-price {
+            font-size: 14px; font-weight: 800; color: var(--color-black);
+            background: var(--color-gray-light);
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-top: 6px;
+            display: inline-block;
+        }
+        .item-qty-row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .qty-label { color: var(--color-gray); font-weight: 600; margin-right: 12px; }
+        .qty-cell {
+            text-align: center;
+            padding: 0 12px;
+            border-right: 1px solid var(--color-border);
+        }
+        .qty-cell:last-child { border-right: none; }
+        .qty-num { font-size: 14px; font-weight: 700; color: var(--color-black); }
+        .qty-uom { font-size: 10px; color: var(--color-gray); }
+
+        /* Overview */
+        .overview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+        .overview-label { color: var(--color-gray); }
+        .overview-value { font-weight: 700; color: var(--color-black); }
+
+        /* Bottom Total */
+        .bottom-total {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid var(--color-border);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .total-label { font-size: 14px; font-weight: 800; color: var(--color-black); }
+        .total-value { font-size: 18px; font-weight: 800; color: var(--color-black); }
+    </style>
+</head>
+<body>
+<div class="mobile-wrapper">
+    <!-- Header -->
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-chevron-left"></i></button>
+        <span class="header-title">Faktur penjualan</span>
+        <div style="display:flex; gap:4px;">
+            <button class="header-action" onclick="printInvoice()"><i class="fas fa-print"></i></button>
+            <button class="header-action" onclick="showMore()"><i class="fas fa-ellipsis-v"></i></button>
+        </div>
+    </div>
+
+    <div class="mobile-content no-nav" style="padding-bottom:70px;">
+        <!-- Invoice Number & Badge -->
+        <div class="detail-card">
+            <div class="inv-title-row">
+                <span class="inv-title-no" id="invNo">-</span>
+                <span class="inv-badge inv-badge-paid" id="invBadge">Paid</span>
+            </div>
+            <div class="payment-summary">
+                <div class="payment-summary-item">
+                    <div class="payment-summary-label">Sudah bayar</div>
+                    <div class="payment-summary-value" id="paidAmount">Rp0</div>
+                </div>
+                <div class="payment-summary-item">
+                    <div class="payment-summary-label">Sisa bayar</div>
+                    <div class="payment-summary-value" id="remainAmount">Rp0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="detail-card">
+            <div class="customer-row">
+                <div class="customer-name"><i class="fas fa-times-circle"></i> <span id="custName">-</span></div>
+                <i class="fas fa-chevron-right" style="color:var(--color-gray);"></i>
+            </div>
+            <div class="customer-code" id="custCode">-</div>
+
+            <div class="info-item" style="margin-top:12px;">
+                <div class="info-icon loc"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <div class="info-label">Alamat pelanggan</div>
+                    <div class="info-value" id="custAddress">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Info -->
+        <div class="detail-card">
+            <div class="info-item">
+                <div class="info-icon cal"><i class="far fa-calendar"></i></div>
+                <div>
+                    <div class="info-label">Tanggal faktur</div>
+                    <div class="info-value" id="invDate">-</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon pay"><i class="fas fa-dollar-sign"></i></div>
+                <div>
+                    <div class="info-label">Waktu pembayaran</div>
+                    <div class="info-value" id="invPayterm">Cash</div>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon due"><i class="far fa-calendar-check"></i></div>
+                <div>
+                    <div class="info-label">Tanggal jatuh tempo</div>
+                    <div class="info-value" id="invDueDate">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="detail-card">
+            <div class="items-header">
+                <span class="items-title">Item faktur penjualan</span>
+                <span class="items-count" id="itemsCount">0 item</span>
+            </div>
+            <div id="itemsContainer"></div>
+        </div>
+
+        <!-- Overview -->
+        <div class="detail-card">
+            <div class="items-title" style="margin-bottom:8px;">Overview</div>
+            <div class="overview-row">
+                <span class="overview-label">Subtotal (Termasuk pajak)</span>
+                <span class="overview-value" id="ovSubtotal">0</span>
+            </div>
+            <div class="overview-row">
+                <span class="overview-label">Total pajak</span>
+                <span class="overview-value" id="ovTax">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Total -->
+    <div class="bottom-total">
+        <span class="total-label">Total</span>
+        <span class="total-value" id="totalValue">Rp0</span>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        const invId = params.get('id');
+
+        if (!invId) { history.back(); return; }
+
+        const stored = JSON.parse(localStorage.getItem('sfa_invoices') || '[]');
+        const inv = stored.find(i => String(i.id) === String(invId));
+
+        if (!inv) {
+            Swal.fire('Error', 'Faktur tidak ditemukan.', 'error').then(() => history.back());
+            return;
+        }
+
+        const cust = SfaStore.getCustomerById(inv.customerId);
+        const fmt = (n) => new Intl.NumberFormat('id-ID').format(n);
+        const fmtRp = (n) => 'Rp' + fmt(n);
+
+        // Header
+        $('#invNo').text('INV-' + inv.id);
+        const isPaid = (inv.paymentStatus || 'paid') === 'paid';
+        $('#invBadge').text(isPaid ? 'Paid' : 'Unpaid')
+            .attr('class', `inv-badge ${isPaid ? 'inv-badge-paid' : 'inv-badge-unpaid'}`);
+
+        // Payment summary
+        const total = inv.totalNet || inv.totalGross || 0;
+        $('#paidAmount').text(fmtRp(isPaid ? total : 0));
+        $('#remainAmount').text(fmtRp(isPaid ? 0 : total));
+
+        // Customer
+        $('#custName').text(cust ? cust.name : inv.customerName || inv.customerId);
+        $('#custCode').text(inv.customerId);
+        $('#custAddress').text(cust ? (cust.address + ', ' + cust.kota) : '-');
+
+        // Dates
+        const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+        const invDate = new Date(inv.date || Date.now());
+        const dateStr = `${invDate.getDate()} ${months[invDate.getMonth()]} ${invDate.getFullYear()} | ${String(invDate.getHours()).padStart(2,'0')}:${String(invDate.getMinutes()).padStart(2,'0')}`;
+        $('#invDate').text(dateStr);
+        $('#invPayterm').text('Cash');
+
+        const dueDate = new Date(inv.deliveryDate || inv.date || Date.now());
+        const dueDateStr = `${dueDate.getDate()} ${months[dueDate.getMonth()]} ${dueDate.getFullYear()} | ${String(dueDate.getHours()).padStart(2,'0')}:${String(dueDate.getMinutes()).padStart(2,'0')}`;
+        $('#invDueDate').text(dueDateStr);
+
+        // Items
+        const items = inv.items || [];
+        $('#itemsCount').text(items.length + ' item');
+
+        const container = $('#itemsContainer');
+        // Group items by code
+        const grouped = {};
+        items.forEach(item => {
+            if (!grouped[item.code]) {
+                grouped[item.code] = { code: item.code, name: item.name, qtyKarton: 0, qtyBox: 0, qtyPcs: 0, subtotal: 0 };
+            }
+            if (item.uom === 'KARTON') grouped[item.code].qtyKarton += item.qty;
+            else if (item.uom === 'BOX') grouped[item.code].qtyBox += item.qty;
+            else grouped[item.code].qtyPcs += item.qty;
+            grouped[item.code].subtotal += item.subtotal;
+            if (item.name) grouped[item.code].name = item.name.replace(/ \(Karton\)| \(Box\)| \(Pcs\)/g, '');
+        });
+
+        const groupedItems = Object.values(grouped);
+        const products = SfaStore.getProducts();
+
+        groupedItems.forEach((item, idx) => {
+            const prod = products.find(p => p.code === item.code);
+            const imgHtml = prod && prod.imageUrl
+                ? `<img src="${prod.imageUrl}" alt="${item.name}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-box text-success\\' style=\\'font-size:16px;\\'></i>'">`
+                : `<i class="fa-solid fa-box text-success" style="font-size:16px;"></i>`;
+
+            container.append(`
+                <div class="item-row">
+                    <span class="item-num">${idx + 1}.</span>
+                    <div class="item-img">${imgHtml}</div>
+                    <div class="item-details">
+                        <div class="item-code">${item.code}</div>
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">${fmt(item.subtotal)}</div>
+                        <div class="item-qty-row">
+                            <span class="qty-label">Qty</span>
+                            <div class="qty-cell"><div class="qty-num">${item.qtyKarton}</div><div class="qty-uom">KARTON</div></div>
+                            <div class="qty-cell"><div class="qty-num">${item.qtyBox}</div><div class="qty-uom">BOX</div></div>
+                            <div class="qty-cell" style="border-right:none;"><div class="qty-num">${item.qtyPcs}</div><div class="qty-uom">PCS</div></div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        });
+
+        // Overview
+        const subtotal = inv.totalGross || total;
+        const tax = inv.totalNet ? (inv.totalNet - (inv.totalGross || 0)) : 0;
+        $('#ovSubtotal').text(fmt(subtotal));
+        $('#ovTax').text(fmt(Math.max(0, tax)));
+        $('#totalValue').text(fmtRp(total));
+    });
+
+    function printInvoice() {
+        Swal.fire({ title: 'Cetak Faktur', text: 'Fitur cetak via Bluetooth printer akan tersedia.', icon: 'info', confirmButtonColor: '#005D41' });
+    }
+
+    function showMore() {
+        Swal.fire({ title: 'Opsi Lainnya', html: '<p style="font-size:13px;">Hapus / Duplikat / Kirim ulang akan tersedia.</p>', confirmButtonColor: '#005D41' });
+    }
+</script>
+</body>
+</html>

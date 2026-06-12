@@ -8,13 +8,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
     <style>
+        :root {
+            --color-primary: #005D41;
+            --color-accent: #78B500;
+            --color-bg-light: #F1F7E5;
+            --color-black: #231F20;
+            --color-gray: #ADA4A5;
+            --color-gray-light: #F6F6F6;
+            --color-border: #E9EFEF;
+        }
+
         .outlet-banner {
             background: linear-gradient(135deg, #004d35, #005D41);
             color: #fff;
             padding: 16px;
         }
         .outlet-banner .name { font-size: 16px; font-weight: 700; }
-        .outlet-banner .sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+        .outlet-banner .sub  { font-size: 12px; opacity: 0.85; margin-top: 2px; }
         .outstanding-badge {
             background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.25);
@@ -28,30 +38,83 @@
         }
         .outstanding-badge .amount { font-size: 18px; font-weight: 700; color: #FFE57A; }
 
+        /* Invoice checkbox list */
         .invoice-item {
             background: #fff;
-            border: 1px solid var(--color-border);
+            border: 1.5px solid var(--color-border);
             border-radius: 10px;
             padding: 12px 14px;
             margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: border-color 0.2s;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
         }
-        .invoice-item.selected { border-color: var(--color-primary); background: var(--color-bg-light); }
-        .invoice-item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--color-primary); cursor: pointer; flex-shrink: 0; }
+        .invoice-item.selected {
+            border-color: var(--color-primary);
+            background: var(--color-bg-light);
+        }
+        .invoice-item.overdue .invoice-no { color: #dc3545; }
+        .invoice-item input[type=checkbox] {
+            width: 18px; height: 18px;
+            accent-color: var(--color-primary);
+            cursor: pointer; flex-shrink: 0;
+        }
         .invoice-info { flex: 1; }
-        .invoice-no { font-size: 13px; font-weight: 700; color: var(--color-black); }
+        .invoice-no   { font-size: 13px; font-weight: 700; color: var(--color-black); }
         .invoice-meta { font-size: 11px; color: var(--color-gray); margin-top: 2px; }
         .invoice-balance { font-size: 14px; font-weight: 700; color: #dc3545; white-space: nowrap; }
+        .overdue-tag {
+            display: inline-block;
+            background: #fdecea;
+            color: #dc3545;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
 
         .section-title {
-            font-size: 13px; font-weight: 700; color: var(--color-gray);
+            font-size: 12px; font-weight: 700; color: var(--color-gray);
             text-transform: uppercase; letter-spacing: 0.5px;
             margin: 16px 0 8px;
         }
 
+        /* Nominal input */
+        .nominal-input-group {
+            background: #fff;
+            border: 1.5px solid var(--color-border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex; align-items: center; gap: 8px;
+            transition: border-color 0.2s;
+        }
+        .nominal-input-group.over-limit  { border-color: #dc3545; }
+        .nominal-input-group.ok-partial  { border-color: #fd7e14; }
+        .nominal-input-group.ok-exact    { border-color: var(--color-primary); }
+        .nominal-input-group:focus-within:not(.over-limit) { border-color: var(--color-primary); }
+        .nominal-input-group span { font-size: 16px; font-weight: 700; color: var(--color-gray); }
+        .nominal-input-group input {
+            border: none; outline: none; font-size: 20px; font-weight: 700;
+            color: var(--color-black); flex: 1; background: transparent;
+        }
+
+        /* Status row below nominal input */
+        .nominal-status {
+            font-size: 11px;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: none;
+        }
+        .nominal-status.over   { display: block; background: #fdecea; color: #dc3545; }
+        .nominal-status.under  { display: block; background: #fff3cd; color: #856404; }
+        .nominal-status.exact  { display: block; background: var(--color-bg-light); color: var(--color-primary); }
+
+        /* Method grid */
         .method-grid {
             display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;
         }
@@ -74,6 +137,7 @@
         }
         .method-btn i { display: block; font-size: 20px; margin-bottom: 4px; }
 
+        /* Photo upload */
         .photo-box {
             width: 100%; height: 160px;
             background: #f0f2f5; border-radius: 10px;
@@ -83,46 +147,55 @@
             cursor: pointer; transition: border-color 0.2s; overflow: hidden;
         }
         .photo-box:active { border-color: var(--color-primary); }
-        .photo-box img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
+        .photo-box img    { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
         .photo-box .placeholder { color: var(--color-gray); text-align: center; font-size: 13px; }
         .photo-box .placeholder i { font-size: 32px; display: block; margin-bottom: 6px; }
 
-        .nominal-input-group {
-            background: #fff;
-            border: 1.5px solid var(--color-border);
+        /* Summary bar above submit button */
+        .summary-bar {
+            background: var(--color-bg-light);
+            border: 1px solid rgba(0,93,65,0.15);
             border-radius: 10px;
-            padding: 12px 16px;
-            display: flex; align-items: center; gap: 8px;
-            transition: border-color 0.2s;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            display: none;
         }
-        .nominal-input-group:focus-within { border-color: var(--color-primary); }
-        .nominal-input-group span { font-size: 16px; font-weight: 700; color: var(--color-gray); }
-        .nominal-input-group input {
-            border: none; outline: none; font-size: 20px; font-weight: 700;
-            color: var(--color-black); flex: 1; background: transparent;
-        }
+        .summary-bar.visible { display: block; }
+        .summary-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+        .summary-row:last-child { margin-bottom: 0; font-weight: 700; font-size: 13px; }
+        .summary-label { color: var(--color-gray); }
+        .summary-value { color: var(--color-black); font-weight: 600; }
+        .summary-value.kembalian { color: var(--color-primary); }
+        .summary-value.kurang    { color: #dc3545; }
 
         .bottom-action {
             position: sticky; bottom: 0; background: #fff;
             border-top: 1px solid var(--color-border);
             padding: 14px 16px;
         }
+
+        /* Select all bar */
+        .select-all-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; font-size: 12px;
+        }
+        .select-all-bar a { color: var(--color-primary); font-weight: 700; text-decoration: none; cursor: pointer; }
     </style>
 </head>
 <body style="background:#f7f9fa;">
 <div class="mobile-wrapper">
     <div class="mobile-header">
-        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <button class="header-action" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
         <span class="header-title">Input Pembayaran</span>
         <div style="width:36px;"></div>
     </div>
 
-    <div class="mobile-content no-nav" style="padding-bottom:80px;">
+    <div class="mobile-content no-nav" style="padding-bottom:160px;">
 
         <!-- Outlet Banner -->
         <div class="outlet-banner">
             <div class="name" id="outletName">-</div>
-            <div class="sub" id="outletCode">-</div>
+            <div class="sub"  id="outletCode">-</div>
             <div class="outstanding-badge">
                 <span>Total Outstanding</span>
                 <span class="amount" id="totalOutstanding">Rp0</span>
@@ -133,14 +206,20 @@
 
             <!-- Invoice List -->
             <div class="section-title">Pilih Invoice yang Dibayar</div>
+            <div class="select-all-bar">
+                <span class="text-muted" id="selectedCountLabel">0 invoice dipilih</span>
+                <a onclick="toggleSelectAll()" id="selectAllLink">Pilih Semua</a>
+            </div>
             <div id="invoiceList"></div>
 
             <!-- Nominal Input -->
             <div class="section-title">Nominal Pembayaran</div>
-            <div class="nominal-input-group">
+            <div class="nominal-input-group" id="nominalWrapper">
                 <span>Rp</span>
-                <input type="number" id="nominalInput" placeholder="0" oninput="onNominalChange()"/>
+                <input type="text" id="nominalInput" placeholder="0" inputmode="numeric"
+                       oninput="onNominalInput(this)" onkeypress="return allowNumbersOnly(event)"/>
             </div>
+            <div class="nominal-status" id="nominalStatus"></div>
             <p style="font-size:11px; color:var(--color-gray); margin-top:4px;">
                 Total terpilih: <strong id="selectedTotal">Rp0</strong>
             </p>
@@ -151,18 +230,9 @@
                 <div class="method-btn active" id="methodTunai" onclick="selectMethod('Tunai')">
                     <i class="fas fa-money-bill-wave"></i>Tunai
                 </div>
-                <div class="method-btn" id="methodTransfer" onclick="selectMethod('Transfer Bank')">
-                    <i class="fas fa-university"></i>Transfer Bank
-                </div>
-                <div class="method-btn" id="methodGiro" onclick="selectMethod('Giro')">
-                    <i class="fas fa-file-invoice"></i>Giro
-                </div>
-                <div class="method-btn" id="methodCek" onclick="selectMethod('Cek')">
-                    <i class="fas fa-check-square"></i>Cek
-                </div>
             </div>
 
-            <!-- Bukti Foto (tampil jika non-tunai) -->
+            <!-- Bukti Foto -->
             <div id="photoSection" class="d-none">
                 <div class="section-title">Foto Bukti Pembayaran</div>
                 <div class="photo-box" id="photoBox" onclick="capturePhoto()">
@@ -172,32 +242,56 @@
                     </div>
                     <img src="" id="photoPreview" class="d-none" alt="Bukti"/>
                 </div>
-                <input type="file" id="fileInput" accept="image/*" capture="environment" class="d-none" onchange="onFileSelected(event)"/>
+                <input type="file" id="fileInput" accept="image/*" capture="environment"
+                       class="d-none" onchange="onFileSelected(event)"/>
             </div>
 
             <!-- Catatan -->
             <div class="section-title">Catatan (opsional)</div>
-            <textarea class="form-control" id="notesInput" rows="2" placeholder="Tulis catatan..." style="font-size:13px; border-radius:10px;"></textarea>
+            <textarea class="form-control" id="notesInput" rows="2" placeholder="Tulis catatan..."
+                      style="font-size:13px; border-radius:10px;"></textarea>
         </div>
     </div>
 
     <!-- Bottom Action -->
     <div class="bottom-action">
-        <button class="btn-mobile-primary" onclick="submitPayment()">
+        <!-- Summary bar -->
+        <div class="summary-bar" id="summaryBar">
+            <div class="summary-row">
+                <span class="summary-label">Total tagihan terpilih</span>
+                <span class="summary-value" id="sbTagihan">Rp0</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Dibayar</span>
+                <span class="summary-value" id="sbDibayar">Rp0</span>
+            </div>
+            <div class="summary-row" id="sbKembalianRow" style="display:none;">
+                <span class="summary-label">Kembalian</span>
+                <span class="summary-value kembalian" id="sbKembalian">Rp0</span>
+            </div>
+            <div class="summary-row" id="sbSisaRow" style="display:none;">
+                <span class="summary-label">Sisa piutang</span>
+                <span class="summary-value kurang" id="sbSisa">Rp0</span>
+            </div>
+        </div>
+        <button class="btn-mobile-primary" id="btnSimpan" onclick="submitPayment()">
             <i class="fas fa-save me-2"></i>Simpan Pembayaran
         </button>
     </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    let customerId = null;
-    let selectedMethod = 'Tunai';
+    let customerId      = null;
+    let selectedMethod  = 'Tunai';
     let selectedInvoiceIds = [];
-    let photoData = null;
+    let allInvoices     = [];   // outstanding invoices for this customer
+    let photoData       = null;
 
+    /* ── INIT ──────────────────────────────────────────────── */
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
         customerId = params.get('customerId');
@@ -207,33 +301,39 @@
             return;
         }
 
-        const cust = SfaStore.getCustomerById(customerId);
+        const cust        = SfaStore.getCustomerById(customerId);
         const outstanding = SfaStore.getOutstandingByCustomerId(customerId);
 
         $('#outletName').text(cust ? cust.name : customerId);
-        $('#outletCode').text(customerId);
+        $('#outletCode').text(cust ? `${customerId} • ${cust.outletType || ''}` : customerId);
         $('#totalOutstanding').text(SfaStore.formatRupiah(outstanding));
 
         renderInvoices();
     });
 
+    /* ── RENDER INVOICE LIST ────────────────────────────────── */
     function renderInvoices() {
-        const invoices = SfaStore.getCollectionsByCustomerId(customerId).filter(c => c.balance > 0);
+        allInvoices = SfaStore.getCollectionsByCustomerId(customerId).filter(c => c.balance > 0);
         const container = $('#invoiceList');
         container.empty();
 
-        if (invoices.length === 0) {
-            container.html('<p class="text-muted" style="font-size:13px;">Tidak ada invoice outstanding.</p>');
+        if (allInvoices.length === 0) {
+            container.html('<p class="text-muted text-center py-3" style="font-size:13px;"><i class="fas fa-check-circle text-success me-1"></i>Tidak ada invoice outstanding.</p>');
             return;
         }
 
-        invoices.forEach(inv => {
+        const today = new Date().toISOString().slice(0, 10);
+        allInvoices.forEach(inv => {
+            const isOverdue = inv.dueDate && inv.dueDate < today;
+            const overdueTag = isOverdue ? '<span class="overdue-tag">JATUH TEMPO</span>' : '';
             container.append(`
-                <div class="invoice-item" id="inv_${inv.id}">
-                    <input type="checkbox" id="chk_${inv.id}" onchange="toggleInvoice('${inv.id}', this.checked)"/>
+                <div class="invoice-item ${isOverdue ? 'overdue' : ''}" id="inv_${inv.id}"
+                     onclick="toggleInvoiceRow('${inv.id}')">
+                    <input type="checkbox" id="chk_${inv.id}"
+                           onclick="event.stopPropagation(); toggleInvoice('${inv.id}', this.checked)"/>
                     <div class="invoice-info">
-                        <div class="invoice-no">${inv.invoiceNo}</div>
-                        <div class="invoice-meta">Tgl: ${inv.invoiceDate} • Jatuh tempo: ${inv.dueDate}</div>
+                        <div class="invoice-no">${inv.invoiceNo}${overdueTag}</div>
+                        <div class="invoice-meta">Tgl: ${inv.date} • Jatuh tempo: ${inv.dueDate || '-'}</div>
                     </div>
                     <div class="invoice-balance">${SfaStore.formatRupiah(inv.balance)}</div>
                 </div>
@@ -241,51 +341,161 @@
         });
     }
 
+    function toggleInvoiceRow(id) {
+        const chk = document.getElementById('chk_' + id);
+        chk.checked = !chk.checked;
+        toggleInvoice(id, chk.checked);
+    }
+
     function toggleInvoice(id, checked) {
         if (checked) {
             if (!selectedInvoiceIds.includes(id)) selectedInvoiceIds.push(id);
             $(`#inv_${id}`).addClass('selected');
+            $(`#chk_${id}`).prop('checked', true);
         } else {
             selectedInvoiceIds = selectedInvoiceIds.filter(x => x !== id);
             $(`#inv_${id}`).removeClass('selected');
+            $(`#chk_${id}`).prop('checked', false);
         }
         updateSelectedTotal();
     }
 
-    function updateSelectedTotal() {
-        const collections = SfaStore.getCollectionsByCustomerId(customerId);
+    /* ── SELECT ALL / DESELECT ALL ─────────────────────────── */
+    function toggleSelectAll() {
+        const allSelected = selectedInvoiceIds.length === allInvoices.length;
+        if (allSelected) {
+            // deselect all
+            allInvoices.forEach(inv => {
+                selectedInvoiceIds = [];
+                $(`#inv_${inv.id}`).removeClass('selected');
+                $(`#chk_${inv.id}`).prop('checked', false);
+            });
+            $('#selectAllLink').text('Pilih Semua');
+        } else {
+            // select all
+            allInvoices.forEach(inv => {
+                if (!selectedInvoiceIds.includes(inv.id)) selectedInvoiceIds.push(inv.id);
+                $(`#inv_${inv.id}`).addClass('selected');
+                $(`#chk_${inv.id}`).prop('checked', true);
+            });
+            $('#selectAllLink').text('Batal Semua');
+        }
+        updateSelectedTotal();
+    }
+
+    /* ── TOTAL & NOMINAL SYNC ───────────────────────────────── */
+    function getSelectedTotalAmount() {
         let total = 0;
         selectedInvoiceIds.forEach(id => {
-            const inv = collections.find(c => c.id === id);
+            const inv = allInvoices.find(c => c.id === id);
             if (inv) total += inv.balance;
         });
+        return total;
+    }
+
+    function updateSelectedTotal() {
+        const total = getSelectedTotalAmount();
         $('#selectedTotal').text(SfaStore.formatRupiah(total));
-        if (!$('#nominalInput').val()) {
-            $('#nominalInput').val(total > 0 ? total : '');
+        $('#selectedCountLabel').text(`${selectedInvoiceIds.length} invoice dipilih`);
+
+        // Auto-fill nominal if user hasn't typed yet
+        const currentNominal = getNominalValue();
+        if (currentNominal === 0 && total > 0) {
+            setNominalValue(total);
         }
+
+        validateNominal();
     }
 
-    function onNominalChange() { /* user override, no auto-fill */ }
+    /* ── NOMINAL INPUT HANDLERS ─────────────────────────────── */
+    function onNominalInput(el) {
+        formatNominalInput(el);
+        validateNominal();
+    }
 
-    function selectMethod(method) {
-        selectedMethod = method;
-        $('.method-btn').removeClass('active');
-        const idMap = { 'Tunai': 'methodTunai', 'Transfer Bank': 'methodTransfer', 'Giro': 'methodGiro', 'Cek': 'methodCek' };
-        $(`#${idMap[method]}`).addClass('active');
+    function formatNominalInput(el) {
+        let raw = el.value.replace(/[^\d]/g, '');
+        if (raw === '') { el.value = ''; return; }
+        el.value = parseInt(raw).toLocaleString('id-ID');
+    }
 
-        if (method !== 'Tunai') {
-            $('#photoSection').removeClass('d-none');
+    function allowNumbersOnly(event) {
+        const code = event.which || event.keyCode;
+        return code >= 48 && code <= 57;
+    }
+
+    function getNominalValue() {
+        const raw = $('#nominalInput').val().replace(/[^\d]/g, '');
+        return parseInt(raw) || 0;
+    }
+
+    function setNominalValue(num) {
+        $('#nominalInput').val(num > 0 ? num.toLocaleString('id-ID') : '');
+        validateNominal();
+    }
+
+    /* ── VALIDATION ─────────────────────────────────────────── */
+    /**
+     * Rules (matching SimpliDOTS behaviour):
+     *  1. Nominal > selected total  → BLOCK (over-payment NOT allowed)
+     *  2. Nominal = selected total  → OK (exact / full payment)
+     *  3. 0 < Nominal < selected total → WARN but ALLOW (partial / underpayment)
+     *  4. Nominal = 0               → button disabled, no status shown
+     */
+    function validateNominal() {
+        const nominal       = getNominalValue();
+        const selectedTotal = getSelectedTotalAmount();
+        const wrapper       = $('#nominalWrapper');
+        const statusEl      = $('#nominalStatus');
+        const summaryBar    = $('#summaryBar');
+
+        // Reset classes
+        wrapper.removeClass('over-limit ok-partial ok-exact');
+        statusEl.removeClass('over under exact');
+        $('#sbKembalianRow, #sbSisaRow').hide();
+
+        if (selectedInvoiceIds.length === 0 || nominal === 0) {
+            statusEl.text('').hide();
+            summaryBar.removeClass('visible');
+            return;
+        }
+
+        // Update summary bar
+        $('#sbTagihan').text(SfaStore.formatRupiah(selectedTotal));
+        $('#sbDibayar').text(SfaStore.formatRupiah(nominal));
+        summaryBar.addClass('visible');
+
+        if (nominal > selectedTotal) {
+            // OVER-PAYMENT — block
+            const lebih = nominal - selectedTotal;
+            wrapper.addClass('over-limit');
+            statusEl.addClass('over')
+                .html(`<i class="fas fa-exclamation-circle me-1"></i>Nominal melebihi tagihan sebesar <strong>${SfaStore.formatRupiah(lebih)}</strong>. Harap sesuaikan.`);
+            $('#sbKembalianRow').show();
+            $('#sbKembalian').text(SfaStore.formatRupiah(lebih));
+        } else if (nominal === selectedTotal) {
+            // EXACT payment
+            wrapper.addClass('ok-exact');
+            statusEl.addClass('exact')
+                .html(`<i class="fas fa-check-circle me-1"></i>Nominal sesuai. Pembayaran penuh.`);
         } else {
-            $('#photoSection').addClass('d-none');
-            photoData = null;
-            $('#photoPreview').addClass('d-none').attr('src', '');
-            $('#photoPlaceholder').removeClass('d-none');
+            // PARTIAL — allow with warning
+            const sisa = selectedTotal - nominal;
+            wrapper.addClass('ok-partial');
+            statusEl.addClass('under')
+                .html(`<i class="fas fa-info-circle me-1"></i>Bayar sebagian. Sisa piutang: <strong>${SfaStore.formatRupiah(sisa)}</strong>`);
+            $('#sbSisaRow').show();
+            $('#sbSisa').text(SfaStore.formatRupiah(sisa));
         }
     }
 
-    function capturePhoto() {
-        $('#fileInput').click();
+    /* ── PAYMENT METHOD ─────────────────────────────────────── */
+    function selectMethod(method) {
+        selectedMethod = 'Tunai'; // currently only Tunai supported
     }
+
+    /* ── PHOTO ──────────────────────────────────────────────── */
+    function capturePhoto() { $('#fileInput').click(); }
 
     function onFileSelected(event) {
         const file = event.target.files[0];
@@ -299,51 +509,85 @@
         reader.readAsDataURL(file);
     }
 
+    /* ── SUBMIT ─────────────────────────────────────────────── */
     function submitPayment() {
-        const nominal = parseFloat($('#nominalInput').val());
-        if (!nominal || nominal <= 0) {
-            Swal.fire('Nominal Kosong', 'Masukkan nominal pembayaran yang valid.', 'warning');
-            return;
-        }
+        const nominal       = getNominalValue();
+        const selectedTotal = getSelectedTotalAmount();
+
+        // Guard: no invoice selected
         if (selectedInvoiceIds.length === 0) {
             Swal.fire('Invoice Belum Dipilih', 'Pilih minimal satu invoice yang akan dibayar.', 'warning');
             return;
         }
-        if (selectedMethod !== 'Tunai' && !photoData) {
-            Swal.fire('Foto Diperlukan', 'Upload foto bukti pembayaran untuk metode non-tunai.', 'warning');
+
+        // Guard: empty nominal
+        if (!nominal || nominal <= 0) {
+            Swal.fire('Nominal Kosong', 'Masukkan nominal pembayaran yang valid.', 'warning');
             return;
         }
 
+        // Guard: over-payment
+        if (nominal > selectedTotal) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Nominal Melebihi Tagihan',
+                html: `Nominal yang dimasukkan (<strong>${SfaStore.formatRupiah(nominal)}</strong>) melebihi total tagihan yang dipilih (<strong>${SfaStore.formatRupiah(selectedTotal)}</strong>).<br><br>Silakan sesuaikan nominal pembayaran.`,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'OK, Perbaiki'
+            });
+            return;
+        }
+
+        // Partial-payment confirmation (underpayment)
+        const isPartial = nominal < selectedTotal;
+        const sisa      = selectedTotal - nominal;
+
+        const confirmHtml = isPartial
+            ? `Nominal: <strong>${SfaStore.formatRupiah(nominal)}</strong><br>
+               Metode: <strong>${selectedMethod}</strong><br>
+               <span class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Pembayaran sebagian — sisa piutang <strong>${SfaStore.formatRupiah(sisa)}</strong> akan tetap tercatat.</span>`
+            : `Nominal: <strong>${SfaStore.formatRupiah(nominal)}</strong><br>
+               Metode: <strong>${selectedMethod}</strong><br>
+               <span class="text-success"><i class="fas fa-check-circle me-1"></i>Pembayaran penuh.</span>`;
+
         Swal.fire({
-            title: 'Simpan Pembayaran?',
-            html: `Nominal: <strong>${SfaStore.formatRupiah(nominal)}</strong><br>Metode: <strong>${selectedMethod}</strong>`,
+            title: isPartial ? 'Konfirmasi Bayar Sebagian?' : 'Simpan Pembayaran?',
+            html: confirmHtml,
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#005D41',
-            confirmButtonText: 'Simpan',
+            confirmButtonText: isPartial ? 'Ya, Bayar Sebagian' : 'Simpan',
             cancelButtonText: 'Batal'
         }).then(result => {
             if (result.isConfirmed) {
+                // Save to store
                 SfaStore.saveCollection({
-                    customerId: customerId,
-                    invoiceIds: selectedInvoiceIds,
-                    paidAmount: nominal,
-                    method: selectedMethod,
+                    customerId:    customerId,
+                    invoiceIds:    selectedInvoiceIds,
+                    paidAmount:    nominal,
+                    method:        selectedMethod,
                     evidencePhoto: photoData || null,
-                    notes: $('#notesInput').val()
+                    notes:         $('#notesInput').val()
                 });
 
                 Swal.fire({
-                    icon: 'success',
+                    icon:  'success',
                     title: 'Pembayaran Disimpan',
-                    text: 'Data penagihan ditambahkan ke antrean sinkronisasi.',
-                    timer: 1500,
+                    html:  isPartial
+                        ? `Pembayaran sebagian <strong>${SfaStore.formatRupiah(nominal)}</strong> dicatat.<br>Sisa piutang <strong>${SfaStore.formatRupiah(sisa)}</strong> tetap outstanding.`
+                        : `Pembayaran <strong>${SfaStore.formatRupiah(nominal)}</strong> berhasil dicatat.`,
+                    timer: 2000,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = 'collection_list.html';
+                    window.location.href = 'visit_list.html';
                 });
             }
         });
+    }
+
+    /* ── BACK ───────────────────────────────────────────────── */
+    function goBack() {
+        window.location.href = 'visit_list.html';
     }
 </script>
 </body>

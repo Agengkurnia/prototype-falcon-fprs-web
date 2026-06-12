@@ -1,0 +1,8 @@
+[
+  { "id": 1, "nama": "Admin", "level": "", "jumlah": 0, "anggota": 0 },
+  { "id": 2, "nama": "Motoris", "level": "Level 3", "jumlah": 147, "anggota": 0 },
+  { "id": 3, "nama": "Nasional", "level": "Level 1", "jumlah": 0, "anggota": 0 },
+  { "id": 4, "nama": "Salesman", "level": "Level 2", "jumlah": 25, "anggota": 0 },
+  { "id": 5, "nama": "SPG", "level": "Level 3", "jumlah": 10, "anggota": 0 },
+  { "id": 6, "nama": "Supervisor", "level": "Level 2", "jumlah": 8, "anggota": 0 }
+]

@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Buat Faktur Penjualan - Falcon SFA Mobile</title>
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        :root {
+            --color-primary: #005D41;
+            --color-primary-dark: #004d35;
+            --color-accent: #78B500;
+            --color-accent-hover: #659800;
+            --color-bg-light: #F1F7E5;
+            --color-black: #231F20;
+            --color-gray: #ADA4A5;
+            --color-gray-light: #F6F6F6;
+            --color-border: #E9EFEF;
+        }
+
+        .order-bg {
+            background-color: #f7f9fa;
+        }
+
+        .mobile-header {
+            background-color: var(--color-primary);
+            color: #fff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .mobile-header .header-action {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .mobile-header .header-title-container {
+            flex: 1;
+            margin-left: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mobile-header .header-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .mobile-header .info-icon {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.85);
+            cursor: pointer;
+        }
+
+        .mobile-content {
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f7f9fa;
+            position: relative;
+            padding-bottom: 140px; /* space for the fixed bottom bar */
+        }
+
+        .card-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #7B6F72;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .customer-picker-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 12px 14px;
+            background-color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .customer-picker-box:active {
+            background-color: var(--color-gray-light);
+        }
+
+        .customer-picker-box .selected-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .customer-picker-box .selected-name {
+            font-weight: 700;
+            color: var(--color-black);
+            font-size: 14px;
+        }
+
+        .customer-picker-box .selected-code {
+            font-size: 11px;
+            color: var(--color-gray);
+            margin-top: 2px;
+        }
+
+        .input-with-icon {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .input-with-icon input {
+            padding-right: 40px;
+            background-color: var(--color-gray-light);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 13px;
+            height: 44px;
+            font-weight: 600;
+            color: var(--color-black);
+        }
+
+        .input-with-icon .icon-right {
+            position: absolute;
+            right: 14px;
+            top: 14px;
+            font-size: 15px;
+            color: var(--color-gray);
+            pointer-events: none;
+        }
+
+        .form-select-custom {
+            height: 44px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+            margin-bottom: 12px;
+            width: 100%;
+            padding: 0 12px;
+            font-weight: 600;
+            background-color: #fff;
+            color: var(--color-black);
+            outline: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .info-label {
+            color: #7B6F72;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--color-black);
+            font-weight: 700;
+        }
+
+        /* Added item card */
+        .added-item-row {
+            background-color: var(--color-gray-light);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .added-item-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .added-item-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-black);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .added-item-meta {
+            font-size: 11px;
+            color: var(--color-gray);
+            margin-top: 2px;
+        }
+
+        .added-item-qty {
+            font-weight: 700;
+            color: var(--color-primary);
+            font-size: 13px;
+            margin-right: 12px;
+        }
+
+        .added-item-price {
+            font-size: 12px;
+            font-weight: 700;
+            color: #dc3545;
+            text-align: right;
+            margin-right: 8px;
+        }
+
+        .added-item-remove {
+            color: var(--color-gray);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .added-item-remove:hover {
+            color: #dc3545;
+        }
+
+        /* Bottom Fixed Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px;
+            background-color: #fff;
+            border-top: 1px solid var(--color-border);
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+            padding: 14px 16px;
+            z-index: 1000;
+        }
+
+        .btn-action-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-simpan {
+            flex: 4;
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            color: var(--color-gray);
+            cursor: not-allowed;
+        }
+
+        .btn-lanjut {
+            flex: 6;
+            background-color: var(--color-gray-light);
+            color: var(--color-gray);
+            cursor: not-allowed;
+        }
+
+        /* Active state classes */
+        .btn-simpan.active {
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+            cursor: pointer;
+        }
+
+        .btn-simpan.active:active {
+            background-color: var(--color-bg-light);
+        }
+
+        .btn-lanjut.active {
+            background-color: var(--color-primary);
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 93, 65, 0.2);
+            cursor: pointer;
+        }
+
+        .btn-lanjut.active:active {
+            background-color: var(--color-primary-dark);
+        }
+
+        /* Modal specific styling */
+        .category-chip {
+            padding: 5px 12px;
+            background-color: var(--color-gray-light);
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--color-gray);
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .category-chip.active {
+            background-color: var(--color-bg-light);
+            color: var(--color-primary);
+            border-color: rgba(0, 93, 65, 0.2);
+        }
+
+        .qty-picker {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border);
+            background-color: #fff;
+            color: var(--color-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .qty-val {
+            font-size: 12px;
+            font-weight: 700;
+            width: 20px;
+            text-align: center;
+        }
+
+        .uom-toggle {
+            font-size: 10px;
+            padding: 2px 6px;
+            background-color: var(--color-gray-light);
+            border-radius: 4px;
+            font-weight: 700;
+            color: var(--color-gray);
+            cursor: pointer;
+        }
+
+        .uom-toggle.active {
+            background-color: var(--color-primary);
+            color: #fff;
+        }
+
+        .product-modal-card {
+            border-bottom: 1px solid var(--color-border);
+            padding: 10px 0;
+        }
+
+        .active-input-uom {
+            border: 2px solid var(--color-primary) !important;
+            border-radius: 6px;
+            background-color: var(--color-bg-light) !important;
+        }
+
+        .active-keypad-btn {
+            background-color: var(--color-primary) !important;
+            color: #fff !important;
+            border-color: var(--color-primary) !important;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="order-bg">
+
+    <div class="mobile-wrapper">
+        <!-- Header -->
+        <div class="mobile-header">
+            <button class="header-action" onclick="goBack()" aria-label="Kembali">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="header-title-container">
+                <span class="header-title">Buat faktur penjualan</span>
+                <i class="far fa-question-circle info-icon" id="infoIcon" onclick="showInfoModal()"></i>
+            </div>
+            <div style="width: 30px;"></div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="mobile-content">
+            <div class="p-16">
+                <!-- Block 1: Informasi Pelanggan -->
+                <div class="card-section-title">Informasi pelanggan</div>
+                <div class="mobile-card p-12">
+                    <div class="customer-picker-box" id="customerPickerBox" onclick="openCustomerSelector()">
+                        <div class="selected-info" id="customerPickerInfo">
+                            <span class="placeholder-text text-muted" id="customerPickerPlaceholder">Pelanggan <span class="text-danger">*</span></span>
+                            <span class="selected-name d-none" id="customerSelectedName"></span>
+                            <span class="selected-code d-none" id="customerSelectedCode"></span>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </div>
+                </div>
+
+                <!-- Block 2: Informasi Faktur -->
+                <div class="card-section-title mt-3">Informasi faktur</div>
+                <div class="mobile-card p-12">
+                    <label class="form-label text-muted fs-7 mb-1" style="font-weight: 500;">Tanggal faktur</label>
+                    <div class="input-with-icon">
+                        <input type="text" class="form-control" id="invoiceDateInput" readonly />
+                        <i class="far fa-calendar-alt text-muted icon-right"></i>
+                    </div>
+
+                    <label class="form-label text-muted fs-7 mb-1" style="font-weight: 500;">Waktu pembayaran</label>
+                    <select class="form-select-custom" id="paymentTermSelect" onchange="calculateDueDate()">
+                        <option value="0" selected>Cash</option>
+                    </select>
+
+                    <label class="form-label text-muted fs-7 mb-1" style="font-weight: 500;">Tanggal jatuh tempo</label>
+                    <div class="input-with-icon mb-0">
+                        <input type="text" class="form-control" id="dueDateInput" readonly />
+                        <i class="far fa-calendar-alt text-muted icon-right"></i>
+                    </div>
+                </div>
+
+                <!-- Block 3: Tambah Item -->
+                <div class="mobile-card p-12 mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold fs-6" style="color: var(--color-black);">Tambah item</div>
+                        <button class="btn btn-sm text-white px-3" id="addItemsBtn" onclick="openProductModal()" style="background-color: #008B5B; border-radius: 8px; font-weight: 600; font-size: 12px; height: 32px;">Tambah item</button>
+                    </div>
+                    <div class="text-muted fs-7 mb-3" id="itemsCountLabel">0 item ditambahkan</div>
+                    
+                    <!-- Added items container -->
+                    <div class="added-items-container" id="addedItemsContainer">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+
+                <!-- Block 4: Overview -->
+                <div class="mobile-card p-12 mt-3">
+                    <div class="fw-bold fs-6 mb-3" style="color: var(--color-black);">Overview</div>
+                    <div class="info-row">
+                        <span class="info-label">Subtotal (Tidak termasuk pajak)</span>
+                        <span class="info-value" id="summarySubtotal">Rp0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Total pajak</span>
+                        <span class="info-value" id="summaryTax">Rp0</span>
+                    </div>
+                    <div class="mt-2">
+                        <textarea class="form-control" id="invoiceNotes" placeholder="Catatan" rows="2" style="border-radius: 8px; border-color: var(--color-border); font-size: 13px;"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Bottom Bar -->
+        <div class="bottom-bar">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold fs-6" style="color: var(--color-black);">Total</span>
+                <span class="fw-bold fs-5 text-danger" id="summaryTotal">Rp0</span>
+            </div>
+            <div class="btn-action-container">
+                <button class="btn-action btn-simpan" id="btnSimpan" onclick="saveDraft()">Simpan</button>
+                <button class="btn-action btn-lanjut" id="btnLanjutkan" onclick="checkoutPayment()">Lanjutkan pembayaran</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Customer Selector -->
+    <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px; padding: 16px;">
+            <div class="modal-content border-0" style="border-radius: 16px;">
+                <div class="modal-header border-0 bg-light" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold fs-6">Pilih Pelanggan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 border-bottom">
+                        <div class="search-box bg-light border rounded-pill px-3 py-2 d-flex align-items-center">
+                            <i class="fas fa-search text-muted me-2"></i>
+                            <input type="text" id="customerSearchInput" placeholder="Cari pelanggan..." class="border-0 bg-transparent w-100 outline-none" style="outline: none; font-size: 13px;" oninput="filterCustomers()"/>
+                        </div>
+                    </div>
+                    <div class="list-group list-group-flush overflow-auto" id="customerListContainer" style="max-height: 300px;">
+                        <!-- Dynamically filled -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Product Selector -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px; padding: 16px;">
+            <div class="modal-content border-0" style="border-radius: 16px;">
+                <div class="modal-header border-0 bg-light" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold fs-6">Tambah Item Produk</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-3 border-bottom">
+                        <div class="search-box bg-light border rounded-pill px-3 py-2 d-flex align-items-center mb-2">
+                            <i class="fas fa-search text-muted me-2"></i>
+                            <input type="text" id="productSearchInput" placeholder="Cari nama atau kode produk..." class="border-0 bg-transparent w-100" style="outline: none; font-size: 13px;" oninput="filterProducts()"/>
+                        </div>
+                        <div class="d-flex gap-1 overflow-x-auto pb-1" id="categoryFilterContainer" style="scrollbar-width: none;">
+                            <!-- Category chips -->
+                        </div>
+                    </div>
+                    <div class="overflow-auto p-3" id="productListContainer" style="max-height: 320px;">
+                        <!-- Populate products with qty buttons -->
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary fs-7 rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn text-white fs-7 rounded-pill px-4" onclick="applySelectedProducts()" style="background-color: var(--color-primary);">Terapkan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Dependencies -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
+    <script>
+        let customers = [];
+        let products = [];
+        let selectedCustomer = null;
+        let invoiceDate = new Date();
+        
+        // Temporary quantities in modal: productCode -> { qty, uom }
+        let tempCart = {}; 
+        // Real active invoice items: productCode -> { qty, uom, price }
+        let activeCart = {}; 
+        
+        let customerModal = null;
+        let productModal = null;
+        let selectedCategory = 'All';
+
+        $(document).ready(function() {
+            customers = SfaStore.getCustomers();
+            products = SfaStore.getProducts();
+
+            customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+            productModal = new bootstrap.Modal(document.getElementById('productModal'));
+
+            // Format current date/time on load
+            setupDates();
+
+            // Check if customer ID passed in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const cid = urlParams.get('customerId');
+            if (cid) {
+                const c = SfaStore.getCustomerById(cid);
+                if (c) selectCustomer(c);
+            }
+
+            updateCalculation();
+        });
+
+        function setupDates() {
+            const formatStr = formatDateTimeString(invoiceDate);
+            $('#invoiceDateInput').val(formatStr);
+            calculateDueDate();
+        }
+
+        function formatDateTimeString(dateObj) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            const month = months[dateObj.getMonth()];
+            const year = dateObj.getFullYear();
+            const hours = String(dateObj.getHours()).padStart(2, '0');
+            const mins = String(dateObj.getMinutes()).padStart(2, '0');
+            return `${day} ${month} ${year} | ${hours}:${mins}`;
+        }
+
+        function calculateDueDate() {
+            const daysToAdd = parseInt($('#paymentTermSelect').val()) || 0;
+            const dueDate = new Date(invoiceDate);
+            dueDate.setDate(dueDate.getDate() + daysToAdd);
+            $('#dueDateInput').val(formatDateTimeString(dueDate));
+        }
+
+        function openCustomerSelector() {
+            customerModal.show();
+            renderCustomerList('');
+        }
+
+        function renderCustomerList(query) {
+            const container = $('#customerListContainer');
+            container.empty();
+            const filtered = customers.filter(c => 
+                c.name.toLowerCase().includes(query.toLowerCase()) || 
+                c.id.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                container.append('<div class="p-3 text-center text-muted">Pelanggan tidak ditemukan.</div>');
+                return;
+            }
+
+            filtered.forEach(c => {
+                const activeClass = selectedCustomer && selectedCustomer.id === c.id ? 'active' : '';
+                container.append(`
+                    <button class="list-group-item list-group-item-action ${activeClass} d-flex justify-content-between align-items-center" onclick='confirmCustomerSelect(${JSON.stringify(c)})'>
+                        <div>
+                            <div class="fw-bold fs-7">${c.name}</div>
+                            <div class="text-muted fs-8">${c.id} • ${c.kota}</div>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted fs-8"></i>
+                    </button>
+                `);
+            });
+        }
+
+        function filterCustomers() {
+            const val = $('#customerSearchInput').val();
+            renderCustomerList(val);
+        }
+
+        function confirmCustomerSelect(cust) {
+            selectCustomer(cust);
+            customerModal.hide();
+        }
+
+        function selectCustomer(cust) {
+            selectedCustomer = cust;
+            $('#customerPickerPlaceholder').addClass('d-none');
+            $('#customerSelectedName').text(cust.name).removeClass('d-none');
+            $('#customerSelectedCode').text(`${cust.id} • Outstanding AR: ${SfaStore.formatRupiah(cust.arBalance || 0)}`).removeClass('d-none');
+            
+            // Set payment term default to Cash (value 0)
+            $(`#paymentTermSelect`).val("0");
+            calculateDueDate();
+            
+            updateCalculation();
+        }
+
+        function openProductModal() {
+            if (!selectedCustomer) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pilih Pelanggan',
+                    text: 'Silakan pilih pelanggan terlebih dahulu sebelum menambahkan item.',
+                    confirmButtonColor: 'var(--color-primary)',
+                    confirmButtonText: 'Pilih Pelanggan'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        openCustomerSelector();
+                    }
+                });
+                return;
+            }
+            tempCart = JSON.parse(JSON.stringify(activeCart));
+            productModal.show();
+            buildCategoryChips();
+            renderProductList();
+        }
+
+        function buildCategoryChips() {
+            const container = $('#categoryFilterContainer');
+            container.empty();
+            const cats = ['All', ...SfaStore.getProductCategories()];
+            cats.forEach(c => {
+                const activeClass = selectedCategory === c ? 'active' : '';
+                container.append(`<div class="category-chip ${activeClass}" onclick="setModalCategoryFilter('${c}')">${c}</div>`);
+            });
+        }
+
+        function setModalCategoryFilter(cat) {
+            selectedCategory = cat;
+            buildCategoryChips();
+            renderProductList();
+        }
+
+        function filterProducts() {
+            renderProductList();
+        }
+
+        function renderProductList() {
+            const query = $('#productSearchInput').val().toLowerCase();
+            const container = $('#productListContainer');
+            container.empty();
+
+            const filtered = products.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query);
+                const matchesCat = selectedCategory === 'All' || p.category === selectedCategory;
+                return matchesSearch && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                container.append('<div class="p-4 text-center text-muted"><i class="fas fa-box-open fs-3 mb-2 d-block"></i>Produk tidak ditemukan.</div>');
+                return;
+            }
+
+            filtered.forEach(p => {
+                const item = tempCart[p.code];
+                let qtyBadgeText = '';
+                if (item) {
+                    let parts = [];
+                    if (item.qtyKarton > 0) parts.push(`${item.qtyKarton} Ktn`);
+                    if (item.qtyBox > 0) parts.push(`${item.qtyBox} Box`);
+                    if (item.qtyPcs > 0) parts.push(`${item.qtyPcs} Pcs`);
+                    if (parts.length > 0) {
+                        qtyBadgeText = `<span class="badge bg-success" style="font-size: 10px;">${parts.join(', ')}</span>`;
+                    }
+                }
+
+                container.append(`
+                    <div class="product-modal-card d-flex align-items-center justify-content-between py-2 cursor-pointer" onclick="openSimplidotsModalFromAdd('${p.code}')">
+                        <div style="width:44px; height:44px; border-radius:8px; overflow:hidden; flex-shrink:0; background:#f6f6f6; display:flex; align-items:center; justify-content:center; margin-right:10px;">
+                            <img src="${p.imageUrl || ''}" alt="${p.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid ${p.icon || 'fa-box'} text-success\' style=\'font-size:18px;\'></i>'"/>
+                        </div>
+                        <div style="flex:1; min-width:0; padding-right:8px;">
+                            <div class="fw-bold fs-7 text-dark text-truncate">${p.name}</div>
+                            <div class="text-muted fs-8">${p.code} • ${SfaStore.formatRupiah(p.pricePcs)}/Pcs</div>
+                        </div>
+                        <div>
+                            ${qtyBadgeText || '<span class="badge bg-light text-muted border px-2 py-1 fs-9">+ Tambah</span>'}
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        let activeModalProductCode = null;
+        let activeModalUnit = 'KARTON'; // 'KARTON' | 'BOX' | 'PCS'
+        let modalQuantities = { KARTON: 0, BOX: 0, PCS: 0 };
+        let itemNotes = "";
+
+        function openSimplidotsModalFromAdd(code) {
+            productModal.hide();
+            activeModalProductCode = code;
+            const prod = products.find(p => p.code === code);
+            if (!prod) return;
+
+            // Setup product detail
+            $('#modalPrdCode').text(prod.code);
+            $('#modalPrdName').text(prod.name);
+            if (prod.imageUrl) {
+                $('#modalPrdImg').attr('src', prod.imageUrl).removeClass('d-none');
+                $('#modalPrdIcon').addClass('d-none');
+            } else {
+                $('#modalPrdImg').addClass('d-none');
+                $('#modalPrdIcon').attr('class', `fa-solid ${prod.icon || 'fa-box'} text-success`).removeClass('d-none');
+            }
+
+            // Setup stock
+            const stockKtn = prod.stock || 12;
+            const stockBox = stockKtn * prod.boxPerCtn;
+            const stockPcs = stockKtn * prod.pcsPerCtn;
+            $('#modalStokKarton').text(stockKtn);
+            $('#modalStokBox').text(stockBox);
+            $('#modalStokPcs').text(stockPcs);
+
+            // Setup price
+            $('#modalHargaKarton').text(new Intl.NumberFormat('id-ID').format(prod.priceKarton));
+            $('#modalHargaBox').text(new Intl.NumberFormat('id-ID').format(prod.priceBox));
+            $('#modalHargaPcs').text(new Intl.NumberFormat('id-ID').format(prod.pricePcs));
+
+            // Load quantities from tempCart
+            const cartItem = tempCart[code] || { qtyKarton: 0, qtyBox: 0, qtyPcs: 0, notes: '' };
+            modalQuantities.KARTON = cartItem.qtyKarton || 0;
+            modalQuantities.BOX = cartItem.qtyBox || 0;
+            modalQuantities.PCS = cartItem.qtyPcs || 0;
+            itemNotes = cartItem.notes || '';
+
+            // Setup notes
+            $('#itemNotesInput').val(itemNotes);
+            if (itemNotes) {
+                $('#itemNotesInput').removeClass('d-none');
+                $('#btnShowNotes').addClass('d-none');
+            } else {
+                $('#itemNotesInput').addClass('d-none');
+                $('#btnShowNotes').removeClass('d-none');
+            }
+
+            // Set active input UOM
+            setActiveInputUom('KARTON');
+
+            // Render current values
+            updateModalInputValues();
+
+            // Set action targets
+            $('#simplidotsSaveBtn').attr('onclick', 'saveModalItemFromAdd()');
+            $('#simplidotsCloseBtn').attr('onclick', 'cancelModalItemFromAdd()');
+
+            // Show UOM modal
+            const uomModal = new bootstrap.Modal(document.getElementById('simplidotsAddPrdModal'));
+            uomModal.show();
+        }
+
+        function saveModalItemFromAdd() {
+            const hasQty = modalQuantities.KARTON > 0 || modalQuantities.BOX > 0 || modalQuantities.PCS > 0;
+            
+            if (hasQty) {
+                tempCart[activeModalProductCode] = {
+                    qtyKarton: modalQuantities.KARTON,
+                    qtyBox: modalQuantities.BOX,
+                    qtyPcs: modalQuantities.PCS,
+                    notes: $('#itemNotesInput').val()
+                };
+            } else {
+                delete tempCart[activeModalProductCode];
+            }
+
+            // Hide UOM modal
+            const uomModalEl = document.getElementById('simplidotsAddPrdModal');
+            const uomInstance = bootstrap.Modal.getInstance(uomModalEl);
+            if (uomInstance) uomInstance.hide();
+
+            // Show product modal again and re-render
+            productModal.show();
+            renderProductList();
+        }
+
+        function cancelModalItemFromAdd() {
+            const uomModalEl = document.getElementById('simplidotsAddPrdModal');
+            const uomInstance = bootstrap.Modal.getInstance(uomModalEl);
+            if (uomInstance) uomInstance.hide();
+            productModal.show();
+        }
+
+        function openSimplidotsModalFromMainPage(code) {
+            tempCart = JSON.parse(JSON.stringify(activeCart));
+            activeModalProductCode = code;
+            const prod = products.find(p => p.code === code);
+            if (!prod) return;
+
+            // Setup product detail
+            $('#modalPrdCode').text(prod.code);
+            $('#modalPrdName').text(prod.name);
+            if (prod.imageUrl) {
+                $('#modalPrdImg').attr('src', prod.imageUrl).removeClass('d-none');
+                $('#modalPrdIcon').addClass('d-none');
+            } else {
+                $('#modalPrdImg').addClass('d-none');
+                $('#modalPrdIcon').attr('class', `fa-solid ${prod.icon || 'fa-box'} text-success`).removeClass('d-none');
+            }
+
+            // Setup stock
+            const stockKtn = prod.stock || 12;
+            const stockBox = stockKtn * prod.boxPerCtn;
+            const stockPcs = stockKtn * prod.pcsPerCtn;
+            $('#modalStokKarton').text(stockKtn);
+            $('#modalStokBox').text(stockBox);
+            $('#modalStokPcs').text(stockPcs);
+
+            // Setup price
+            $('#modalHargaKarton').text(new Intl.NumberFormat('id-ID').format(prod.priceKarton));
+            $('#modalHargaBox').text(new Intl.NumberFormat('id-ID').format(prod.priceBox));
+            $('#modalHargaPcs').text(new Intl.NumberFormat('id-ID').format(prod.pricePcs));
+
+            // Load quantities from tempCart
+            const cartItem = tempCart[code] || { qtyKarton: 0, qtyBox: 0, qtyPcs: 0, notes: '' };
+            modalQuantities.KARTON = cartItem.qtyKarton || 0;
+            modalQuantities.BOX = cartItem.qtyBox || 0;
+            modalQuantities.PCS = cartItem.qtyPcs || 0;
+            itemNotes = cartItem.notes || '';
+
+            // Setup notes
+            $('#itemNotesInput').val(itemNotes);
+            if (itemNotes) {
+                $('#itemNotesInput').removeClass('d-none');
+                $('#btnShowNotes').addClass('d-none');
+            } else {
+                $('#itemNotesInput').addClass('d-none');
+                $('#btnShowNotes').removeClass('d-none');
+            }
+
+            // Set active input UOM
+            setActiveInputUom('KARTON');
+
+            // Render current values
+            updateModalInputValues();
+
+            // Set action targets
+            $('#simplidotsSaveBtn').attr('onclick', 'saveModalItemFromMainPage()');
+            $('#simplidotsCloseBtn').attr('onclick', 'cancelModalItemFromMainPage()');
+
+            // Show UOM modal
+            const uomModal = new bootstrap.Modal(document.getElementById('simplidotsAddPrdModal'));
+            uomModal.show();
+        }
+
+        function saveModalItemFromMainPage() {
+            const hasQty = modalQuantities.KARTON > 0 || modalQuantities.BOX > 0 || modalQuantities.PCS > 0;
+            
+            if (hasQty) {
+                activeCart[activeModalProductCode] = {
+                    qtyKarton: modalQuantities.KARTON,
+                    qtyBox: modalQuantities.BOX,
+                    qtyPcs: modalQuantities.PCS,
+                    notes: $('#itemNotesInput').val()
+                };
+            } else {
+                delete activeCart[activeModalProductCode];
+            }
+
+            // Hide UOM modal
+            const uomModalEl = document.getElementById('simplidotsAddPrdModal');
+            const uomInstance = bootstrap.Modal.getInstance(uomModalEl);
+            if (uomInstance) uomInstance.hide();
+
+            renderAddedItems();
+            updateCalculation();
+        }
+
+        function cancelModalItemFromMainPage() {
+            const uomModalEl = document.getElementById('simplidotsAddPrdModal');
+            const uomInstance = bootstrap.Modal.getInstance(uomModalEl);
+            if (uomInstance) uomInstance.hide();
+        }
+
+        function setActiveInputUom(uom) {
+            activeModalUnit = uom;
+            $('#pesananKartonBox, #pesananBoxBox, #pesananPcsBox').removeClass('active-input-uom');
+            $('#keypadBtnKarton, #keypadBtnBox, #keypadBtnPcs').removeClass('active-keypad-btn').addClass('text-muted');
+
+            if (uom === 'KARTON') {
+                $('#pesananKartonBox').addClass('active-input-uom');
+                $('#keypadBtnKarton').addClass('active-keypad-btn').removeClass('text-muted');
+            } else if (uom === 'BOX') {
+                $('#pesananBoxBox').addClass('active-input-uom');
+                $('#keypadBtnBox').addClass('active-keypad-btn').removeClass('text-muted');
+            } else {
+                $('#pesananPcsBox').addClass('active-input-uom');
+                $('#keypadBtnPcs').addClass('active-keypad-btn').removeClass('text-muted');
+            }
+
+            $('#keypadDisplay').text(modalQuantities[uom]);
+        }
+
+        function updateModalInputValues() {
+            $('#valKarton').text(modalQuantities.KARTON);
+            $('#valBox').text(modalQuantities.BOX);
+            $('#valPcs').text(modalQuantities.PCS);
+            $('#keypadDisplay').text(modalQuantities[activeModalUnit]);
+        }
+
+        function toggleItemNotes() {
+            $('#itemNotesInput').removeClass('d-none').focus();
+            $('#btnShowNotes').addClass('d-none');
+        }
+
+        function pressKeypad(key) {
+            let currentValStr = String(modalQuantities[activeModalUnit]);
+
+            if (key === 'clear') {
+                modalQuantities[activeModalUnit] = 0;
+            } else if (key === 'backspace') {
+                if (currentValStr.length > 1) {
+                    modalQuantities[activeModalUnit] = parseInt(currentValStr.substring(0, currentValStr.length - 1)) || 0;
+                } else {
+                    modalQuantities[activeModalUnit] = 0;
+                }
+            } else {
+                if (currentValStr === '0') {
+                    currentValStr = key;
+                } else {
+                    currentValStr += key;
+                }
+                modalQuantities[activeModalUnit] = parseInt(currentValStr) || 0;
+            }
+
+            updateModalInputValues();
+        }
+
+        function applySelectedProducts() {
+            activeCart = JSON.parse(JSON.stringify(tempCart));
+            productModal.hide();
+            renderAddedItems();
+            updateCalculation();
+        }
+
+        function renderAddedItems() {
+            const container = $('#addedItemsContainer');
+            container.empty();
+
+            const codes = Object.keys(activeCart);
+            $('#itemsCountLabel').text(`${codes.length} item ditambahkan`);
+
+            if (codes.length === 0) {
+                container.append('<div class="text-center py-4 text-muted fs-7">Belum ada item ditambahkan.</div>');
+                return;
+            }
+
+            codes.forEach(code => {
+                const prod = products.find(p => p.code === code);
+                const item = activeCart[code];
+                if (!prod) return;
+
+                const itemKtn = item.qtyKarton || 0;
+                const itemBox = item.qtyBox || 0;
+                const itemPcs = item.qtyPcs || 0;
+
+                const itemTotal = (itemKtn * prod.priceKarton) + (itemBox * prod.priceBox) + (itemPcs * prod.pricePcs);
+
+                let breakdownStr = [];
+                if (itemKtn > 0) breakdownStr.push(`${itemKtn} Ktn`);
+                if (itemBox > 0) breakdownStr.push(`${itemBox} Box`);
+                if (itemPcs > 0) breakdownStr.push(`${itemPcs} Pcs`);
+                const breakdownLabel = breakdownStr.join(', ');
+
+                const notesBadge = item.notes ? `<div class="mt-1 text-muted fs-8 italic"><i class="far fa-sticky-note me-1"></i>"${item.notes}"</div>` : '';
+
+                container.append(`
+                    <div class="added-item-row cursor-pointer" onclick="openSimplidotsModalFromMainPage('${code}')" style="align-items:flex-start;">
+                        <div style="width:40px; height:40px; border-radius:8px; overflow:hidden; flex-shrink:0; background:#f6f6f6; display:flex; align-items:center; justify-content:center; margin-right:10px;">
+                            <img src="${prod.imageUrl || ''}" alt="${prod.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fa-solid ${prod.icon || 'fa-box'} text-success\' style=\'font-size:16px;\'></i>'"/>
+                        </div>
+                        <div class="added-item-details" style="flex:1; min-width:0;">
+                            <span class="added-item-name">${prod.name}</span>
+                            <span class="added-item-meta">${code} • ${breakdownLabel}</span>
+                            ${notesBadge}
+                        </div>
+                        <div class="added-item-price me-3">${SfaStore.formatRupiah(itemTotal)}</div>
+                        <div class="added-item-remove" onclick="event.stopPropagation(); removeAddedItem('${code}')"><i class="fas fa-trash-alt"></i></div>
+                    </div>
+                `);
+            });
+        }
+
+        function removeAddedItem(code) {
+            delete activeCart[code];
+            renderAddedItems();
+            updateCalculation();
+        }
+
+        function updateCalculation() {
+            let subtotal = 0;
+            const codes = Object.keys(activeCart);
+
+            codes.forEach(code => {
+                const prod = products.find(p => p.code === code);
+                const item = activeCart[code];
+                if (prod) {
+                    const itemKtn = item.qtyKarton || 0;
+                    const itemBox = item.qtyBox || 0;
+                    const itemPcs = item.qtyPcs || 0;
+                    subtotal += (itemKtn * prod.priceKarton) + (itemBox * prod.priceBox) + (itemPcs * prod.pricePcs);
+                }
+            });
+
+            // Calculate PPN (11%)
+            const tax = Math.round(subtotal * 0.11);
+            const total = subtotal + tax;
+
+            $('#summarySubtotal').text(SfaStore.formatRupiah(subtotal));
+            $('#summaryTax').text(SfaStore.formatRupiah(tax));
+            $('#summaryTotal').text(SfaStore.formatRupiah(total));
+
+            // Enable or disable buttons based on form validity
+            const isValid = selectedCustomer !== null && codes.length > 0;
+            if (isValid) {
+                $('#btnSimpan, #btnLanjutkan').addClass('active').prop('disabled', false);
+            } else {
+                $('#btnSimpan, #btnLanjutkan').removeClass('active').prop('disabled', true);
+            }
+        }
+
+        function saveDraft() {
+            if (!selectedCustomer || Object.keys(activeCart).length === 0) return;
+
+            Swal.fire({
+                title: 'Simpan Faktur?',
+                text: 'Faktur penjualan akan disimpan sebagai draft transaksi.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--color-primary)',
+                confirmButtonText: 'Simpan Draft',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processInvoiceSubmit('draft');
+                }
+            });
+        }
+
+        function checkoutPayment() {
+            if (!selectedCustomer || Object.keys(activeCart).length === 0) return;
+
+            Swal.fire({
+                title: 'Konfirmasi Pembayaran?',
+                text: 'Simpan faktur dan lanjutkan ke menu pembayaran penagihan.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--color-primary)',
+                confirmButtonText: 'Ya, Lanjutkan',
+                cancelButtonText: 'Kembali'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processInvoiceSubmit('payment');
+                }
+            });
+        }
+
+        function processInvoiceSubmit(actionType) {
+            const itemsList = [];
+            Object.keys(activeCart).forEach(code => {
+                const prod = products.find(p => p.code === code);
+                const item = activeCart[code];
+                
+                if (item.qtyKarton > 0) {
+                    itemsList.push({
+                        code: code,
+                        name: `${prod.name} (Karton)`,
+                        qty: item.qtyKarton,
+                        uom: 'KARTON',
+                        qtyPcs: item.qtyKarton * (prod.pcsPerCtn || 36),
+                        price: prod.priceKarton,
+                        subtotal: prod.priceKarton * item.qtyKarton
+                    });
+                }
+                if (item.qtyBox > 0) {
+                    itemsList.push({
+                        code: code,
+                        name: `${prod.name} (Box)`,
+                        qty: item.qtyBox,
+                        uom: 'BOX',
+                        qtyPcs: item.qtyBox * (prod.pcsPerBox || 6),
+                        price: prod.priceBox,
+                        subtotal: prod.priceBox * item.qtyBox
+                    });
+                }
+                if (item.qtyPcs > 0) {
+                    itemsList.push({
+                        code: code,
+                        name: `${prod.name} (Pcs)`,
+                        qty: item.qtyPcs,
+                        uom: 'PCS',
+                        qtyPcs: item.qtyPcs,
+                        price: prod.pricePcs,
+                        subtotal: prod.pricePcs * item.qtyPcs
+                    });
+                }
+            });
+
+            const subtotal = itemsList.reduce((s, i) => s + i.subtotal, 0);
+            const tax = Math.round(subtotal * 0.11);
+            const total = subtotal + tax;
+
+            // Save via SfaStore
+            const invId = SfaStore.saveInvoice({
+                customerId: selectedCustomer.id,
+                customerName: selectedCustomer.name,
+                items: itemsList,
+                totalGross: subtotal,
+                discount: 0,
+                totalNet: total,
+                deliveryDate: new Date(invoiceDate.getTime() + (parseInt($('#paymentTermSelect').val()) || 0)*24*60*60*1000).toISOString().split('T')[0],
+                notes: $('#invoiceNotes').val(),
+                status: 'confirmed'
+            });
+
+            SfaStore.completeInvoice(invId);
+
+            if (actionType === 'payment') {
+                const outstandingList = SfaStore.getCollections();
+                outstandingList.push({
+                    id: 'AR-' + invId,
+                    customerId: selectedCustomer.id,
+                    invoiceNo: 'FKT-' + invId,
+                    date: new Date().toISOString().slice(0, 10),
+                    amount: total,
+                    balance: total,
+                    status: 'outstanding',
+                    dueDate: new Date(invoiceDate.getTime() + (parseInt($('#paymentTermSelect').val()) || 0)*24*60*60*1000).toISOString().slice(0, 10)
+                });
+                localStorage.setItem('sfa_collections', JSON.stringify(outstandingList));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Faktur Disimpan',
+                    text: 'Faktur berhasil dibuat! Mengalihkan ke menu pembayaran...',
+                    timer: 1800,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = `collection_input.html?customerId=${selectedCustomer.id}`;
+                });
+            } else {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Faktur Disimpan',
+                    text: 'Faktur penjualan berhasil disimpan.',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'visit_list.html';
+                });
+            }
+        }
+
+        function showInfoModal() {
+            Swal.fire({
+                title: 'Informasi Faktur',
+                text: 'Halaman ini digunakan untuk membuat Faktur Penjualan langsung secara luring (offline) bagi pelanggan/outlet yang dipilih.',
+                confirmButtonColor: 'var(--color-primary)'
+            });
+        }
+
+        function goBack() {
+            window.location.href = 'visit_list.html';
+        }
+    </script>
+
+    <!-- MODAL: SimpliDOTS Style Tambah Item -->
+    <div class="modal fade" id="simplidotsAddPrdModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-end mx-auto" style="max-width: 450px; margin: 0 auto; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1100;">
+            <div class="modal-content border-0" style="border-radius: 20px 20px 0 0; box-shadow: 0 -8px 32px rgba(0,0,0,0.15);">
+                <!-- Header -->
+                <div class="modal-header border-0 bg-light py-2 px-3 d-flex align-items-center justify-content-between">
+                    <button type="button" class="btn-close ms-0" id="simplidotsCloseBtn" style="font-size: 12px;"></button>
+                    <h5 class="modal-title fw-bold text-center" style="font-size: 15px; color: var(--color-black); flex: 1;">Tambah item</h5>
+                    <span class="badge text-white" id="modalPrdFocusBadge" style="background-color: var(--color-primary); font-size: 9px;">Product focus</span>
+                </div>
+                <div class="modal-body p-0 bg-white">
+                    <!-- Product details card -->
+                    <div class="p-3 d-flex gap-3 align-items-center border-bottom">
+                        <div class="product-img-box m-0" id="modalPrdImgBox" style="width: 52px; height: 52px; background-color: var(--color-gray-light); display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow:hidden;">
+                            <img src="" id="modalPrdImg" style="width:100%; height:100%; object-fit:cover;" />
+                            <i class="fa-solid fa-box text-success d-none" id="modalPrdIcon" style="font-size: 20px;"></i>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div class="text-muted fs-8" id="modalPrdCode" style="font-weight: 600;">KN-SF-001</div>
+                            <div class="fw-bold fs-7 text-dark text-truncate" id="modalPrdName">Morinaga Chil*Kid Gold</div>
+                            <a href="javascript:void(0)" class="text-primary fs-8 fw-semibold" onclick="Swal.fire('Detail Produk', 'Detail info produk lengkap offline.', 'info')">Lebih detail <i class="fas fa-chevron-right fs-9"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- UOM Table -->
+                    <div class="px-3 py-2 border-bottom">
+                        <table class="w-100 text-center fs-8" style="border-collapse: collapse;">
+                            <thead>
+                                <tr style="color: var(--color-gray); border-bottom: 1px solid var(--color-border);">
+                                    <th class="text-start pb-2" style="font-weight: 500;">Unit <i class="far fa-question-circle text-muted fs-9"></i></th>
+                                    <th class="pb-2" style="font-weight: 500;">KARTON</th>
+                                    <th class="pb-2" style="font-weight: 500;">BOX</th>
+                                    <th class="pb-2" style="font-weight: 500;">PCS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="color: #27AE60; font-weight: 700;">
+                                    <td class="text-start py-2">Stok</td>
+                                    <td id="modalStokKarton">9999</td>
+                                    <td id="modalStokBox">0</td>
+                                    <td id="modalStokPcs">0</td>
+                                </tr>
+                                <tr style="color: var(--color-black); font-weight: 700;">
+                                    <td class="text-start py-2">Harga</td>
+                                    <td id="modalHargaKarton">234.000</td>
+                                    <td id="modalHargaBox">39.000</td>
+                                    <td id="modalHargaPcs">6.500</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pesanan split box -->
+                    <div class="p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="fw-bold fs-7 text-dark">Pesanan</span>
+                            <div class="d-flex border rounded-3 overflow-hidden text-center" style="width: 240px; border-color: var(--color-border); height: 50px;">
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananKartonBox" onclick="setActiveInputUom('KARTON')" style="border-right: 1px solid var(--color-border); flex: 1;">
+                                    <div class="fw-bold fs-6" id="valKarton">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">KARTON</div>
+                                </div>
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananBoxBox" onclick="setActiveInputUom('BOX')" style="border-right: 1px solid var(--color-border); flex: 1;">
+                                    <div class="fw-bold fs-6" id="valBox">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">BOX</div>
+                                </div>
+                                <div class="flex-1 py-1 cursor-pointer" id="pesananPcsBox" onclick="setActiveInputUom('PCS')" style="flex: 1;">
+                                    <div class="fw-bold fs-6" id="valPcs">0</div>
+                                    <div class="text-muted" style="font-size: 8px; font-weight: 700;">PCS</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tambah catatan button/field -->
+                        <div id="notesContainer">
+                            <button class="btn btn-sm border rounded-pill px-3 py-1 fs-8 text-muted" id="btnShowNotes" onclick="toggleItemNotes()" style="font-weight: 600; border-color: var(--color-border); background-color: #fff;"><i class="far fa-edit me-1"></i> Tambah catatan</button>
+                            <textarea class="form-control mt-2 d-none fs-8" id="itemNotesInput" placeholder="Tulis catatan untuk item ini..." rows="1" style="border-radius: 8px;"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Custom Numeric Keypad -->
+                    <div style="background-color: #E9ECEF; padding: 10px;">
+                        <!-- Keypad Display bar -->
+                        <div class="d-flex justify-content-between align-items-center bg-white border rounded-3 px-3 py-2 mb-2" style="height: 40px;">
+                            <span class="fw-bold text-dark fs-6" id="keypadDisplay">0</span>
+                            <i class="fa-solid fa-backspace text-muted fs-5 cursor-pointer" onclick="pressKeypad('backspace')"></i>
+                        </div>
+
+                        <div class="row g-2 text-center">
+                            <!-- Row 1 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('1')">1</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('2')">2</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('3')">3</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border border-primary text-primary" id="keypadBtnKarton" onclick="setActiveInputUom('KARTON')" style="height: 100%;">KARTON</button></div>
+                            
+                            <!-- Row 2 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('4')">4</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('5')">5</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('6')">6</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border text-muted" id="keypadBtnBox" onclick="setActiveInputUom('BOX')" style="height: 100%;">BOX</button></div>
+                            
+                            <!-- Row 3 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('7')">7</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('8')">8</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('9')">9</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-2 fw-bold fs-7 border text-muted" id="keypadBtnPcs" onclick="setActiveInputUom('PCS')" style="height: 100%;">PCS</button></div>
+                            
+                            <!-- Row 4 -->
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-semibold fs-7 border" onclick="pressKeypad('clear')">Hapus</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 fw-bold fs-5 border" onclick="pressKeypad('0')">0</button></div>
+                            <div class="col-3"><button class="btn btn-light w-100 py-3 border" onclick="pressKeypad('backspace')"><i class="fa-solid fa-arrow-left-long"></i></button></div>
+                            <div class="col-3"><button class="btn w-100 py-3 border text-white" id="simplidotsSaveBtn" style="background-color: var(--color-primary); height: 100%;"><i class="fa-solid fa-check fs-5"></i></button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

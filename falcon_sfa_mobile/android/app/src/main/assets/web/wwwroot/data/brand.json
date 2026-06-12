@@ -1,0 +1,10 @@
+[
+  { "id": 1, "nama": "ZEE", "deskripsi": "", "totalProduk": 5 },
+  { "id": 2, "nama": "Hydro Coco", "deskripsi": "", "totalProduk": 2 },
+  { "id": 3, "nama": "Entrasol", "deskripsi": "", "totalProduk": 3 },
+  { "id": 4, "nama": "CHIL GO", "deskripsi": "", "totalProduk": 9 },
+  { "id": 5, "nama": "Benecol", "deskripsi": "", "totalProduk": 5 },
+  { "id": 6, "nama": "Diabetasol", "deskripsi": "", "totalProduk": 4 },
+  { "id": 7, "nama": "Prenagen", "deskripsi": "", "totalProduk": 6 },
+  { "id": 8, "nama": "Milna", "deskripsi": "", "totalProduk": 7 }
+]

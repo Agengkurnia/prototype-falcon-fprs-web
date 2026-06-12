@@ -289,6 +289,33 @@
             stroke: var(--color-primary);
             fill: none;
         }
+
+        /* Floating Action Button (FAB) */
+        .fab-btn {
+            position: absolute;
+            bottom: 76px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            background-color: var(--color-accent);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(120, 181, 0, 0.4);
+            cursor: pointer;
+            z-index: 90;
+            transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none;
+        }
+
+        .fab-btn:active {
+            transform: scale(0.95);
+            background-color: var(--color-accent-hover);
+            color: #fff;
+        }
     </style>
 </head>
 <body class="home-bg">
@@ -350,7 +377,7 @@
                 <!-- 2x2 Grid Stats (Exact Replica) -->
                 <div class="stats-grid">
                     <!-- 1. Pelanggan (Blue) -->
-                    <div class="stat-card">
+                    <div class="stat-card" style="opacity: 0.4; pointer-events: none;">
                         <div class="stat-card-left">
                             <div class="stat-circle-icon" style="background-color: #E8F4FD;">
                                 <i class="fas fa-users" style="color: #1E88E5;"></i>
@@ -415,30 +442,120 @@
                 </div>
 
                 <!-- Link ke Target Detail -->
-                <a href="target.html" style="display:flex; align-items:center; justify-content:space-between; background:var(--color-bg-light); border:1px solid rgba(0,93,65,0.15); border-radius:10px; padding:10px 14px; text-decoration:none; margin-bottom:12px;">
+                <a href="#" style="display:flex; align-items:center; justify-content:space-between; background:var(--color-bg-light); border:1px solid rgba(0,93,65,0.15); border-radius:10px; padding:10px 14px; text-decoration:none; margin-bottom:12px; opacity: 0.4; pointer-events: none;">
                     <span style="font-size:13px; font-weight:700; color:var(--color-primary);"><i class="fas fa-bullseye me-2"></i>Lihat Detail Target Harian</span>
                     <i class="fas fa-chevron-right" style="color:var(--color-primary); font-size:12px;"></i>
                 </a>
 
                 <!-- Full Width Total Faktur Penjualan (Green) -->
-                <div class="full-stat-card">
+                <a href="order_input.html" style="text-decoration: none; display: block; margin-bottom: 12px;">
+                    <div class="full-stat-card" style="position: relative;">
+                        <div class="stat-card-left">
+                            <div class="stat-circle-icon" style="background-color: #E8F5E9; width: 44px; height: 44px;">
+                                <i class="fas fa-receipt" style="color: #43A047; font-size: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="stat-card-right">
+                            <div class="stat-card-label-row">
+                                <span>Total Faktur Penjualan</span>
+                                <i class="fas fa-info-circle" onclick="event.preventDefault(); showInfoToast('Total Faktur Penjualan', 'Akumulasi nilai rupiah dari seluruh faktur penjualan hari ini.')"></i>
+                            </div>
+                            <span class="stat-card-value" id="valTotalFaktur" style="font-size: 20px; color: #43A047;">Rp0</span>
+                        </div>
+                        <i class="fas fa-chevron-right" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #ccc;"></i>
+                    </div>
+                </a>
+
+                <!-- Full Width Total Pembayaran Pelanggan -->
+                <div class="full-stat-card" style="margin-bottom: 24px; opacity: 0.4; pointer-events: none;">
                     <div class="stat-card-left">
-                        <div class="stat-circle-icon" style="background-color: #E8F5E9; width: 44px; height: 44px;">
-                            <i class="fas fa-receipt" style="color: #43A047; font-size: 18px;"></i>
+                        <div class="stat-circle-icon" style="background-color: #F6F6F6; width: 44px; height: 44px;">
+                            <i class="fas fa-hand-holding-usd" style="color: #555; font-size: 18px;"></i>
                         </div>
                     </div>
                     <div class="stat-card-right">
                         <div class="stat-card-label-row">
-                            <span>Total Faktur Penjualan</span>
-                            <i class="fas fa-info-circle" onclick="showInfoToast('Total Faktur Penjualan', 'Akumulasi nilai rupiah dari seluruh faktur penjualan hari ini.')"></i>
+                            <span>Total Pembayaran Pelanggan</span>
+                            <i class="fas fa-info-circle" onclick="showInfoToast('Total Pembayaran Pelanggan', 'Akumulasi nilai rupiah dari seluruh pembayaran hari ini.')"></i>
                         </div>
-                        <span class="stat-card-value" id="valTotalFaktur" style="font-size: 20px; color: #43A047;">Rp0</span>
+                        <span class="stat-card-value" id="valTotalPembayaran" style="font-size: 20px; color: var(--color-black);">Rp0</span>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div style="border-top: 1px solid var(--color-border); padding-top: 16px;">
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Total Faktur Penjualan</h4>
+                    <div style="background: #fff; padding: 0; margin-bottom: 24px; position: relative; height: 180px;">
+                        <canvas id="fakturChart"></canvas>
+                    </div>
+
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555; opacity: 0.4;">Total Pembayaran Pelanggan</h4>
+                    <div style="background: #fff; padding: 0; margin-bottom: 24px; position: relative; height: 180px; opacity: 0.4; pointer-events: none;">
+                        <canvas id="pembayaranChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Tables Section -->
+                <div style="margin-top: 24px;">
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555; opacity: 0.4;">Pelanggan Terbaik Berdasarkan Faktur Penjualan</h4>
+                    <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0; margin-bottom: 24px; overflow: hidden; opacity: 0.4; pointer-events: none;">
+                        <table class="table table-borderless" style="margin-bottom: 0; font-size: 13px;">
+                            <thead style="border-bottom: 1px solid var(--color-border);">
+                                <tr>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">No</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Pelanggan</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Transaksi</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600; text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 32px 16px;">
+                                        <div style="background-color: #F1F7E5; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+                                            <i class="fas fa-box-open" style="font-size: 20px; color: #78B500;"></i>
+                                        </div>
+                                        <div style="color: var(--color-black); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Belum Ada Data</div>
+                                        <div style="color: #7B6F72; font-size: 12px;">Belum ada faktur penjualan untuk pelanggan pada periode ini.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Produk Terbaik Berdasarkan Faktur Penjualan</h4>
+                    <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0; margin-bottom: 24px; overflow: hidden;">
+                        <table class="table table-borderless" style="margin-bottom: 0; font-size: 13px;">
+                            <thead style="border-bottom: 1px solid var(--color-border);">
+                                <tr>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">No</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Produk</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Terjual</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600; text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 32px 16px;">
+                                        <div style="background-color: #F1F7E5; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+                                            <i class="fas fa-shopping-basket" style="font-size: 20px; color: #78B500;"></i>
+                                        </div>
+                                        <div style="color: var(--color-black); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Belum Ada Data</div>
+                                        <div style="color: #7B6F72; font-size: 12px;">Produk terbaik akan muncul setelah ada penjualan.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
             </div>
 
         </div>
+
+        <!-- Floating Action Button for Sales/Orders -->
+        <a href="order_input.html" class="fab-btn">
+            <i class="fas fa-plus"></i>
+        </a>
 
         <!-- Bottom Navigation Bar (Dasbor Active) -->
         <div class="mobile-nav">
@@ -472,6 +589,7 @@
     <!-- JS Dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
         // Load session data
@@ -490,6 +608,9 @@
 
             // Load KPI dari SfaStore
             updateDashboardFromStorage();
+
+            // Initialize line charts
+            initCharts();
         });
 
         function updateDashboardFromStorage() {
@@ -595,6 +716,82 @@
                     SfaStore.clearUser();
                     window.location.href = 'login.html';
                 }
+            });
+        }
+
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        title: { display: true, text: 'Waktu', font: { size: 11, family: 'sans-serif' }, color: '#999' }
+                    },
+                    y: {
+                        position: 'right',
+                        grid: { color: '#f0f0f0', drawBorder: false },
+                        title: { display: true, text: 'Nominal', font: { size: 11, family: 'sans-serif' }, color: '#999' },
+                        ticks: {
+                            callback: function(value) {
+                                return value === 0 ? '0k' : value + 'k';
+                            },
+                            color: '#999',
+                            font: { size: 10 }
+                        },
+                        beginAtZero: true,
+                        min: 0,
+                        max: 10
+                    }
+                },
+                layout: {
+                    padding: { left: -10, bottom: 0 }
+                }
+            };
+
+            const labels = ['00:00', '01:00', '02:00', '03:00', '04:00'];
+            const dataZeros = [0, 0, 0, 0, 0];
+            
+            // Kalbe Green Color: #005D41
+            // Accent Green: #00A54F
+            
+            const ctxFaktur = document.getElementById('fakturChart').getContext('2d');
+            new Chart(ctxFaktur, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataZeros,
+                        borderColor: '#005D41',
+                        backgroundColor: '#00A54F',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#00A54F',
+                        tension: 0.1
+                    }]
+                },
+                options: chartOptions
+            });
+
+            const ctxPembayaran = document.getElementById('pembayaranChart').getContext('2d');
+            new Chart(ctxPembayaran, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataZeros,
+                        borderColor: '#005D41',
+                        backgroundColor: '#00A54F',
+                        borderWidth: 2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#00A54F',
+                        tension: 0.1
+                    }]
+                },
+                options: chartOptions
             });
         }
     </script>
