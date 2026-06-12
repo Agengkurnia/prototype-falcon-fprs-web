@@ -9,7 +9,8 @@
     <style>
         @font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
         
-        .dash-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+        .dash-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+        @media(max-width:1200px){ .dash-grid { grid-template-columns: repeat(3,1fr); } }
         @media(max-width:992px){ .dash-grid { grid-template-columns: repeat(2,1fr); } }
         @media(max-width:576px){ .dash-grid { grid-template-columns: 1fr; } }
 
@@ -136,6 +137,45 @@
         .nota-attach-card:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,93,65,0.08); border-color: #00402c; background: #F4FAF7; }
         .nota-attach-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #005d41, #005d41 6px, transparent 6px, transparent 12px); }
         .nota-barcode { width: 75%; height: 16px; background: repeating-linear-gradient(90deg, #334155, #334155 2px, transparent 2px, transparent 5px, #334155 5px, #334155 8px); margin-top: 6px; opacity: 0.5; }
+
+        /* Qty / Rupiah Toggle */
+        .unit-toggle { display: inline-flex; background: #f1f3f5; border-radius: 8px; padding: 3px; gap: 2px; }
+        .unit-toggle button { border: none; background: transparent; font-size: 0.78rem; font-weight: 700; color: #64748b; padding: 4px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .unit-toggle button.active { background: #005d41; color: #fff; box-shadow: 0 2px 4px rgba(0,93,65,0.2); }
+
+        /* Card secondary metric (Rupiah / sell-through) */
+        .dc-extra { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 0.74rem; font-weight: 700; }
+        .dc-extra .pill { padding: 1px 7px; border-radius: 20px; font-size: 0.7rem; }
+        .pill-up { background: #E8F5E9; color: #2E7D32; }
+        .pill-down { background: #FFEBEE; color: #C62828; }
+        .pill-rp { background: #EEF2FF; color: #3730A3; }
+
+        /* Saldo Stok per Motoris table */
+        .balance-card { background: #fff; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; border: 1px solid #f1f3f5; box-shadow: 0 3px 12px rgba(0,0,0,0.03); }
+        .balance-card h3 { font-size: 0.95rem; font-weight: 700; color: #343a40; margin: 0 0 0.25rem 0; font-family: 'Kalbe Geometric', sans-serif; }
+        .balance-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .balance-table thead th { background: #005d41; color: #fff; padding: 0.6rem 0.7rem; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; white-space: nowrap; }
+        .balance-table thead th:first-child { border-radius: 8px 0 0 0; }
+        .balance-table thead th:last-child { border-radius: 0 8px 0 0; }
+        .balance-table tbody td { padding: 0.6rem 0.7rem; font-size: 0.82rem; border-bottom: 1px solid #f1f3f5; color: #334155; }
+        .balance-table tbody tr:hover { background: #F8FBF2; }
+        .mini-bar { height: 6px; border-radius: 4px; background: #eef2f5; overflow: hidden; min-width: 70px; position: relative; }
+        .mini-bar > span { display: block; height: 100%; border-radius: 4px; }
+        .st-good { background: linear-gradient(90deg,#2E7D32,#66BB6A); }
+        .st-mid { background: linear-gradient(90deg,#F57F17,#FFB300); }
+        .st-low { background: linear-gradient(90deg,#C62828,#EF5350); }
+        .aging-badge { padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
+        .aging-fresh { background: #E8F5E9; color: #2E7D32; }
+        .aging-warn { background: #FFF8E1; color: #F57F17; }
+        .aging-old { background: #FFEBEE; color: #C62828; }
+
+        /* DataTable custom styling overrides */
+        .dataTables_wrapper .dataTables_length select { border-radius: 6px; border: 1px solid #e2e8f0; padding: 4px 8px; font-size: 0.8rem; }
+        .dataTables_wrapper .dataTables_filter input { border-radius: 8px; border: 1px solid #e2e8f0; padding: 5px 12px; font-size: 0.82rem; }
+        .dataTables_wrapper .dataTables_filter input:focus { border-color: #005d41; outline: none; box-shadow: 0 0 0 3px rgba(0,93,65,0.1); }
+        .dataTables_wrapper .dataTables_info { font-size: 0.78rem; color: #8a92a6; font-weight: 600; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button { border-radius: 6px !important; font-size: 0.78rem; font-weight: 600; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #005d41 !important; color: #fff !important; border-color: #005d41 !important; }
     </style>
 </head>
 <body>
@@ -152,8 +192,12 @@
                     </ol>
                 </nav>
             </div>
-            <div style="display:flex; gap:0.5rem;">
-                <button class="btn btn-outline-success btn-sm"><i class="fa fa-download me-1"></i> Export Excel</button>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+                <div class="unit-toggle" id="unitToggle">
+                    <button class="active" data-unit="qty" onclick="setUnitMode('qty')">Qty</button>
+                    <button data-unit="rp" onclick="setUnitMode('rp')">Rupiah</button>
+                </div>
+                <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="fa fa-download me-1"></i> Export Excel</button>
                 <button class="btn btn-success btn-sm" onclick="refreshDashboard()"><i class="fa fa-sync-alt me-1"></i> Refresh</button>
             </div>
         </div>
@@ -176,9 +220,9 @@
             </select>
             <div class="d-flex align-items-center" style="gap: 0.4rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.1rem 0.5rem; height: 34px;">
                 <span style="font-size:0.75rem; font-weight:700; color:#64748b;"><i class="fas fa-calendar-alt me-1"></i> Dari:</span>
-                <input type="date" id="filterDateStart" value="2026-06-10" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
+                <input type="date" id="filterDateStart" value="2026-06-01" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
                 <span style="font-size:0.75rem; font-weight:700; color:#64748b; margin-left:4px;">S/D:</span>
-                <input type="date" id="filterDateEnd" value="2026-06-15" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
+                <input type="date" id="filterDateEnd" value="2026-06-30" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
             </div>
         </div>
 
@@ -189,24 +233,35 @@
                 <div class="dc-label">Armada Motoris Aktif</div>
                 <div class="dc-value" id="cardActiveMotoris">342</div>
                 <div class="dc-sub">tersebar di seluruh Indonesia</div>
+                <div class="dc-extra"><span class="pill pill-up"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 318 Online</span> <span style="color:#94a3b8;">24 Offline</span></div>
             </div>
             <div class="dash-card" style="--stripe-color:#1565C0;">
                 <div class="dc-icon" style="background:rgba(21,101,192,0.08); color:#1565C0;"><i class="fas fa-warehouse"></i></div>
                 <div class="dc-label">Total Kulakan (Inbound)</div>
-                <div class="dc-value" id="cardInbound">2,840 Krt</div>
+                <div class="dc-value" id="cardInbound">3,810 Krt</div>
                 <div class="dc-sub">dari 48 stokis / grosir resmi</div>
+                <div class="dc-extra"><span class="pill pill-rp" id="cardInboundRp">≈ Rp 1,91 M</span></div>
             </div>
             <div class="dash-card" style="--stripe-color:#2E7D32;">
                 <div class="dc-icon" style="background:rgba(46,125,50,0.08); color:#2E7D32;"><i class="fas fa-store"></i></div>
                 <div class="dc-label">Penjualan Warung (Outbound)</div>
-                <div class="dc-value" id="cardOutbound">12,450 Pcs</div>
-                <div class="dc-sub">ke 1,480 outlet kelontong</div>
+                <div class="dc-value" id="cardOutbound">14,820 Pcs</div>
+                <div class="dc-sub">ke 1,580 outlet kelontong</div>
+                <div class="dc-extra"><span class="pill pill-up" id="cardSellThrough">Sell-Through 73%</span></div>
+            </div>
+            <div class="dash-card" style="--stripe-color:#8E24AA;">
+                <div class="dc-icon" style="background:rgba(142,36,170,0.08); color:#8E24AA;"><i class="fas fa-boxes-stacked"></i></div>
+                <div class="dc-label">Saldo Stok di Motor</div>
+                <div class="dc-value" id="cardSaldoMotor">708 Krt</div>
+                <div class="dc-sub">stok berjalan belum terjual</div>
+                <div class="dc-extra"><span class="pill pill-rp" id="cardSaldoRp">≈ Rp 354 Jt</span></div>
             </div>
             <div class="dash-card" style="--stripe-color:#E65100;">
                 <div class="dc-icon" style="background:rgba(230,81,0,0.08); color:#E65100;"><i class="fas fa-exclamation-triangle"></i></div>
                 <div class="dc-label">Deviasi & Selisih</div>
                 <div class="dc-value" id="cardDeviations">5 Kasus</div>
                 <div class="dc-sub">GPS / Selisih stok fisik</div>
+                <div class="dc-extra"><span class="pill pill-down"><i class="fas fa-clock" style="font-size:0.6rem;"></i> 2 Stok Aging > 14 hari</span></div>
             </div>
         </div>
 
@@ -281,13 +336,13 @@
                     <h3 style="margin:0;"><i class="fas fa-clipboard-list" style="color:#005d41; margin-right:6px;"></i> Audit Trail Transaksi & Pergerakan Stok</h3>
                     <span style="font-size:0.75rem; color:#8a92a6; font-weight:600;"><i class="fas fa-info-circle me-1"></i> Klik pada baris tabel untuk memverifikasi detail audit transaksi secara mendalam.</span>
                 </div>
-                <input type="text" placeholder="Cari Motoris, Wilayah, atau Stokis..." style="border:1px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.75rem; font-size:0.82rem; width:250px;" id="searchAudit"/>
+                <input type="text" placeholder="Cari Motoris, Wilayah, atau Stokis..." style="border:1px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.75rem; font-size:0.82rem; width:250px;" id="searchAudit" oninput="applyAllFilters()"/>
             </div>
             <div class="table-responsive">
                 <table class="audit-table" id="tblAudit">
                     <thead>
                         <tr>
-                            <th>Waktu</th>
+                            <th>Tanggal/Waktu</th>
                             <th>Wilayah</th>
                             <th>Motoris</th>
                             <th>Tipe</th>
@@ -300,6 +355,33 @@
                         </tr>
                     </thead>
                     <tbody id="tblAuditBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Saldo Stok Berjalan per Motoris -->
+        <div class="balance-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+                <div>
+                    <h3><i class="fas fa-boxes-stacked" style="color:#8E24AA; margin-right:6px;"></i> Saldo Stok Berjalan per Motoris</h3>
+                    <span style="font-size:0.75rem; color:#8a92a6; font-weight:600;"><i class="fas fa-info-circle me-1"></i> Posisi stok yang masih dibawa motoris (aset berjalan), rasio penjualan, dan umur stok untuk deteksi penumpukan.</span>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="balance-table" id="tblBalance">
+                    <thead>
+                        <tr>
+                            <th>Motoris</th>
+                            <th>Wilayah</th>
+                            <th style="text-align:center;">Kulakan</th>
+                            <th style="text-align:center;">Terjual</th>
+                            <th style="text-align:center;">Saldo di Motor</th>
+                            <th style="text-align:center; min-width:130px;">Sell-Through</th>
+                            <th style="text-align:center;">Umur Stok</th>
+                            <th style="text-align:right;">Nilai Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblBalanceBody"></tbody>
                 </table>
             </div>
         </div>
@@ -323,227 +405,208 @@
     };
 
     const auditData = [
-        { 
-            id: 'TX-IN-260612-001',
-            time: '08:15', 
-            region: 'Jabodetabek', 
-            area: 'Jakarta Timur', 
-            sales: 'Andi Prasetyo', 
-            salesCode: 'MTR-009',
-            type: 'inbound', 
-            location: 'Grosir Sinar Jaya (Stokis #12)', 
-            product: 'Morinaga Chil*Kid Gold', 
-            qty: '+30 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Akurat. Jarak check-in 12m dari koordinat terdaftar Stokis.',
-            gpsCoords: '-6.229728, 106.840742',
-            nota: true, 
-            status: 'verified',
-            items: [
-                { name: 'Morinaga Chil*Kid Gold 800g', before: '12 Krt', adjust: '+30 Krt', after: '42 Krt' },
-                { name: 'Milna Bubur Bayi Beras Merah 120g', before: '5 Krt', adjust: '0 Krt (Sesuai)', after: '5 Krt' }
-            ]
-        },
-        { 
-            id: 'TX-IN-260612-002',
-            time: '08:45', 
-            region: 'Jawa Barat', 
-            area: 'Bandung', 
-            sales: 'Budi Santoso', 
-            salesCode: 'MTR-043',
-            type: 'inbound', 
-            location: 'Grosir Maju Bersama (Stokis #03)', 
-            product: 'Morinaga Chil*School', 
-            qty: '+15 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Akurat. Jarak check-in 24m dari koordinat terdaftar Stokis.',
-            gpsCoords: '-6.917464, 107.619122',
-            nota: true, 
-            status: 'verified',
-            items: [
-                { name: 'Morinaga Chil*School Cokelat 400g', before: '3 Krt', adjust: '+15 Krt', after: '18 Krt' }
-            ]
-        },
-        { 
-            id: 'TX-OUT-260612-003',
-            time: '09:10', 
-            region: 'Jabodetabek', 
-            area: 'Jakarta Timur', 
-            sales: 'Andi Prasetyo', 
-            salesCode: 'MTR-009',
-            type: 'outbound', 
-            location: 'Toko Kelontong Berkah (Warung)', 
-            product: 'Morinaga Chil*Kid Gold', 
-            qty: '-3 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Validasi Kunjungan Rutin. Jarak check-in 8m dari outlet.',
-            gpsCoords: '-6.230102, 106.841220',
-            nota: false, 
-            status: 'verified',
-            items: [
-                { name: 'Morinaga Chil*Kid Gold 800g', before: '42 Krt', adjust: '-3 Krt', after: '39 Krt' }
-            ]
-        },
-        { 
-            id: 'TX-IN-260612-004',
-            time: '09:30', 
-            region: 'Jawa Timur', 
-            area: 'Surabaya', 
-            sales: 'Citra Dewi', 
-            salesCode: 'MTR-108',
-            type: 'inbound', 
-            location: 'Grosir Cahaya Abadi (Stokis #22)', 
-            product: 'Milna Bubur Bayi', 
-            qty: '+20 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Akurat. Jarak check-in 15m dari koordinat terdaftar Stokis.',
-            gpsCoords: '-7.257472, 112.752092',
-            nota: true, 
-            status: 'verified',
-            items: [
-                { name: 'Milna Bubur Bayi Pisang 120g', before: '8 Krt', adjust: '+20 Krt', after: '28 Krt' }
-            ]
-        },
-        { 
-            id: 'TX-IN-260612-005',
-            time: '10:05', 
-            region: 'Jawa Tengah', 
-            area: 'Solo', 
-            sales: 'Dimas Prayoga', 
-            salesCode: 'MTR-084',
-            type: 'inbound', 
-            location: 'Grosir Harapan Baru (Stokis #07)', 
-            product: 'Prenagen Mommy', 
-            qty: '+12 Box', 
-            gps: 'invalid', 
-            gpsDetails: 'PERINGATAN: Jarak check-in terdeteksi 1.2 km dari koordinat terdaftar Stokis.',
-            gpsCoords: '-7.566639, 110.824258',
-            nota: true, 
-            status: 'pending',
-            items: [
-                { name: 'Prenagen Mommy Cokelat 400g', before: '2 Box', adjust: '+12 Box', after: '14 Box' }
-            ]
-        },
-        { 
-            id: 'TX-OUT-260612-006',
-            time: '10:20', 
-            region: 'Jawa Barat', 
-            area: 'Bandung', 
-            sales: 'Budi Santoso', 
-            salesCode: 'MTR-043',
-            type: 'outbound', 
-            location: 'Warung Ibu Siti', 
-            product: 'Morinaga Chil*School', 
-            qty: '-2 Krt, -1 Box', 
-            gps: 'valid', 
-            gpsDetails: 'Validasi Kunjungan Rutin. Jarak check-in 5m.',
-            gpsCoords: '-6.918112, 107.620010',
-            nota: false, 
-            status: 'verified',
-            items: [
-                { name: 'Morinaga Chil*School Cokelat 400g', before: '18 Krt', adjust: '-2 Krt', after: '16 Krt' },
-                { name: 'Morinaga Chil*School Vanila 200g', before: '12 Box', adjust: '-1 Box', after: '11 Box' }
-            ]
-        },
-        { 
-            id: 'TX-OUT-260612-007',
-            time: '10:45', 
-            region: 'Jabodetabek', 
-            area: 'Jakarta Selatan', 
-            sales: 'Rian Wijaya', 
-            salesCode: 'MTR-018',
-            type: 'outbound', 
-            location: 'Toko Rejeki Jaya', 
-            product: 'Morinaga Chil*Kid Gold', 
-            qty: '-5 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Validasi Kunjungan. Jarak check-in 19m.',
-            gpsCoords: '-6.270110, 106.801220',
-            nota: false, 
-            status: 'verified',
-            items: [
-                { name: 'Morinaga Chil*Kid Gold 800g', before: '15 Krt', adjust: '-5 Krt', after: '10 Krt' }
-            ]
-        },
-        { 
-            id: 'TX-OUT-260612-008',
-            time: '11:00', 
-            region: 'Jawa Timur', 
-            area: 'Surabaya', 
-            sales: 'Citra Dewi', 
-            salesCode: 'MTR-108',
-            type: 'outbound', 
-            location: 'Warung Pak Joko', 
-            product: 'Milna Bubur Bayi', 
-            qty: '-8 Pcs', 
-            gps: 'valid', 
-            gpsDetails: 'Validasi Kunjungan. Jarak check-in 3m.',
-            gpsCoords: '-7.258100, 112.753110',
-            nota: false, 
-            status: 'verified',
-            items: [
-                { name: 'Milna Bubur Bayi Pisang 120g', before: '28 Krt', adjust: '-8 Pcs (Ecer)', after: '27 Krt + 4 Pcs' }
-            ]
-        },
-        { 
-            id: 'TX-OUT-260612-009',
-            time: '11:30', 
-            region: 'Jawa Tengah', 
-            area: 'Solo', 
-            sales: 'Dimas Prayoga', 
-            salesCode: 'MTR-084',
-            type: 'outbound', 
-            location: 'Toko Makmur Sentosa', 
-            product: 'Prenagen Mommy', 
-            qty: '-4 Box', 
-            gps: 'valid', 
-            gpsDetails: 'Peringatan: Verifikasi Inbound sebelumnya belum disetujui, tapi penjualan diizinkan sistem.',
-            gpsCoords: '-7.568112, 110.825660',
-            nota: false, 
-            status: 'pending',
-            items: [
-                { name: 'Prenagen Mommy Cokelat 400g', before: '14 Box', adjust: '-4 Box', after: '10 Box' }
-            ]
-        },
-        { 
-            id: 'TX-IN-260612-010',
-            time: '12:15', 
-            region: 'Sumatera', 
-            area: 'Medan', 
-            sales: 'Eko Wahyudi', 
-            salesCode: 'MTR-211',
-            type: 'inbound', 
-            location: 'Grosir Sumatera Sejahtera (Stokis #02)', 
-            product: 'Entrasol Gold', 
-            qty: '+8 Krt', 
-            gps: 'valid', 
-            gpsDetails: 'Akurat. Jarak check-in 11m dari koordinat terdaftar Stokis.',
-            gpsCoords: '3.595196, 98.672223',
-            nota: true, 
-            status: 'verified',
-            items: [
-                { name: 'Entrasol Gold Vanila 600g', before: '4 Krt', adjust: '+8 Krt', after: '12 Krt' }
-            ]
-        },
+        { id:'TX-IN-260601-001', time:'07:30', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Morinaga Chil*Kid Gold 800g', qty:'+25 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m dari stokis.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'0 Krt',adjust:'+25 Krt',after:'25 Krt'}] },
+        { id:'TX-OUT-260601-002', time:'09:45', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Kelontong Berkah', product:'Morinaga Chil*Kid Gold 800g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 8m dari outlet.', gpsCoords:'-6.230102,106.841220', nota:false, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'25 Krt',adjust:'-3 Krt',after:'22 Krt'}] },
+        { id:'TX-IN-260601-003', time:'08:00', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Morinaga Chil*School Cokelat 400g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'2 Krt',adjust:'+18 Krt',after:'20 Krt'}] },
+        { id:'TX-OUT-260602-004', time:'10:15', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Ibu Siti', product:'Morinaga Chil*School Cokelat 400g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 5m.', gpsCoords:'-6.918112,107.620010', nota:false, status:'verified', date:'2026-06-02', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'20 Krt',adjust:'-4 Krt',after:'16 Krt'}] },
+        { id:'TX-IN-260602-005', time:'07:45', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'inbound', location:'Grosir Cahaya Abadi (Stokis #22)', product:'Milna Bubur Bayi Pisang 120g', qty:'+30 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 15m.', gpsCoords:'-7.257472,112.752092', nota:true, status:'verified', date:'2026-06-02', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'5 Krt',adjust:'+30 Krt',after:'35 Krt'}] },
+        { id:'TX-OUT-260602-006', time:'11:00', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Warung Pak Joko', product:'Milna Bubur Bayi Pisang 120g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 3m.', gpsCoords:'-7.258100,112.753110', nota:false, status:'verified', date:'2026-06-02', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'35 Krt',adjust:'-6 Krt',after:'29 Krt'}] },
+        { id:'TX-IN-260603-007', time:'08:20', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'inbound', location:'Grosir Harapan Baru (Stokis #07)', product:'Prenagen Mommy Cokelat 400g', qty:'+15 Box', gps:'invalid', gpsDetails:'PERINGATAN: Jarak 1.2 km dari stokis.', gpsCoords:'-7.566639,110.824258', nota:true, status:'pending', date:'2026-06-03', items:[{name:'Prenagen Mommy Cokelat 400g',before:'0 Box',adjust:'+15 Box',after:'15 Box'}] },
+        { id:'TX-OUT-260603-008', time:'10:30', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'outbound', location:'Toko Makmur Sentosa', product:'Prenagen Mommy Cokelat 400g', qty:'-3 Box', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-7.568112,110.825660', nota:false, status:'verified', date:'2026-06-03', items:[{name:'Prenagen Mommy Cokelat 400g',before:'15 Box',adjust:'-3 Box',after:'12 Box'}] },
+        { id:'TX-IN-260603-009', time:'08:10', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'inbound', location:'Grosir Sumatera Sejahtera (Stokis #02)', product:'Entrasol Gold Vanila 600g', qty:'+10 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 11m.', gpsCoords:'3.595196,98.672223', nota:true, status:'verified', date:'2026-06-03', items:[{name:'Entrasol Gold Vanila 600g',before:'2 Krt',adjust:'+10 Krt',after:'12 Krt'}] },
+        { id:'TX-OUT-260604-010', time:'09:20', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Warung Haji Makmur', product:'Entrasol Gold Vanila 600g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'3.596010,98.673111', nota:false, status:'verified', date:'2026-06-04', items:[{name:'Entrasol Gold Vanila 600g',before:'12 Krt',adjust:'-2 Krt',after:'10 Krt'}] },
+        { id:'TX-IN-260604-011', time:'07:50', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'inbound', location:'Grosir Abadi Sentosa (Stokis #05)', product:'Morinaga Chil*Kid Gold 800g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 18m.', gpsCoords:'-6.270110,106.801220', nota:true, status:'verified', date:'2026-06-04', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'3 Krt',adjust:'+20 Krt',after:'23 Krt'}] },
+        { id:'TX-OUT-260604-012', time:'11:30', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Toko Rejeki Jaya', product:'Morinaga Chil*Kid Gold 800g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 19m.', gpsCoords:'-6.271200,106.802001', nota:false, status:'verified', date:'2026-06-04', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'23 Krt',adjust:'-5 Krt',after:'18 Krt'}] },
+        { id:'TX-OUT-260605-013', time:'09:00', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Bu Ani', product:'Morinaga Chil*Kid Gold 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.231001,106.842112', nota:false, status:'verified', date:'2026-06-05', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'22 Krt',adjust:'-4 Krt',after:'18 Krt'}] },
+        { id:'TX-OUT-260605-014', time:'10:40', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Sumber Rejeki', product:'Morinaga Chil*Kid Gold 800g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'-6.232001,106.843100', nota:false, status:'verified', date:'2026-06-05', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'18 Krt',adjust:'-6 Krt',after:'12 Krt'}] },
+        { id:'TX-IN-260605-015', time:'08:30', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'inbound', location:'Grosir Indah Permai (Stokis #09)', product:'Zee RTD Strawberry 185ml', qty:'+40 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 9m.', gpsCoords:'-6.706210,108.556112', nota:true, status:'verified', date:'2026-06-05', items:[{name:'Zee RTD Strawberry 185ml',before:'0 Krt',adjust:'+40 Krt',after:'40 Krt'}] },
+        { id:'TX-OUT-260606-016', time:'09:15', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Toko Mitra Jaya', product:'Zee RTD Strawberry 185ml', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-6.707100,108.557200', nota:false, status:'verified', date:'2026-06-06', items:[{name:'Zee RTD Strawberry 185ml',before:'40 Krt',adjust:'-5 Krt',after:'35 Krt'}] },
+        { id:'TX-OUT-260606-017', time:'10:50', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Warung Pak Iwan', product:'Zee RTD Strawberry 185ml', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 4m.', gpsCoords:'-6.708020,108.558010', nota:false, status:'verified', date:'2026-06-06', items:[{name:'Zee RTD Strawberry 185ml',before:'35 Krt',adjust:'-3 Krt',after:'32 Krt'}] },
+        { id:'TX-IN-260607-018', time:'07:40', region:'Jawa Timur', area:'Malang', sales:'Guntur Hermawan', salesCode:'MTR-145', type:'inbound', location:'Grosir Putera Malang (Stokis #15)', product:'Morinaga BMT 800g', qty:'+22 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 13m.', gpsCoords:'-7.978005,112.630110', nota:true, status:'verified', date:'2026-06-07', items:[{name:'Morinaga BMT 800g',before:'3 Krt',adjust:'+22 Krt',after:'25 Krt'}] },
+        { id:'TX-OUT-260607-019', time:'10:00', region:'Jawa Timur', area:'Malang', sales:'Guntur Hermawan', salesCode:'MTR-145', type:'outbound', location:'Toko Sehat Selalu', product:'Morinaga BMT 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 22m.', gpsCoords:'-7.979100,112.631200', nota:false, status:'verified', date:'2026-06-07', items:[{name:'Morinaga BMT 800g',before:'25 Krt',adjust:'-4 Krt',after:'21 Krt'}] },
+        { id:'TX-OUT-260608-020', time:'08:50', region:'Jabodetabek', area:'Bekasi', sales:'Hendra Kurniawan', salesCode:'MTR-032', type:'outbound', location:'Warung Segar', product:'Hydro Coco 500ml', qty:'-12 Pcs', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-6.241200,107.001100', nota:false, status:'verified', date:'2026-06-08', items:[{name:'Hydro Coco 500ml',before:'48 Pcs',adjust:'-12 Pcs',after:'36 Pcs'}] },
+        { id:'TX-IN-260608-021', time:'07:30', region:'Jabodetabek', area:'Bekasi', sales:'Hendra Kurniawan', salesCode:'MTR-032', type:'inbound', location:'Grosir Jaya Abadi (Stokis #11)', product:'Hydro Coco 500ml', qty:'+5 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 10m.', gpsCoords:'-6.240100,107.000200', nota:true, status:'verified', date:'2026-06-08', items:[{name:'Hydro Coco 500ml (1 Krt = 24 Pcs)',before:'2 Krt',adjust:'+5 Krt',after:'7 Krt'}] },
+        { id:'TX-OUT-260609-022', time:'09:30', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Mang Ujang', product:'Morinaga Chil*School Cokelat 400g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.919200,107.621100', nota:false, status:'verified', date:'2026-06-09', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'16 Krt',adjust:'-3 Krt',after:'13 Krt'}] },
+        { id:'TX-OUT-260609-023', time:'11:10', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Toko Sembako Pak Dede', product:'Morinaga Chil*School Cokelat 400g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 15m.', gpsCoords:'-6.920010,107.622000', nota:false, status:'verified', date:'2026-06-09', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'13 Krt',adjust:'-2 Krt',after:'11 Krt'}] },
+        { id:'TX-IN-260609-024', time:'08:00', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'inbound', location:'Grosir Central Jaya (Stokis #06)', product:'Prenagen Esensis Cokelat 360g', qty:'+12 Box', gps:'valid', gpsDetails:'Akurat. Jarak 16m.', gpsCoords:'-6.966667,110.419444', nota:true, status:'verified', date:'2026-06-09', items:[{name:'Prenagen Esensis Cokelat 360g',before:'0 Box',adjust:'+12 Box',after:'12 Box'}] },
+        { id:'TX-OUT-260610-025', time:'09:50', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'outbound', location:'Warung Bu Tini', product:'Prenagen Esensis Cokelat 360g', qty:'-2 Box', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.967500,110.420100', nota:false, status:'verified', date:'2026-06-10', items:[{name:'Prenagen Esensis Cokelat 360g',before:'12 Box',adjust:'-2 Box',after:'10 Box'}] },
+        { id:'TX-OUT-260610-026', time:'11:20', region:'Jabodetabek', area:'Tangerang', sales:'Joko Susilo', salesCode:'MTR-055', type:'outbound', location:'Toko Anugrah', product:'Morinaga Chil*Kid Vanila 400g', qty:'-7 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'-6.178300,106.631200', nota:false, status:'verified', date:'2026-06-10', items:[{name:'Morinaga Chil*Kid Vanila 400g',before:'20 Krt',adjust:'-7 Krt',after:'13 Krt'}] },
+        { id:'TX-IN-260610-027', time:'07:55', region:'Jabodetabek', area:'Tangerang', sales:'Joko Susilo', salesCode:'MTR-055', type:'inbound', location:'Grosir Bintang Jaya (Stokis #08)', product:'Morinaga Chil*Kid Vanila 400g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 8m.', gpsCoords:'-6.177200,106.630100', nota:true, status:'verified', date:'2026-06-10', items:[{name:'Morinaga Chil*Kid Vanila 400g',before:'0 Krt',adjust:'+20 Krt',after:'20 Krt'}] },
+        { id:'TX-OUT-260611-028', time:'10:10', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Toko Mentari', product:'Milna Bubur Bayi Pisang 120g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-7.259000,112.754000', nota:false, status:'verified', date:'2026-06-11', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'29 Krt',adjust:'-5 Krt',after:'24 Krt'}] },
+        { id:'TX-OUT-260611-029', time:'11:40', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Warung Cak Narto', product:'Milna Bubur Bayi Pisang 120g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 5m.', gpsCoords:'-7.260010,112.755200', nota:false, status:'verified', date:'2026-06-11', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'24 Krt',adjust:'-3 Krt',after:'21 Krt'}] },
+        { id:'TX-IN-260611-030', time:'08:15', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Milna Biskuit Bayi 130g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-11', items:[{name:'Milna Biskuit Bayi 130g',before:'0 Krt',adjust:'+18 Krt',after:'18 Krt'}] },
+        { id:'TX-OUT-260612-031', time:'09:00', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Mitra Bunda', product:'Milna Biskuit Bayi 130g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 10m.', gpsCoords:'-6.230500,106.841500', nota:false, status:'verified', date:'2026-06-12', items:[{name:'Milna Biskuit Bayi 130g',before:'18 Krt',adjust:'-4 Krt',after:'14 Krt'}] },
+        { id:'TX-OUT-260612-032', time:'10:45', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Warung Pak Bambang', product:'Morinaga Chil*Kid Gold 800g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.272000,106.803000', nota:false, status:'verified', date:'2026-06-12', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'18 Krt',adjust:'-3 Krt',after:'15 Krt'}] },
+        { id:'TX-IN-260612-033', time:'08:00', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Zee RTD Vanilla 185ml', qty:'+22 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-12', items:[{name:'Zee RTD Vanilla 185ml',before:'0 Krt',adjust:'+22 Krt',after:'22 Krt'}] },
+        { id:'TX-OUT-260613-034', time:'09:30', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Toko Cendana', product:'Zee RTD Vanilla 185ml', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.918500,107.620500', nota:false, status:'verified', date:'2026-06-13', items:[{name:'Zee RTD Vanilla 185ml',before:'22 Krt',adjust:'-6 Krt',after:'16 Krt'}] },
+        { id:'TX-OUT-260613-035', time:'11:00', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Warung Bunda', product:'Entrasol Gold Vanila 600g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'3.596800,98.674000', nota:false, status:'verified', date:'2026-06-13', items:[{name:'Entrasol Gold Vanila 600g',before:'10 Krt',adjust:'-3 Krt',after:'7 Krt'}] },
+        { id:'TX-IN-260614-036', time:'07:45', region:'Sumatera', area:'Palembang', sales:'Kurnia Sari', salesCode:'MTR-228', type:'inbound', location:'Grosir Palembang Makmur (Stokis #04)', product:'Morinaga Chil*Kid Madu 400g', qty:'+14 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 13m.', gpsCoords:'-2.976111,104.775278', nota:true, status:'verified', date:'2026-06-14', items:[{name:'Morinaga Chil*Kid Madu 400g',before:'1 Krt',adjust:'+14 Krt',after:'15 Krt'}] },
+        { id:'TX-OUT-260614-037', time:'10:20', region:'Sumatera', area:'Palembang', sales:'Kurnia Sari', salesCode:'MTR-228', type:'outbound', location:'Warung Pak Salim', product:'Morinaga Chil*Kid Madu 400g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-2.977000,104.776100', nota:false, status:'verified', date:'2026-06-14', items:[{name:'Morinaga Chil*Kid Madu 400g',before:'15 Krt',adjust:'-4 Krt',after:'11 Krt'}] },
+        { id:'TX-IN-260615-038', time:'08:10', region:'Jawa Timur', area:'Kediri', sales:'Luki Prasetyo', salesCode:'MTR-156', type:'inbound', location:'Grosir Kediri Sejahtera (Stokis #19)', product:'Milna Goodmil 6+ 120g', qty:'+16 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 14m.', gpsCoords:'-7.816700,112.018200', nota:true, status:'verified', date:'2026-06-15', items:[{name:'Milna Goodmil 6+ 120g',before:'2 Krt',adjust:'+16 Krt',after:'18 Krt'}] },
+        { id:'TX-OUT-260615-039', time:'10:30', region:'Jawa Timur', area:'Kediri', sales:'Luki Prasetyo', salesCode:'MTR-156', type:'outbound', location:'Toko Ibu Wati', product:'Milna Goodmil 6+ 120g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-7.817500,112.019000', nota:false, status:'verified', date:'2026-06-15', items:[{name:'Milna Goodmil 6+ 120g',before:'18 Krt',adjust:'-5 Krt',after:'13 Krt'}] },
+        { id:'TX-OUT-260616-040', time:'09:15', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'outbound', location:'Warung Pak Darmo', product:'Prenagen Mommy Cokelat 400g', qty:'-2 Box', gps:'valid', gpsDetails:'Jarak 10m.', gpsCoords:'-7.567000,110.825000', nota:false, status:'verified', date:'2026-06-16', items:[{name:'Prenagen Mommy Cokelat 400g',before:'12 Box',adjust:'-2 Box',after:'10 Box'}] },
+        { id:'TX-IN-260616-041', time:'07:35', region:'Jawa Tengah', area:'Yogyakarta', sales:'Mega Utami', salesCode:'MTR-099', type:'inbound', location:'Grosir Jogja Raya (Stokis #10)', product:'Morinaga BMT 400g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 17m.', gpsCoords:'-7.795580,110.369490', nota:true, status:'verified', date:'2026-06-16', items:[{name:'Morinaga BMT 400g',before:'0 Krt',adjust:'+20 Krt',after:'20 Krt'}] },
+        { id:'TX-OUT-260617-042', time:'10:00', region:'Jawa Tengah', area:'Yogyakarta', sales:'Mega Utami', salesCode:'MTR-099', type:'outbound', location:'Toko Rahayu', product:'Morinaga BMT 400g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-7.796200,110.370100', nota:false, status:'verified', date:'2026-06-17', items:[{name:'Morinaga BMT 400g',before:'20 Krt',adjust:'-6 Krt',after:'14 Krt'}] },
+        { id:'TX-OUT-260617-043', time:'11:30', region:'Jabodetabek', area:'Bogor', sales:'Nanda Firmansyah', salesCode:'MTR-067', type:'outbound', location:'Warung Haji Usman', product:'Morinaga Chil*Kid Gold 800g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-6.595038,106.816635', nota:false, status:'verified', date:'2026-06-17', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'15 Krt',adjust:'-5 Krt',after:'10 Krt'}] },
+        { id:'TX-IN-260617-044', time:'07:50', region:'Jabodetabek', area:'Bogor', sales:'Nanda Firmansyah', salesCode:'MTR-067', type:'inbound', location:'Grosir Bogor Indah (Stokis #14)', product:'Morinaga Chil*Kid Gold 800g', qty:'+15 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 8m.', gpsCoords:'-6.594100,106.815700', nota:true, status:'verified', date:'2026-06-17', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'0 Krt',adjust:'+15 Krt',after:'15 Krt'}] },
+        { id:'TX-OUT-260618-045', time:'09:40', region:'Jawa Barat', area:'Karawang', sales:'Oki Pratama', salesCode:'MTR-081', type:'outbound', location:'Toko Barokah', product:'Zee RTD Cokelat 185ml', qty:'-8 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.305200,107.312100', nota:false, status:'verified', date:'2026-06-18', items:[{name:'Zee RTD Cokelat 185ml',before:'25 Krt',adjust:'-8 Krt',after:'17 Krt'}] },
+        { id:'TX-IN-260618-046', time:'07:30', region:'Jawa Barat', area:'Karawang', sales:'Oki Pratama', salesCode:'MTR-081', type:'inbound', location:'Grosir Karawang Mas (Stokis #13)', product:'Zee RTD Cokelat 185ml', qty:'+25 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 11m.', gpsCoords:'-6.304100,107.311000', nota:true, status:'verified', date:'2026-06-18', items:[{name:'Zee RTD Cokelat 185ml',before:'0 Krt',adjust:'+25 Krt',after:'25 Krt'}] },
+        { id:'TX-OUT-260619-047', time:'10:20', region:'Jawa Timur', area:'Jember', sales:'Putra Aditya', salesCode:'MTR-167', type:'outbound', location:'Warung Bu Ning', product:'Milna Biskuit 130g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-8.172000,113.700200', nota:false, status:'verified', date:'2026-06-19', items:[{name:'Milna Biskuit 130g',before:'14 Krt',adjust:'-3 Krt',after:'11 Krt'}] },
+        { id:'TX-IN-260619-048', time:'08:05', region:'Jawa Timur', area:'Jember', sales:'Putra Aditya', salesCode:'MTR-167', type:'inbound', location:'Grosir Jember Mandiri (Stokis #21)', product:'Milna Biskuit 130g', qty:'+14 Krt', gps:'invalid', gpsDetails:'PERINGATAN: Jarak 800m dari stokis.', gpsCoords:'-8.168000,113.695000', nota:true, status:'pending', date:'2026-06-19', items:[{name:'Milna Biskuit 130g',before:'0 Krt',adjust:'+14 Krt',after:'14 Krt'}] },
+        { id:'TX-OUT-260620-049', time:'09:10', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Sumber Makmur', product:'Milna Biskuit Bayi 130g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-6.231200,106.842500', nota:false, status:'verified', date:'2026-06-20', items:[{name:'Milna Biskuit Bayi 130g',before:'14 Krt',adjust:'-3 Krt',after:'11 Krt'}] },
+        { id:'TX-OUT-260620-050', time:'11:15', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Toko Melati', product:'Morinaga Chil*Kid Gold 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 15m.', gpsCoords:'-6.273100,106.804000', nota:false, status:'verified', date:'2026-06-20', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'15 Krt',adjust:'-4 Krt',after:'11 Krt'}] },
+        { id:'TX-IN-260621-051', time:'07:40', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'inbound', location:'Grosir Indah Permai (Stokis #09)', product:'Zee RTD Strawberry 185ml', qty:'+30 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 9m.', gpsCoords:'-6.706210,108.556112', nota:true, status:'verified', date:'2026-06-21', items:[{name:'Zee RTD Strawberry 185ml',before:'32 Krt',adjust:'+30 Krt',after:'62 Krt'}] },
+        { id:'TX-OUT-260621-052', time:'10:30', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Toko Asri', product:'Zee RTD Strawberry 185ml', qty:'-10 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.707500,108.557500', nota:false, status:'verified', date:'2026-06-21', items:[{name:'Zee RTD Strawberry 185ml',before:'62 Krt',adjust:'-10 Krt',after:'52 Krt'}] },
+        { id:'TX-OUT-260622-053', time:'09:00', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'outbound', location:'Warung Mbak Sri', product:'Prenagen Esensis Cokelat 360g', qty:'-3 Box', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.968000,110.421000', nota:false, status:'verified', date:'2026-06-22', items:[{name:'Prenagen Esensis Cokelat 360g',before:'10 Box',adjust:'-3 Box',after:'7 Box'}] },
+        { id:'TX-IN-260622-054', time:'08:00', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'inbound', location:'Grosir Cahaya Abadi (Stokis #22)', product:'Milna Toddler Biscuit 110g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 15m.', gpsCoords:'-7.257472,112.752092', nota:true, status:'verified', date:'2026-06-22', items:[{name:'Milna Toddler Biscuit 110g',before:'0 Krt',adjust:'+18 Krt',after:'18 Krt'}] },
+        { id:'TX-OUT-260623-055', time:'10:10', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Toko Bu Rini', product:'Milna Toddler Biscuit 110g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-7.258500,112.753500', nota:false, status:'verified', date:'2026-06-23', items:[{name:'Milna Toddler Biscuit 110g',before:'18 Krt',adjust:'-5 Krt',after:'13 Krt'}] },
+        { id:'TX-OUT-260623-056', time:'11:40', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Toko Sinar Baru', product:'Entrasol Gold Vanila 600g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'3.597000,98.674500', nota:false, status:'verified', date:'2026-06-23', items:[{name:'Entrasol Gold Vanila 600g',before:'7 Krt',adjust:'-2 Krt',after:'5 Krt'}] },
+        { id:'TX-IN-260624-057', time:'07:35', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Morinaga Chil*Kid Gold 800g', qty:'+28 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-24', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'12 Krt',adjust:'+28 Krt',after:'40 Krt'}] },
+        { id:'TX-OUT-260624-058', time:'09:50', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Sembako Jaya', product:'Morinaga Chil*Kid Gold 800g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-6.231500,106.843000', nota:false, status:'verified', date:'2026-06-24', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'40 Krt',adjust:'-6 Krt',after:'34 Krt'}] },
+        { id:'TX-IN-260625-059', time:'08:15', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Morinaga Chil*School Vanila 200g', qty:'+16 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-25', items:[{name:'Morinaga Chil*School Vanila 200g',before:'5 Krt',adjust:'+16 Krt',after:'21 Krt'}] },
+        { id:'TX-OUT-260625-060', time:'10:40', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Aa Asep', product:'Morinaga Chil*School Vanila 200g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.918800,107.620800', nota:false, status:'verified', date:'2026-06-25', items:[{name:'Morinaga Chil*School Vanila 200g',before:'21 Krt',adjust:'-4 Krt',after:'17 Krt'}] },
     ];
 
     document.addEventListener('layoutReady', () => {
-        // Assign dates programmatically to mock data
-        const mockDates = [
-            '2026-06-12', '2026-06-12', '2026-06-12', '2026-06-11', '2026-06-11',
-            '2026-06-12', '2026-06-10', '2026-06-13', '2026-06-13', '2026-06-12'
-        ];
-        auditData.forEach((item, index) => {
-            item.date = mockDates[index] || '2026-06-12';
-        });
-
         initCharts();
         populateFilters();
         populateSalesFilter();
+        renderBalanceTable();
         applyAllFilters();
-
-        document.getElementById('searchAudit').addEventListener('input', applyAllFilters);
     });
+
+    /* ============================================================
+       UNIT MODE (Qty / Rupiah) — average value per unit (mock)
+       ============================================================ */
+    let unitMode = 'qty';
+    const RP_PER_KRT = 500000;   // asumsi nilai rata-rata per karton
+    const RP_PER_PCS = 21000;    // asumsi nilai rata-rata per pcs
+
+    function fmtRp(n) {
+        if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(2).replace('.', ',') + ' M';
+        if (n >= 1e6) return 'Rp ' + Math.round(n / 1e6) + ' Jt';
+        if (n >= 1e3) return 'Rp ' + Math.round(n / 1e3) + ' Rb';
+        return 'Rp ' + n;
+    }
+
+    function setUnitMode(mode) {
+        unitMode = mode;
+        document.querySelectorAll('#unitToggle button').forEach(b => {
+            b.classList.toggle('active', b.dataset.unit === mode);
+        });
+
+        // Toggle main summary card values
+        if (mode === 'rp') {
+            document.getElementById('cardInbound').innerText = fmtRp(2840 * RP_PER_KRT);
+            document.getElementById('cardOutbound').innerText = fmtRp(12450 * RP_PER_PCS);
+            document.getElementById('cardSaldoMotor').innerText = fmtRp(624 * RP_PER_KRT);
+        } else {
+            document.getElementById('cardInbound').innerText = '2,840 Krt';
+            document.getElementById('cardOutbound').innerText = '12,450 Pcs';
+            document.getElementById('cardSaldoMotor').innerText = '624 Krt';
+        }
+
+        // Toggle chart axis dataset (multiply by avg rp when in rupiah)
+        if (mainChart) {
+            const factor = mode === 'rp' ? RP_PER_KRT / 1000 : 1; // ribuan rupiah agar skala terbaca
+            mainChart.options.plugins.tooltip = {
+                callbacks: {
+                    label: (ctx) => {
+                        const v = ctx.parsed.y;
+                        return mode === 'rp'
+                            ? `${ctx.dataset.label}: ${fmtRp(v * RP_PER_KRT)}`
+                            : `${ctx.dataset.label}: ${v} unit`;
+                    }
+                }
+            };
+            mainChart.update();
+        }
+        renderBalanceTable();
+    }
+
+    /* ============================================================
+       SALDO STOK BERJALAN PER MOTORIS
+       ============================================================ */
+    const motorisStock = [
+        { name: 'Andi Prasetyo', code: 'MTR-009', region: 'Jabodetabek', area: 'Jakarta Timur', inbound: 71, sold: 26, aging: 4 },
+        { name: 'Budi Santoso', code: 'MTR-043', region: 'Jawa Barat', area: 'Bandung', inbound: 56, sold: 21, aging: 6 },
+        { name: 'Citra Dewi', code: 'MTR-108', region: 'Jawa Timur', area: 'Surabaya', inbound: 68, sold: 27, aging: 3 },
+        { name: 'Dimas Prayoga', code: 'MTR-084', region: 'Jawa Tengah', area: 'Solo', inbound: 27, sold: 9, aging: 17 },
+        { name: 'Eko Wahyudi', code: 'MTR-211', region: 'Sumatera', area: 'Medan', inbound: 18, sold: 7, aging: 9 },
+        { name: 'Rian Wijaya', code: 'MTR-018', region: 'Jabodetabek', area: 'Jakarta Selatan', inbound: 38, sold: 16, aging: 2 },
+        { name: 'Fira Anggraini', code: 'MTR-077', region: 'Jawa Barat', area: 'Cirebon', inbound: 70, sold: 18, aging: 15 },
+        { name: 'Guntur Hermawan', code: 'MTR-145', region: 'Jawa Timur', area: 'Malang', inbound: 22, sold: 4, aging: 12 },
+        { name: 'Hendra Kurniawan', code: 'MTR-032', region: 'Jabodetabek', area: 'Bekasi', inbound: 5, sold: 2, aging: 5 },
+        { name: 'Indah Permata', code: 'MTR-092', region: 'Jawa Tengah', area: 'Semarang', inbound: 12, sold: 5, aging: 8 },
+        { name: 'Joko Susilo', code: 'MTR-055', region: 'Jabodetabek', area: 'Tangerang', inbound: 20, sold: 7, aging: 7 },
+        { name: 'Kurnia Sari', code: 'MTR-228', region: 'Sumatera', area: 'Palembang', inbound: 14, sold: 4, aging: 10 },
+        { name: 'Luki Prasetyo', code: 'MTR-156', region: 'Jawa Timur', area: 'Kediri', inbound: 16, sold: 5, aging: 9 },
+        { name: 'Mega Utami', code: 'MTR-099', region: 'Jawa Tengah', area: 'Yogyakarta', inbound: 20, sold: 6, aging: 7 },
+        { name: 'Nanda Firmansyah', code: 'MTR-067', region: 'Jabodetabek', area: 'Bogor', inbound: 15, sold: 5, aging: 6 },
+        { name: 'Oki Pratama', code: 'MTR-081', region: 'Jawa Barat', area: 'Karawang', inbound: 25, sold: 8, aging: 5 },
+        { name: 'Putra Aditya', code: 'MTR-167', region: 'Jawa Timur', area: 'Jember', inbound: 14, sold: 3, aging: 4 },
+    ];
+
+    function renderBalanceTable() {
+        // Destroy existing DataTable if already initialized
+        if (dtBalance) {
+            dtBalance.destroy();
+            dtBalance = null;
+        }
+
+        const tbody = document.getElementById('tblBalanceBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        motorisStock.forEach(m => {
+            const saldo = m.inbound - m.sold;
+            const sellThrough = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
+
+            // sell-through bar color
+            let stClass = 'st-good';
+            if (sellThrough < 50) stClass = 'st-low';
+            else if (sellThrough < 75) stClass = 'st-mid';
+
+            // aging badge
+            let agingClass = 'aging-fresh', agingTxt = `${m.aging} hari`;
+            if (m.aging > 14) agingClass = 'aging-old';
+            else if (m.aging > 7) agingClass = 'aging-warn';
+
+            const saldoVal = unitMode === 'rp' ? fmtRp(saldo * RP_PER_KRT) : `${saldo} Krt`;
+
+            tbody.innerHTML += `<tr>
+                <td><strong>${m.name}</strong><br><small style="color:#8a92a6;">${m.code}</small></td>
+                <td><small>${m.region}</small><br><strong style="font-size:0.78rem;">${m.area}</strong></td>
+                <td style="text-align:center; color:#2E7D32; font-weight:700;">${m.inbound} Krt</td>
+                <td style="text-align:center; color:#1565C0; font-weight:700;">${m.sold} Krt</td>
+                <td style="text-align:center; font-weight:800; color:${saldo > 10 ? '#E65100' : '#0f172a'};">${saldo} Krt</td>
+                <td data-order="${sellThrough}">
+                    <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
+                        <div class="mini-bar"><span class="${stClass}" style="width:${sellThrough}%;"></span></div>
+                        <span style="font-weight:700; font-size:0.76rem; color:#475569;">${sellThrough}%</span>
+                    </div>
+                </td>
+                <td style="text-align:center;" data-order="${m.aging}"><span class="aging-badge ${agingClass}">${agingTxt}</span></td>
+                <td style="text-align:right; font-weight:700; color:#3730A3;" data-order="${saldo * RP_PER_KRT}">${fmtRp(saldo * RP_PER_KRT)}</td>
+            </tr>`;
+        });
+
+        // Initialize DataTable
+        dtBalance = $('#tblBalance').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25],
+            order: [[4, 'desc']],
+            language: {
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_-_END_ dari _TOTAL_ motoris',
+                infoEmpty: 'Tidak ada data',
+                paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                zeroRecords: 'Tidak ada motoris yang cocok'
+            },
+            dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rt<"d-flex justify-content-between align-items-center mt-2"ip>'
+        });
+    }
 
     function populateFilters() {
         const areaSelect = document.getElementById('filterArea');
@@ -775,9 +838,22 @@
         `);
         printWindow.document.close();
     }
+    let auditLastData = [];
+    let dtAudit = null;
+    let dtBalance = null;
+
     function renderAuditTable(data) {
+        auditLastData = data;
+
+        // Destroy existing DataTable if already initialized
+        if (dtAudit) {
+            dtAudit.destroy();
+            dtAudit = null;
+        }
+
         const tbody = document.getElementById('tblAuditBody');
         tbody.innerHTML = '';
+
         data.forEach((r) => {
             const origIdx = auditData.findIndex(item => item.id === r.id);
             const typeBadge = r.type === 'inbound'
@@ -790,7 +866,7 @@
                 : '<span class="badge-sm badge-pending"><i class="fas fa-clock"></i> Pending</span>';
             
             tbody.innerHTML += `<tr onclick="showAuditDetail(${origIdx})" style="cursor:pointer;">
-                <td style="font-weight:600;">${r.time}</td>
+                <td style="font-weight:600;">${r.date || ''} ${r.time}</td>
                 <td><small>${r.region}</small><br><strong>${r.area}</strong></td>
                 <td><strong>${r.sales}</strong></td>
                 <td>${typeBadge}</td>
@@ -801,6 +877,24 @@
                 <td style="text-align:center;">${notaIcon}</td>
                 <td>${statusBadge}</td>
             </tr>`;
+        });
+
+        // Initialize DataTable
+        dtAudit = $('#tblAudit').DataTable({
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50],
+            order: [[0, 'desc']],
+            language: {
+                search: 'Cari:',
+                lengthMenu: 'Tampilkan _MENU_ data',
+                info: 'Menampilkan _START_-_END_ dari _TOTAL_ transaksi',
+                infoEmpty: 'Tidak ada data',
+                infoFiltered: '(disaring dari _MAX_ total)',
+                paginate: { first: '«', last: '»', next: '›', previous: '‹' },
+                zeroRecords: 'Tidak ada transaksi yang cocok'
+            },
+            dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
+            searching: false // We use our own filter bar
         });
     }
 
@@ -1042,14 +1136,14 @@
             }
         });
 
-        // Top 10 Sales (Leaderboard representation)
+        // Top 10 Sales (Leaderboard — will be populated by updateTopSalesChart)
         topSalesChart = new Chart(document.getElementById('chartDoughnut'), {
             type: 'bar',
             data: {
-                labels: ['Andi P.', 'Budi S.', 'Citra D.', 'Dimas P.', 'Eko W.', 'Fira A.', 'Guntur H.', 'Hendra K.', 'Indah P.', 'Joko S.'],
+                labels: [],
                 datasets: [{
-                    label: 'Efektivitas Outlet Terlayani',
-                    data: [98, 92, 89, 87, 85, 82, 80, 78, 75, 72],
+                    label: 'Sell-Through (%)',
+                    data: [],
                     backgroundColor: 'rgba(21, 101, 192, 0.7)',
                     borderRadius: 5
                 }]
@@ -1061,20 +1155,24 @@
             }
         });
 
-        // Tren Line
-        const days = Array.from({length:15}, (_,i) => `${i+1}/6`);
+        // Initialize Top 10 with national data
+        updateTopSalesChart(null, null);
+
+        // Tren Line (25 hari Juni)
+        const days = Array.from({length:25}, (_,i) => `${i+1}/6`);
         trendChart = new Chart(document.getElementById('chartLine'), {
             type: 'line',
             data: {
                 labels: days,
                 datasets: [
-                    { label: 'Kulakan', data: [80,85,78,90,95,110,105,115,120,130,125,135,140,138,150], borderColor: '#005d41', backgroundColor: 'rgba(0,93,65,0.05)', fill: true, tension: 0.3, pointRadius: 2 },
-                    { label: 'Jual', data: [70,72,68,78,82,90,92,98,102,112,108,118,122,120,130], borderColor: '#1565C0', backgroundColor: 'rgba(21,101,192,0.03)', fill: true, tension: 0.3, pointRadius: 2 }
+                    { label: 'Kulakan', data: [25,18,27,20,40,25,22,26,24,32,18,28,22,14,16,20,35,25,14,28,30,18,22,28,16], borderColor: '#005d41', backgroundColor: 'rgba(0,93,65,0.05)', fill: true, tension: 0.3, pointRadius: 2 },
+                    { label: 'Jual', data: [7,4,9,7,8,12,8,12,5,14,10,15,9,8,5,8,11,8,6,10,10,8,6,10,4], borderColor: '#1565C0', backgroundColor: 'rgba(21,101,192,0.03)', fill: true, tension: 0.3, pointRadius: 2 }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top' } }
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } }
             }
         });
 
@@ -1121,6 +1219,9 @@
         mainChart.data.datasets[1].data = outboundValues;
         mainChart.update();
 
+        // Update Top 10 to show only this region's motoris
+        updateTopSalesChart(regionKey, null);
+
         // Update list table to show only this region
         const filtered = auditData.filter(r => r.region.toLowerCase() === regionKey.replace('_', ' '));
         renderAuditTable(filtered);
@@ -1140,6 +1241,9 @@
         mainChart.data.datasets[1].data = outVal;
         mainChart.update();
 
+        // Update Top 10 to show only this area's motoris
+        updateTopSalesChart(currentSelectedRegion, areaName);
+
         const filtered = auditData.filter(r => r.area === areaName);
         renderAuditTable(filtered);
     }
@@ -1154,12 +1258,12 @@
         
         // Reset summary card values
         document.getElementById('cardActiveMotoris').innerText = "342";
-        document.getElementById('cardInbound').innerText = "2,840 Krt";
-        document.getElementById('cardOutbound').innerText = "12,450 Pcs";
+        document.getElementById('cardInbound').innerText = "3,810 Krt";
+        document.getElementById('cardOutbound').innerText = "14,820 Pcs";
         
         document.getElementById('flowStokis').innerText = "48 Outlet";
         document.getElementById('flowMotoris').innerText = "342 Sales";
-        document.getElementById('flowWarung').innerText = "1,480 Outlet";
+        document.getElementById('flowWarung').innerText = "1,580 Outlet";
 
         // Restore original chart data
         mainChart.data.labels = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera'];
@@ -1167,7 +1271,106 @@
         mainChart.data.datasets[1].data = [870, 580, 390, 520, 180];
         mainChart.update();
 
+        // Reset Top 10 to national
+        updateTopSalesChart(null, null);
+
         renderAuditTable(auditData);
+    }
+
+    /**
+     * Updates the Top 10 Motoris chart based on the selected region/area.
+     * Calculates sell-through from motorisStock data filtered by region/area.
+     */
+    function updateTopSalesChart(regionKey, areaName) {
+        // Filter motoris data based on region/area
+        let filtered = motorisStock;
+
+        if (regionKey) {
+            const regionLabel = regionKey.replace('_', ' ');
+            filtered = filtered.filter(m => m.region.toLowerCase() === regionLabel);
+        }
+        if (areaName) {
+            filtered = filtered.filter(m => m.area === areaName);
+        }
+
+        // Calculate sell-through % for each and sort descending
+        const ranked = filtered.map(m => {
+            const st = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
+            return { name: m.name.split(' ')[0] + ' ' + m.name.split(' ')[1]?.charAt(0) + '.', fullName: m.name, sellThrough: st, sold: m.sold };
+        }).sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
+
+        // Update chart title context
+        const chartTitle = document.querySelector('#chartDoughnut')?.closest('.chart-card')?.querySelector('h3');
+        if (chartTitle) {
+            let titleText = '<i class="fas fa-medal" style="color:#1565C0; margin-right:6px;"></i> Top Motoris Teraktif';
+            if (areaName) titleText += ` — ${areaName}`;
+            else if (regionKey) titleText += ` — ${regionKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
+            else titleText += ' (Nasional)';
+            chartTitle.innerHTML = titleText;
+        }
+
+        // Update chart data
+        topSalesChart.data.labels = ranked.map(r => r.name);
+        topSalesChart.data.datasets[0].data = ranked.map(r => r.sellThrough);
+        topSalesChart.data.datasets[0].label = 'Sell-Through (%)';
+
+        // Color by performance
+        topSalesChart.data.datasets[0].backgroundColor = ranked.map(r => {
+            if (r.sellThrough >= 70) return 'rgba(46, 125, 50, 0.7)';
+            if (r.sellThrough >= 50) return 'rgba(245, 127, 23, 0.7)';
+            return 'rgba(198, 40, 40, 0.7)';
+        });
+
+        topSalesChart.update();
+    }
+
+    function exportToExcel() {
+        // Export currently filtered audit data + saldo motoris to CSV (Excel-compatible)
+        const rows = auditLastData.length ? auditLastData : auditData;
+
+        let csv = 'AUDIT TRAIL PERGERAKAN STOK MOTORIS\n';
+        csv += `Diekspor: ${new Date().toLocaleString('id-ID')}\n\n`;
+        csv += 'Tanggal,Waktu,Wilayah,Area,Motoris,Kode,Tipe,Partner/Tujuan,Produk,Qty,GPS,Status\n';
+        rows.forEach(r => {
+            const line = [
+                r.date || '', r.time, r.region, r.area, r.sales, r.salesCode,
+                r.type === 'inbound' ? 'Kulakan' : 'Penjualan',
+                r.location, r.product, r.qty,
+                r.gps === 'valid' ? 'Valid' : 'Invalid',
+                r.status === 'verified' ? 'Verified' : 'Pending'
+            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+            csv += line + '\n';
+        });
+
+        csv += '\nSALDO STOK BERJALAN PER MOTORIS\n';
+        csv += 'Motoris,Kode,Wilayah,Area,Kulakan(Krt),Terjual(Krt),Saldo(Krt),Sell-Through(%),Umur Stok(hari),Nilai Saldo(Rp)\n';
+        motorisStock.forEach(m => {
+            const saldo = m.inbound - m.sold;
+            const st = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
+            const line = [
+                m.name, m.code, m.region, m.area, m.inbound, m.sold, saldo, st, m.aging, saldo * RP_PER_KRT
+            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
+            csv += line + '\n';
+        });
+
+        // BOM for Excel UTF-8 compatibility
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `StokMotoris_${new Date().toISOString().slice(0, 10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Export Berhasil',
+            text: `${rows.length} transaksi & ${motorisStock.length} data saldo motoris diekspor ke CSV.`,
+            confirmButtonColor: '#005d41',
+            timer: 2000
+        });
     }
 
     function refreshDashboard() {
