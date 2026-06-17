@@ -784,7 +784,7 @@
         // Dev Tools
         resetAndReseed,
         // Utilities
-        formatRupiah, formatTime, formatDate
+        formatRupiah, formatTime, formatDate, todayStr
     };
 
     console.log('[SfaStore] Ready. Customers:', getCustomers().length, '| Products:', getProducts().length, '| Queue:', getSyncQueue().length);

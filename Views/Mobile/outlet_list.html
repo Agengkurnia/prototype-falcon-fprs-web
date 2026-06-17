@@ -151,7 +151,7 @@
             if (!matchSearch) return false;
             if (currentFilter === 'Aktif') return c.status === 'Aktif';
             if (currentFilter === 'Potential') return c.status === 'Potential';
-            if (currentFilter === 'nogps') return !c.hasGps;
+            if (currentFilter === 'nogps') return !(c.lat && c.lng && c.lat !== 0 && c.lng !== 0);
             return true;
         });
 
@@ -161,7 +161,8 @@
         }
 
         filtered.forEach(c => {
-            const gpsBadge = c.hasGps
+            const hasGps = (c.lat && c.lng && c.lat !== 0 && c.lng !== 0);
+            const gpsBadge = hasGps
                 ? `<span class="gps-badge gps-ok"><i class="fas fa-check-circle me-1"></i>GPS OK</span>`
                 : `<span class="gps-badge gps-missing"><i class="fas fa-exclamation-triangle me-1"></i>Belum GPS</span>`;
 
@@ -186,7 +187,7 @@
                     </div>
                     <div class="outlet-meta">
                         <i class="fas fa-map-marker-alt" style="color:var(--color-primary);"></i>
-                        ${c.kecamatan}, ${c.kota}
+                        ${c.address || ''}, ${c.kota}
                     </div>
                 </a>
             `);

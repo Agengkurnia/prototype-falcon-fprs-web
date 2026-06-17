@@ -527,8 +527,15 @@
                 </div>
             </section>
 
+            <!-- ===== Action Button: Rute Kunjungan Harian ===== -->
+            <div style="padding: 0 16px; margin: 8px 0 24px;">
+                <a href="visit_list.html" class="btn-mobile-primary d-flex align-items-center justify-content-center gap-2 py-3" style="text-decoration:none; font-size:16px;">
+                    <i class="fas fa-route"></i> Rute Kunjungan Hari Ini
+                </a>
+            </div>
+
             <!-- ===== Sync Section ===== -->
-            <section class="sync-section" aria-label="Status sinkronisasi" style="opacity: 0.4; pointer-events: none;">
+            <section class="sync-section" aria-label="Status sinkronisasi">
                 <div class="last-sync-text">
                     Terakhir disinkronkan: <span id="syncTimestamp">Belum pernah</span>
                 </div>
@@ -576,7 +583,7 @@
                 <div class="menu-circle-grid" role="list">
 
                     <!-- Faktur Penjualan: Daftar faktur/invoice yang sudah dibuat hari ini -->
-                    <a href="visit_list.html" class="menu-circle-card" role="listitem" aria-label="Faktur Penjualan">
+                    <a href="invoice_list.html" class="menu-circle-card" role="listitem" aria-label="Faktur Penjualan">
                         <div class="circle-icon-wrapper" style="background-color: #E6F2ED; border-color: #C6E2D6;">
                             <i class="fas fa-file-invoice-dollar" style="color: #005D41;" aria-hidden="true"></i>
                         </div>
@@ -584,7 +591,7 @@
                     </a>
 
                     <!-- Pembayaran: Tagih piutang / AR outstanding pelanggan -->
-                    <a href="#" class="menu-circle-card" role="listitem" aria-label="Pembayaran Pelanggan" style="opacity: 0.4; pointer-events: none;">
+                    <a href="collection_list.html" class="menu-circle-card" role="listitem" aria-label="Pembayaran Pelanggan">
                         <div class="circle-icon-wrapper" style="background-color: #F1F7E5; border-color: #DDE8C1;">
                             <i class="fas fa-hand-holding-usd" style="color: #78B500;" aria-hidden="true"></i>
                         </div>
@@ -592,7 +599,7 @@
                     </a>
 
                     <!-- Pelanggan: Daftar outlet/toko yang bisa dikunjungi (termasuk geo tag di detail) -->
-                    <a href="#" class="menu-circle-card" role="listitem" aria-label="Daftar Pelanggan" style="opacity: 0.4; pointer-events: none;">
+                    <a href="outlet_list.html" class="menu-circle-card" role="listitem" aria-label="Daftar Pelanggan">
                         <div class="circle-icon-wrapper" style="background-color: #F6FAED; border-color: #E4F0CD;">
                             <i class="fas fa-store" style="color: #5E8E00;" aria-hidden="true"></i>
                         </div>
@@ -608,7 +615,7 @@
                     </a>
 
                     <!-- Target: Lihat target penjualan harian/bulanan -->
-                    <a href="#" class="menu-circle-card" role="listitem" aria-label="Target Penjualan" style="opacity: 0.4; pointer-events: none;">
+                    <a href="target.html" class="menu-circle-card" role="listitem" aria-label="Target Penjualan">
                         <div class="circle-icon-wrapper" style="background-color: #FFF4E6; border-color: #FFD9A8;">
                             <i class="fas fa-bullseye" style="color: #B25900;" aria-hidden="true"></i>
                         </div>
@@ -616,7 +623,7 @@
                     </a>
 
                     <!-- Sinkronisasi: Status & proses sync data offline ke server -->
-                    <a href="#" class="menu-circle-card" role="listitem" aria-label="Detail Sinkronisasi" style="opacity: 0.4; pointer-events: none;">
+                    <a href="sync_detail.html" class="menu-circle-card" role="listitem" aria-label="Detail Sinkronisasi">
                         <div class="circle-icon-wrapper" style="background-color: #EAF1FB; border-color: #B7CFEE;">
                             <i class="fas fa-cloud-download-alt" style="color: #1F4E79;" aria-hidden="true"></i>
                         </div>

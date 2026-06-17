@@ -1,0 +1,2 @@
+No	Modul	Case ID	Nama Kasus Uji	Langkah Uji	Hasil yang Diharapkan	Hasil Aktual	Status	Tester	Tanggal Uji
+1	Dashboard	TC-001-01a	Rute Kunjungan Quick Access	Periksa keberadaan tombol quick access di Beranda	Tombol Rute Kunjungan Hari Ini harus terlihat	Tombol Rute Kunjungan Hari Ini aktif & terlihat	PASS	AI Antigravity	17/6/2026
