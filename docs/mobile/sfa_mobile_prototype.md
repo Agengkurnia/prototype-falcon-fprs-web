@@ -31,10 +31,15 @@ d:\Work\Source\Comsup\falcon\Prototype\
 ├── Views/
 │   └── Mobile/
 │       ├── login.html               # Simulasi login dengan splash/loading
-│       ├── home.html                # Beranda utama (dashboard pencapaian & transaksi)
+│       ├── home.html                # Beranda utama (dashboard, detail kanvas, notifikasi)
+│       ├── dasbor.html              # Dasbor grafik & performa harian sales
 │       ├── visit_list.html          # Daftar Rute Kunjungan harian & filter status
 │       ├── visit_detail.html        # Detail outlet & alur Check-In GPS/Kamera
-│       └── order_input.html         # Modul Sales Order (katalog, keranjang, promo)
+│       ├── order_input.html         # Modul Sales Order (katalog, keranjang, promo)
+│       ├── invoice_list.html        # Daftar riwayat faktur penjualan periode terpilih
+│       ├── invoice_detail.html      # Detail review faktur penjualan (read-only)
+│       ├── collection_list.html     # Daftar piutang / AR outstanding pelanggan
+│       └── collection_input.html    # Modul input pencatatan pembayaran piutang
 └── docs/
     └── sfa_mobile_prototype.md      # Berkas dokumentasi ini
 ```

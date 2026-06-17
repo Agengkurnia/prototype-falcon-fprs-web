@@ -41,12 +41,13 @@ Berikut adalah status replikasi halaman dari SimpliDOTS SFA Android ke dalam fol
 | Halaman Asli (SimpliDOTS SFA Android) | Halaman Prototipe (Falcon SFA Mobile) | Status | Fitur yang Tersedia di Prototipe |
 | :--- | :--- | :--- | :--- |
 | `LoginPage` | `Views/Mobile/login.html` | **Selesai** | Default user `SINGARAJA`, role `canvasser`, loading spinner, inisialisasi sesi sales ke `localStorage`. |
-| `HomePage` / `Beranda` | `Views/Mobile/home.html` | **Selesai** | Banner kanvas berjalan, accordion sinkronisasi, menu circular (Faktur Penjualan, Pembayaran Pelanggan, Geo Tag, Pelanggan, Produk). |
-| `Dashboard` / `Dasbor` | `Views/Mobile/dasbor.html` | **Selesai** | Dropdown server, pager tanggal, grid metrik 2x2 (Pelanggan, Faktur, Kunjungan, K. Efektif), total faktur penjualan. |
+| `HomePage` / `Beranda` | `Views/Mobile/home.html` | **Selesai** | Banner kanvas berjalan (dengan popup detail siklus), popup notifikasi interaktif, accordion sinkronisasi, menu circular (Faktur Penjualan, Pembayaran, Pelanggan, Produk, dll). |
+| `Dashboard` / `Dasbor` | `Views/Mobile/dasbor.html` | **Selesai** | Dropdown server, pager tanggal, grid metrik 2x2, total faktur penjualan yang menavigasi ke review daftar faktur (`invoice_list.html`) & detail (`invoice_detail.html`) dengan filter tanggal. |
 | `CustomerDaily` | `Views/Mobile/visit_list.html` | **Selesai** | Tab filter (Semua/Belum/Selesai), real-time search, badge piutang AR (merah menyala). |
 | `CustomerProfile` / `StorePage` | `Views/Mobile/visit_detail.html` | **Selesai** | Peta radius check-in, aturan check-in luar radius (alasan remote check-in + kamera bukti). |
 | `Order` / `ProductList` | `Views/Mobile/order_input.html` | **Selesai** | Filter kategori produk, pencarian produk, toggle UOM (Pcs/Karton), kalkulasi diskon otomatis (kotor > 200rb). |
-| `Collections` / `CollectionDetail`| *Belum ada* | **Belum** | *Rencana Opsi A (Pembayaran Pelanggan)* |
+| `Collections` / `CollectionDetail`| `Views/Mobile/collection_list.html` & `collection_input.html` | **Selesai** | Daftar piutang/AR outstanding per pelanggan dengan status (Belum/Sebagian/Lunas) dan form pengisian nominal pembayaran. |
+| `InvoiceList` / `InvoiceDetail` | `Views/Mobile/invoice_list.html` & `invoice_detail.html` | **Selesai** | Daftar faktur terfilter tanggal dashboard dan review rincian barang/diskon secara read-only. |
 | `CustomerAll` / `GeoTagging` | *Belum ada* | **Belum** | *Rencana Opsi B (Geo Tag / Pelanggan)* |
 | `Delivery` / `DeliveryDetail` | *Belum ada* | **Belum** | *Rencana Opsi C (Surat Jalan Driver)* |
 | `Promo` | *Belum ada* | **Belum** | Informasi skema promo aktif di level sales. |

@@ -48,11 +48,15 @@ Prototype/
 │   │   └── MasterData/         # 17 Sub-modul Master Data (Produk, Pelanggan, dll)
 │   └── Mobile/                 # [MOBILE] Antarmuka Client Sales Lapangan
 │       ├── login.html          # Form login mobile
-│       ├── home.html           # Menu utama & ringkasan sync
-│       ├── dasbor.html         # Statistik performa harian
-│       ├── order_input.html    # Form transaksi penjualan sales
-│       ├── collection_input.html  # Form pembayaran piutang (AR)
-│       └── outlet_detail.html  # Detail pelanggan & penandaan GPS
+│       ├── home.html           # Menu utama, detail kanvas, & notifikasi
+│       ├── dasbor.html         # Statistik performa harian & chart
+│       ├── visit_list.html     # Daftar target rute kunjungan harian
+│       ├── visit_detail.html   # Detail outlet & alur check-in radius GPS/kamera
+│       ├── order_input.html    # Form input transaksi penjualan sales
+│       ├── invoice_list.html   # Daftar riwayat faktur penjualan periode terpilih
+│       ├── invoice_detail.html # Detail review faktur penjualan (read-only)
+│       ├── collection_list.html # Daftar piutang / AR outstanding pelanggan
+│       └── collection_input.html # Pencatatan pembayaran tagihan piutang
 ├── Mobile/
 │   └── MobileApp/              # Proyek Flutter WebView Wrapper
 │       ├── android/            # Kode native Android
@@ -88,6 +92,73 @@ Mengelola seluruh state operasional sales lapangan melalui objek global `window.
   Setiap transaksi mobile yang disimpan saat sales di lapangan akan masuk ke dalam **Antrean Sinkronisasi (Sync Queue)** lokal. 
   - `addToSyncQueue(type, payload)`: Menyimpan data offline berstatus `pending`.
   - `processQueue(onProgress)`: Mensimulasikan upload data satu per satu ke server mock dengan delay 350ms per item dan simulasi tingkat kegagalan 5% untuk menguji fitur *Retry*.
+
+### C. Kontrak Skema Data JSON (Mock Database Payload)
+
+Untuk memfasilitasi integrasi Backend API nyata di kemudian hari, berikut adalah standar format data JSON yang disimpan di `localStorage`:
+
+#### 1. Data Kunjungan (`sfa_visits`)
+```json
+{
+  "id": "VST-SEED-16-0",
+  "customerId": "OL-10283",
+  "customerName": "Apotek Roxy Salemba",
+  "date": "2026-06-17",
+  "createdAt": "2026-06-17T08:00:00.000Z",
+  "status": "checked_out",
+  "hasOrder": true,
+  "hasCollection": false,
+  "orderAmount": 755200,
+  "collectionAmount": 0,
+  "checkInTime": "2026-06-17T08:05:00.000Z",
+  "checkOutTime": "2026-06-17T08:45:00.000Z",
+  "checkInPhoto": "data:image/jpeg;base64,...",
+  "remoteReason": "Jarak koordinat GPS tidak sesuai"
+}
+```
+
+#### 2. Faktur Penjualan (`sfa_invoices`)
+```json
+{
+  "id": "INV-SEED-16-0",
+  "invoiceNo": "FKT-0012",
+  "customerId": "OL-10283",
+  "customerName": "Apotek Roxy Salemba",
+  "date": "2026-06-17",
+  "createdAt": "2026-06-17T09:00:00.000Z",
+  "status": "confirmed",
+  "items": [
+    {
+      "code": "KN-SF-001",
+      "name": "Morinaga Chil*Kid Gold",
+      "qty": 3,
+      "qtyPcs": 3,
+      "price": 265000,
+      "subtotal": 795000
+    }
+  ],
+  "totalGross": 795000,
+  "discount": 39750,
+  "totalNet": 755250
+}
+```
+
+#### 3. Catatan Pembayaran Piutang (`sfa_collections`)
+```json
+{
+  "id": "AR-2026-0022",
+  "customerId": "OL-10283",
+  "invoiceNo": "FKT-2026-0061",
+  "date": "2026-06-17",
+  "amount": 2500000,
+  "balance": 0,
+  "status": "paid",
+  "paymentMethod": "transfer",
+  "referenceNo": "TRF-9817263",
+  "imageUrl": "data:image/jpeg;base64,...",
+  "dueDate": "2026-05-31"
+}
+```
 
 ---
 
