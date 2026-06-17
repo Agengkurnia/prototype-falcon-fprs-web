@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Daftar Faktur Penjualan - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        .summary-bar {
+            background: linear-gradient(135deg, #004d35, #005D41);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .summary-bar .lbl { font-size: 11px; opacity: 0.85; margin-bottom: 2px; }
+        .summary-bar .val { font-size: 18px; font-weight: 700; }
+        
+        .invoice-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.1s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .invoice-card:active { transform: scale(0.98); background: #fafbfc; }
+        
+        .invoice-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .invoice-id { font-size: 14px; font-weight: 700; color: var(--color-black); }
+        .invoice-total {
+            font-size: 15px; font-weight: 700; color: #005D41;
+        }
+        .customer-name { font-size: 12px; color: var(--color-black); margin-top: 4px; font-weight: 600; }
+        .invoice-date { font-size: 11px; color: var(--color-gray); margin-top: 2px; }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--color-gray); }
+
+        /* Badge custom */
+        .badge-mobile {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-mobile-success { background: #E0F7F0; color: #00A76F; }
+        .badge-mobile-warning { background: #FFF3E0; color: #FF8F00; }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="goBack()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title" id="pageTitle">Daftar Faktur</span>
+        <button class="header-action" onclick="toggleSearch()"><i class="fas fa-search" style="font-size:16px;"></i></button>
+    </div>
+
+    <!-- Search container (hidden by default) -->
+    <div class="search-container d-none" id="searchBoxContainer" style="background: #fff; padding: 10px 16px; border-bottom: 1px solid var(--color-border);">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="invSearchInput" placeholder="Cari nomor INV atau nama pelanggan..." onkeyup="filterInvoices()"/>
+        </div>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="summary-bar">
+        <div>
+            <div class="lbl">Total Nilai Faktur</div>
+            <div class="val" id="totalAmount">Rp0</div>
+        </div>
+        <div style="text-align:right;">
+            <div class="lbl">Jumlah Faktur</div>
+            <div class="val" id="totalCount">0</div>
+        </div>
+    </div>
+
+    <!-- Period label banner -->
+    <div style="background: #E8F5E9; color: #005D41; padding: 8px 16px; font-size: 12px; font-weight: 600; border-bottom: 1px solid rgba(0,93,65,0.1);">
+        <i class="far fa-calendar-alt me-1"></i> Periode: <span id="periodLabel">-</span>
+    </div>
+
+    <div class="mobile-content no-nav">
+        <div class="p-16" id="listContainer"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    let fromDate = "";
+    let toDate = "";
+    let periodLabel = "";
+    let invoices = [];
+
+    $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        fromDate = params.get('from') || new Date().toISOString().slice(0, 10);
+        toDate = params.get('to') || new Date().toISOString().slice(0, 10);
+        periodLabel = params.get('label') || 'Hari Ini';
+
+        $('#periodLabel').text(periodLabel);
+
+        loadInvoices();
+        renderList();
+    });
+
+    function loadInvoices() {
+        // Fetch all invoices from storage and filter by active range
+        const allInvoices = SfaStore.getInvoices();
+        invoices = allInvoices.filter(i => i.date >= fromDate && i.date <= toDate);
+    }
+
+    function updateSummary(filteredInvs) {
+        const total = filteredInvs.reduce((sum, inv) => sum + (inv.totalNet || inv.totalGross || 0), 0);
+        $('#totalAmount').text(SfaStore.formatRupiah(total));
+        $('#totalCount').text(filteredInvs.length);
+    }
+
+    function toggleSearch() {
+        $('#searchBoxContainer').toggleClass('d-none');
+        if (!$('#searchBoxContainer').hasClass('d-none')) {
+            $('#invSearchInput').focus();
+        }
+    }
+
+    function filterInvoices() {
+        renderList();
+    }
+
+    function renderList() {
+        const container = $('#listContainer');
+        container.empty();
+
+        const query = $('#invSearchInput').val() || '';
+        const searchQ = query.toLowerCase().trim();
+
+        const filtered = invoices.filter(inv => {
+            if (!searchQ) return true;
+            const matchesInvId = `INV-${inv.id}`.toLowerCase().includes(searchQ) || String(inv.id).includes(searchQ);
+            const matchesCust = (inv.customerName || '').toLowerCase().includes(searchQ) || (inv.customerId || '').toLowerCase().includes(searchQ);
+            return matchesInvId || matchesCust;
+        });
+
+        updateSummary(filtered);
+
+        if (filtered.length === 0) {
+            container.html(`
+                <div class="empty-state">
+                    <i class="fas fa-file-invoice-dollar fs-1 mb-3 text-muted" style="opacity: 0.5;"></i>
+                    <div>Tidak ada faktur ditemukan.</div>
+                </div>
+            `);
+            return;
+        }
+
+        // Sort descending by ID / Date
+        filtered.sort((a, b) => b.id - a.id);
+
+        filtered.forEach(inv => {
+            const isPaid = (inv.paymentStatus || 'paid') === 'paid';
+            const badgeHtml = isPaid 
+                ? `<span class="badge-mobile badge-mobile-success">Paid</span>` 
+                : `<span class="badge-mobile badge-mobile-warning">Unpaid</span>`;
+
+            const total = inv.totalNet || inv.totalGross || 0;
+
+            container.append(`
+                <a href="invoice_detail.html?id=${inv.id}" class="invoice-card">
+                    <div class="invoice-card-header">
+                        <div>
+                            <div class="invoice-id">INV-${inv.id}</div>
+                            <div class="customer-name">${inv.customerName || 'Pelanggan'}</div>
+                            <div class="invoice-date"><i class="far fa-calendar-alt me-1"></i>${inv.date}</div>
+                        </div>
+                        <div class="text-end">
+                            ${badgeHtml}
+                            <div class="invoice-total mt-2">${SfaStore.formatRupiah(total)}</div>
+                        </div>
+                    </div>
+                </a>
+            `);
+        });
+    }
+
+    function goBack() {
+        window.location.href = 'dasbor.html';
+    }
+</script>
+</body>
+</html>

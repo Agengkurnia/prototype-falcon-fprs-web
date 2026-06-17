@@ -182,7 +182,7 @@
         CUSTOMERS:   'sfa_customers',
         PRODUCTS:    'sfa_products',
         SYNC_QUEUE:  'sfa_sync_queue',
-        SEEDED:      'sfa_seeded_v3'
+        SEEDED:      'sfa_seeded_v7_today'
     };
 
     // =========================================================
@@ -209,11 +209,101 @@
         write(KEYS.CUSTOMERS,   SEED_CUSTOMERS);
         write(KEYS.PRODUCTS,    SEED_PRODUCTS);
         write(KEYS.COLLECTIONS, SEED_COLLECTIONS);
-        write(KEYS.VISITS,      []);
-        write(KEYS.INVOICES,    []);
+        write(KEYS.VISITS,      buildSeedVisits());
+        write(KEYS.INVOICES,    buildSeedInvoices());
         write(KEYS.SYNC_QUEUE,  []);
         write(KEYS.SEEDED, true);
-        console.log('[SfaStore] Seed data loaded.');
+        console.log('[SfaStore] Seed data v7 (1 Year with Today) loaded.');
+    }
+
+    // Generate 3 months of realistic historical invoice + visit data
+    function buildSeedVisits() {
+        const visits = [];
+        const today = new Date();
+        const customerIds = SEED_CUSTOMERS.map(c => c.id);
+        // ~5 visits per working day over 365 days
+        for (let d = 365; d >= 0; d--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - d);
+            const dow = date.getDay();
+            if (dow === 0) continue; // skip Sunday
+            const dateStr = date.toISOString().slice(0, 10);
+            const count = dow === 6 ? 3 : 5;
+            for (let i = 0; i < count; i++) {
+                const cid = customerIds[(d * 7 + i) % customerIds.length];
+                const hasOrder = Math.random() > 0.25;
+                const vid = 'VST-SEED-' + d + '-' + i;
+                visits.push({
+                    id: vid,
+                    customerId: cid,
+                    customerName: SEED_CUSTOMERS.find(c => c.id === cid).name,
+                    date: dateStr,
+                    createdAt: dateStr + 'T08:00:00.000Z',
+                    status: 'checked_out',
+                    hasOrder: hasOrder,
+                    hasCollection: false,
+                    orderAmount: hasOrder ? Math.round((Math.random() * 2000000 + 300000) / 1000) * 1000 : 0,
+                    collectionAmount: 0
+                });
+            }
+        }
+        return visits;
+    }
+
+    function buildSeedInvoices() {
+        const invoices = [];
+        const today = new Date();
+        const productSeed = [
+            { code: 'KN-SF-001', name: 'Morinaga Chil*Kid Gold',        price: 265000 },
+            { code: 'KN-SF-002', name: 'Morinaga Chil*School Gold',     price: 235000 },
+            { code: 'KN-SF-003', name: 'Morinaga Chil*Kid Platinum',    price: 398000 },
+            { code: 'KN-SA-001', name: 'Zee Platinum',                  price: 215000 },
+            { code: 'KN-SA-002', name: 'Zee Reguler',                   price: 145000 },
+            { code: 'KN-MB-001', name: 'Milna Biskuit Bayi',            price: 28500  },
+            { code: 'KN-MB-002', name: 'Milna Bubur Bayi',              price: 24000  },
+            { code: 'KN-ND-001', name: 'Entrasol Gold',                 price: 65000  },
+            { code: 'KN-MB-004', name: 'PRENAGEN mommy',                price: 135000 }
+        ];
+        const customerIds = SEED_CUSTOMERS.map(c => c.id);
+        let seq = 1;
+        for (let d = 365; d >= 0; d--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - d);
+            const dow = date.getDay();
+            if (dow === 0) continue;
+            const dateStr = date.toISOString().slice(0, 10);
+            const invoiceCount = dow === 6 ? 2 : Math.floor(Math.random() * 3) + 2;
+            for (let i = 0; i < invoiceCount; i++) {
+                const cid = customerIds[(d * 5 + i) % customerIds.length];
+                const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                const numItems = Math.floor(Math.random() * 3) + 1;
+                const items = [];
+                let totalGross = 0;
+                for (let j = 0; j < numItems; j++) {
+                    const prod = productSeed[(d + i + j) % productSeed.length];
+                    const qty = Math.floor(Math.random() * 5) + 1;
+                    const subtotal = prod.price * qty;
+                    totalGross += subtotal;
+                    items.push({ code: prod.code, name: prod.name, qty, qtyPcs: qty, price: prod.price, subtotal });
+                }
+                const discount = Math.round(totalGross * 0.03);
+                const totalNet = totalGross - discount;
+                invoices.push({
+                    id: 'INV-SEED-' + d + '-' + i,
+                    invoiceNo: 'FKT-' + String(seq++).padStart(4, '0'),
+                    customerId: cid,
+                    customerName: cust.name,
+                    date: dateStr,
+                    createdAt: dateStr + 'T09:00:00.000Z',
+                    status: 'confirmed',
+                    items,
+                    totalGross,
+                    discount,
+                    totalNet
+                });
+            }
+        }
+        return invoices;
     }
 
     // =========================================================
@@ -294,6 +384,15 @@
     function getProductCategories() {
         const cats = [...new Set(getProducts().map(p => p.category))];
         return cats;
+    }
+
+    function updateProductStock(code, stockKarton) {
+        const list = read(KEYS.PRODUCTS) || [];
+        const idx = list.findIndex(p => p.code === code);
+        if (idx >= 0) {
+            list[idx].stock = stockKarton;
+            write(KEYS.PRODUCTS, list);
+        }
     }
 
     // =========================================================
@@ -458,13 +557,18 @@
     // DASHBOARD & KPI AGGREGATES
     // =========================================================
     function getTodayKpi() {
-        const visits   = getVisits().filter(v => v.date === todayStr());
-        const invoices = getTodayInvoices();
+        return getKpiByDate(todayStr());
+    }
+
+    function getKpiByDate(dateStr) {
+        const visits   = getVisits().filter(v => v.date === dateStr);
+        const invoices = getInvoices().filter(i => i.date === dateStr);
         const doneVisits = visits.filter(v => v.status === 'checked_out');
         const effective  = doneVisits.filter(v => v.hasOrder).length;
         const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
         return {
             kunjungan:        doneVisits.length,
+            efektif:          effective,
             kunjunganEfektif: effective,
             fakturCount:      invoices.length,
             totalFaktur:      totalRupiah,
@@ -473,12 +577,92 @@
         };
     }
 
+    function getKpiByMonth(year, month) {
+        // month: 1-12
+        const prefix = year + '-' + String(month).padStart(2, '0');
+        const invoices = getInvoices().filter(i => i.date && i.date.startsWith(prefix));
+        const visits   = getVisits().filter(v => v.date && v.date.startsWith(prefix));
+        const doneVisits = visits.filter(v => v.status === 'checked_out');
+        const effective  = doneVisits.filter(v => v.hasOrder).length;
+        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+        return {
+            kunjungan:   doneVisits.length,
+            efektif:     effective,
+            fakturCount: invoices.length,
+            totalRupiah,
+            pelanggan:   getCustomers().length
+        };
+    }
+
+    function getKpiByWeek(year, week) {
+        // week: ISO week number
+        const invoices = getInvoices().filter(i => {
+            if (!i.date) return false;
+            const d = new Date(i.date);
+            return getISOWeek(d) === week && d.getFullYear() === year;
+        });
+        const visits = getVisits().filter(v => {
+            if (!v.date) return false;
+            const d = new Date(v.date);
+            return getISOWeek(d) === week && d.getFullYear() === year;
+        });
+        const doneVisits = visits.filter(v => v.status === 'checked_out');
+        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+        return {
+            kunjungan:   doneVisits.length,
+            efektif:     doneVisits.filter(v => v.hasOrder).length,
+            fakturCount: invoices.length,
+            totalRupiah,
+            pelanggan:   getCustomers().length
+        };
+    }
+
+    function getISOWeek(d) {
+        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        const dayNum = date.getUTCDay() || 7;
+        date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+        return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // Last N days chart data: returns {labels, data} arrays
+    function getDailyChartData(days) {
+        days = days || 14;
+        const labels = [], data = [];
+        const today = new Date();
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const ds = d.toISOString().slice(0, 10);
+            const kpi = getKpiByDate(ds);
+            labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+            data.push(Math.round(kpi.totalRupiah / 1000)); // in thousands
+        }
+        return { labels, data };
+    }
+
+    // Last N months chart data
+    function getMonthlyChartData(months) {
+        months = months || 3;
+        const labels = [], data = [];
+        const today = new Date();
+        for (let i = months - 1; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const kpi = getKpiByMonth(d.getFullYear(), d.getMonth() + 1);
+            labels.push(d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }));
+            data.push(Math.round(kpi.totalRupiah / 1000));
+        }
+        return { labels, data };
+    }
+
     // Alias for backward compat
     function getDashboardToday() { return getTodayKpi(); }
 
-    function getTopProducts(n) {
-        n = n || 3;
-        const invoices = getTodayInvoices();
+    function getTopProductsByPeriod(dateFrom, dateTo, n) {
+        n = n || 5;
+        const from = dateFrom || todayStr();
+        const to   = dateTo   || todayStr();
+        const invoices = getInvoices().filter(i => i.date >= from && i.date <= to);
         const map = {};
         invoices.forEach(inv => {
             if (!inv.items) return;
@@ -491,9 +675,11 @@
         return Object.values(map).sort((a,b) => b.totalAmount - a.totalAmount).slice(0, n);
     }
 
-    function getTopCustomers(n) {
-        n = n || 3;
-        const invoices = getTodayInvoices();
+    function getTopCustomersByPeriod(dateFrom, dateTo, n) {
+        n = n || 5;
+        const from = dateFrom || todayStr();
+        const to   = dateTo   || todayStr();
+        const invoices = getInvoices().filter(i => i.date >= from && i.date <= to);
         const map = {};
         invoices.forEach(inv => {
             const id = inv.customerId;
@@ -503,6 +689,9 @@
         });
         return Object.values(map).sort((a,b) => b.totalAmount - a.totalAmount).slice(0, n);
     }
+
+    function getTopProducts(n) { return getTopProductsByPeriod(todayStr(), todayStr(), n); }
+    function getTopCustomers(n) { return getTopCustomersByPeriod(todayStr(), todayStr(), n); }
 
     // =========================================================
     // CUSTOMERS — EXTRA METHODS
@@ -573,7 +762,7 @@
         // Customers
         getCustomers, getCustomerById, saveCustomer, updateCustomerGps,
         // Products
-        getProducts, getProductById, getProductCategories,
+        getProducts, getProductById, getProductCategories, updateProductStock,
         // Visits
         getVisits, getTodayVisitByCustomerId, getActiveVisitByCustomerId,
         saveVisit, updateVisit, completeVisit,
@@ -587,7 +776,11 @@
         getSyncQueue, addToSyncQueue, clearSyncQueue, processQueue,
         retryQueueItem, clearSuccessfulQueue,
         // KPI & Dashboard
-        getTodayKpi, getDashboardToday, getTopProducts, getTopCustomers,
+        getTodayKpi, getKpiByDate, getKpiByMonth, getKpiByWeek,
+        getDailyChartData, getMonthlyChartData,
+        getDashboardToday, getTopProducts, getTopCustomers,
+        getTopProductsByPeriod, getTopCustomersByPeriod,
+        getISOWeek,
         // Dev Tools
         resetAndReseed,
         // Utilities

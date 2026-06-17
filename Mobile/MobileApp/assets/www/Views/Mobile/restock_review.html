@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Review Kulakan - Falcon SFA</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css">
+    <style>
+        .review-header {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: #fff;
+            padding: 24px 16px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 93, 65, 0.15);
+        }
+        .review-header-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .review-header-subtitle {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-black);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 16px 16px 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 0 16px 12px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        
+        .gps-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .gps-icon {
+            width: 40px;
+            height: 40px;
+            background: #EBF8F4;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #27AE60;
+            font-size: 20px;
+        }
+        .gps-details {
+            flex: 1;
+        }
+        .gps-details h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 2px;
+        }
+        .gps-details p {
+            font-size: 11px;
+            color: var(--color-gray);
+        }
+        .badge-gps {
+            background: #E8F5E9;
+            color: #2E7D32;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        
+        .receipt-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .receipt-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: #F1F7E5;
+            border: 1px solid rgba(0, 93, 65, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            font-size: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .receipt-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .receipt-info {
+            flex: 1;
+        }
+        .receipt-info h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-black);
+            margin-bottom: 2px;
+        }
+        .receipt-info p {
+            font-size: 11px;
+            color: var(--color-gray);
+        }
+        
+        .product-summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .summary-item {
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 12px;
+        }
+        .summary-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .summary-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .summary-item-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-black);
+            text-transform: uppercase;
+            line-height: 1.3;
+            max-width: 75%;
+        }
+        .summary-item-code {
+            font-size: 10px;
+            color: var(--color-gray);
+            font-weight: 600;
+        }
+        
+        .uom-changes-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            text-align: center;
+        }
+        .uom-changes-table th {
+            font-weight: 600;
+            color: var(--color-gray);
+            padding: 4px;
+            font-size: 9px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .uom-changes-table td {
+            padding: 6px 4px;
+            font-weight: 700;
+        }
+        .change-arrow {
+            color: var(--color-gray);
+            margin: 0 4px;
+            font-weight: 400;
+        }
+        .val-old {
+            color: #777;
+            font-weight: 500;
+        }
+        .val-new {
+            color: var(--color-primary);
+        }
+        .val-changed {
+            color: #27AE60;
+            background: #EBF8F4;
+            border-radius: 4px;
+        }
+        
+        .notes-textarea {
+            width: 100%;
+            height: 80px;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 12.5px;
+            color: var(--color-black);
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            background: var(--color-gray-light);
+            transition: all 0.2s;
+        }
+        .notes-textarea:focus {
+            background: #fff;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(0, 93, 65, 0.05);
+        }
+        
+        .action-footer {
+            padding: 16px;
+            background: #fff;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+        
+        .btn-checkout-primary {
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 93, 65, 0.2);
+            transition: background 0.2s;
+        }
+        .btn-checkout-primary:active {
+            background: var(--color-primary-dark);
+        }
+        .btn-checkout-secondary {
+            background: #fff;
+            color: #777;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn-checkout-secondary:active {
+            background: var(--color-gray-light);
+        }
+    </style>
+</head>
+<body style="background:#f7f9fa;">
+<div class="mobile-wrapper">
+    <!-- Header -->
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Konfirmasi Kulakan</span>
+        <div style="width: 36px;"></div> <!-- Spacer -->
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="mobile-content no-nav" style="padding-bottom: 0;">
+        
+        <!-- Header Banner -->
+        <div class="review-header">
+            <div class="review-header-title">Review Data Kulakan</div>
+            <div class="review-header-subtitle">Silakan periksa kembali laporan pemindahan stok motoris Anda.</div>
+        </div>
+        
+        <!-- Section: GPS & Store -->
+        <div class="section-title"><i class="fas fa-map-marker-alt"></i> Lokasi & Check-in</div>
+        <div class="info-card">
+            <div class="gps-status">
+                <div class="gps-icon"><i class="fas fa-store"></i></div>
+                <div class="gps-details">
+                    <h4 id="grosirName">Grosir Sinar Jaya</h4>
+                    <p id="checkInTime">Check-in: Hari ini, 00:00 WIB</p>
+                </div>
+                <span class="badge-gps">GPS Valid</span>
+            </div>
+        </div>
+
+        <!-- Section: Nota Bukti -->
+        <div class="section-title"><i class="fas fa-receipt"></i> Bukti Pembelian</div>
+        <div class="info-card">
+            <div class="receipt-card">
+                <div class="receipt-preview">
+                    <!-- Placeholder icon simulating camera picture -->
+                    <i class="fas fa-file-invoice" style="opacity: 0.7;"></i>
+                </div>
+                <div class="receipt-info">
+                    <h4>nota_belanja_stokis.jpg</h4>
+                    <p>Ukuran file: 1.4 MB • Format: JPEG</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Summary Products -->
+        <div class="section-title"><i class="fas fa-box"></i> Ringkasan Penyesuaian Stok</div>
+        <div class="info-card">
+            <div class="product-summary-list" id="summaryList">
+                <!-- Dynamically populated summary table per product -->
+            </div>
+        </div>
+
+        <!-- Section: Catatan -->
+        <div class="section-title"><i class="fas fa-comment-alt"></i> Catatan Tambahan</div>
+        <div class="info-card" style="margin-bottom: 24px;">
+            <textarea class="notes-textarea" id="notesInput" placeholder="Tambahkan catatan jika ada (contoh: ada kemasan penyok atau bonus produk)"></textarea>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="action-footer">
+        <button class="btn-checkout-primary" onclick="submitRestockReport()">
+            <i class="fas fa-paper-plane"></i> Kirim Laporan Kulakan
+        </button>
+        <button class="btn-checkout-secondary" onclick="history.back()">
+            Cek Kembali
+        </button>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    const tempAdjustments = JSON.parse(localStorage.getItem('temp_restock_adjustments')) || {};
+    const grosirName = localStorage.getItem('temp_restock_grosir') || 'Grosir Sinar Jaya';
+    const checkInTimeIso = localStorage.getItem('temp_restock_time') || new Date().toISOString();
+
+    $(document).ready(function() {
+        // Render headers
+        $('#grosirName').text(grosirName);
+        $('#checkInTime').text(`Check-in: ${SfaStore.formatTime(checkInTimeIso)}`);
+
+        // Render summary list
+        renderSummaryList();
+    });
+
+    function renderSummaryList() {
+        const container = $('#summaryList');
+        container.empty();
+
+        const productCodes = Object.keys(tempAdjustments);
+        if (productCodes.length === 0) {
+            container.html('<div style="text-align:center; padding: 12px; color: #888;">Tidak ada data penyesuaian.</div>');
+            return;
+        }
+
+        productCodes.forEach(code => {
+            const adj = tempAdjustments[code];
+            const originalProduct = SfaStore.getProductById(code) || { stockKarton: 0, stockBox: 0, stockPcs: 0 };
+
+            // Check if there are changes
+            const changeKarton = adj.karton !== originalProduct.stockKarton;
+            const changeBox = adj.box !== originalProduct.stockBox;
+            const changePcs = adj.pcs !== originalProduct.stockPcs;
+
+            container.append(`
+                <div class="summary-item">
+                    <div class="summary-item-header">
+                        <span class="summary-item-name">${adj.name}</span>
+                        <span class="summary-item-code">${code}</span>
+                    </div>
+                    <table class="uom-changes-table">
+                        <thead>
+                            <tr>
+                                <th>Satuan</th>
+                                <th>Stok Lama</th>
+                                <th></th>
+                                <th>Stok Baru</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Karton</td>
+                                <td class="val-old">${originalProduct.stockKarton}</td>
+                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
+                                <td class="val-new ${changeKarton ? 'val-changed' : ''}">${adj.karton}</td>
+                            </tr>
+                            <tr>
+                                <td>Box</td>
+                                <td class="val-old">${originalProduct.stockBox}</td>
+                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
+                                <td class="val-new ${changeBox ? 'val-changed' : ''}">${adj.box}</td>
+                            </tr>
+                            <tr>
+                                <td>Pcs</td>
+                                <td class="val-old">${originalProduct.stockPcs}</td>
+                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
+                                <td class="val-new ${changePcs ? 'val-changed' : ''}">${adj.pcs}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `);
+        });
+    }
+
+    function submitRestockReport() {
+        Swal.fire({
+            title: 'Kirim Data Kulakan?',
+            text: 'Data penyesuaian stok fisik di motor Anda akan segera dikirim dan diperbarui di sistem.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#005D41',
+            cancelButtonColor: '#777',
+            confirmButtonText: 'Ya, Kirim',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Mengirim Laporan...',
+                    html: `
+                        <div style="margin-bottom: 12px; font-size: 13px; color: #666;">Menyinkronkan data stok motoris ke server pusat...</div>
+                        <div style="display:flex; justify-content:center; align-items:center; height: 50px;">
+                            <i class="fas fa-cloud-upload-alt fa-bounce" style="font-size:30px; color:#005D41;"></i>
+                        </div>
+                    `,
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        setTimeout(() => {
+                            // Update persistent database SfaStore stocks
+                            for (const code in tempAdjustments) {
+                                const adj = tempAdjustments[code];
+                                // We update the main stock in Karton conversion
+                                SfaStore.updateProductStock(code, adj.karton);
+                            }
+
+                            // Generate history entries detail list
+                            const logDetails = [];
+                            for (const code in tempAdjustments) {
+                                const adj = tempAdjustments[code];
+                                logDetails.push(`${adj.name}: ${adj.karton} Karton, ${adj.box} Box, ${adj.pcs} Pcs (Stok Baru)`);
+                            }
+
+                            const notes = $('#notesInput').val().trim();
+                            if (notes) {
+                                logDetails.push(`Catatan: "${notes}"`);
+                            }
+
+                            const now = new Date();
+                            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+                            // Load existing history and prepend new log
+                            let history = JSON.parse(localStorage.getItem('restock_history')) || [];
+                            history.unshift({
+                                time: timeStr,
+                                type: 'inbound',
+                                title: 'Kulakan: Grosir Sinar Jaya',
+                                details: logDetails
+                            });
+                            localStorage.setItem('restock_history', JSON.stringify(history));
+
+                            // Clear transaction states
+                            localStorage.removeItem('restock_state');
+                            localStorage.removeItem('temp_restock_adjustments');
+                            localStorage.removeItem('temp_restock_receipt');
+                            localStorage.removeItem('temp_restock_grosir');
+                            localStorage.removeItem('temp_restock_time');
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Laporan Kulakan Terkirim!',
+                                text: 'Stok motoris telah diperbarui ke server SimpliDOTS.',
+                                confirmButtonColor: '#005D41'
+                            }).then(() => {
+                                // Redirect back to product catalog screen
+                                window.location.href = 'product_catalog.html';
+                            });
+                        }, 2200);
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

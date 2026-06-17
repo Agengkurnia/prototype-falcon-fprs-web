@@ -251,6 +251,23 @@
             gap: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
+        /* Floating Restock Bar (Gojek-style) */
+        .floating-restock-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(0, 93, 65, 0.08);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 16px 20px 20px 20px;
+            box-shadow: 0 -8px 24px rgba(0, 93, 65, 0.08);
+            z-index: 95;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
         .restock-status-badge {
             font-size: 10px;
             font-weight: 700;
@@ -271,20 +288,22 @@
             background: #005D41;
             color: #fff;
             border: none;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 12px;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: background 0.2s, transform 0.1s;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 93, 65, 0.15);
         }
         .btn-restock-action:active {
             background: #004530;
-            transform: scale(0.98);
+            transform: scale(0.96);
+            box-shadow: 0 2px 6px rgba(0, 93, 65, 0.1);
         }
 
         /* Stock History Styles */
@@ -379,19 +398,19 @@
         </div>
     </div>
 
-    <!-- Restock One-Stop Panel -->
-    <div class="restock-card" id="restockContainer"></div>
-
-    <!-- Actions Row -->
-    <div class="action-row">
-        <button class="btn-print-outline" onclick="window.print()"><i class="fas fa-print"></i> Cetak Opname</button>
-        <span class="product-count-label" id="productCountLabel">Jumlah: 0</span>
-    </div>
-
     <!-- Main Content List -->
-    <div class="mobile-content no-nav" style="padding-top: 0;">
+    <div class="mobile-content no-nav" style="padding-top: 0; padding-bottom: 100px;">
+        <!-- Actions Row -->
+        <div class="action-row">
+            <button class="btn-print-outline" onclick="window.print()"><i class="fas fa-print"></i> Cetak Opname</button>
+            <span class="product-count-label" id="productCountLabel">Jumlah: 0</span>
+        </div>
+
         <div class="product-list-container" id="productGrid"></div>
     </div>
+
+    <!-- Floating Restock Bar (Gojek-style) -->
+    <div class="floating-restock-bar" id="restockContainer"></div>
 
     <!-- Bottom Sheet Backdrop & Container -->
     <div class="bottom-sheet-backdrop" id="sheetBackdrop" onclick="closeBottomSheet()"></div>
@@ -442,9 +461,11 @@
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
     let currentCat = 'Semua';
-    let restockState = 'idle'; // 'idle', 'checked_in', 'restocking'
-    let tempAdjustments = {}; // Holds temporary adjustments made during the current restock session
-    let historyEntries = [
+    let restockState = localStorage.getItem('restock_state') || 'idle'; 
+    let tempAdjustments = JSON.parse(localStorage.getItem('temp_restock_adjustments')) || {}; 
+    
+    // Seed and load history entries
+    const defaultHistory = [
         {
             time: '08:00',
             type: 'system',
@@ -471,6 +492,10 @@
             ]
         }
     ];
+    if (!localStorage.getItem('restock_history')) {
+        localStorage.setItem('restock_history', JSON.stringify(defaultHistory));
+    }
+    let historyEntries = JSON.parse(localStorage.getItem('restock_history'));
 
     $(document).ready(function() {
         buildChips();
@@ -484,53 +509,50 @@
 
         if (restockState === 'idle') {
             container.html(`
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="restock-status-badge status-not-started"><i class="fas fa-times-circle"></i> Belum Check-in</span>
-                    <span style="font-size:11px; color:var(--color-gray); font-weight:600;">Aktivitas Kulakan</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div style="flex: 1;">
+                        <span class="restock-status-badge status-not-started" style="margin-bottom: 2px;"><i class="fas fa-times-circle"></i> Belum Check-in</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">Kulakan di Grosir/Stokis</div>
+                    </div>
+                    <button class="btn-restock-action" style="padding: 10px 16px; font-size:12px; margin-top:0;" onclick="startCheckIn()">
+                        <i class="fas fa-map-marker-alt"></i> Check-in GPS
+                    </button>
                 </div>
-                <div style="font-size:11.5px; color:#555; line-height:1.4;">
-                    Lakukan check-in di grosir/stokis terlebih dahulu untuk memulai aktivitas input stok fisik ke motor.
-                </div>
-                <button class="btn-restock-action" onclick="startCheckIn()">
-                    <i class="fas fa-map-marker-alt"></i> Check-in GPS di Grosir
-                </button>
             `);
         } else if (restockState === 'checked_in') {
             container.html(`
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="restock-status-badge status-started"><i class="fas fa-check-circle"></i> GPS Valid</span>
-                    <span style="font-size:11px; color:var(--color-gray); font-weight:600;">Langkah 2: Bukti Nota</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div style="flex: 1;">
+                        <span class="restock-status-badge status-started" style="margin-bottom: 2px;"><i class="fas fa-check-circle"></i> GPS Valid</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">Grosir Sinar Jaya</div>
+                    </div>
+                    <button class="btn-restock-action" style="background-color: #78B500; padding: 10px 16px; font-size:12px; margin-top:0;" onclick="uploadReceiptMock()">
+                        <i class="fas fa-camera"></i> Foto Nota
+                    </button>
                 </div>
-                <div style="font-size:11.5px; color:#555; line-height:1.4;">
-                    Lokasi: <strong>Grosir Sinar Jaya (10m dari posisi Anda)</strong>.<br>
-                    Harap foto nota/kwitansi pembelian grosir sebagai bukti audit.
-                </div>
-                <button class="btn-restock-action" style="background-color: #78B500;" onclick="uploadReceiptMock()">
-                    <i class="fas fa-camera"></i> Ambil Foto Nota Pembelian
-                </button>
             `);
         } else if (restockState === 'restocking') {
+            const adjustedCount = Object.keys(tempAdjustments).length;
             container.html(`
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="restock-status-badge status-started" style="background:#E1F5FE; color:#0288D1;"><i class="fas fa-receipt"></i> Nota Terunggah</span>
-                    <span style="font-size:11px; color:var(--color-gray); font-weight:600;">Langkah 3: Input Stok</span>
-                </div>
-                <div style="font-size:11.5px; color:#555; line-height:1.4; display:flex; align-items:center; gap:8px;">
-                    <div style="width:40px; height:40px; background:#EBF8F4; border:1px solid #D2ECE4; border-radius:6px; display:flex; align-items:center; justify-content:center;">
-                        <i class="fas fa-image" style="font-size:18px; color:#005D41;"></i>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div style="flex: 1; display:flex; align-items:center; gap:8px;">
+                        <div style="width:36px; height:36px; background:#EBF8F4; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative;">
+                            <i class="fas fa-motorcycle" style="color:#005D41; font-size:16px;"></i>
+                            ${adjustedCount > 0 ? `<span style="position:absolute; top:-6px; right:-6px; background:#C62828; color:#fff; font-size:9px; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">${adjustedCount}</span>` : ''}
+                        </div>
+                        <div>
+                            <div style="font-size:12px; font-weight:700; color:#231F20;">${adjustedCount} Produk di-adjust</div>
+                            <div style="font-size:10px; color:var(--color-gray); font-weight:500;">Sesuaikan stok fisik motor</div>
+                        </div>
                     </div>
-                    <div>
-                        File: <strong>nota_belanja_stokis.jpg</strong><br>
-                        Silakan klik tombol <strong>Sesuaikan</strong> di barang di bawah.
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-restock-action" style="background-color:#E0E0E0; color:#555; padding: 10px 12px; font-size:12px; margin-top:0;" onclick="cancelRestock()">
+                            Batal
+                        </button>
+                        <button class="btn-restock-action" style="background-color:#005D41; padding: 10px 16px; font-size:12px; margin-top:0;" onclick="completeRestock()">
+                            Tinjau <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>
+                        </button>
                     </div>
-                </div>
-                <div style="display:flex; gap:8px; margin-top: 4px;">
-                    <button class="btn-restock-action" style="flex:1; background-color:#E0E0E0; color:#555;" onclick="cancelRestock()">
-                        Batal
-                    </button>
-                    <button class="btn-restock-action" style="flex:2; background-color:#005D41;" onclick="completeRestock()">
-                        <i class="fas fa-paper-plane"></i> Kirim Data Kulakan
-                    </button>
                 </div>
             `);
         }
@@ -583,6 +605,12 @@
             const formattedBox = new Intl.NumberFormat('id-ID').format(p.priceBox);
             const formattedPcs = new Intl.NumberFormat('id-ID').format(p.pricePcs);
 
+            // Use temp adjustments if available
+            const adj = tempAdjustments[p.code];
+            const stockK = adj ? adj.karton : p.stockKarton;
+            const stockB = adj ? adj.box : p.stockBox;
+            const stockP = adj ? adj.pcs : p.stockPcs;
+
             container.append(`
                 <div class="product-card">
                     <a href="product_detail.html?id=${p.code}" style="text-decoration: none; color: inherit; display: block;">
@@ -609,9 +637,9 @@
                             <tbody>
                                 <tr class="stok-row">
                                     <td>Stok</td>
-                                    <td id="stok-karton-${p.code}">${p.stockKarton}</td>
-                                    <td id="stok-box-${p.code}">${p.stockBox}</td>
-                                    <td id="stok-pcs-${p.code}">${p.stockPcs}</td>
+                                    <td id="stok-karton-${p.code}">${stockK}</td>
+                                    <td id="stok-box-${p.code}">${stockB}</td>
+                                    <td id="stok-pcs-${p.code}">${stockP}</td>
                                 </tr>
                                 <tr class="harga-row">
                                     <td>Harga</td>
@@ -625,7 +653,7 @@
                     <div class="product-divider" style="margin-top: 10px; margin-bottom: 8px;"></div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 11px; color: var(--color-gray); font-weight: 500;"><i class="fas fa-motorcycle" style="color: #78B500; margin-right: 4px;"></i> Stok fisik di motor</span>
-                        <button onclick="adjustStock('${p.code}', '${p.name}', ${p.stockKarton}, ${p.stockBox}, ${p.stockPcs})" style="background: #F1F7E5; color: #005D41; border: 1px solid #DDE8C1; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
+                        <button onclick="adjustStock('${p.code}', '${p.name.replace(/'/g, "\\'")}', ${stockK}, ${stockB}, ${stockP})" style="background: #F1F7E5; color: #005D41; border: 1px solid #DDE8C1; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
                             <i class="fas fa-edit"></i> Sesuaikan
                         </button>
                     </div>
@@ -683,6 +711,8 @@
             box: box,
             pcs: pcs
         };
+        localStorage.setItem('temp_restock_adjustments', JSON.stringify(tempAdjustments));
+        updateRestockUI();
 
         // Update values in DOM
         $(`#stok-karton-${code}`).text(karton).hide().fadeIn();
@@ -722,6 +752,7 @@
             didOpen: () => {
                 setTimeout(() => {
                     restockState = 'checked_in';
+                    localStorage.setItem('restock_state', 'checked_in');
                     updateRestockUI();
                     Swal.fire({
                         icon: 'success',
@@ -772,6 +803,7 @@
                     didOpen: () => {
                         setTimeout(() => {
                             restockState = 'restocking';
+                            localStorage.setItem('restock_state', 'restocking');
                             updateRestockUI();
                             Swal.fire({
                                 icon: 'success',
@@ -801,71 +833,34 @@
             if (result.isConfirmed) {
                 restockState = 'idle';
                 tempAdjustments = {};
+                localStorage.removeItem('restock_state');
+                localStorage.removeItem('temp_restock_adjustments');
                 updateRestockUI();
+                renderGrid();
             }
         });
     }
 
     function completeRestock() {
-        Swal.fire({
-            title: 'Kirim Data Kulakan?',
-            text: 'Apakah Anda sudah yakin semua stok yang dimasukkan sudah sesuai dengan fisik?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#005D41',
-            cancelButtonColor: '#777',
-            confirmButtonText: 'Kirim Sekarang',
-            cancelButtonText: 'Cek Kembali'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Mengirim Laporan...',
-                    html: `
-                        <div style="margin-bottom: 12px; font-size: 13px; color: #666;">Sinkronisasi data kulakan ke server pusat...</div>
-                        <div style="display:flex; justify-content:center; align-items:center; height: 50px;">
-                            <i class="fas fa-cloud-upload-alt fa-bounce" style="font-size:30px; color:#005D41;"></i>
-                        </div>
-                    `,
-                    showConfirmButton: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        setTimeout(() => {
-                            // Generate log details from tempAdjustments
-                            const logDetails = [];
-                            for (const code in tempAdjustments) {
-                                const adj = tempAdjustments[code];
-                                logDetails.push(`${adj.name}: ${adj.karton} Karton, ${adj.box} Box, ${adj.pcs} Pcs (Stok Baru)`);
-                            }
-                            if (logDetails.length === 0) {
-                                logDetails.push('Tidak ada penyesuaian barang.');
-                            }
+        if (Object.keys(tempAdjustments).length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Ada Penyesuaian',
+                text: 'Harap lakukan penyesuaian stok minimal pada 1 produk sebelum mengirim.',
+                confirmButtonColor: '#005D41'
+            });
+            return;
+        }
 
-                            const now = new Date();
-                            const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        // Save review data to localStorage
+        localStorage.setItem('restock_state', restockState);
+        localStorage.setItem('temp_restock_adjustments', JSON.stringify(tempAdjustments));
+        localStorage.setItem('temp_restock_receipt', 'nota_belanja_stokis.jpg');
+        localStorage.setItem('temp_restock_grosir', 'Grosir Sinar Jaya');
+        localStorage.setItem('temp_restock_time', new Date().toISOString());
 
-                            // Push to history
-                            historyEntries.unshift({
-                                time: timeStr,
-                                type: 'inbound',
-                                title: 'Kulakan: Grosir Sinar Jaya',
-                                details: logDetails
-                            });
-
-                            restockState = 'idle';
-                            tempAdjustments = {};
-                            updateRestockUI();
-
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Proses Kulakan Selesai!',
-                                text: 'Stok motor Anda telah diperbarui ke sistem.',
-                                confirmButtonColor: '#005D41'
-                            });
-                        }, 2000);
-                    }
-                });
-            }
-        });
+        // Redirect to Gojek-like checkout review page
+        window.location.href = 'restock_review.html';
     }
 
     function openHistorySheet() {

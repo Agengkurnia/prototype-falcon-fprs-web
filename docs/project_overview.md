@@ -1,73 +1,124 @@
-# Falcon FPRS Web Prototype - Project Overview
+# Falcon FPRS - Project Overview & Architecture
 
-Dokumen ini menjelaskan latar belakang, sejarah, tujuan, serta arsitektur teknis dari prototipe web **Falcon FPRS (PT Kalbe Nutritionals)**. Dokumen ini ditujukan sebagai panduan bagi developer untuk memahami standar implementasi dan melanjutkan pengembangan tanpa harus melakukan pemindaian/analisis ulang.
+Dokumen ini menjelaskan latar belakang, sejarah, tujuan, serta arsitektur teknis dari prototipe **Falcon FPRS (PT Kalbe Nutritionals)**. Dokumen ini ditujukan sebagai panduan bagi developer untuk memahami standar implementasi, struktur folder, manajemen data lokal, serta alur build aplikasi web maupun mobile.
 
 ---
 
 ## 📜 Sejarah & Latar Belakang
 
-Proyek ini bermula dari kebutuhan untuk menghadirkan antarmuka web (UI/UX) baru yang premium, responsif, dan terstandarisasi untuk sistem internal **Falcon FPRS** (PT Kalbe Nutritionals). Prototype dikembangkan dengan mereplikasi dan memodifikasi alur bisnis dari platform **SimpliDOTS** (khususnya versi Condensed) untuk diselaraskan dengan kebutuhan visual dan branding Kalbe.
+Proyek ini bermula dari kebutuhan untuk menghadirkan antarmuka web (UI/UX) baru yang premium, responsif, dan terstandarisasi untuk sistem internal **Falcon FPRS** (PT Kalbe Nutritionals). Prototipe dikembangkan dengan menyelaraskan alur bisnis, branding Kalbe (hijau korporat), dan fungsionalitas lapangan.
 
 Dalam perjalanannya, prototipe ini telah melewati beberapa fase penyempurnaan:
-1. **Fase Inisiasi**: Pembuatan struktur menu dasar, integrasi pustaka CSS/JS, dan styling tema Kalbe (hijau korporat).
+1. **Fase Inisiasi**: Pembuatan struktur menu dasar, integrasi pustaka CSS/JS, dan styling tema Kalbe.
 2. **Fase Master Data & Refinement**: Implementasi 17 modul Master Data lengkap dengan antarmuka tabel interaktif, fungsionalitas CRUD lokal, dan validasi formulir.
-3. **Fase Penjualan & Canvassing**: Pengembangan modul Canvassing (sebelumnya Canvassing V2) yang responsif dengan kartu ringkasan interaktif, tabel pencarian, detail riwayat produk, dan konfirmasi SweetAlert.
-4. **Fase Rebranding & Pembersihan**: Mengubah struktur sidebar untuk mengelompokkan modul transaksi di bawah kategori **Penjualan**, menyembunyikan modul non-aktif, serta membersihkan modul Canvassing lama.
-5. **Fase Pelacakan Geografis Kunjungan**: Penambahan modul Geografis Kunjungan di bawah menu **Kunjungan** dengan visualisasi peta jalan (rute sales) menggunakan MapLibre GL JS, sinkronisasi panel detail, dan navigasi sidebar yang dinamis.
+3. **Fase Penjualan & Canvassing**: Pengembangan modul Canvassing desktop yang responsif dengan kartu ringkasan interaktif, pencarian, dan konfirmasi SweetAlert.
+4. **Fase Pelacakan Geografis Kunjungan**: Penambahan modul Geografis Kunjungan desktop dengan visualisasi peta rute sales menggunakan MapLibre GL JS dan panel interaktif.
+5. **Fase Mobile SFA & Pembayaran**: Pembuatan prototipe antarmuka mobile khusus untuk sales lapangan (`Views/Mobile/`) yang mencakup pemesanan barang, tagihan piutang, pelacakan GPS, dan dasbor target.
+6. **Fase Kemasan Flutter APK**: Pengintegrasian modul mobile ke dalam pembungkus (wrapper) Flutter untuk menghasilkan aplikasi Android mandiri (`app-release.apk`).
 
 ---
 
 ## 🎯 Tujuan Proyek
 
-- **High-Fidelity Interactive Prototype**: Menjadi alat peraga interaktif bagi tim bisnis dan stakeholders untuk memvalidasi alur kerja sebelum masuk ke fase produksi.
-- **Unified Branding System**: Menggunakan palet warna standar Kalbe (`#005d41`, menu aktif `#DDE8C1`, total penjualan `#d83f52`) dan tipografi modern (font lokal Kalbe Geometric / Outfit) demi konsistensi visual.
-- **Client-Side Simulation**: Mensimulasikan aplikasi web dinamis secara utuh di sisi klien tanpa ketergantungan database server aktif (menggunakan localStorage, file JSON statis, dan koordinat rute tiruan).
+- **High-Fidelity Interactive Prototype**: Menjadi alat peraga interaktif bagi tim bisnis dan stakeholders untuk memvalidasi alur kerja web admin maupun aplikasi lapangan (mobile) sebelum masuk ke fase produksi.
+- **Unified Branding System**: Menggunakan palet warna standar Kalbe (`#005d41` hijau utama, menu aktif `#DDE8C1`, total penjualan `#d83f52`) dan tipografi modern (font lokal Kalbe Geometric / Outfit) demi konsistensi visual.
+- **Client-Side Simulation**: Mensimulasikan aplikasi dinamis secara utuh di sisi klien tanpa ketergantungan server database aktif (menggunakan localStorage, file JSON statis, GPS virtual, dan antrean sinkronisasi tiruan).
 
 ---
 
 ## 🏗️ Arsitektur Prototipe
 
-Prototipe ini dibangun sebagai aplikasi **Multi-Page Static (MPA)** murni untuk kemudahan portabilitas (dapat dijalankan langsung dengan server statis seperti `http-server` atau Live Server).
+Prototipe ini dirancang dengan model **Dual-Target**:
+1. **Web Desktop Panel Admin** (`Views/FPRS/`) -> Halaman web multi-halaman (MPA) untuk administrasi data dan pemantauan.
+2. **Mobile Sales Client** (`Views/Mobile/` & `Mobile/`) -> Tampilan responsif mobile yang dijalankan langsung atau dibungkus dalam Flutter WebView.
 
 ### 1. Struktur Folder & Tata Letak
+
 ```
 Prototype/
-├── index.html                  # Halaman Dashboard Utama
+├── index.html                  # Halaman Dashboard Utama Desktop
+├── app-release.apk             # Android APK hasil build rilis
+├── build-apk.bat               # Script batch otomatisasi kompilasi APK
+├── scripts/
+│   └── create-flutter-wrapper.js  # Script Node.js sinkronisasi aset ke Flutter
 ├── Views/
-│   └── FPRS/
-│       ├── Canvassing/         # Modul Transaksi Canvassing (Index, Add, Detail, Tests)
-│       ├── Kunjungan/
-│       │   └── Geografis/      # Modul Geografis Kunjungan (Peta & Lintasan Urutan Toko)
-│       ├── MasterData/         # 17 Sub-modul Master Data (Supplier, Produk, dll)
-│       └── unit-test.html      # Suite Pengujian Kepatuhan UI/UX & Fungsional
+│   ├── FPRS/                   # [WEB] Panel Admin Desktop
+│   │   ├── Canvassing/         # Modul Transaksi Canvassing
+│   │   ├── Kunjungan/          # Modul Geografis Kunjungan & Rute
+│   │   └── MasterData/         # 17 Sub-modul Master Data (Produk, Pelanggan, dll)
+│   └── Mobile/                 # [MOBILE] Antarmuka Client Sales Lapangan
+│       ├── login.html          # Form login mobile
+│       ├── home.html           # Menu utama & ringkasan sync
+│       ├── dasbor.html         # Statistik performa harian
+│       ├── order_input.html    # Form transaksi penjualan sales
+│       ├── collection_input.html  # Form pembayaran piutang (AR)
+│       └── outlet_detail.html  # Detail pelanggan & penandaan GPS
+├── Mobile/
+│   └── MobileApp/              # Proyek Flutter WebView Wrapper
+│       ├── android/            # Kode native Android
+│       ├── assets/www/         # Lokasi salinan web aset hasil build sync
+│       └── lib/main.dart       # Titik masuk Flutter WebView
 └── wwwroot/
-    ├── css/                    # Desain Sistem & File CSS Spesifik Modul
-    │   ├── layout.css          # Desain sistem global, sidebar, dan komponen umum
-    │   └── canvassing.css      # Styling khusus untuk modul Canvassing
-    ├── data/                   # Mock Database (file JSON statis untuk drop-down/LOV)
-    └── js/                     # Logika Global dan Local Storage Handler
-        ├── layout.js           # Penanganan transisi sidebar & auto-highlight active menu
-        └── canvassing-store.js # Data Access Object (DAO) lokal untuk transaksi Canvassing
+    ├── css/                    # Desain Sistem & File CSS spesifik
+    │   ├── layout.css          # Styling global layout desktop
+    │   └── styles-vuexy.css    # Penyesuaian tema Vuexy Admin
+    ├── js/                     # Logika Global dan Data Layer
+    │   ├── layout.js           # Penanganan struktur sidebar & menu desktop
+    │   ├── canvassing-store.js # Data Access Object (DAO) lokal untuk canvassing desktop
+    │   └── sfa-store.js        # Data Access Object (DAO) & sync queue untuk SFA mobile
+    └── data/                   # Mock Database (file JSON statis referensi awal)
 ```
 
-### 2. Mekanisme State Management (localStorage)
+---
+
+## 💾 Manajemen State & Simulasi Data (localStorage)
+
 Untuk mereplikasi perilaku backend (Create, Read, Update, Delete), prototipe menggunakan browser **`localStorage`**:
-- **Master Data**: Setiap modul memuat data awal dari file JSON di `wwwroot/data/` jika `localStorage` kosong, lalu menyimpan perubahan ke `localStorage` (misal: `alasan_data`, `supplier_data`).
-- **Canvassing**: Dikelola secara terpusat oleh `wwwroot/js/canvassing-store.js` (`CanvassingStore`) dengan data awal berupa 20 entri mock yang merepresentasikan riwayat canvassing nyata.
-- **Geografis Kunjungan**: Menggunakan data koordinat spasial statis dan memicu penggambaran rute serta update status panel detail secara reaktif saat interaksi tombol dilakukan oleh pengguna.
 
-### 3. Fungsionalitas Navigasi Sidebar (`layout.js`)
-Karena tidak ada template engine server-side, sidebar diduplikasi secara statis di setiap file HTML. Logika aktifasi menu ditangani oleh `wwwroot/js/layout.js`:
-- Membaca path URL saat ini (`window.location.pathname`).
-- Mencocokkan link menu yang sesuai di dalam sidebar.
-- Menambahkan kelas `.active` untuk memberikan highlight warna hijau muda (`#DDE8C1`) dengan border kiri tebal (`#005d41`).
-- Menjaga agar kategori induk (seperti **Penjualan**, **Kunjungan**, atau **Data Master**) tetap terbuka (`show`) saat user berada di dalam submenu.
+### A. Data Layer Web Desktop (`canvassing-store.js`)
+* Menyimpan daftar data master awal dari JSON statis ke browser.
+* Mengelola riwayat data canvassing transaksi desktop lokal secara *real-time*.
 
-### 4. Dependensi Pustaka Pihak Ketiga
-Semua pustaka dimuat melalui CDN untuk meminimalkan beban penyimpanan lokal:
-- **Bootstrap 5.3.2**: Kerangka responsivitas grid, form control, modal, dan collapse sidebar.
-- **FontAwesome 6.4.2**: Ikon visual di menu sidebar dan tombol aksi.
-- **jQuery 3.7.1**: Dibutuhkan oleh plugin DataTables dan pemrosesan event.
-- **jQuery DataTables 1.13.7**: Manajemen tabel pintar (global search, filter per kolom, pagination).
-- **SweetAlert2 (v11)**: Dialog konfirmasi interaktif saat menghapus data atau setelah berhasil mengirim formulir.
-- **MapLibre GL JS (v3.6.2)**: Engine render peta vektor berbasis WebGL untuk plotting rute dan marker geografis.
+### B. Data Layer Mobile SFA (`sfa-store.js`)
+Mengelola seluruh state operasional sales lapangan melalui objek global `window.SfaStore`:
+- **Auth**: Informasi akun sales dan status login (`getUser()`, `saveUser()`).
+- **Customer & GPS**: Daftar outlet, pencarian, serta pembaruan koordinat latitude/longitude secara lokal (`updateCustomerGps()`).
+- **Transaction**: Penulisan faktur penjualan baru (`saveInvoice()`) dan pembayaran piutang/AR (`saveCollection()`).
+- **Offline Sync Queue**: 
+  Setiap transaksi mobile yang disimpan saat sales di lapangan akan masuk ke dalam **Antrean Sinkronisasi (Sync Queue)** lokal. 
+  - `addToSyncQueue(type, payload)`: Menyimpan data offline berstatus `pending`.
+  - `processQueue(onProgress)`: Mensimulasikan upload data satu per satu ke server mock dengan delay 350ms per item dan simulasi tingkat kegagalan 5% untuk menguji fitur *Retry*.
+
+---
+
+## 📱 Mekanisme Flutter Wrapper & Build APK
+
+Penyatuan kode web HTML/CSS/JS mobile ke dalam format aplikasi Android (.apk) menggunakan alur otomatisasi berikut:
+
+1. **Sinkronisasi File (`create-flutter-wrapper.js`)**:
+   - Menghapus folder target aset lama `Mobile/MobileApp/assets/www/`.
+   - Menyalin folder `Views/Mobile/` dan folder aset pendukung `wwwroot/` ke dalam folder Flutter.
+   - Membuat file `index.html` root di dalam aset Flutter yang berisi script pengalihan langsung (*meta-refresh*) ke halaman `Views/Mobile/login.html`.
+   - Memindai seluruh folder aset baru tersebut dan mendaftarkannya secara otomatis ke dalam konfigurasi `pubspec.yaml` Flutter di bagian `assets:`.
+2. **Kompilasi Flutter**:
+   - Script masuk ke dalam direktori `Mobile/MobileApp`.
+   - Menjalankan perintah `flutter build apk --release` untuk memaketkan seluruh webview lokal ke dalam binary Android.
+3. **Penyalinan APK**:
+   - Menyalin file output `app-release.apk` kembali ke root folder proyek utama agar mudah didistribusikan.
+
+Semua alur di atas dapat dijalankan hanya dengan sekali klik melalui file batch **`build-apk.bat`** di root direktori.
+
+---
+
+## 🛠️ Dependensi Pustaka Pihak Ketiga
+
+Pustaka pendukung dimuat melalui CDN untuk keefektifan akses, atau disalin secara lokal untuk kebutuhan luring mobile:
+
+| Pustaka | Penggunaan | Keterangan |
+| :--- | :--- | :--- |
+| **Bootstrap 5.3.2** | Tata letak responsif, grid, form, dan modal dialog | Digunakan di Web & Mobile |
+| **FontAwesome 6.4.2** | Ikon visual tombol dan menu sidebar | Digunakan di Web & Mobile |
+| **jQuery 3.7.1** | Manipulasi DOM & pemrosesan event | Digunakan di Web & Mobile |
+| **SweetAlert2 (v11)** | Notifikasi pop-up konfirmasi aksi dan status | Digunakan di Web & Mobile |
+| **Leaflet.js (1.9.4)** | Peta OpenStreetMap interaktif untuk penandaan lokasi GPS | Digunakan di Mobile (`outlet_detail.html`) |
+| **MapLibre GL JS** | Engine render peta vektor untuk plotting rute sales | Digunakan di Web (`Geografis Kunjungan`) |

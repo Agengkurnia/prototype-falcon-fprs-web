@@ -458,7 +458,7 @@
                     <button type="button"
                             class="header-icon-btn"
                             aria-label="Notifikasi"
-                            onclick="alertUnderDevelopment('Notifikasi')">
+                            onclick="showNotifications()">
                         <i class="fas fa-bell" aria-hidden="true"></i>
                         <span class="notif-dot" aria-hidden="true"></span>
                         <span class="sr-only">Ada notifikasi baru</span>
@@ -473,7 +473,7 @@
                    class="canvas-banner"
                    role="button"
                    aria-label="Lihat detail periode kanvas aktif"
-                   onclick="alertUnderDevelopment('Detail Periode Kanvas')">
+                   onclick="showCanvasPeriodDetails()">
                     <div class="canvas-banner-content">
                         <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                         <div>
@@ -788,6 +788,94 @@
                 text: `Modul '${featureName}' sedang disimulasikan. Hubungkan dengan API SFA untuk integrasi data nyata.`,
                 confirmButtonColor: '#005D41',
                 confirmButtonText: 'Mengerti'
+            });
+        }
+
+        function showCanvasPeriodDetails() {
+            const user = SfaStore.getUser() || { name: 'SINGARAJA', role: 'canvasser' };
+            const userName = (user.name || 'SINGARAJA').toUpperCase();
+            const userRole = (user.role || 'canvasser').toUpperCase();
+
+            Swal.fire({
+                title: '<span style="font-size:16px; font-weight:700; color:#005D41;">Detail Periode Kanvas</span>',
+                html: `
+                    <div class="text-start p-2" style="font-size: 13px;">
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 11px;">Nama Siklus Kanvas</label>
+                            <span class="fw-bold text-dark">Siklus Kanvas Utama Jabodetabek</span>
+                        </div>
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 11px;">Durasi Periode</label>
+                            <span class="fw-bold text-dark">13 Jan 2026 — 01 Jan 2027</span>
+                        </div>
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 11px;">Petugas Canvasser</label>
+                            <span class="fw-bold text-dark">${userName} (${userRole})</span>
+                        </div>
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 11px;">Gudang / Stockist Asal</label>
+                            <span class="fw-bold text-dark">Gudang Distribusi Jakarta Barat (G-JKT02)</span>
+                        </div>
+                        <div class="mb-0" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 11px;">Kendaraan Operasional</label>
+                            <span class="fw-bold text-dark">Toyota Dyna Box (B 9845 SC)</span>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Tutup',
+                width: '360px'
+            });
+        }
+
+        function showNotifications() {
+            // Hide the red notification dot to simulate "marking as read"
+            $('.notif-dot').fadeOut(300);
+
+            Swal.fire({
+                title: '<span style="font-size:16px; font-weight:700; color:#005D41;">Notifikasi Masuk</span>',
+                html: `
+                    <div class="list-group list-group-flush text-start" style="max-height: 300px; overflow-y: auto; font-size: 12px; font-family: inherit;">
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-danger text-white" style="font-size: 9px; padding: 2px 6px;">PENTING</span>
+                                <span class="text-muted" style="font-size: 10px;">15 mnt lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Overdue Outstanding (AP)</div>
+                            <div class="text-muted" style="line-height: 1.4;">Apotek Roxy Salemba memiliki tagihan lewat jatuh tempo sebesar Rp 3.750.000. Harap tindak lanjuti hari ini.</div>
+                        </div>
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-success text-white" style="font-size: 9px; padding: 2px 6px;">PRESTASI</span>
+                                <span class="text-muted" style="font-size: 10px;">1 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Target Kunjungan Terlampaui</div>
+                            <div class="text-muted" style="line-height: 1.4;">Selamat! Anda telah melampaui 80% dari target kunjungan harian Anda hari ini. Pertahankan kinerjanya!</div>
+                        </div>
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-primary text-white" style="font-size: 9px; padding: 2px 6px;">PROMO</span>
+                                <span class="text-muted" style="font-size: 10px;">3 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Promo Khusus Canvasser</div>
+                            <div class="text-muted" style="line-height: 1.4;">Promo Morinaga Chil*Kid Gold (Beli 3 Karton gratis 1 Karton) resmi diperpanjang hingga 30 Juni 2026.</div>
+                        </div>
+                        <div class="list-group-item p-3 style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-secondary text-white" style="font-size: 9px; padding: 2px 6px;">SISTEM</span>
+                                <span class="text-muted" style="font-size: 10px;">4 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Auto-Sync Sukses</div>
+                            <div class="text-muted" style="line-height: 1.4;">Sinkronisasi database offline dengan server utama Kalbe telah selesai diunggah.</div>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Tutup',
+                width: '380px',
+                customClass: {
+                    htmlContainer: 'p-0 text-start'
+                }
             });
         }
     </script>

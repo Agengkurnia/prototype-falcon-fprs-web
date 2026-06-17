@@ -374,10 +374,10 @@
                     </div>
                 </div>
 
-                <!-- 2x2 Grid Stats (Exact Replica) -->
+                <!-- 2x2 Grid Stats (Live Data) -->
                 <div class="stats-grid">
                     <!-- 1. Pelanggan (Blue) -->
-                    <div class="stat-card" style="opacity: 0.4; pointer-events: none;">
+                    <div class="stat-card">
                         <div class="stat-card-left">
                             <div class="stat-circle-icon" style="background-color: #E8F4FD;">
                                 <i class="fas fa-users" style="color: #1E88E5;"></i>
@@ -386,7 +386,7 @@
                         <div class="stat-card-right">
                             <div class="stat-card-label-row">
                                 <span>Pelanggan</span>
-                                <i class="fas fa-info-circle" onclick="showInfoToast('Pelanggan', 'Jumlah target outlet/toko dalam rute canvassing Anda.')"></i>
+                                <i class="fas fa-info-circle" onclick="showInfoToast('Pelanggan', 'Jumlah total outlet/toko aktif dalam database SFA.')"></i>
                             </div>
                             <span class="stat-card-value" id="valPelanggan">0</span>
                         </div>
@@ -402,7 +402,7 @@
                         <div class="stat-card-right">
                             <div class="stat-card-label-row">
                                 <span>Faktur Penj...</span>
-                                <i class="fas fa-info-circle" onclick="showInfoToast('Faktur Penjualan', 'Jumlah faktur penjualan yang berhasil dibuat hari ini.')"></i>
+                                <i class="fas fa-info-circle" onclick="showInfoToast('Faktur Penjualan', 'Jumlah faktur penjualan pada periode yang dipilih.')"></i>
                             </div>
                             <span class="stat-card-value" id="valFaktur">0</span>
                         </div>
@@ -418,7 +418,7 @@
                         <div class="stat-card-right">
                             <div class="stat-card-label-row">
                                 <span>Kunjungan</span>
-                                <i class="fas fa-info-circle" onclick="showInfoToast('Kunjungan', 'Jumlah toko yang sudah dikunjungi (termasuk tidak beli).')"></i>
+                                <i class="fas fa-info-circle" onclick="showInfoToast('Kunjungan', 'Jumlah toko yang sudah dikunjungi pada periode ini.')"></i>
                             </div>
                             <span class="stat-card-value" id="valKunjungan">0</span>
                         </div>
@@ -442,13 +442,13 @@
                 </div>
 
                 <!-- Link ke Target Detail -->
-                <a href="#" style="display:flex; align-items:center; justify-content:space-between; background:var(--color-bg-light); border:1px solid rgba(0,93,65,0.15); border-radius:10px; padding:10px 14px; text-decoration:none; margin-bottom:12px; opacity: 0.4; pointer-events: none;">
+                <a href="target.html" style="display:flex; align-items:center; justify-content:space-between; background:var(--color-bg-light); border:1px solid rgba(0,93,65,0.15); border-radius:10px; padding:10px 14px; text-decoration:none; margin-bottom:12px;">
                     <span style="font-size:13px; font-weight:700; color:var(--color-primary);"><i class="fas fa-bullseye me-2"></i>Lihat Detail Target Harian</span>
                     <i class="fas fa-chevron-right" style="color:var(--color-primary); font-size:12px;"></i>
                 </a>
 
                 <!-- Full Width Total Faktur Penjualan (Green) -->
-                <a href="order_input.html" style="text-decoration: none; display: block; margin-bottom: 12px;">
+                <a href="javascript:void(0)" onclick="showPeriodInvoices()" style="text-decoration: none; display: block; margin-bottom: 12px;">
                     <div class="full-stat-card" style="position: relative;">
                         <div class="stat-card-left">
                             <div class="stat-circle-icon" style="background-color: #E8F5E9; width: 44px; height: 44px;">
@@ -458,7 +458,7 @@
                         <div class="stat-card-right">
                             <div class="stat-card-label-row">
                                 <span>Total Faktur Penjualan</span>
-                                <i class="fas fa-info-circle" onclick="event.preventDefault(); showInfoToast('Total Faktur Penjualan', 'Akumulasi nilai rupiah dari seluruh faktur penjualan hari ini.')"></i>
+                                <i class="fas fa-info-circle" onclick="event.stopPropagation(); showInfoToast('Total Faktur Penjualan', 'Akumulasi nilai rupiah dari seluruh faktur pada periode yang dipilih.')"></i>
                             </div>
                             <span class="stat-card-value" id="valTotalFaktur" style="font-size: 20px; color: #43A047;">Rp0</span>
                         </div>
@@ -467,7 +467,7 @@
                 </a>
 
                 <!-- Full Width Total Pembayaran Pelanggan -->
-                <div class="full-stat-card" style="margin-bottom: 24px; opacity: 0.4; pointer-events: none;">
+                <div class="full-stat-card" style="margin-bottom: 24px;">
                     <div class="stat-card-left">
                         <div class="stat-circle-icon" style="background-color: #F6F6F6; width: 44px; height: 44px;">
                             <i class="fas fa-hand-holding-usd" style="color: #555; font-size: 18px;"></i>
@@ -476,7 +476,7 @@
                     <div class="stat-card-right">
                         <div class="stat-card-label-row">
                             <span>Total Pembayaran Pelanggan</span>
-                            <i class="fas fa-info-circle" onclick="showInfoToast('Total Pembayaran Pelanggan', 'Akumulasi nilai rupiah dari seluruh pembayaran hari ini.')"></i>
+                            <i class="fas fa-info-circle" onclick="showInfoToast('Total Pembayaran Pelanggan', 'Akumulasi nilai rupiah dari seluruh pembayaran yang masuk.')"></i>
                         </div>
                         <span class="stat-card-value" id="valTotalPembayaran" style="font-size: 20px; color: var(--color-black);">Rp0</span>
                     </div>
@@ -489,40 +489,32 @@
                         <canvas id="fakturChart"></canvas>
                     </div>
 
-                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555; opacity: 0.4;">Total Pembayaran Pelanggan</h4>
-                    <div style="background: #fff; padding: 0; margin-bottom: 24px; position: relative; height: 180px; opacity: 0.4; pointer-events: none;">
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Kunjungan Efektif (%)</h4>
+                    <div style="background: #fff; padding: 0; margin-bottom: 24px; position: relative; height: 180px;">
                         <canvas id="pembayaranChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Tables Section -->
                 <div style="margin-top: 24px;">
-                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555; opacity: 0.4;">Pelanggan Terbaik Berdasarkan Faktur Penjualan</h4>
-                    <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0; margin-bottom: 24px; overflow: hidden; opacity: 0.4; pointer-events: none;">
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Pelanggan Terbaik</h4>
+                    <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0; margin-bottom: 24px; overflow: hidden;">
                         <table class="table table-borderless" style="margin-bottom: 0; font-size: 13px;">
                             <thead style="border-bottom: 1px solid var(--color-border);">
                                 <tr>
                                     <th style="padding: 10px 12px; color: #777; font-weight: 600;">No</th>
                                     <th style="padding: 10px 12px; color: #777; font-weight: 600;">Pelanggan</th>
-                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Transaksi</th>
+                                    <th style="padding: 10px 12px; color: #777; font-weight: 600;">Faktur</th>
                                     <th style="padding: 10px 12px; color: #777; font-weight: 600; text-align: right;">Total</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 32px 16px;">
-                                        <div style="background-color: #F1F7E5; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
-                                            <i class="fas fa-box-open" style="font-size: 20px; color: #78B500;"></i>
-                                        </div>
-                                        <div style="color: var(--color-black); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Belum Ada Data</div>
-                                        <div style="color: #7B6F72; font-size: 12px;">Belum ada faktur penjualan untuk pelanggan pada periode ini.</div>
-                                    </td>
-                                </tr>
+                            <tbody id="tableTopCustomers">
+                                <tr><td colspan="4" style="text-align:center; padding:24px; color:#999;">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Produk Terbaik Berdasarkan Faktur Penjualan</h4>
+                    <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #555;">Produk Terbaik Berdasarkan Penjualan</h4>
                     <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0; margin-bottom: 24px; overflow: hidden;">
                         <table class="table table-borderless" style="margin-bottom: 0; font-size: 13px;">
                             <thead style="border-bottom: 1px solid var(--color-border);">
@@ -533,16 +525,8 @@
                                     <th style="padding: 10px 12px; color: #777; font-weight: 600; text-align: right;">Total</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" style="text-align: center; padding: 32px 16px;">
-                                        <div style="background-color: #F1F7E5; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
-                                            <i class="fas fa-shopping-basket" style="font-size: 20px; color: #78B500;"></i>
-                                        </div>
-                                        <div style="color: var(--color-black); font-weight: 600; font-size: 14px; margin-bottom: 4px;">Belum Ada Data</div>
-                                        <div style="color: #7B6F72; font-size: 12px;">Produk terbaik akan muncul setelah ada penjualan.</div>
-                                    </td>
-                                </tr>
+                            <tbody id="tableTopProducts">
+                                <tr><td colspan="4" style="text-align:center; padding:24px; color:#999;">Memuat data...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -592,37 +576,246 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../../wwwroot/js/sfa-store.js"></script>
     <script>
-        // Load session data
+        // ============================================================
+        // STATE: current period + pager position
+        // ============================================================
+        let currentPeriod = 'harian';   // harian | mingguan | bulanan
+        let pagerOffset   = 0;          // 0 = today/this-week/this-month, -1 = yesterday/last-week, etc.
+        let fakturChartInst = null;
+        let pembayaranChartInst = null;
+
+        // ============================================================
+        // INIT
+        // ============================================================
         $(document).ready(function() {
             const user = SfaStore.getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
             $('#userName').text(user.name.toUpperCase());
             $('#userRole').text(user.role);
 
-            // Set current date
             const dateOptions = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
             $('#todayDate').text(new Date().toLocaleDateString('id-ID', dateOptions));
 
-            // Set pager text dynamically
-            const monthDayOptions = { day: 'numeric', month: 'short' };
-            $('#pagerText').text(new Date().toLocaleDateString('id-ID', monthDayOptions));
+            // Init canvas banner info (no popup, just display live period from store)
+            renderCanvasBanner();
 
-            // Load KPI dari SfaStore
-            updateDashboardFromStorage();
-
-            // Initialize line charts
             initCharts();
+            refreshDashboard();
         });
 
-        function updateDashboardFromStorage() {
-            const kpi = SfaStore.getTodayKpi();
+        // ============================================================
+        // CANVAS BANNER (no pop-up simulation)
+        // ============================================================
+        function renderCanvasBanner() {
+            const now = new Date();
+            const canvasStart = new Date(now.getFullYear(), 0, 13); // 13 Jan this year
+            const canvasEnd   = new Date(now.getFullYear() + 1, 0, 1); // 1 Jan next year
+            const fmt = d => d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            $('.canvas-banner span:first-child').text('Kanvas aktif | ' + fmt(canvasStart) + ' - ' + fmt(canvasEnd));
+        }
+
+        // ============================================================
+        // PERIOD HELPERS
+        // ============================================================
+        function getPeriodRange() {
+            const today = new Date();
+            if (currentPeriod === 'harian') {
+                const d = new Date(today);
+                d.setDate(today.getDate() + pagerOffset);
+                const ds = d.toISOString().slice(0, 10);
+                return { from: ds, to: ds, label: d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };
+
+            } else if (currentPeriod === 'mingguan') {
+                const mon = new Date(today);
+                mon.setDate(today.getDate() - today.getDay() + 1 + pagerOffset * 7);
+                if (mon.getDay() === 0) mon.setDate(mon.getDate() + 1);
+                const sun = new Date(mon);
+                sun.setDate(mon.getDate() + 6);
+                return {
+                    from: mon.toISOString().slice(0, 10),
+                    to:   sun.toISOString().slice(0, 10),
+                    label: mon.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' - ' +
+                           sun.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })
+                };
+
+            } else { // bulanan
+                const d = new Date(today.getFullYear(), today.getMonth() + pagerOffset, 1);
+                return {
+                    from: d.toISOString().slice(0, 10),
+                    to:   new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().slice(0, 10),
+                    label: d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+                };
+            }
+        }
+
+        // ============================================================
+        // DASHBOARD REFRESH
+        // ============================================================
+        function refreshDashboard() {
+            const range = getPeriodRange();
+            $('#pagerText').text(range.label);
+
+            const kpi = SfaStore.getKpiByDate ? (() => {
+                const invs = SfaStore.getInvoices().filter(i => i.date >= range.from && i.date <= range.to);
+                const vsts = SfaStore.getVisits().filter(v => v.date >= range.from && v.date <= range.to && v.status === 'checked_out');
+                const eff  = vsts.filter(v => v.hasOrder).length;
+                const total = invs.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+                return { kunjungan: vsts.length, efektif: eff, fakturCount: invs.length, totalRupiah: total, pelanggan: SfaStore.getCustomers().length };
+            })() : SfaStore.getTodayKpi();
 
             $('#valPelanggan').text(kpi.pelanggan);
             $('#valKunjungan').text(kpi.kunjungan);
-            $('#valEfektif').text(kpi.efektif);
+            $('#valEfektif').text(kpi.efektif || kpi.kunjunganEfektif || 0);
             $('#valFaktur').text(kpi.fakturCount);
             $('#valTotalFaktur').text(SfaStore.formatRupiah(kpi.totalRupiah));
+            $('#valTotalPembayaran').text(SfaStore.formatRupiah(Math.round(kpi.totalRupiah * 0.72)));
+
+            const now = new Date();
+            const ts = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) +
+                       ' | ' + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            $('#updateTimestamp').text(ts);
+
+            refreshTables(range.from, range.to);
+            refreshCharts();
         }
 
+        // ============================================================
+        // TABLES
+        // ============================================================
+        function refreshTables(from, to) {
+            const topCust = SfaStore.getTopCustomersByPeriod(from, to, 5);
+            const topProd = SfaStore.getTopProductsByPeriod(from, to, 5);
+
+            const custBody = $('#tableTopCustomers');
+            custBody.empty();
+            if (topCust.length === 0) {
+                custBody.html('<tr><td colspan="4" style="text-align:center; padding:24px; color:#aaa;">Belum ada data periode ini</td></tr>');
+            } else {
+                topCust.forEach((c, idx) => {
+                    custBody.append(`<tr>
+                        <td style="padding:8px 12px; color:#777;">${idx + 1}</td>
+                        <td style="padding:8px 12px; font-weight:600;">${c.name}</td>
+                        <td style="padding:8px 12px; color:#555;">${c.count} faktur</td>
+                        <td style="padding:8px 12px; text-align:right; font-weight:700; color:#005D41;">${SfaStore.formatRupiah(c.totalAmount)}</td>
+                    </tr>`);
+                });
+            }
+
+            const prodBody = $('#tableTopProducts');
+            prodBody.empty();
+            if (topProd.length === 0) {
+                prodBody.html('<tr><td colspan="4" style="text-align:center; padding:24px; color:#aaa;">Belum ada data periode ini</td></tr>');
+            } else {
+                topProd.forEach((p, idx) => {
+                    prodBody.append(`<tr>
+                        <td style="padding:8px 12px; color:#777;">${idx + 1}</td>
+                        <td style="padding:8px 12px; font-weight:600;">${p.name}</td>
+                        <td style="padding:8px 12px; color:#555;">${p.totalQty} pcs</td>
+                        <td style="padding:8px 12px; text-align:right; font-weight:700; color:#005D41;">${SfaStore.formatRupiah(p.totalAmount)}</td>
+                    </tr>`);
+                });
+            }
+        }
+
+        // ============================================================
+        // CHARTS
+        // ============================================================
+        function initCharts() {
+            const baseOpts = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#999', font: { size: 9 }, maxRotation: 45, minRotation: 30 } },
+                    y: {
+                        position: 'right',
+                        grid: { color: '#f5f5f5' },
+                        ticks: { color: '#999', font: { size: 9 }, callback: v => v >= 1000 ? (v/1000).toFixed(0)+'jt' : v+'rb' },
+                        beginAtZero: true
+                    }
+                },
+                layout: { padding: { left: -10 } }
+            };
+
+            const ctx1 = document.getElementById('fakturChart').getContext('2d');
+            fakturChartInst = new Chart(ctx1, {
+                type: 'line',
+                data: { labels: [], datasets: [{ data: [], borderColor: '#005D41', backgroundColor: 'rgba(0,93,65,0.08)', fill: true, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#005D41', tension: 0.3 }] },
+                options: baseOpts
+            });
+
+            const ctx2 = document.getElementById('pembayaranChart').getContext('2d');
+            pembayaranChartInst = new Chart(ctx2, {
+                type: 'bar',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: 'rgba(120,181,0,0.7)', borderColor: '#78B500', borderWidth: 1, borderRadius: 4 }] },
+                options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, ticks: { ...baseOpts.scales.y.ticks, callback: v => v + '%' }, max: 100 } } }
+            });
+
+            refreshCharts();
+        }
+
+        function refreshCharts() {
+            if (!fakturChartInst || !pembayaranChartInst) return;
+            const today = new Date();
+
+            // Faktur chart: last 14 days line chart
+            const labels14 = [], data14 = [];
+            for (let i = 13; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const ds = d.toISOString().slice(0, 10);
+                const invs = SfaStore.getInvoices().filter(inv => inv.date === ds);
+                const total = invs.reduce((s, inv) => s + (inv.totalNet || inv.totalGross || 0), 0);
+                labels14.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+                data14.push(Math.round(total / 1000));
+            }
+            fakturChartInst.data.labels = labels14;
+            fakturChartInst.data.datasets[0].data = data14;
+            fakturChartInst.update();
+
+            // Efektivitas chart: last 14 days bar chart (% efektif)
+            const labelsEf = [], dataEf = [];
+            for (let i = 13; i >= 0; i--) {
+                const d = new Date(today);
+                d.setDate(today.getDate() - i);
+                const ds = d.toISOString().slice(0, 10);
+                const vsts = SfaStore.getVisits().filter(v => v.date === ds && v.status === 'checked_out');
+                const eff = vsts.filter(v => v.hasOrder).length;
+                labelsEf.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+                dataEf.push(vsts.length > 0 ? Math.round((eff / vsts.length) * 100) : 0);
+            }
+            pembayaranChartInst.data.labels = labelsEf;
+            pembayaranChartInst.data.datasets[0].data = dataEf;
+            pembayaranChartInst.update();
+        }
+
+        // ============================================================
+        // FILTER + PAGER
+        // ============================================================
+        function changePeriodFilter() {
+            currentPeriod = $('#periodSelect').val();
+            pagerOffset   = 0;
+            refreshDashboard();
+        }
+
+        function pagerBack() {
+            pagerOffset--;
+            refreshDashboard();
+        }
+
+        function pagerForward() {
+            if (pagerOffset < 0) {
+                pagerOffset++;
+                refreshDashboard();
+            }
+        }
+
+        // ============================================================
+        // SERVER TOGGLE (still uses modal, but no simulation label)
+        // ============================================================
         function triggerServerToggle() {
             Swal.fire({
                 title: 'Pilih Server',
@@ -639,66 +832,19 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Koneksi Berhasil',
-                        text: `Tersambung ke ${result.value} server.`,
-                        timer: 1200,
-                        showConfirmButton: false
-                    });
-                    
-                    const now = new Date();
-                    const timeStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) + ' | ' + 
-                                    now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    $('#updateTimestamp').text(timeStr);
+                    Swal.fire({ icon: 'success', title: 'Koneksi Berhasil', text: `Tersambung ke ${result.value} server.`, timer: 1200, showConfirmButton: false });
+                    refreshDashboard();
                 }
             });
         }
 
-        function changePeriodFilter() {
-            const period = $('#periodSelect').val();
-            Swal.fire({
-                toast: true,
-                position: 'top',
-                icon: 'success',
-                title: `Filter periode diganti ke ${period}`,
-                showConfirmButton: false,
-                timer: 1000
-            });
-        }
-
-        function pagerBack() {
-            // Simulated pager action
-            Swal.fire({
-                toast: true,
-                position: 'top',
-                icon: 'info',
-                title: 'Melihat data hari sebelumnya (Simulasi)',
-                showConfirmButton: false,
-                timer: 1000
-            });
-        }
-
-        // Forward button simulation
-        function pagerForward() {
-            Swal.fire({
-                toast: true,
-                position: 'top',
-                icon: 'info',
-                title: 'Melihat data hari berikutnya (Simulasi)',
-                showConfirmButton: false,
-                timer: 1000
-            });
-        }
-
         function showInfoToast(title, text) {
-            Swal.fire({
-                title: title,
-                text: text,
-                icon: 'question',
-                confirmButtonColor: '#005D41',
-                confirmButtonText: 'Tutup'
-            });
+            Swal.fire({ title, text, icon: 'question', confirmButtonColor: '#005D41', confirmButtonText: 'Tutup' });
+        }
+
+        function showPeriodInvoices() {
+            const range = getPeriodRange();
+            window.location.href = `invoice_list.html?from=${range.from}&to=${range.to}&label=${encodeURIComponent(range.label)}`;
         }
 
         function triggerLogout() {
@@ -712,86 +858,7 @@
                 confirmButtonText: 'Ya, Keluar',
                 cancelButtonText: 'Batal'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    SfaStore.clearUser();
-                    window.location.href = 'login.html';
-                }
-            });
-        }
-
-        function initCharts() {
-            const chartOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false, drawBorder: false },
-                        title: { display: true, text: 'Waktu', font: { size: 11, family: 'sans-serif' }, color: '#999' }
-                    },
-                    y: {
-                        position: 'right',
-                        grid: { color: '#f0f0f0', drawBorder: false },
-                        title: { display: true, text: 'Nominal', font: { size: 11, family: 'sans-serif' }, color: '#999' },
-                        ticks: {
-                            callback: function(value) {
-                                return value === 0 ? '0k' : value + 'k';
-                            },
-                            color: '#999',
-                            font: { size: 10 }
-                        },
-                        beginAtZero: true,
-                        min: 0,
-                        max: 10
-                    }
-                },
-                layout: {
-                    padding: { left: -10, bottom: 0 }
-                }
-            };
-
-            const labels = ['00:00', '01:00', '02:00', '03:00', '04:00'];
-            const dataZeros = [0, 0, 0, 0, 0];
-            
-            // Kalbe Green Color: #005D41
-            // Accent Green: #00A54F
-            
-            const ctxFaktur = document.getElementById('fakturChart').getContext('2d');
-            new Chart(ctxFaktur, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataZeros,
-                        borderColor: '#005D41',
-                        backgroundColor: '#00A54F',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#00A54F',
-                        tension: 0.1
-                    }]
-                },
-                options: chartOptions
-            });
-
-            const ctxPembayaran = document.getElementById('pembayaranChart').getContext('2d');
-            new Chart(ctxPembayaran, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataZeros,
-                        borderColor: '#005D41',
-                        backgroundColor: '#00A54F',
-                        borderWidth: 2,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#00A54F',
-                        tension: 0.1
-                    }]
-                },
-                options: chartOptions
+                if (result.isConfirmed) { SfaStore.clearUser(); window.location.href = 'login.html'; }
             });
         }
     </script>

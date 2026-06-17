@@ -259,6 +259,16 @@
         if (!product) { history.back(); return; }
 
         renderDetail();
+
+        // Only show bottom action button when in checkout transaction context
+        const backToOrder = params.get('backToOrder');
+        if (backToOrder === '1') {
+            $('.bottom-action').show();
+            $('.mobile-content').css('padding-bottom', '80px');
+        } else {
+            $('.bottom-action').hide();
+            $('.mobile-content').css('padding-bottom', '20px');
+        }
     });
 
     function renderDetail() {
