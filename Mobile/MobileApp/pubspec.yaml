@@ -80,6 +80,7 @@ flutter:
     - assets/www/wwwroot/areas/SKP/js/
     - assets/www/wwwroot/assets/css/
     - assets/www/wwwroot/assets/images/icons/
+    - assets/www/wwwroot/assets/images/outlets/
     - assets/www/wwwroot/assets/images/
     - assets/www/wwwroot/assets/js/
     - assets/www/wwwroot/css/maps/vertical-layout-light/

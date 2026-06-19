@@ -97,14 +97,7 @@
     </div>
 
     <!-- FAB Tambah Faktur -->
-    <a href="order_input.html" style="
-        position: absolute; bottom: 20px; right: 20px;
-        width: 52px; height: 52px; border-radius: 50%;
-        background: var(--color-accent); color: #fff;
-        display: flex; align-items: center; justify-content: center;
-        font-size: 24px; box-shadow: 0 4px 12px rgba(120,181,0,0.4);
-        text-decoration: none; z-index: 200;
-    " title="Tambah Faktur">
+    <a href="javascript:void(0)" onclick="goToAddOrder()" style="position: fixed; bottom: 24px; right: calc(50% - 225px + 16px); width: 56px; height: 56px; background: #005D41; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,93,65,0.4); cursor: pointer; z-index: 200; text-decoration: none; color: #fff; font-size: 24px;" title="Tambah Faktur">
         <i class="fas fa-plus"></i>
     </a>
 </div>
@@ -221,7 +214,26 @@
     }
 
     function goBack() {
-        window.location.href = 'dasbor.html';
+        const params = new URLSearchParams(window.location.search);
+        const backTo = params.get('backTo');
+        if (backTo === 'home') {
+            window.location.href = 'home.html';
+        } else if (backTo === 'dasbor') {
+            window.location.href = 'dasbor.html';
+        } else {
+            if (document.referrer.includes('home.html')) {
+                window.location.href = 'home.html';
+            } else if (document.referrer.includes('dasbor.html')) {
+                window.location.href = 'dasbor.html';
+            } else {
+                window.location.href = 'home.html';
+            }
+        }
+    }
+
+    function goToAddOrder() {
+        const currentUrl = window.location.pathname + window.location.search;
+        window.location.href = `order_input.html?backUrl=${encodeURIComponent(currentUrl)}`;
     }
 </script>
 </body>

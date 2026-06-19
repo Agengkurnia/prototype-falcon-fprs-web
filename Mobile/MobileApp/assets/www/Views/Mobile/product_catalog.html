@@ -173,9 +173,7 @@
             color: #555; padding-top: 6px;
         }
 
-        .empty-state {
-            text-align: center; padding: 48px 24px; color: var(--color-gray);
-        }
+        /* .empty-state styling now lives in shared mobile.css */
 
         /* Bottom Sheet Backdrop */
         .bottom-sheet-backdrop {
@@ -574,6 +572,11 @@
         renderGrid();
     }
 
+    function resetProductFilter() {
+        $('#searchInput').val('');
+        setCategory('Semua');
+    }
+
     function renderGrid() {
         const query = $('#searchInput').val().toLowerCase();
         const products = SfaStore.getProducts();
@@ -589,7 +592,11 @@
         $('#productCountLabel').text(`Jumlah: ${filtered.length}`);
 
         if (filtered.length === 0) {
-            container.html('<div class="empty-state"><i class="fas fa-box-open fs-2 d-block mb-2"></i>Produk tidak ditemukan.</div>');
+            const isFiltered = query !== '' || currentCat !== 'Semua';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetProductFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
+            container.html(`<div class="empty-state"><i class="fas fa-box-open"></i><div>Produk tidak ditemukan.</div>${resetBtn}</div>`);
             return;
         }
 

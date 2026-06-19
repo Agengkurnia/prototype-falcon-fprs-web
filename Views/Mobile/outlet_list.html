@@ -49,12 +49,23 @@
         }
         .outlet-card {
             background: #fff; border: 1px solid var(--color-border);
-            border-radius: 12px; padding: 14px 16px;
-            margin-bottom: 10px; display: block;
+            border-radius: 12px; padding: 12px 14px;
+            margin-bottom: 10px; display: flex; gap: 12px;
             text-decoration: none; color: inherit;
             transition: transform 0.1s;
+            align-items: center;
         }
         .outlet-card:active { transform: scale(0.98); }
+        .outlet-img-container {
+            width: 60px; height: 60px; border-radius: 8px; overflow: hidden; flex-shrink: 0;
+            border: 1px solid var(--color-border); background: var(--color-gray-light);
+        }
+        .outlet-img-container img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .outlet-info-container {
+            flex-grow: 1; min-width: 0;
+        }
         .outlet-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
         .outlet-name { font-size: 14px; font-weight: 700; }
         .outlet-meta { font-size: 12px; color: var(--color-gray); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
@@ -179,24 +190,31 @@
                 ? `<span class="badge-mobile badge-mobile-success">${c.status}</span>`
                 : `<span class="badge-mobile badge-mobile-warning">${c.status}</span>`;
 
+            const imgUrl = c.imageUrl || '../../wwwroot/assets/images/img_not_found.jpg';
+
             container.append(`
                 <a href="outlet_detail.html?id=${c.id}" class="outlet-card">
-                    <div class="outlet-header">
-                        <div>
-                            <div class="outlet-name">${c.name}</div>
-                            <div class="outlet-meta">
-                                <span>${c.id}</span> •
-                                <span>${c.channel || 'GT'}</span>
+                    <div class="outlet-img-container">
+                        <img src="${imgUrl}" alt="${c.name}" onerror="this.src='../../wwwroot/assets/images/img_not_found.jpg'"/>
+                    </div>
+                    <div class="outlet-info-container">
+                        <div class="outlet-header" style="margin-bottom: 4px;">
+                            <div style="min-width:0;">
+                                <div class="outlet-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</div>
+                                <div class="outlet-meta" style="margin-top: 1px;">
+                                    <span>${c.id}</span> •
+                                    <span>${c.channel || 'GT'}</span>
+                                </div>
+                            </div>
+                            <div class="text-end d-flex flex-column gap-1 align-items-end" style="flex-shrink:0;">
+                                ${statusBadge}
+                                ${gpsBadge}
                             </div>
                         </div>
-                        <div class="text-end d-flex flex-column gap-1 align-items-end">
-                            ${statusBadge}
-                            ${gpsBadge}
+                        <div class="outlet-meta" style="margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;">
+                            <i class="fas fa-map-marker-alt" style="color:var(--color-primary); margin-right: 4px;"></i>
+                            ${c.address || ''}, ${c.kota}
                         </div>
-                    </div>
-                    <div class="outlet-meta">
-                        <i class="fas fa-map-marker-alt" style="color:var(--color-primary);"></i>
-                        ${c.address || ''}, ${c.kota}
                     </div>
                 </a>
             `);

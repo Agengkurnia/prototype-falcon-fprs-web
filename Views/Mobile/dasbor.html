@@ -537,7 +537,7 @@
         </div>
 
         <!-- Floating Action Button for Sales/Orders -->
-        <a href="order_input.html" class="fab-btn">
+        <a href="javascript:void(0)" onclick="goToAddOrder()" class="fab-btn">
             <i class="fas fa-plus"></i>
         </a>
 
@@ -843,7 +843,12 @@
 
         function showPeriodInvoices() {
             const range = getPeriodRange();
-            window.location.href = `invoice_list.html?from=${range.from}&to=${range.to}&label=${encodeURIComponent(range.label)}`;
+            window.location.href = `invoice_list.html?from=${range.from}&to=${range.to}&label=${encodeURIComponent(range.label)}&backTo=dasbor`;
+        }
+
+        function goToAddOrder() {
+            const currentUrl = window.location.pathname + window.location.search;
+            window.location.href = `order_input.html?backUrl=${encodeURIComponent(currentUrl)}`;
         }
 
         function triggerLogout() {

@@ -152,7 +152,7 @@
         }
 
         .activity-desc {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--color-gray);
             margin-top: 2px;
         }
@@ -174,7 +174,7 @@
         .camera-overlay {
             position: absolute;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
             padding: 10px;
             pointer-events: none;
@@ -279,9 +279,9 @@
 
                 <!-- STATE 1: UNVISITED ACTIONS -->
                 <div id="unvisitedStateContainer">
-                    <div class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
+                    <div id="checkInHintBanner" class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        Anda berada di luar radius outlet (100 meter). Check-in akan memerlukan verifikasi alasan.
+                        <span id="checkInHintText">Anda berada di luar radius outlet (100 meter). Check-in memerlukan alasan & foto bukti.</span>
                     </div>
                     <button class="btn-mobile-primary" onclick="triggerCheckInWorkflow()">
                         <i class="fas fa-sign-in-alt me-2"></i>Check-In Kunjungan
@@ -520,9 +520,15 @@
                 $('#mapOutlet').css({ 'top': '48%', 'left': '52%' });
                 $('#mapSales').css({ 'top': '52%', 'left': '48%' });
                 $('.map-radius-circle').css({ 'top': '48%', 'left': '52%', 'width': '120px', 'height': '120px' });
+                // Pre-check-in hint: dalam radius → siap check-in
+                $('#checkInHintBanner').removeClass('alert-warning').addClass('alert-success');
+                $('#checkInHintText').html(`Anda dalam radius outlet (${outlet.distance}). Siap check-in langsung.`);
             } else {
                 $('#mapDistance').text(`Jarak: ${outlet.distance} (Di Luar Radius 100m)`);
                 $('.distance-info-badge').css('background-color', 'rgba(220, 53, 69, 0.85)');
+                // Pre-check-in hint: luar radius → butuh alasan + foto
+                $('#checkInHintBanner').removeClass('alert-success').addClass('alert-warning');
+                $('#checkInHintText').html(`Anda di luar radius outlet (${outlet.distance} &gt; 100m). Check-in memerlukan alasan & foto bukti.`);
             }
         }
 
@@ -584,11 +590,36 @@
                     doCheckIn(timeStr, 'Dalam Radius Outlet');
                 });
             } else {
+                showCheckInPreWarning();
+            }
+        }
+
+        // Peringatan dini sebelum check-in di luar radius: jelaskan syarat (alasan + foto)
+        // sebelum user masuk ke modal, agar tidak kaget di tengah alur.
+        function showCheckInPreWarning() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Check-In di Luar Radius',
+                html: `<div style="text-align:left; font-size:13px; line-height:1.5;">
+                        <p style="margin:0 0 8px;">Jarak Anda <strong>${outlet.distance}</strong> melampaui batas toleransi <strong>100 meter</strong>.</p>
+                        <p style="margin:0 0 4px;">Untuk melanjutkan, Anda perlu:</p>
+                        <ul style="margin:0; padding-left:18px;">
+                            <li>Memilih <strong>alasan</strong> remote check-in</li>
+                            <li>Mengambil <strong>foto bukti</strong> toko (wajib)</li>
+                        </ul>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Lanjutkan Check-In',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#005D41',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
                 photoTaken = false;
                 $('#cameraPreview').addClass('d-none');
                 $('#cameraOverlay').removeClass('d-none');
                 checkInReasonModal.show();
-            }
+            });
         }
 
         function doCheckIn(timeStr, reason) {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Faktur Penjualan - Falcon SFA Mobile</title>
+    <title>Rute Kunjungan - Falcon SFA Mobile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
@@ -41,7 +41,7 @@
             padding: 6px 14px;
             border: 1px solid var(--color-border);
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-gray);
             white-space: nowrap;
@@ -55,13 +55,13 @@
         /* Count Label */
         .count-label {
             padding: 8px 16px 4px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--color-gray);
             text-align: right;
         }
 
-        /* Invoice Card */
-        .invoice-card {
+        /* Visit Card */
+        .visit-card {
             background: #fff;
             border: 1px solid var(--color-border);
             border-radius: 12px;
@@ -74,88 +74,36 @@
             transition: transform 0.1s;
             box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
-        .invoice-card:active { transform: scale(0.98); }
+        .visit-card:active { transform: scale(0.98); }
 
-        .inv-header {
+        .card-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 6px;
         }
-        .inv-number {
+        .customer-name {
             font-size: 14px;
-            font-weight: 800;
-            color: var(--color-black);
-        }
-        .inv-badge {
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 11px;
             font-weight: 700;
+            color: var(--color-black);
+            max-width: 70%;
         }
-        .inv-badge-paid { background: #E0F7F0; color: #00A76F; }
-        .inv-badge-unpaid { background: #FFF3E0; color: #FF8F00; }
-        .inv-badge-pending { background: #FFF8E1; color: #F57F17; }
-
-        .inv-customer {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        
+        .card-body-row {
             font-size: 13px;
             color: var(--color-black);
-            margin-bottom: 2px;
-        }
-        .inv-customer i { color: #dc3545; font-size: 12px; }
-        .inv-customer-code {
-            font-size: 12px;
-            color: var(--color-gray);
-            margin-left: 18px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .inv-footer {
+        .card-footer-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            border-top: 1px solid #f0f2f5;
-            padding-top: 10px;
-        }
-        .inv-date-label {
-            font-size: 11px;
-            color: var(--color-gray);
-        }
-        .inv-date-value {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--color-black);
-        }
-        .inv-amount {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--color-black);
-            background: var(--color-gray-light);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        /* Sync Banner */
-        .sync-banner {
-            background: #FFF8E1;
-            border-top: 1px solid #FFE082;
-            padding: 8px 16px;
-            display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #F57F17;
-            margin-top: 6px;
-            border-radius: 0 0 12px 12px;
-            margin: -2px 16px 12px;
-            border: 1px solid #FFE082;
-            border-top: none;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 8px;
+            margin-top: 8px;
         }
-        .sync-banner i { font-size: 14px; }
 
         /* FAB */
         .fab {
@@ -178,7 +126,7 @@
     <!-- Header -->
     <div class="mobile-header">
         <button class="header-action" onclick="window.location.href='home.html'"><i class="fas fa-chevron-left"></i></button>
-        <span class="header-title">Faktur penjualan</span>
+        <span class="header-title">Rute Kunjungan</span>
         <button class="header-action" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
     </div>
 
@@ -186,7 +134,7 @@
     <div class="search-container d-none" id="searchBar" style="padding:10px 16px; background:#fff; border-bottom:1px solid var(--color-border);">
         <div style="background:var(--color-gray-light); border-radius:20px; display:flex; align-items:center; padding:0 14px;">
             <i class="fas fa-search" style="color:var(--color-gray); margin-right:8px;"></i>
-            <input type="text" id="searchInput" placeholder="Cari no. faktur atau pelanggan..." style="border:none; background:transparent; padding:10px 0; width:100%; font-size:13px; outline:none;" oninput="renderList()"/>
+            <input type="text" id="searchInput" placeholder="Cari nama outlet atau kode..." style="border:none; background:transparent; padding:10px 0; width:100%; font-size:13px; outline:none;" oninput="renderList()"/>
         </div>
     </div>
 
@@ -194,60 +142,95 @@
     <div class="filter-bar">
         <div class="filter-chip" onclick="openFilterPanel()"><i class="fas fa-sliders-h"></i> Filter</div>
         <div class="filter-chip active" id="chipAll" onclick="setStatusFilter('all')">Semua</div>
-        <div class="filter-chip" id="chipPaid" onclick="setStatusFilter('paid')">Paid</div>
-        <div class="filter-chip" id="chipUnpaid" onclick="setStatusFilter('unpaid')">Unpaid</div>
+        <div class="filter-chip" id="chipUnvisited" onclick="setStatusFilter('unvisited')">Belum Kunjungan</div>
+        <div class="filter-chip" id="chipVisited" onclick="setStatusFilter('visited')">Selesai</div>
     </div>
 
     <!-- Count -->
-    <div class="count-label">Jumlah: <strong id="invoiceCount">0</strong></div>
+    <div class="count-label">Jumlah Outlet: <strong id="visitCount">0</strong></div>
 
-    <!-- Invoice List -->
+    <!-- Visit List -->
     <div class="mobile-content no-nav" style="padding-bottom:80px;">
-        <div id="invoiceListContainer"></div>
+        <div id="visitListContainer"></div>
     </div>
 
-    <!-- FAB -->
-    <a href="order_add.html" class="fab"><i class="fas fa-plus"></i></a>
+    <!-- FAB: Tambah Kunjungan Luar Rute -->
+    <a href="outlet_list.html" class="fab" title="Kunjungan Luar Rute"><i class="fas fa-plus"></i></a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    let invoices = [];
+    const MOCK_DISTANCES = { "OL-10492": 0.2, "OL-10511": 0.6, "OL-10283": 1.1, "OL-10772": 0.05, "OL-10819": 2.5, "OL-10902": 0.8, "OL-11002": 2.6, "OL-11145": 0.7, "OL-11239": 1.9, "OL-11340": 2.2, "OL-11451": 1.3, "OL-11562": 1.2, "OL-11673": 1.5, "OL-11784": 2.7, "OL-11895": 0.5 };
+    const DEFAULT_ROUTE_IDS = ["OL-10492", "OL-10511", "OL-10283", "OL-10772", "OL-10819"];
+
+    let visits = [];
     let statusFilter = 'all';
 
     $(document).ready(function() {
-        loadInvoices();
+        loadVisits();
         renderList();
     });
 
-    function loadInvoices() {
-        // Get invoices from SfaStore (completed ones)
-        const stored = JSON.parse(localStorage.getItem('sfa_invoices') || '[]');
-        invoices = stored.map(inv => {
-            const cust = SfaStore.getCustomerById(inv.customerId);
-            return {
-                id: inv.id,
-                invoiceNo: 'INV-' + inv.id,
-                customerName: inv.customerName || (cust ? cust.name : inv.customerId),
-                customerId: inv.customerId,
-                date: inv.date || new Date().toISOString().slice(0,10),
-                createdAt: inv.createdAt || inv.date || new Date().toISOString(),
-                totalNet: inv.totalNet || inv.totalGross || 0,
-                status: inv.paymentStatus || 'paid',
-                synced: inv.synced || false,
-                items: inv.items || []
-            };
+    function loadVisits() {
+        // 1. Get all customers
+        const allCustomers = SfaStore.getCustomers();
+        
+        // 2. Get today's visits from storage
+        const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
+
+        // 3. Compile today's visit list
+        const list = [];
+
+        // Add default route customers
+        DEFAULT_ROUTE_IDS.forEach(id => {
+            const cust = allCustomers.find(c => c.id === id);
+            if (!cust) return;
+
+            const visitRecord = todayVisits.find(v => v.customerId === id);
+            list.push({
+                customerId: id,
+                customerName: cust.name,
+                address: cust.address || '-',
+                inRoute: true,
+                status: visitRecord ? visitRecord.status : 'unvisited',
+                visitId: visitRecord ? visitRecord.id : null,
+                distance: MOCK_DISTANCES[id] || 1.0,
+                visitRecord: visitRecord
+            });
         });
+
+        // Add out-of-route customers who have visit records today
+        todayVisits.forEach(v => {
+            if (DEFAULT_ROUTE_IDS.includes(v.customerId)) return; // already added
+
+            const cust = allCustomers.find(c => c.id === v.customerId);
+            list.push({
+                customerId: v.customerId,
+                customerName: cust ? cust.name : v.customerName,
+                address: cust ? cust.address : '-',
+                inRoute: false,
+                status: v.status,
+                visitId: v.id,
+                distance: MOCK_DISTANCES[v.customerId] || 1.5,
+                visitRecord: v
+            });
+        });
+
+        visits = list;
     }
 
     function setStatusFilter(filter) {
         statusFilter = filter;
         $('.filter-chip').removeClass('active');
         $(`#chip${filter.charAt(0).toUpperCase() + filter.slice(1)}`).addClass('active');
-        if (filter === 'all') $('#chipAll').addClass('active');
         renderList();
+    }
+
+    function resetVisitFilter() {
+        $('#searchInput').val('');
+        setStatusFilter('all'); // mengembalikan chip + render ulang
     }
 
     function toggleSearch() {
@@ -259,8 +242,8 @@
 
     function openFilterPanel() {
         Swal.fire({
-            title: 'Filter',
-            html: '<p style="font-size:13px; color:#666;">Filter lanjutan (tanggal, pelanggan) akan tersedia di versi berikutnya.</p>',
+            title: 'Filter Lanjutan',
+            html: '<p style="font-size:13px; color:#666;">Filter berdasarkan Jarak, Tipe Outlet, atau Rute Kunjungan akan tersedia di versi berikutnya.</p>',
             confirmButtonColor: '#005D41',
             confirmButtonText: 'Tutup'
         });
@@ -268,70 +251,99 @@
 
     function renderList() {
         const query = ($('#searchInput').val() || '').toLowerCase();
-        const container = $('#invoiceListContainer');
+        const container = $('#visitListContainer');
         container.empty();
 
-        let filtered = invoices.filter(inv => {
-            const matchSearch = inv.invoiceNo.toLowerCase().includes(query) ||
-                                inv.customerName.toLowerCase().includes(query) ||
-                                inv.customerId.toLowerCase().includes(query);
+        let filtered = visits.filter(v => {
+            const matchSearch = v.customerName.toLowerCase().includes(query) ||
+                                v.customerId.toLowerCase().includes(query);
             if (!matchSearch) return false;
+            
             if (statusFilter === 'all') return true;
-            return inv.status === statusFilter;
+            if (statusFilter === 'unvisited') return v.status === 'unvisited';
+            if (statusFilter === 'visited') return v.status === 'checked_out';
+            return true;
         });
 
-        // Sort by created date descending (newest first)
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        // Sort: checked_in first, then unvisited, then checked_out (completed)
+        const statusOrder = { 'checked_in': 1, 'unvisited': 2, 'checked_out': 3 };
+        filtered.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
-        $('#invoiceCount').text(filtered.length);
+        $('#visitCount').text(filtered.length);
 
         if (filtered.length === 0) {
+            const isFiltered = query !== '' || statusFilter !== 'all';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetVisitFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
             container.html(`
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-file-invoice fs-2 mb-2 d-block"></i>
-                    Belum ada faktur penjualan.<br>
-                    <small>Klik tombol + untuk membuat faktur baru.</small>
+                <div class="empty-state">
+                    <i class="fas fa-route"></i>
+                    <div>Tidak ada rute kunjungan ditemukan.</div>
+                    <small>${isFiltered ? 'Coba ubah atau reset filter pencarian.' : 'Tambahkan kunjungan luar rute lewat tombol (+).'}</small>
+                    ${resetBtn}
                 </div>
             `);
             return;
         }
 
-        filtered.forEach(inv => {
-            const badgeClass = inv.status === 'paid' ? 'inv-badge-paid' : 'inv-badge-unpaid';
-            const badgeText = inv.status === 'paid' ? 'Paid' : 'Unpaid';
+        filtered.forEach(v => {
+            let statusText = 'Belum Dikunjungi';
+            let badgeClass = 'badge-mobile-warning';
+            if (v.status === 'checked_in') {
+                statusText = 'Sedang Check-In';
+                badgeClass = 'badge-mobile-info';
+            } else if (v.status === 'checked_out') {
+                statusText = 'Selesai Kunjungan';
+                badgeClass = 'badge-mobile-success';
+            }
 
-            // Format date
-            const dateObj = new Date(inv.date);
-            const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-            const dateStr = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+            const routeText = v.inRoute ? 'Rute Harian' : 'Luar Rute';
+            const routeClass = v.inRoute ? 'bg-light text-dark border' : 'bg-secondary text-white';
 
-            // Format amount
-            const amountStr = new Intl.NumberFormat('id-ID').format(inv.totalNet);
-
-            const syncBanner = !inv.synced ? `
-                <div class="sync-banner" style="margin:-2px 0 0; border-radius:0 0 10px 10px; border:none; background:#FFF8E1; padding:8px 12px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Menunggu untuk dikirim ke back office</span>
-                </div>
+            // Outstanding AR from SfaStore
+            const ar = SfaStore.getOutstandingByCustomerId(v.customerId);
+            const arBadge = ar > 0 ? `
+                <span style="font-size:10px; font-weight:700; color:#dc3545; background:#FFF3E0; padding:2px 8px; border-radius:4px; margin-left: 6px; border: 1px solid rgba(220,53,69,0.15)">
+                    AR: ${SfaStore.formatRupiah(ar)}
+                </span>
             ` : '';
 
+            // Distance layout
+            const distColor = v.distance <= 0.1 ? '#00A76F' : '#FF8F00';
+            const distLabel = `Jarak: ${v.distance.toFixed(2)} km`;
+
+            // Card HTML
             container.append(`
-                <a href="invoice_detail.html?id=${inv.id}" class="invoice-card" style="${!inv.synced ? 'padding-bottom:0; border-radius:12px 12px 0 0; margin-bottom:0;' : ''}">
-                    <div class="inv-header">
-                        <span class="inv-number">${inv.invoiceNo}</span>
-                        <span class="inv-badge ${badgeClass}">${badgeText}</span>
+                <a href="visit_detail.html?id=${v.customerId}" class="visit-card" style="text-decoration:none; display:block;">
+                    <div class="card-header-row">
+                        <span class="customer-name">${v.customerName}</span>
+                        <span class="badge-mobile ${badgeClass}">${statusText}</span>
                     </div>
-                    <div class="inv-customer"><i class="fas fa-times-circle"></i> ${inv.customerName}</div>
-                    <div class="inv-customer-code">${inv.customerId}</div>
-                    <div class="inv-footer">
-                        <div>
-                            <div class="inv-date-label">Tanggal faktur</div>
-                            <div class="inv-date-value">${dateStr}</div>
+                    <div style="font-size:13px; color:var(--color-gray); margin-bottom:6px;">
+                        <i class="fas fa-store-alt me-1"></i> ${v.customerId}
+                        <span class="badge-mobile ${routeClass} ms-2" style="font-size:10px; padding:2px 6px;">${routeText}</span>
+                        ${arBadge}
+                    </div>
+                    <div class="card-body-row">
+                        <i class="fas fa-map-marker-alt text-danger me-1"></i> ${v.address}
+                    </div>
+                    <div class="card-footer-row">
+                        <div style="font-size:13px; font-weight:600; color:${distColor};">
+                            <i class="fas fa-street-view me-1"></i> ${distLabel}
                         </div>
-                        <div class="inv-amount">${amountStr}</div>
+                        ${v.status === 'checked_out' && v.visitRecord.hasOrder ? `
+                            <div style="font-size:13px; font-weight:700; color:#005D41;">
+                                <i class="fas fa-shopping-cart me-1"></i> Order: ${SfaStore.formatRupiah(v.visitRecord.orderAmount)}
+                            </div>
+                        ` : ''}
+                        ${v.status === 'checked_out' && v.visitRecord.hasNoOrderReason ? `
+                            <div style="font-size:13px; font-weight:700; color:#dc3545;">
+                                <i class="fas fa-times-circle me-1"></i> ${v.visitRecord.noOrderReason}
+                            </div>
+                        ` : ''}
                     </div>
                 </a>
-                ${!inv.synced ? '<div style="margin:0 16px 12px;background:#FFF8E1;border:1px solid #FFE082;border-top:none;border-radius:0 0 12px 12px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#F57F17;"><i class="fas fa-exclamation-triangle"></i> Menunggu untuk dikirim ke back office</div>' : ''}
             `);
         });
     }

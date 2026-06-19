@@ -700,7 +700,8 @@
         // Simulate activity SO / Collection
         function simulateActivity(type) {
             if (type === 'order') {
-                window.location.href = `order_input.html?outletId=${currentOutletId}`;
+                const currentUrl = window.location.pathname + window.location.search;
+                window.location.href = `order_input.html?outletId=${currentOutletId}&backUrl=${encodeURIComponent(currentUrl)}`;
             } else if (type === 'collection') {
                 // Redirect ke collection_input jika sudah dibuat, fallback ke modal
                 const arTotal = SfaStore.getOutstandingByCustomerId(currentOutletId);

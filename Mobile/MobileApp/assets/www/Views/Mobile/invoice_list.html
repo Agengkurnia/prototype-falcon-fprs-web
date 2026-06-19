@@ -45,7 +45,7 @@
         }
         .customer-name { font-size: 12px; color: var(--color-black); margin-top: 4px; font-weight: 600; }
         .invoice-date { font-size: 11px; color: var(--color-gray); margin-top: 2px; }
-        .empty-state { text-align: center; padding: 48px 24px; color: var(--color-gray); }
+        /* .empty-state styling now lives in shared mobile.css */
 
         /* Badge custom */
         .badge-mobile {
@@ -95,6 +95,18 @@
     <div class="mobile-content no-nav">
         <div class="p-16" id="listContainer"></div>
     </div>
+
+    <!-- FAB Tambah Faktur -->
+    <a href="order_input.html" style="
+        position: absolute; bottom: 20px; right: 20px;
+        width: 52px; height: 52px; border-radius: 50%;
+        background: var(--color-accent); color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 24px; box-shadow: 0 4px 12px rgba(120,181,0,0.4);
+        text-decoration: none; z-index: 200;
+    " title="Tambah Faktur">
+        <i class="fas fa-plus"></i>
+    </a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -108,9 +120,12 @@
 
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
-        fromDate = params.get('from') || new Date().toISOString().slice(0, 10);
-        toDate = params.get('to') || new Date().toISOString().slice(0, 10);
-        periodLabel = params.get('label') || 'Hari Ini';
+        // ponytail: default to 30 days so list is never empty on first open
+        const today = new Date().toISOString().slice(0, 10);
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+        fromDate = params.get('from') || thirtyDaysAgo;
+        toDate = params.get('to') || today;
+        periodLabel = params.get('label') || '30 Hari Terakhir';
 
         $('#periodLabel').text(periodLabel);
 
@@ -141,6 +156,11 @@
         renderList();
     }
 
+    function resetInvoiceSearch() {
+        $('#invSearchInput').val('');
+        renderList();
+    }
+
     function renderList() {
         const container = $('#listContainer');
         container.empty();
@@ -158,10 +178,14 @@
         updateSummary(filtered);
 
         if (filtered.length === 0) {
+            const resetBtn = searchQ !== ''
+                ? `<button class="empty-state-action" onclick="resetInvoiceSearch()"><i class="fas fa-rotate-left me-1"></i>Reset Pencarian</button>`
+                : '';
             container.html(`
                 <div class="empty-state">
-                    <i class="fas fa-file-invoice-dollar fs-1 mb-3 text-muted" style="opacity: 0.5;"></i>
+                    <i class="fas fa-file-invoice-dollar"></i>
                     <div>Tidak ada faktur ditemukan.</div>
+                    ${resetBtn}
                 </div>
             `);
             return;

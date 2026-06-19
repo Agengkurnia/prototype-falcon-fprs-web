@@ -579,16 +579,26 @@
                     timer: 2000,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = 'visit_list.html';
+                    handleRedirect();
                 });
             }
         });
-    }
+     }
 
-    /* ── BACK ───────────────────────────────────────────────── */
-    function goBack() {
-        window.location.href = 'visit_list.html';
-    }
+     /* ── BACK ───────────────────────────────────────────────── */
+     function handleRedirect() {
+         const params = new URLSearchParams(window.location.search);
+         const backUrl = params.get('backUrl');
+         if (backUrl) {
+             window.location.href = backUrl;
+         } else {
+             window.location.href = 'visit_list.html';
+         }
+     }
+
+     function goBack() {
+         handleRedirect();
+     }
 </script>
 </body>
 </html>

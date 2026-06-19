@@ -10,21 +10,21 @@
     // SEED DATA
     // =========================================================
     const SEED_CUSTOMERS = [
-        { id: 'OL-10492', name: 'Apotek Sehat Prima',      outletType: 'Apotek',         address: 'Jl. Kebayoran Baru No.12', kota: 'Jakarta Selatan', owner: 'Drs. Hendra S.',  phone: '0812-1111-2222', channel: 'GT', status: 'Aktif',     lat: -6.2200, lng: 106.8100, arBalance: 0,         top: 14 },
-        { id: 'OL-10511', name: 'Toko Ibu & Anak Melati',  outletType: 'Baby Shop',      address: 'Jl. Fatmawati Raya No.55', kota: 'Jakarta Selatan', owner: 'Siti Rahayu',     phone: '0813-3333-4444', channel: 'GT', status: 'Aktif',     lat: -6.2890, lng: 106.7940, arBalance: 1850000,   top: 30 },
-        { id: 'OL-10283', name: 'Apotek Roxy Salemba',     outletType: 'Apotek',         address: 'Jl. Salemba Raya No.15',  kota: 'Jakarta Pusat',   owner: 'H. Syamsul A.',   phone: '0821-5555-6666', channel: 'GT', status: 'Aktif',     lat: -6.2010, lng: 106.8440, arBalance: 3750000,   top: 30 },
-        { id: 'OL-10772', name: 'Klinik Bunda Mulia',      outletType: 'Klinik',         address: 'Jl. Menteng Raya No.88',  kota: 'Jakarta Pusat',   owner: 'dr. Susi W.',     phone: '0815-7777-8888', channel: 'MT', status: 'Aktif',     lat: -6.1960, lng: 106.8370, arBalance: 0,         top: 14 },
-        { id: 'OL-10819', name: 'Minimart Keluarga Jaya',  outletType: 'Outlet Regular', address: 'Jl. Tebet Raya No.101',   kota: 'Jakarta Selatan', owner: 'Budi Santoso',    phone: '0817-9999-0000', channel: 'GT', status: 'Aktif',     lat: -6.2250, lng: 106.8510, arBalance: 2100000,   top: 30 },
-        { id: 'OL-10902', name: 'RS Ibu Prima',            outletType: 'Rumah Sakit',    address: 'Jl. Kuningan No.22',      kota: 'Jakarta Selatan', owner: 'Dr. Andika P.',   phone: '0818-1212-3434', channel: 'MT', status: 'Aktif',     lat: -6.2310, lng: 106.8320, arBalance: 8500000,   top: 14 },
-        { id: 'OL-11002', name: 'Apotek 24 Jam Selaras',   outletType: 'Apotek',         address: 'Jl. Kemang Raya No.67',   kota: 'Jakarta Selatan', owner: 'Farida Hanum',    phone: '0819-5656-7878', channel: 'GT', status: 'Aktif',     lat: -6.2620, lng: 106.8130, arBalance: 0,         top: 30 },
-        { id: 'OL-11145', name: 'Posyandu Melati RW 05',   outletType: 'Posyandu',       address: 'Jl. Senopati No.10',      kota: 'Jakarta Selatan', owner: 'Ibu Kartini',     phone: '0822-2345-6789', channel: 'GT', status: 'Potential', lat: -6.2380, lng: 106.8090, arBalance: 0,         top: 0  },
-        { id: 'OL-11239', name: 'Apotek Kimia Farma 88',   outletType: 'Apotek',         address: 'Jl. Sudirman No.88',      kota: 'Jakarta Pusat',   owner: 'Manager KF88',    phone: '0821-8080-9090', channel: 'MT', status: 'Aktif',     lat: -6.2100, lng: 106.8200, arBalance: 5600000,   top: 14 },
-        { id: 'OL-11340', name: 'Toko Nutrisi Mama',       outletType: 'Baby Shop',      address: 'Jl. Blok M No.34',        kota: 'Jakarta Selatan', owner: 'Nurhayati',       phone: '0823-4567-8901', channel: 'GT', status: 'Aktif',     lat: -6.2440, lng: 106.7990, arBalance: 750000,    top: 30 },
-        { id: 'OL-11451', name: 'Koperasi Karyawan PLN',   outletType: 'Koperasi',       address: 'Jl. Gatot Subroto No.47', kota: 'Jakarta Selatan', owner: 'Kop. PLN Jaksel', phone: '0824-6789-0123', channel: 'GT', status: 'Aktif',     lat: -6.2280, lng: 106.8270, arBalance: 0,         top: 30 },
-        { id: 'OL-11562', name: 'Apotek Generik Sehat',    outletType: 'Apotek',         address: 'Jl. Pancoran No.9',       kota: 'Jakarta Selatan', owner: 'Agus Santoso',    phone: '0825-1111-2345', channel: 'GT', status: 'Aktif',     lat: -6.2555, lng: 106.8430, arBalance: 1200000,   top: 30 },
-        { id: 'OL-11673', name: 'Baby World Pondok Indah', outletType: 'Baby Shop',      address: 'Jl. Metro Pondok Indah',  kota: 'Jakarta Selatan', owner: 'Chandra W.',      phone: '0826-3456-7890', channel: 'MT', status: 'Aktif',     lat: -6.2680, lng: 106.7880, arBalance: 4200000,   top: 14 },
-        { id: 'OL-11784', name: 'Puskesmas Mampang',       outletType: 'Puskesmas',      address: 'Jl. Mampang Prapatan 12', kota: 'Jakarta Selatan', owner: 'dr. Teguh',       phone: '0827-5678-9012', channel: 'GT', status: 'Aktif',     lat: -6.2490, lng: 106.8160, arBalance: 0,         top: 0  },
-        { id: 'OL-11895', name: 'Apotek Kasih Ibu',        outletType: 'Apotek',         address: 'Jl. Cipete Raya No.23',   kota: 'Jakarta Selatan', owner: 'Dewi Lestari',    phone: '0828-7890-1234', channel: 'GT', status: 'Aktif',     lat: -6.2810, lng: 106.7960, arBalance: 0,         top: 30 }
+        { id: 'OL-10492', name: 'Apotek Sehat Prima',      outletType: 'Apotek',         address: 'Jl. Kebayoran Baru No.12', kota: 'Jakarta Selatan', owner: 'Drs. Hendra S.',  phone: '0812-1111-2222', channel: 'GT', status: 'Aktif',     lat: -6.2200, lng: 106.8100, arBalance: 0,         top: 14, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-10511', name: 'Toko Ibu & Anak Melati',  outletType: 'Baby Shop',      address: 'Jl. Fatmawati Raya No.55', kota: 'Jakarta Selatan', owner: 'Siti Rahayu',     phone: '0813-3333-4444', channel: 'GT', status: 'Aktif',     lat: -6.2890, lng: 106.7940, arBalance: 1850000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-10283', name: 'Apotek Roxy Salemba',     outletType: 'Apotek',         address: 'Jl. Salemba Raya No.15',  kota: 'Jakarta Pusat',   owner: 'H. Syamsul A.',   phone: '0821-5555-6666', channel: 'GT', status: 'Aktif',     lat: -6.2010, lng: 106.8440, arBalance: 3750000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-10772', name: 'Klinik Bunda Mulia',      outletType: 'Klinik',         address: 'Jl. Menteng Raya No.88',  kota: 'Jakarta Pusat',   owner: 'dr. Susi W.',     phone: '0815-7777-8888', channel: 'MT', status: 'Aktif',     lat: -6.1960, lng: 106.8370, arBalance: 0,         top: 14, imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-10819', name: 'Minimart Keluarga Jaya',  outletType: 'Outlet Regular', address: 'Jl. Tebet Raya No.101',   kota: 'Jakarta Selatan', owner: 'Budi Santoso',    phone: '0817-9999-0000', channel: 'GT', status: 'Aktif',     lat: -6.2250, lng: 106.8510, arBalance: 2100000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-10902', name: 'RS Ibu Prima',            outletType: 'Rumah Sakit',    address: 'Jl. Kuningan No.22',      kota: 'Jakarta Selatan', owner: 'Dr. Andika P.',   phone: '0818-1212-3434', channel: 'MT', status: 'Aktif',     lat: -6.2310, lng: 106.8320, arBalance: 8500000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-11002', name: 'Apotek 24 Jam Selaras',   outletType: 'Apotek',         address: 'Jl. Kemang Raya No.67',   kota: 'Jakarta Selatan', owner: 'Farida Hanum',    phone: '0819-5656-7878', channel: 'GT', status: 'Aktif',     lat: -6.2620, lng: 106.8130, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11145', name: 'Posyandu Melati RW 05',   outletType: 'Posyandu',       address: 'Jl. Senopati No.10',      kota: 'Jakarta Selatan', owner: 'Ibu Kartini',     phone: '0822-2345-6789', channel: 'GT', status: 'Potential', lat: -6.2380, lng: 106.8090, arBalance: 0,         top: 0,  imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-11239', name: 'Apotek Kimia Farma 88',   outletType: 'Apotek',         address: 'Jl. Sudirman No.88',      kota: 'Jakarta Pusat',   owner: 'Manager KF88',    phone: '0821-8080-9090', channel: 'MT', status: 'Aktif',     lat: -6.2100, lng: 106.8200, arBalance: 5600000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11340', name: 'Toko Nutrisi Mama',       outletType: 'Baby Shop',      address: 'Jl. Blok M No.34',        kota: 'Jakarta Selatan', owner: 'Nurhayati',       phone: '0823-4567-8901', channel: 'GT', status: 'Aktif',     lat: -6.2440, lng: 106.7990, arBalance: 750000,    top: 30, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-11451', name: 'Koperasi Karyawan PLN',   outletType: 'Koperasi',       address: 'Jl. Gatot Subroto No.47', kota: 'Jakarta Selatan', owner: 'Kop. PLN Jaksel', phone: '0824-6789-0123', channel: 'GT', status: 'Aktif',     lat: -6.2280, lng: 106.8270, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-11562', name: 'Apotek Generik Sehat',    outletType: 'Apotek',         address: 'Jl. Pancoran No.9',       kota: 'Jakarta Selatan', owner: 'Agus Santoso',    phone: '0825-1111-2345', channel: 'GT', status: 'Aktif',     lat: -6.2555, lng: 106.8430, arBalance: 1200000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11673', name: 'Baby World Pondok Indah', outletType: 'Baby Shop',      address: 'Jl. Metro Pondok Indah',  kota: 'Jakarta Selatan', owner: 'Chandra W.',      phone: '0826-3456-7890', channel: 'MT', status: 'Aktif',     lat: -6.2680, lng: 106.7880, arBalance: 4200000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-11784', name: 'Puskesmas Mampang',       outletType: 'Puskesmas',      address: 'Jl. Mampang Prapatan 12', kota: 'Jakarta Selatan', owner: 'dr. Teguh',       phone: '0827-5678-9012', channel: 'GT', status: 'Aktif',     lat: -6.2490, lng: 106.8160, arBalance: 0,         top: 0,  imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-11895', name: 'Apotek Kasih Ibu',        outletType: 'Apotek',         address: 'Jl. Cipete Raya No.23',   kota: 'Jakarta Selatan', owner: 'Dewi Lestari',    phone: '0828-7890-1234', channel: 'GT', status: 'Aktif',     lat: -6.2810, lng: 106.7960, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' }
     ];
 
     const SEED_PRODUCTS = [
@@ -182,7 +182,7 @@
         CUSTOMERS:   'sfa_customers',
         PRODUCTS:    'sfa_products',
         SYNC_QUEUE:  'sfa_sync_queue',
-        SEEDED:      'sfa_seeded_v7_today'
+        SEEDED:      'sfa_seeded_v8_today'
     };
 
     // =========================================================
@@ -216,7 +216,7 @@
         write(KEYS.INVOICES,    buildSeedInvoices());
         write(KEYS.SYNC_QUEUE,  []);
         write(KEYS.SEEDED,      todayString);
-        console.log('[SfaStore] Seed data v7 (1 Year with Today) loaded/refreshed for ' + todayString);
+        console.log('[SfaStore] Seed data v8 (1 Year with Today) loaded/refreshed for ' + todayString);
     }
 
     // Generate 3 months of realistic historical invoice + visit data
