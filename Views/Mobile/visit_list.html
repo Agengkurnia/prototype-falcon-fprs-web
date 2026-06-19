@@ -41,7 +41,7 @@
             padding: 6px 14px;
             border: 1px solid var(--color-border);
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-gray);
             white-space: nowrap;
@@ -55,7 +55,7 @@
         /* Count Label */
         .count-label {
             padding: 8px 16px 4px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--color-gray);
             text-align: right;
         }
@@ -90,7 +90,7 @@
         }
         
         .card-body-row {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--color-black);
             margin-bottom: 8px;
             line-height: 1.4;
@@ -228,6 +228,11 @@
         renderList();
     }
 
+    function resetVisitFilter() {
+        $('#searchInput').val('');
+        setStatusFilter('all'); // mengembalikan chip + render ulang
+    }
+
     function toggleSearch() {
         $('#searchBar').toggleClass('d-none');
         if (!$('#searchBar').hasClass('d-none')) {
@@ -267,11 +272,16 @@
         $('#visitCount').text(filtered.length);
 
         if (filtered.length === 0) {
+            const isFiltered = query !== '' || statusFilter !== 'all';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetVisitFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
             container.html(`
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-route fs-2 mb-2 d-block"></i>
-                    Tidak ada rute kunjungan ditemukan.<br>
-                    <small>Coba ubah filter atau tambahkan kunjungan luar rute (+).</small>
+                <div class="empty-state">
+                    <i class="fas fa-route"></i>
+                    <div>Tidak ada rute kunjungan ditemukan.</div>
+                    <small>${isFiltered ? 'Coba ubah atau reset filter pencarian.' : 'Tambahkan kunjungan luar rute lewat tombol (+).'}</small>
+                    ${resetBtn}
                 </div>
             `);
             return;
@@ -310,7 +320,7 @@
                         <span class="customer-name">${v.customerName}</span>
                         <span class="badge-mobile ${badgeClass}">${statusText}</span>
                     </div>
-                    <div style="font-size:12px; color:var(--color-gray); margin-bottom:6px;">
+                    <div style="font-size:13px; color:var(--color-gray); margin-bottom:6px;">
                         <i class="fas fa-store-alt me-1"></i> ${v.customerId}
                         <span class="badge-mobile ${routeClass} ms-2" style="font-size:10px; padding:2px 6px;">${routeText}</span>
                         ${arBadge}
@@ -319,16 +329,16 @@
                         <i class="fas fa-map-marker-alt text-danger me-1"></i> ${v.address}
                     </div>
                     <div class="card-footer-row">
-                        <div style="font-size:11px; font-weight:600; color:${distColor};">
+                        <div style="font-size:13px; font-weight:600; color:${distColor};">
                             <i class="fas fa-street-view me-1"></i> ${distLabel}
                         </div>
                         ${v.status === 'checked_out' && v.visitRecord.hasOrder ? `
-                            <div style="font-size:12px; font-weight:700; color:#005D41;">
+                            <div style="font-size:13px; font-weight:700; color:#005D41;">
                                 <i class="fas fa-shopping-cart me-1"></i> Order: ${SfaStore.formatRupiah(v.visitRecord.orderAmount)}
                             </div>
                         ` : ''}
                         ${v.status === 'checked_out' && v.visitRecord.hasNoOrderReason ? `
-                            <div style="font-size:12px; font-weight:700; color:#dc3545;">
+                            <div style="font-size:13px; font-weight:700; color:#dc3545;">
                                 <i class="fas fa-times-circle me-1"></i> ${v.visitRecord.noOrderReason}
                             </div>
                         ` : ''}

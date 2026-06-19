@@ -205,15 +205,18 @@
     // SEED: Run once per session install
     // =========================================================
     function seedIfNeeded() {
-        if (read(KEYS.SEEDED)) return;
+        const lastSeed = read(KEYS.SEEDED);
+        const todayString = todayStr();
+        if (lastSeed === todayString) return;
+
         write(KEYS.CUSTOMERS,   SEED_CUSTOMERS);
         write(KEYS.PRODUCTS,    SEED_PRODUCTS);
         write(KEYS.COLLECTIONS, SEED_COLLECTIONS);
         write(KEYS.VISITS,      buildSeedVisits());
         write(KEYS.INVOICES,    buildSeedInvoices());
         write(KEYS.SYNC_QUEUE,  []);
-        write(KEYS.SEEDED, true);
-        console.log('[SfaStore] Seed data v7 (1 Year with Today) loaded.');
+        write(KEYS.SEEDED,      todayString);
+        console.log('[SfaStore] Seed data v7 (1 Year with Today) loaded/refreshed for ' + todayString);
     }
 
     // Generate 3 months of realistic historical invoice + visit data

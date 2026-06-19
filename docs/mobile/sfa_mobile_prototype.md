@@ -34,14 +34,25 @@ d:\Work\Source\Comsup\falcon\Prototype\
 │       ├── home.html                # Beranda utama (dashboard, detail kanvas, notifikasi)
 │       ├── dasbor.html              # Dasbor grafik & performa harian sales
 │       ├── visit_list.html          # Daftar Rute Kunjungan harian & filter status
-│       ├── visit_detail.html        # Detail outlet & alur Check-In GPS/Kamera
-│       ├── order_input.html         # Modul Sales Order (katalog, keranjang, promo)
-│       ├── invoice_list.html        # Daftar riwayat faktur penjualan periode terpilih
+│       ├── visit_detail.html        # Detail outlet & alur Check-In GPS/Kamera (Radius validation & early warning)
+│       ├── order_input.html         # Modul Sales Order (katalog lama)
+│       ├── order_add.html           # Modul input transaksi penjualan sales baru (UOM toggle, catalog filter, diskon)
+│       ├── invoice_list.html        # Daftar riwayat faktur penjualan periode terpilih (30 hari terakhir)
 │       ├── invoice_detail.html      # Detail review faktur penjualan (read-only)
 │       ├── collection_list.html     # Daftar piutang / AR outstanding pelanggan
-│       └── collection_input.html    # Modul input pencatatan pembayaran piutang
+│       ├── collection_input.html    # Modul input pencatatan pembayaran piutang
+│       ├── outlet_list.html         # Daftar seluruh outlet dengan filter kategori & pencarian
+│       ├── outlet_detail.html       # Informasi lengkap outlet dengan GPS coordinate mapping
+│       ├── outlet_add.html          # Form pendaftaran outlet baru lapangan
+│       ├── product_catalog.html     # Katalog produk grid responsif dengan info sisa stok
+│       ├── product_detail.html      # Detail produk & visual konversi UOM
+│       ├── profil.html              # Informasi akun sales, status sinkronisasi, & Dev Tools
+│       ├── restock_review.html      # Modul audit stok fisik di level outlet
+│       ├── sync_detail.html         # Detail antrean data sync offline
+│       └── target.html              # Dashboard pencapaian target KPI penjualan sales
 └── docs/
-    └── sfa_mobile_prototype.md      # Berkas dokumentasi ini
+    ├── sfa_mobile_prototype.md      # Berkas dokumentasi ini
+    └── project_overview.md          # Gambaran arsitektur proyek keseluruhan
 ```
 
 ---
@@ -78,12 +89,13 @@ d:\Work\Source\Comsup\falcon\Prototype\
   * **Luar Radius (> 100m)**: Sistem memunculkan **Warning Modal** yang mengharuskan salesman memilih alasan remote check-in (*Toko Tutup*, *Alamat GPS Salah*, *Call/Telesales*, dsb.) serta mengambil foto bukti fisik toko.
 * **Simulasi Kamera Bukti**: Salesman mengeklik kotak kamera untuk menyimulasikan pengambilan foto tampak depan toko sebelum diperbolehkan menekan tombol Check-In.
 
-### E. Aktivitas Kunjungan & Sales Order (`order_input.html`)
+### E. Aktivitas Kunjungan & Sales Order (`order_input.html` & `order_add.html`)
 * **Aktivitas Check-In**: Terdiri atas tombol *Sales Order*, *Penagihan AR*, *Tidak Beli (No Order Reason)*, dan *Check-Out*.
 * **Sales Order Catalog**:
   * Filter kategori produk cepat (Minuman, Susu Formula, Susu Anak, Makanan Bayi).
   * Pencarian produk secara instan.
   * **UOM Toggle**: Pilihan satuan jual per item antara **Pcs** dan **Karton**.
+  * **Quick Stepper**: Mengetuk `+`/`-` pada list langsung menambahkan satuan *Pcs* secara instant.
 * **Keranjang Belanja**:
   * Pratinjau daftar belanja lengkap dengan konversi otomatis (Karton ke Pcs).
   * **Diskon Otomatis**: Potongan harga 5% terhitung otomatis di ringkasan pembayaran jika total order melebihi Rp 200.000.
@@ -91,6 +103,31 @@ d:\Work\Source\Comsup\falcon\Prototype\
 * **Aturan Bisnis Selesai Kunjungan**:
   * Salesman **tidak dapat melakukan Check-Out** kunjungan jika belum ada transaksi (Sales Order/Penagihan) atau belum memilih alasan "Tidak Beli".
   * Setelah check-out dikonfirmasi, ringkasan kunjungan (jam masuk/keluar, total order) dicatat dan disimpan ke `localStorage`.
+
+### F. Katalog Produk & Detail (`product_catalog.html` & `product_detail.html`)
+* Grid layout responsif yang menampilkan nama produk, harga dasar per pcs/karton, kategori, visual gambar asli (dengan fallback icon box jika patah), konversi satuan UOM (Karton, Box, Pcs) dan status stok produk.
+
+### G. Daftar Seluruh Pelanggan & Geotagging (`outlet_list.html`, `outlet_detail.html`, `outlet_add.html`)
+* Mengakses seluruh basis data pelanggan di luar rute harian. Menyediakan peta Leaflet interaktif untuk memetakan koordinat latitude/longitude outlet, memperbarui koordinat GPS secara lokal (Geotagging), dan formulir registrasi outlet baru di lapangan.
+
+### H. Dashboard Target & Performa (`target.html`)
+* Grafik progress visual melingkar (*donut charts*) pencapaian target kunjungan, target Effective Call (EC), dan target nilai transaksi penjualan bulanan.
+
+### I. Audit Stok Fisik / Restock (`restock_review.html`)
+* Formulir pemeriksaan stok fisik produk di toko (*stock opname/restock check*) saat kunjungan untuk memantau perputaran barang.
+
+### J. Profil Canvasser & Dev Tools (`profil.html` & `sync_detail.html`)
+* Rincian session canvasser, status sinkronisasi master data, and antrean data sync offline. Dilengkapi dengan developer tools untuk melakukan force reset dan re-seed database secara manual.
+
+---
+
+## 3.1 Pembaruan Sistem & Polish UI/UX
+
+* **Auto-Refresh Seed Data**: Data tiruan di `sfa-store.js` akan otomatis melakukan regenerasi ulang jika mendeteksi hari baru, sehingga dasbor dan rute harian hari ini/kemarin tidak pernah kosong saat demo.
+* **Gaya Navigasi Semantik**: Navigasi bawah menggunakan tag `<nav class="mobile-nav">` dengan visual ikon outline SVG seragam dan tautan langsung ke halaman profil.
+* **Typographic Refinement**: Ukuran font kecil disesuaikan (11px/12px -> 12px/13px) demi meningkatkan keterbacaan teks di lapangan di bawah terik matahari.
+* **Penyatuan Desain Empty State**: Desain visual data kosong distandarisasi di file CSS global (`mobile.css`) lengkap dengan tombol cepat **Reset Filter**.
+* **Pre-Checkin Warning Modal**: Peringatan awal berbasis SweetAlert2 yang memandu sales mengenai keharusan melampirkan alasan check-in remote dan foto toko saat berada di luar radius outlet.
 
 ---
 

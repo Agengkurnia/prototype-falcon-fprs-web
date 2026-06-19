@@ -43,30 +43,23 @@ Berikut adalah status replikasi halaman dari SimpliDOTS SFA Android ke dalam fol
 | `LoginPage` | `Views/Mobile/login.html` | **Selesai** | Default user `SINGARAJA`, role `canvasser`, loading spinner, inisialisasi sesi sales ke `localStorage`. |
 | `HomePage` / `Beranda` | `Views/Mobile/home.html` | **Selesai** | Banner kanvas berjalan (dengan popup detail siklus), popup notifikasi interaktif, accordion sinkronisasi, menu circular (Faktur Penjualan, Pembayaran, Pelanggan, Produk, dll). |
 | `Dashboard` / `Dasbor` | `Views/Mobile/dasbor.html` | **Selesai** | Dropdown server, pager tanggal, grid metrik 2x2, total faktur penjualan yang menavigasi ke review daftar faktur (`invoice_list.html`) & detail (`invoice_detail.html`) dengan filter tanggal. |
-| `CustomerDaily` | `Views/Mobile/visit_list.html` | **Selesai** | Tab filter (Semua/Belum/Selesai), real-time search, badge piutang AR (merah menyala). |
-| `CustomerProfile` / `StorePage` | `Views/Mobile/visit_detail.html` | **Selesai** | Peta radius check-in, aturan check-in luar radius (alasan remote check-in + kamera bukti). |
-| `Order` / `ProductList` | `Views/Mobile/order_input.html` | **Selesai** | Filter kategori produk, pencarian produk, toggle UOM (Pcs/Karton), kalkulasi diskon otomatis (kotor > 200rb). |
+| `CustomerDaily` | `Views/Mobile/visit_list.html` | **Selesai** | Tab filter (Semua/Belum/Selesai), real-time search, badge piutang AR (merah menyala), reset filter cepat. |
+| `CustomerProfile` / `StorePage` | `Views/Mobile/visit_detail.html` | **Selesai** | Peta radius check-in, aturan check-in luar radius (early warning Swal + remote check-in reason + wajib kamera). |
+| `Order` / `ProductList` | `Views/Mobile/order_input.html` & `order_add.html` | **Selesai** | Filter kategori produk, pencarian produk, toggle UOM (Pcs/Karton), kalkulasi diskon otomatis, quick stepper kuantitas Pcs di list. |
 | `Collections` / `CollectionDetail`| `Views/Mobile/collection_list.html` & `collection_input.html` | **Selesai** | Daftar piutang/AR outstanding per pelanggan dengan status (Belum/Sebagian/Lunas) dan form pengisian nominal pembayaran. |
-| `InvoiceList` / `InvoiceDetail` | `Views/Mobile/invoice_list.html` & `invoice_detail.html` | **Selesai** | Daftar faktur terfilter tanggal dashboard dan review rincian barang/diskon secara read-only. |
-| `CustomerAll` / `GeoTagging` | *Belum ada* | **Belum** | *Rencana Opsi B (Geo Tag / Pelanggan)* |
+| `InvoiceList` / `InvoiceDetail` | `Views/Mobile/invoice_list.html` & `invoice_detail.html` | **Selesai** | Daftar faktur terfilter tanggal dashboard default 30 hari terakhir dan review rincian barang/diskon secara read-only. |
+| `CustomerAll` / `GeoTagging` | `Views/Mobile/outlet_list.html`, `outlet_detail.html`, `outlet_add.html` | **Selesai** | Daftar seluruh pelanggan basis data, detail outlet, registrasi outlet baru, update koordinat GPS via peta Leaflet. |
+| `ProductCatalog` | `Views/Mobile/product_catalog.html` & `product_detail.html` | **Selesai** | Grid katalog produk beserta konversi unit UOM dan sisa stok. |
+| `Target` | `Views/Mobile/target.html` | **Selesai** | Grafik ringkasan pencapaian KPI penjualan detail (Visit, EC, Value). |
+| `StockAudit` / `Restock` | `Views/Mobile/restock_review.html` | **Selesai** | Formulir audit dan input stok fisik di level outlet. |
+| `SyncViewModel` / `Sync Queue` | `Views/Mobile/sync_detail.html` | **Selesai** | Review detail antrean transaksi offline beserta visual progress sinkronisasi. |
+| `Profil` | `Views/Mobile/profil.html` | **Selesai** | Profil canvasser, status sinkronisasi, Developer Tools untuk Reset & Re-Seed data secara manual. |
 | `Delivery` / `DeliveryDetail` | *Belum ada* | **Belum** | *Rencana Opsi C (Surat Jalan Driver)* |
-| `Promo` | *Belum ada* | **Belum** | Informasi skema promo aktif di level sales. |
-| `Target` | *Belum ada* | **Belum** | Pencapaian target KPI penjualan detail. |
+| `Promo` | *Terintegrasi di SO* | **Selesai** | Informasi promo terintegrasi langsung di dalam menu pemesanan/order input. |
 
 ---
 
-## 🚀 Pilihan Modul Mobile untuk Replikasi Berikutnya
+## 🚀 Logika Pembaruan & Data Sync Otomatis
 
-Untuk melengkapi prototipe Falcon SFA Mobile agar semakin menyerupai fungsionalitas SimpliDOTS SFA Android asli, berikut adalah pilihan modul prioritas yang dapat kita scrape dan implementasikan:
+Untuk memastikan keandalan prototipe, sistem simulasi data local storage (`sfa-store.js`) sekarang dilengkapi dengan fitur **Auto-Refresh Seed Data** harian. Logika ini secara dinamis menggeser tanggal transaksi tiruan agar mencakup hari ini dan hari kemarin, memecahkan masalah dasbor kosong ketika hari berganti.
 
-### Opsi A: Modul Penagihan AR / Piutang (`Collections` & `CollectionDetail`)
-* **Alur Bisnis**: Salesman memilih menu **Penagihan** (baik dari menu utama atau saat check-in outlet). Halaman akan menampilkan daftar invoice jatuh tempo milik outlet tersebut. Salesman dapat menginput jumlah bayar, metode pembayaran (Tunai, Cek, Transfer), mengambil foto bukti pembayaran (jika cek/transfer), dan mencetak bukti tanda terima.
-* **Komponen yang Dibuat**: `Views/Mobile/collection_input.html` dan `Views/Mobile/collection_detail.html`.
-
-### Opsi B: Modul Data Outlet & Geo-Tagging (`CustomerAll` & `GeoTagging`)
-* **Alur Bisnis**: Salesman dapat melihat seluruh daftar outlet (tidak terbatas rute hari ini). Jika ada outlet baru di lapangan, salesman dapat mendaftarkannya (Outlet Baru / Potential Outlet), mengisi formulir data diri toko, memotret toko, serta mengambil titik koordinat GPS terkini (Geo-tagging) menggunakan peta interaktif.
-* **Komponen yang Dibuat**: `Views/Mobile/outlet_list.html` dan `Views/Mobile/outlet_add.html`.
-
-### Opsi C: Modul Pengiriman Barang / Delivery (`Delivery` & `DeliveryDetail`)
-* **Alur Bisnis**: Khusus untuk role Driver/Helper. Driver melihat daftar surat jalan (delivery order) hari ini, mengonfirmasi barang siap muat, menandai status pengiriman per outlet (Terkirim, Terkirim Sebagian, Gagal Kirim + Alasan), dan melakukan serah terima pembayaran jika COD.
-* **Komponen yang Dibuat**: `Views/Mobile/delivery_list.html` dan `Views/Mobile/delivery_detail.html`.

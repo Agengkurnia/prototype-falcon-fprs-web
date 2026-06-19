@@ -140,6 +140,11 @@
         renderList();
     }
 
+    function resetOutletFilter() {
+        $('#searchInput').val('');
+        setFilter('semua');
+    }
+
     function renderList() {
         const query = $('#searchInput').val().toLowerCase();
         const customers = SfaStore.getCustomers();
@@ -156,7 +161,11 @@
         });
 
         if (filtered.length === 0) {
-            container.html('<div class="text-center py-5 text-muted"><i class="fas fa-map-marker-slash fs-2 d-block mb-2"></i>Tidak ada outlet ditemukan.</div>');
+            const isFiltered = query !== '' || currentFilter !== 'semua';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetOutletFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
+            container.html(`<div class="empty-state"><i class="fas fa-map-marker-slash"></i><div>Tidak ada outlet ditemukan.</div>${resetBtn}</div>`);
             return;
         }
 

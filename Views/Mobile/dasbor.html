@@ -54,7 +54,7 @@
             border: 1px solid rgba(255, 255, 255, 0.25);
             border-radius: 8px;
             padding: 8px 12px;
-            font-size: 12px;
+            font-size: 13px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -111,7 +111,7 @@
         }
 
         .last-updated-text {
-            font-size: 11px;
+            font-size: 12px;
             color: #7B6F72;
             margin-bottom: 20px;
         }
@@ -171,7 +171,7 @@
             border: none;
             color: var(--color-black);
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             padding: 2px 6px;
             display: flex;
             align-items: center;
@@ -238,7 +238,7 @@
             align-items: center;
             gap: 4px;
             color: #7B6F72;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 500;
             margin-bottom: 2px;
         }
@@ -542,9 +542,9 @@
         </a>
 
         <!-- Bottom Navigation Bar (Dasbor Active) -->
-        <div class="mobile-nav">
-            <a href="dasbor.html" class="mobile-nav-item active">
-                <svg viewBox="0 0 24 24">
+        <nav class="mobile-nav" aria-label="Navigasi utama">
+            <a href="dasbor.html" class="mobile-nav-item active" aria-current="page">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="9" rx="1"></rect>
                     <rect x="14" y="3" width="7" height="5" rx="1"></rect>
                     <rect x="14" y="12" width="7" height="9" rx="1"></rect>
@@ -553,21 +553,20 @@
                 <span>Dasbor</span>
             </a>
             <a href="home.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
                 <span>Beranda</span>
             </a>
-            <a href="javascript:void(0)" class="mobile-nav-item" onclick="triggerLogout()">
-                <svg viewBox="0 0 24 24">
+            <a href="profil.html" class="mobile-nav-item">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
                 <span>Profil</span>
             </a>
-        </div>
+        </nav>
     </div>
 
     <!-- JS Dependencies -->

@@ -4,7 +4,8 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>Management Rute - Falcon FPRS</title>
-    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
     <style>
 
         @font-face {
@@ -261,7 +262,7 @@
             top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10;
+            z-index: 1001; /* must exceed #map's z-index (0) to render above its isolated stacking context */
             background: #fff;
             padding: 3px;
             border-radius: 20px;
@@ -290,6 +291,14 @@
         #map {
             width: 100%;
             height: 100%;
+            position: relative;
+            z-index: 0; /* creates isolated stacking context — Leaflet's internal z-indexes (up to 1000) stay contained inside */
+        }
+
+        /* Hide Leaflet Routing Machine's default itinerary panel —
+           sequence/order is already shown in the "Urutan Pelanggan" side panel */
+        .leaflet-routing-container {
+            display: none !important;
         }
 
         /* Section 2 - Weekly Management */
@@ -563,8 +572,8 @@
                     <!-- PANEL 4: MAP TRAJECTORY -->
                     <div class="route-panel-col-map">
                         <div class="map-type-floating">
-                            <button class="btn-map-type active-type" id="btnOSM">OpenStreetMap</button>
-                            <button class="btn-map-type" id="btnGmaps">Google Map</button>
+                            <button class="btn-map-type active-type" id="btnOSM">Street Map</button>
+                            <button class="btn-map-type" id="btnGmaps">Satelit</button>
                         </div>
                         <div id="map"></div>
                     </div>
@@ -646,7 +655,8 @@
 
 
     </div>
-    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
         document.addEventListener('layoutReady', () => {
@@ -657,7 +667,9 @@
 
     let activeRouteId = null;
     let map;
-    let mapMarkers = [];
+    let osmTile, altTile;
+    let routingControl = null;
+    let fallbackLayers = [];
     let customersList = [];
     let employeesList = [];
     let currentWeekTab = 'week1';
@@ -866,24 +878,63 @@
         localStorage.setItem(KEY_WEEKLY_ASSIGN, JSON.stringify(assignments));
     }
 
-    // Initialize MapLibre
+    // Initialize Leaflet
     function initMap() {
-        map = new maplibregl.Map({
-            container: 'map',
-            style: 'https://tiles.openfreemap.org/styles/liberty',
-            center: [106.8271, -6.1754],
-            zoom: 11
+        map = L.map('map').setView([-6.1754, 106.8271], 11);
+
+        osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+        }).addTo(map);
+
+        altTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri — Source: Esri, USGS, NOAA',
+            maxZoom: 19
         });
-        map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+    }
+
+    function makeNumberedIcon(num) {
+        return L.divIcon({
+            html: `<div style="width:22px;height:22px;border-radius:50%;background:#005d41;color:#fff;font-size:0.7rem;font-weight:bold;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);">${num}</div>`,
+            className: '',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+        });
     }
 
     function clearRouteLayer() {
-        mapMarkers.forEach(m => m.remove());
-        mapMarkers = [];
+        if (routingControl) {
+            map.removeControl(routingControl);
+            routingControl = null;
+        }
+        fallbackLayers.forEach(layer => layer.remove());
+        fallbackLayers = [];
+    }
 
-        if (map.getLayer('route-line')) map.removeLayer('route-line');
-        if (map.getLayer('route-casing')) map.removeLayer('route-casing');
-        if (map.getSource('route')) map.removeSource('route');
+    // Fallback: draw a straight dashed red line when OSRM road routing fails
+    // (e.g. no internet, demo server rate-limited, or no road found between points)
+    function drawStraightFallback(latlngs) {
+        fallbackLayers.forEach(layer => layer.remove());
+        fallbackLayers = [];
+
+        const casing = L.polyline(latlngs, {
+            color: '#fff', weight: 7, dashArray: '1,8',
+            lineJoin: 'round', lineCap: 'round'
+        }).addTo(map);
+        fallbackLayers.push(casing);
+
+        const line = L.polyline(latlngs, {
+            color: '#dc3545', weight: 3, dashArray: '6,6',
+            lineJoin: 'round', lineCap: 'round'
+        }).addTo(map);
+        fallbackLayers.push(line);
+
+        latlngs.forEach((latlng, index) => {
+            const marker = L.marker(latlng, { icon: makeNumberedIcon(index + 1) }).addTo(map);
+            fallbackLayers.push(marker);
+        });
+
+        map.fitBounds(L.latLngBounds(latlngs), { padding: [50, 50], maxZoom: 14 });
     }
 
     function drawRouteOnMap() {
@@ -893,81 +944,49 @@
         const items = getRouteItems(activeRouteId);
         if (items.length === 0) return;
 
-        // Map assigned codes to coordinates
-        const coords = [];
+        // customerCoordinates stores [lng, lat]; Leaflet needs [lat, lng]
+        const latlngs = [];
         items.forEach(code => {
             if (customerCoordinates[code]) {
-                coords.push(customerCoordinates[code]);
+                const c = customerCoordinates[code];
+                latlngs.push(L.latLng(c[1], c[0]));
             }
         });
 
-        if (coords.length === 0) return;
+        if (latlngs.length === 0) return;
 
-        // Draw LineString if coordinates > 1
-        if (coords.length > 1) {
-            map.addSource('route', {
-                'type': 'geojson',
-                'data': {
-                    'type': 'Feature',
-                    'properties': {},
-                    'geometry': {
-                        'type': 'LineString',
-                        'coordinates': coords
-                    }
-                }
-            });
-
-            // White border casing
-            map.addLayer({
-                'id': 'route-casing',
-                'type': 'line',
-                'source': 'route',
-                'layout': { 'line-join': 'round', 'line-cap': 'round' },
-                'paint': {
-                    'line-color': '#fff',
-                    'line-width': 8
-                }
-            });
-
-            // Green line
-            map.addLayer({
-                'id': 'route-line',
-                'type': 'line',
-                'source': 'route',
-                'layout': { 'line-join': 'round', 'line-cap': 'round' },
-                'paint': {
-                    'line-color': '#005d41',
-                    'line-width': 4
-                }
-            });
+        // Single point: just drop a marker, nothing to route
+        if (latlngs.length === 1) {
+            fallbackLayers.push(L.marker(latlngs[0], { icon: makeNumberedIcon(1) }).addTo(map));
+            map.setView(latlngs[0], 14);
+            return;
         }
 
-        // Add markers
-        coords.forEach((c, index) => {
-            const el = document.createElement('div');
-            el.style.width = '22px';
-            el.style.height = '22px';
-            el.style.borderRadius = '50%';
-            el.style.backgroundColor = '#005d41';
-            el.style.color = '#fff';
-            el.style.fontSize = '0.7rem';
-            el.style.fontWeight = 'bold';
-            el.style.display = 'flex';
-            el.style.alignItems = 'center';
-            el.style.justifyContent = 'center';
-            el.style.border = '2px solid #fff';
-            el.innerText = index + 1;
+        // Draw real road-following route via OSRM (Leaflet Routing Machine)
+        routingControl = L.Routing.control({
+            waypoints: latlngs,
+            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1' }),
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            fitSelectedRoutes: true,
+            show: false,
+            lineOptions: {
+                styles: [
+                    { color: '#fff', weight: 8 },
+                    { color: '#005d41', weight: 4 }
+                ]
+            },
+            createMarker: function(i, waypoint) {
+                return L.marker(waypoint.latLng, { icon: makeNumberedIcon(i + 1) });
+            }
+        }).addTo(map);
 
-            const m = new maplibregl.Marker({ element: el })
-                .setLngLat(c)
-                .addTo(map);
-            mapMarkers.push(m);
+        // Fall back to a straight line if OSRM is unreachable or finds no road route
+        routingControl.on('routingerror', function() {
+            clearRouteLayer();
+            drawStraightFallback(latlngs);
         });
-
-        // Fit map bounds
-        const bounds = new maplibregl.LngLatBounds();
-        coords.forEach(c => bounds.extend(c));
-        map.fitBounds(bounds, { padding: 50, maxZoom: 14 });
     }
 
     function renderRoutesList(query = '') {
@@ -1932,17 +1951,23 @@
             applyBulkAssignment(routeId);
         });
 
-        // Map switches
+        // Map tile layer switches
         $('#btnOSM').on('click', function() {
             $('.btn-map-type').removeClass('active-type');
             $(this).addClass('active-type');
-            map.setStyle('https://tiles.openfreemap.org/styles/liberty');
+            if (!map.hasLayer(osmTile)) {
+                map.removeLayer(altTile);
+                map.addLayer(osmTile);
+            }
         });
 
         $('#btnGmaps').on('click', function() {
             $('.btn-map-type').removeClass('active-type');
             $(this).addClass('active-type');
-            map.setStyle('https://tiles.openfreemap.org/styles/bright');
+            if (!map.hasLayer(altTile)) {
+                map.removeLayer(osmTile);
+                map.addLayer(altTile);
+            }
         });
     });
 

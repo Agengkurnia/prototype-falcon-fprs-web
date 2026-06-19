@@ -57,6 +57,15 @@ Prototype/
 │       ├── invoice_detail.html # Detail review faktur penjualan (read-only)
 │       ├── collection_list.html # Daftar piutang / AR outstanding pelanggan
 │       └── collection_input.html # Pencatatan pembayaran tagihan piutang
+│       ├── outlet_list.html    # Daftar pelanggan basis data & filter category
+│       ├── outlet_detail.html  # Detail profile outlet & geotagging map
+│       ├── outlet_add.html     # Registrasi outlet baru lapangan
+│       ├── product_catalog.html # Grid katalog produk & stock info
+│       ├── product_detail.html # Detail produk & UOM info
+│       ├── profil.html         # Detail akun canvasser & Developer Tools
+│       ├── restock_review.html # Form audit & input stok fisik outlet
+│       ├── sync_detail.html    # Log & antrean data sync offline
+│       └── target.html         # Target KPI bulanan canvasser (Visit, EC, Value)
 ├── Mobile/
 │   └── MobileApp/              # Proyek Flutter WebView Wrapper
 │       ├── android/            # Kode native Android
@@ -191,5 +200,5 @@ Pustaka pendukung dimuat melalui CDN untuk keefektifan akses, atau disalin secar
 | **FontAwesome 6.4.2** | Ikon visual tombol dan menu sidebar | Digunakan di Web & Mobile |
 | **jQuery 3.7.1** | Manipulasi DOM & pemrosesan event | Digunakan di Web & Mobile |
 | **SweetAlert2 (v11)** | Notifikasi pop-up konfirmasi aksi dan status | Digunakan di Web & Mobile |
-| **Leaflet.js (1.9.4)** | Peta OpenStreetMap interaktif untuk penandaan lokasi GPS | Digunakan di Mobile (`outlet_detail.html`) |
+| **Leaflet.js (1.9.4)** | Peta OpenStreetMap interaktif, Leaflet Routing Machine (OSRM) untuk plotting rute jalan riil, & layer switching. | Digunakan di Mobile (`outlet_detail.html`) & FPRS Web (`Kunjungan/Rute/index.html`) |
 | **MapLibre GL JS** | Engine render peta vektor untuk plotting rute sales | Digunakan di Web (`Geografis Kunjungan`) |

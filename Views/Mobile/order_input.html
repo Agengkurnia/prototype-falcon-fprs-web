@@ -68,7 +68,7 @@
             padding: 6px 14px;
             background-color: var(--color-gray-light);
             border-radius: 16px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-gray);
             white-space: nowrap;
@@ -107,6 +107,13 @@
             color: var(--color-primary);
             font-size: 24px;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .product-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .product-info {
@@ -216,7 +223,7 @@
         }
 
         .cart-float-count {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--color-gray);
             font-weight: 600;
         }
@@ -254,7 +261,7 @@
             color: #2b702b;
             border-radius: 8px;
             padding: 10px 14px;
-            font-size: 12px;
+            font-size: 13px;
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -458,6 +465,13 @@
             renderCatalog();
         }
 
+        // Render foto produk asli (imageUrl) jika tersedia; fallback ke ikon FontAwesome jika kosong/gagal load
+        function productImgHtml(p) {
+            const iconHtml = `<i class="fa-solid ${p.icon || 'fa-box'}"></i>`;
+            if (!p.imageUrl) return iconHtml;
+            return `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='${iconHtml.replace(/'/g, "\\'")}'"/>`;
+        }
+
         function renderCatalog() {
             const query = $('#prdSearch').val().toLowerCase();
             const container = $('#productCatalogContainer');
@@ -479,38 +493,63 @@
 
             filtered.forEach(p => {
                 const item = cart[p.code];
+                // Badge hanya untuk Karton/Box (dari modal); Pcs dikelola stepper inline di bawah
                 let qtyBadgeText = '';
                 if (item) {
                     let parts = [];
                     if (item.qtyKarton > 0) parts.push(`${item.qtyKarton} Ktn`);
                     if (item.qtyBox > 0) parts.push(`${item.qtyBox} Box`);
-                    if (item.qtyPcs > 0) parts.push(`${item.qtyPcs} Pcs`);
                     if (parts.length > 0) {
                         qtyBadgeText = `<span class="badge bg-success" style="font-size: 10px;">${parts.join(', ')}</span>`;
                     }
                 }
+                const curPcs = item ? (item.qtyPcs || 0) : 0;
                 const promoBadge = p.hasPromo ? `<span class="badge bg-danger ms-1" style="font-size:9px;">PROMO</span>` : '';
 
                 const prdHtml = `
                     <div class="product-card" onclick="openSimplidotsModal('${p.code}')" style="cursor: pointer;">
                         <div class="product-img-box">
-                            <i class="fa-solid ${p.icon || 'fa-box'}"></i>
+                            ${productImgHtml(p)}
                         </div>
                         <div class="product-info">
                             <div class="d-flex justify-content-between align-items-start">
                                 <span class="product-name" style="max-width: 70%;">${p.name}${promoBadge}</span>
                                 ${qtyBadgeText}
                             </div>
-                            <span class="product-code">${p.code} • ${p.category}</span>
+                            <span class="product-code">${p.code} • Stok ${p.stock || 12} Ktn</span>
                             <div class="product-price-row">
                                 <span class="product-price">${SfaStore.formatRupiah(p.pricePcs)}/Pcs</span>
-                                <span class="text-muted fs-8">Stok: ${p.stock || 12} Ktn</span>
+                                <div class="qty-controls" onclick="event.stopPropagation()">
+                                    <button class="qty-btn" onclick="decreaseQty('${p.code}')" aria-label="Kurangi 1 pcs">&minus;</button>
+                                    <span class="qty-val" id="qty_${p.code}">${curPcs}</span>
+                                    <button class="qty-btn" onclick="increaseQty('${p.code}')" aria-label="Tambah 1 pcs">+</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `;
                 container.append(prdHtml);
             });
+        }
+
+        // Inline +/- stepper untuk Pcs di katalog (alur cepat; modal tetap untuk Karton/Box)
+        function increaseQty(code) {
+            if (!cart[code]) cart[code] = { qtyKarton: 0, qtyBox: 0, qtyPcs: 0, notes: '' };
+            cart[code].qtyPcs = (cart[code].qtyPcs || 0) + 1;
+            $('#qty_' + code).text(cart[code].qtyPcs);
+            updateCartSummary();
+        }
+
+        function decreaseQty(code) {
+            if (!cart[code]) return;
+            cart[code].qtyPcs = Math.max(0, (cart[code].qtyPcs || 0) - 1);
+            $('#qty_' + code).text(cart[code].qtyPcs);
+            // Bersihkan entri kosong agar tidak menyisakan item nol di keranjang
+            const it = cart[code];
+            if ((it.qtyKarton || 0) === 0 && (it.qtyBox || 0) === 0 && (it.qtyPcs || 0) === 0 && !it.notes) {
+                delete cart[code];
+            }
+            updateCartSummary();
         }
 
         function _buildCategoryChips() {
@@ -743,7 +782,7 @@
                 const itemHtml = `
                     <div class="product-card" onclick="openSimplidotsModal('${code}')" style="cursor: pointer;">
                         <div class="product-img-box">
-                            <i class="fa-solid ${prod.icon || 'fa-box'}"></i>
+                            ${productImgHtml(prod)}
                         </div>
                         <div class="product-info">
                             <span class="product-name">${prod.name}</span>
