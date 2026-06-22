@@ -7,14 +7,14 @@
  * 3. 003. Faktur Penjualan: URL parsing, aggregates calculation, search real-time, payment status badges, read-only detail view.
  * 
  * Jalankan:
- *   node Testing/Mobile/verify_flow.js
+ *   node Testing/Mobile/automation/verify_flow.js
  */
 
 const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
-const BASE_URL = 'http://127.0.0.1:5500';
+const BASE_URL = 'http://127.0.0.1:5501';
 const SCREENSHOT_DIR = path.join(__dirname, 'screenshots');
 
 const results = [];
@@ -65,13 +65,13 @@ async function run() {
         // MODULE 1: LOGIN & DASHBOARD
         // ----------------------------------------------------
         console.log('\n--- Modul 1: Dashboard ---');
-        
+
         // TC-001-01: Login & Initial State
-        await page.fill('#usernameInput', 'SINGARAJA');
+        await page.fill('#usernameInput', 'FARREL');
         await page.fill('#passwordInput', 'canvasser');
         await page.click('#loginBtn');
         await page.waitForURL('**/home.html');
-        
+
         // Verify Rute Kunjungan Hari Ini button
         const routeBtn = page.locator('a:has-text("Rute Kunjungan Hari Ini")');
         const routeBtnVisible = await routeBtn.isVisible();
@@ -105,7 +105,7 @@ async function run() {
         await page.click('#prevDate');
         await page.waitForTimeout(300);
         const prevDateLabel = await page.locator('#dateRangeLabel').innerText();
-        
+
         recordResult(
             3, 'Dashboard', 'TC-001-02a', 'Date Pager Prev',
             'Klik tombol prev tanggal (<)',
@@ -237,15 +237,15 @@ async function run() {
         // TC-002-03: Bottom Sheet stock input
         await firstAdjustBtn.click();
         await page.waitForSelector('#stockSheet.show');
-        
+
         await page.fill('#inputKarton', '40');
         await page.fill('#inputBox', '2');
         await page.fill('#inputPcs', '2');
         await page.click('button:has-text("Simpan Penyesuaian")');
-        
+
         // Wait for bottom sheet to close
         await page.waitForSelector('#stockSheet.show', { state: 'detached' });
-        
+
         // Check updated UI values in row
         const productCode = await page.evaluate(() => SfaStore.getProducts()[0].code);
         const kartonVal = await page.locator(`#stok-karton-${productCode}`).innerText();
@@ -312,11 +312,11 @@ async function run() {
         // MODULE 3: FAKTUR PENJUALAN
         // ----------------------------------------------------
         console.log('\n--- Modul 3: Faktur Penjualan ---');
-        
+
         // TC-003-01: URL parsing & Date range matching
         await page.goto(`${BASE_URL}/Views/Mobile/invoice_list.html?from=2026-06-11&to=2026-06-17&label=7%20Hari%20Terakhir`);
         await page.waitForLoadState('networkidle');
-        
+
         const invoicePeriodLabel = await page.locator('#periodLabel').innerText();
         const cardCount = await page.locator('#listContainer .invoice-card').count();
 
@@ -359,7 +359,7 @@ async function run() {
         // TC-003-04: Payment Status Badges
         await page.fill('#invSearchInput', ''); // clear search
         await page.waitForTimeout(300);
-        
+
         const hasPaidBadge = await page.locator('.badge-mobile-success:has-text("Paid")').first().isVisible();
         const hasUnpaidBadge = await page.locator('.badge-mobile-warning:has-text("Unpaid")').first().isVisible();
 
@@ -375,7 +375,7 @@ async function run() {
         const firstCard = page.locator('#listContainer .invoice-card').first();
         await firstCard.click();
         await page.waitForURL('**/invoice_detail.html*');
-        
+
         const customerNameDetail = await page.locator('.customer-name-detail').innerText();
         const detailInputsCount = await page.locator('input:not([type="hidden"]), select, textarea').count();
 
@@ -424,7 +424,7 @@ function writeReports() {
 
     console.log(`Hasil: ${passCount} / ${results.length} PASSED`);
 
-    // Write to MARKDOWN Report
+    // Write to MARKDOWN Report (parent folder Testing/Mobile/)
     let md = `# Report Hasil Automated Testing SFA Mobile\n\n`;
     md += `Tanggal Uji: **${new Date().toLocaleDateString('id-ID')}**\n`;
     md += `Tester: **AI Antigravity (Playwright Automation)**\n\n`;
@@ -435,21 +435,23 @@ function writeReports() {
     md += `### Tabel Rincian Pengujian (Salin ke Google Sheets)\n\n`;
     md += `| No | Modul | Case ID | Nama Kasus Uji | Langkah Uji | Hasil yang Diharapkan | Hasil Aktual | Status |\n`;
     md += `|----|-------|---------|----------------|-------------|-----------------------|--------------|--------|\n`;
-    
+
     results.forEach(r => {
         md += `| ${r.no} | ${r.module} | ${r.caseId} | ${r.name} | ${r.step} | ${r.expected} | ${r.actual} | **${r.status}** |\n`;
     });
 
-    fs.writeFileSync(path.join(__dirname, 'test_report.md'), md);
-    console.log(`\n📝 Report Markdown disimpan ke: Testing/Mobile/test_report.md`);
+    const reportPath = path.join(__dirname, '..', 'test_report.md');
+    fs.writeFileSync(reportPath, md);
+    console.log(`\n📝 Report Markdown disimpan ke: ${reportPath}`);
 
     // Write to TSV for easy copy-pasting to Google Sheets
     let tsv = `No\tModul\tCase ID\tNama Kasus Uji\tLangkah Uji\tHasil yang Diharapkan\tHasil Aktual\tStatus\tTester\tTanggal Uji\n`;
     results.forEach(r => {
         tsv += `${r.no}\t${r.module}\t${r.caseId}\t${r.name}\t${r.step}\t${r.expected}\t${r.actual}\t${r.status}\t${r.tester}\t${r.date}\n`;
     });
-    fs.writeFileSync(path.join(__dirname, 'test_report.tsv'), tsv);
-    console.log(`📊 Report TSV disimpan ke: Testing/Mobile/test_report.tsv (Buka dengan Excel/Notepad untuk salin ke Google Sheets)`);
+    const tsvPath = path.join(__dirname, '..', 'test_report.tsv');
+    fs.writeFileSync(tsvPath, tsv);
+    console.log(`📊 Report TSV disimpan ke: ${tsvPath} (Buka dengan Excel/Notepad untuk salin ke Google Sheets)`);
 }
 
 run();

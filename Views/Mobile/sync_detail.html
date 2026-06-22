@@ -248,19 +248,22 @@
                 $('#progressLabel').text(`Memproses item ${idx} dari ${total}`);
                 $('#progressCurrentItem').text(`${item ? item.type : ''} — ${item ? item.status : ''}`);
                 renderQueue();
-            },
-            function onComplete(successCount, failCount) {
+            }
+        ).then(function(result) {
+            const successCount = result.success || 0;
+            const failCount    = result.failed  || 0;
+            $('#progressBarFill').css('width', '100%');
+            setTimeout(() => {
                 $('#progressOverlay').addClass('d-none');
                 renderQueue();
-
                 Swal.fire({
                     icon: failCount === 0 ? 'success' : 'warning',
                     title: failCount === 0 ? 'Sinkronisasi Selesai' : 'Sinkronisasi Sebagian',
                     html: `<b>${successCount}</b> berhasil dikirim${failCount > 0 ? `<br><b>${failCount}</b> gagal (coba retry)` : ''}`,
                     confirmButtonColor: '#005D41'
                 });
-            }
-        );
+            }, 400);
+        });
     }
 
     function addDemoItems() {

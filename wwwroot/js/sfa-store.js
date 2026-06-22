@@ -538,20 +538,30 @@
 
     function processQueue(onProgress) {
         return new Promise(resolve => {
-            const q = getSyncQueue();
+            const q = getSyncQueue().filter(item => item.status === 'pending' || item.status === 'failed');
+            if (q.length === 0) { resolve({ success: 0, failed: 0 }); return; }
             let i = 0;
             function step() {
-                if (i >= q.length) { clearSyncQueue(); resolve({ success: i, failed: 0 }); return; }
+                if (i >= q.length) {
+                    // Mark all as success in stored queue
+                    const all = getSyncQueue();
+                    all.forEach(item => { if (item.status === 'uploading') item.status = 'success'; item.updatedAt = new Date().toISOString(); });
+                    write(KEYS.SYNC_QUEUE, all);
+                    resolve({ success: q.length, failed: 0 });
+                    return;
+                }
+                // Update status in stored queue
+                const all = getSyncQueue();
+                const storedIdx = all.findIndex(item => item.id === q[i].id);
+                if (storedIdx >= 0) { all[storedIdx].status = 'uploading'; all[storedIdx].updatedAt = new Date().toISOString(); write(KEYS.SYNC_QUEUE, all); }
                 q[i].status = 'uploading';
-                write(KEYS.SYNC_QUEUE, q);
-                if (typeof onProgress === 'function') onProgress(i + 1, q.length, q[i]);
+                // onProgress(item, currentIndex 1-based, total)
+                if (typeof onProgress === 'function') onProgress(q[i], i + 1, q.length);
                 setTimeout(() => {
-                    q[i].status = 'done';
-                    write(KEYS.SYNC_QUEUE, q);
+                    q[i].status = 'success';
                     i++; step();
                 }, 350);
             }
-            if (q.length === 0) { resolve({ success: 0, failed: 0 }); return; }
             step();
         });
     }

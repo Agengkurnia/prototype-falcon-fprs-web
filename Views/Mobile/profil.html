@@ -225,27 +225,28 @@
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
     $(document).ready(function() {
-        const user = SfaStore.getUser();
+        const user = SfaStore.getUser() || {};
         const kpi = SfaStore.getTodayKpi();
         const queue = SfaStore.getSyncQueue();
         const pending = queue.filter(q => q.status === 'pending' || q.status === 'failed').length;
 
         // Avatar initials
-        const initials = (user.name || 'S').charAt(0).toUpperCase();
+        const name = user.name || user.username || 'Salesman';
+        const initials = name.charAt(0).toUpperCase();
         $('#avatarCircle').text(initials);
-        $('#profileName').text(user.name.toUpperCase());
+        $('#profileName').text(name.toUpperCase());
         $('#profileBranch').text(`Cabang ${user.branch || 'Jakarta'}`);
-        $('#profileRole').text(user.role || 'canvasser');
+        $('#profileRole').text(user.role || 'Canvasser');
 
         // Info items
-        $('#infoUsername').text(user.username || '-');
-        $('#infoRole').text(user.role || '-');
-        $('#infoBranch').text(user.branch || '-');
+        $('#infoUsername').text(user.username || user.name || '-');
+        $('#infoRole').text(user.role || 'Canvasser');
+        $('#infoBranch').text(user.branch || 'Jakarta');
         $('#infoLoginTime').text(user.loginTime ? SfaStore.formatDate(user.loginTime) : '-');
 
         // KPI
-        $('#infoTargetVisit').text(kpi.pelanggan + ' outlet');
-        $('#infoTodayVisit').text(kpi.kunjungan + ' kunjungan');
+        $('#infoTargetVisit').text((kpi.pelanggan || 0) + ' outlet');
+        $('#infoTodayVisit').text((kpi.kunjungan || 0) + ' kunjungan');
 
         // Sync
         $('#syncQueueBadge').text(`${pending} Pending`);

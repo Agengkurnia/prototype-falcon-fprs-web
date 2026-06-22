@@ -148,7 +148,7 @@
             map[c.customerId].invoices.push(c);
             map[c.customerId].totalOutstanding += (c.balance || 0);
             map[c.customerId].totalPaid += (c.paidAmount || 0);
-            map[c.customerId].totalAmount += (c.totalAmount || 0);
+            map[c.customerId].totalAmount += (c.totalAmount || c.amount || 0);
         });
 
         customerGroups = Object.values(map).filter(g => g.totalAmount > 0);

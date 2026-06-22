@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <title>Monitoring Stok Motoris - Falcon FPRS</title>
     <link rel="stylesheet" href="../../../../wwwroot/css/canvassing-v2.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         @font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-        
+
         .dash-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
         @media(max-width:1200px){ .dash-grid { grid-template-columns: repeat(3,1fr); } }
         @media(max-width:992px){ .dash-grid { grid-template-columns: repeat(2,1fr); } }
@@ -72,7 +77,7 @@
         .audit-table tbody td { padding: 0.6rem 0.8rem; font-size: 0.82rem; border-bottom: 1px solid #f1f3f5; color: #495057; }
         .audit-table tbody tr { transition: background 0.15s; }
         .audit-table tbody tr:hover { background: #F8FBF2; }
-        
+
         .badge-sm { padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
         .badge-inbound { background: #E8F5E9; color: #2E7D32; }
         .badge-outbound { background: #FFEBEE; color: #C62828; }
@@ -95,9 +100,9 @@
         }
         .drilldown-btn:hover { background: #e2e8f0; }
 
-        /* Upgraded Audit Popup Styles (10/10 Masterpiece) */
+        /* Audit Popup Styles */
         .audit-pop { text-align: left; font-size: 0.82rem; color: #495057; }
-        .audit-pop-header { background: linear-gradient(135deg, #005d41 0%, #00402c 100%); color: white; padding: 1.2rem; border-radius: 12px 12px 0 0; margin: -1.25em -1.25em 1rem -1.25em; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,93,65,0.15); }
+        .audit-pop-header { background: linear-gradient(135deg, #005d41 0%, #00402c 100%); color: white; padding: 1.4rem 1.6rem; border-radius: 12px 12px 0 0; margin: -1.6em -1.6em 1.25rem -1.6em; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,93,65,0.15); }
         .audit-pop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
         @media(max-width: 576px) { .audit-pop-grid { grid-template-columns: 1fr; } }
         .audit-pop-sect { border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: border-color 0.2s; }
@@ -109,6 +114,29 @@
         .audit-pop-table th { background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 6px 8px; font-weight: 700; text-align: left; color: #475569; }
         .audit-pop-table td { padding: 8px 8px; border-bottom: 1px solid #f1f5f9; color: #334155; }
         .audit-pop-table tr:last-child td { border-bottom: none; }
+
+        /* Motoris Detail Popup */
+        .motoris-pop { text-align: left; font-size: 0.82rem; color: #495057; }
+        .motoris-pop-header {
+            background: linear-gradient(135deg, #005d41 0%, #00402c 100%); color: white;
+            padding: 1.4rem 1.5rem; border-radius: 12px 12px 0 0;
+            margin: -1.25em -1.5em 1.25rem -1.5em;
+            box-shadow: 0 4px 12px rgba(0,93,65,0.15);
+        }
+        .motoris-pop-header h3 { margin: 0 0 4px 0; font-size: 1.1rem; font-weight: 800; font-family: 'Kalbe Geometric', sans-serif; color: #fff !important; }
+        .motoris-pop-header .mp-sub { font-size: 0.78rem; opacity: 0.85; color: #fff !important; }
+        .motoris-pop-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.25rem; margin-bottom: 1rem; }
+        @media(max-width: 700px) { .motoris-pop-grid { grid-template-columns: 1fr; } }
+        .motoris-pop-sect { border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+        .motoris-pop-sect h4 { font-size: 0.85rem; font-weight: 700; color: #005d41; margin: 0 0 0.6rem 0; border-bottom: 1.5px dashed #C8E099; padding-bottom: 0.35rem; display: flex; align-items: center; gap: 6px; }
+        .motoris-pop-sect table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.76rem; }
+        .motoris-pop-sect table th { background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 5px 7px; font-weight: 700; text-align: left; color: #475569; }
+        .motoris-pop-sect table td { padding: 6px 7px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .motoris-pop-sect table tr:last-child td { border-bottom: none; }
+        .motoris-pop-info { border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; background: #f8fafc; margin-top: 1rem; }
+        .motoris-pop-info h4 { font-size: 0.85rem; font-weight: 700; color: #005d41; margin: 0 0 0.5rem 0; display: flex; align-items: center; gap: 6px; }
+        .motoris-pop-info .info-row { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.78rem; color: #475569; }
+        .motoris-pop-info .info-row span { display: flex; align-items: center; gap: 4px; }
 
         /* Audit Stepper */
         .audit-stepper { display: flex; justify-content: space-between; align-items: center; margin: 0.2rem 0 1.2rem 0; padding: 0.75rem 1.2rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; }
@@ -122,28 +150,12 @@
         .step-item.active .step-label { color: #005d41; }
         .step-item.warning .step-label { color: #E65100; }
 
-        /* Mock Map UI */
-        .mock-map { height: 90px; background: #e2e8f0; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid #cbd5e1; margin-top: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
-        .mock-map-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 15px 15px; background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px); }
-        .mock-map-road { position: absolute; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; }
-        .mock-map-pin { position: absolute; top: 40%; left: 45%; transform: translate(-50%, -50%); color: #C62828; font-size: 1.25rem; z-index: 5; animation: mapBounce 1s infinite alternate; }
-        .mock-map-center { position: absolute; top: 52%; left: 55%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: rgba(0, 93, 65, 0.2); border: 2px solid #005d41; z-index: 4; }
-        .mock-map-pulse { position: absolute; top: 52%; left: 55%; transform: translate(-50%, -50%); width: 35px; height: 35px; border-radius: 50%; background: rgba(0, 93, 65, 0.1); border: 1px solid rgba(0,93,65,0.3); animation: mapPulse 1.8s infinite; z-index: 3; }
-        @keyframes mapBounce { from { transform: translate(-50%, -35%); } to { transform: translate(-50%, -60%); } }
-        @keyframes mapPulse { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
-
-        /* Nota Attachment Card */
-        .nota-attach-card { background: #ffffff; border: 1.5px dashed #005d41; border-radius: 10px; padding: 0.85rem; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.25s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 110px; }
-        .nota-attach-card:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,93,65,0.08); border-color: #00402c; background: #F4FAF7; }
-        .nota-attach-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #005d41, #005d41 6px, transparent 6px, transparent 12px); }
-        .nota-barcode { width: 75%; height: 16px; background: repeating-linear-gradient(90deg, #334155, #334155 2px, transparent 2px, transparent 5px, #334155 5px, #334155 8px); margin-top: 6px; opacity: 0.5; }
-
         /* Qty / Rupiah Toggle */
         .unit-toggle { display: inline-flex; background: #f1f3f5; border-radius: 8px; padding: 3px; gap: 2px; }
         .unit-toggle button { border: none; background: transparent; font-size: 0.78rem; font-weight: 700; color: #64748b; padding: 4px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
         .unit-toggle button.active { background: #005d41; color: #fff; box-shadow: 0 2px 4px rgba(0,93,65,0.2); }
 
-        /* Card secondary metric (Rupiah / sell-through) */
+        /* Card secondary metric */
         .dc-extra { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 0.74rem; font-weight: 700; }
         .dc-extra .pill { padding: 1px 7px; border-radius: 20px; font-size: 0.7rem; }
         .pill-up { background: #E8F5E9; color: #2E7D32; }
@@ -168,14 +180,186 @@
         .aging-fresh { background: #E8F5E9; color: #2E7D32; }
         .aging-warn { background: #FFF8E1; color: #F57F17; }
         .aging-old { background: #FFEBEE; color: #C62828; }
+        .motoris-link { color: #005d41; font-weight: 700; cursor: pointer; text-decoration: none; border-bottom: 1px dashed #005d41; transition: all 0.2s; }
+        .motoris-link:hover { color: #00402c; border-bottom-color: #00402c; }
 
         /* DataTable custom styling overrides */
-        .dataTables_wrapper .dataTables_length select { border-radius: 6px; border: 1px solid #e2e8f0; padding: 4px 8px; font-size: 0.8rem; }
-        .dataTables_wrapper .dataTables_filter input { border-radius: 8px; border: 1px solid #e2e8f0; padding: 5px 12px; font-size: 0.82rem; }
+        .dataTables_wrapper { font-family: 'Kalbe Geometric', -apple-system, sans-serif; }
+        .dataTables_wrapper .dataTables_length select { 
+            border-radius: 8px; border: 1px solid #e2e8f0; padding: 5px 28px 5px 10px; 
+            font-size: 0.8rem; appearance: auto; background: #fff; color: #334155;
+        }
+        .dataTables_wrapper .dataTables_length { font-size: 0.8rem; color: #64748b; font-weight: 600; }
+        .dataTables_wrapper .dataTables_filter label { font-size: 0.8rem; color: #64748b; font-weight: 600; }
+        .dataTables_wrapper .dataTables_filter input { 
+            border-radius: 8px; border: 1px solid #e2e8f0; padding: 6px 14px; 
+            font-size: 0.82rem; margin-left: 6px; transition: all 0.2s;
+        }
         .dataTables_wrapper .dataTables_filter input:focus { border-color: #005d41; outline: none; box-shadow: 0 0 0 3px rgba(0,93,65,0.1); }
-        .dataTables_wrapper .dataTables_info { font-size: 0.78rem; color: #8a92a6; font-weight: 600; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button { border-radius: 6px !important; font-size: 0.78rem; font-weight: 600; }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #005d41 !important; color: #fff !important; border-color: #005d41 !important; }
+        .dataTables_wrapper .dataTables_info { font-size: 0.78rem; color: #8a92a6; font-weight: 600; padding-top: 0.75rem; }
+        
+        /* Pagination buttons - premium styling */
+        .dataTables_wrapper .dataTables_paginate { padding-top: 0.75rem; }
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border: 1px solid #e2e8f0 !important; border-radius: 6px !important; 
+            font-size: 0.72rem; font-weight: 600; padding: 4px 9px !important;
+            margin: 0 1px !important; color: #475569 !important; background: #fff !important;
+            transition: all 0.2s !important; min-width: auto !important; line-height: 1.4 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f1f5f9 !important; color: #005d41 !important; 
+            border-color: #005d41 !important; box-shadow: none !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #005d41 !important; color: #fff !important; 
+            border-color: #005d41 !important; box-shadow: none !important;
+            font-weight: 700;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #004530 !important; color: #fff !important; border-color: #004530 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.4 !important; cursor: not-allowed !important;
+            background: #f8fafc !important; color: #94a3b8 !important; border-color: #e2e8f0 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+            font-weight: 600; letter-spacing: 0.02em;
+        }
+        
+        /* Table base resets for DataTables */
+        table.dataTable { border-collapse: separate !important; border-spacing: 0 !important; }
+        table.dataTable thead th { border-bottom: none !important; cursor: pointer; }
+        table.dataTable thead th:active { opacity: 0.8; }
+        table.dataTable.no-footer { border-bottom: none !important; }
+        
+        /* Sorting icons fix */
+        table.dataTable thead .sorting::after,
+        table.dataTable thead .sorting_asc::after,
+        table.dataTable thead .sorting_desc::after {
+            font-size: 0.6rem; opacity: 0.6; right: 8px;
+        }
+        table.dataTable thead .sorting_asc::after,
+        table.dataTable thead .sorting_desc::after { opacity: 1; color: #fff; }
+
+        /* Filter Active Chips Bar */
+        .filter-chips-bar {
+            display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;
+            margin-bottom: 1rem; padding: 0.5rem 0.75rem;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .filter-chips-bar.hidden { display: none; }
+        .filter-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #fff; border: 1px solid #cbd5e1; border-radius: 20px;
+            padding: 4px 10px 4px 8px; font-size: 0.72rem; font-weight: 700; color: #334155;
+            transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .filter-chip i { color: #005d41; font-size: 0.68rem; }
+        .filter-chip .chip-remove {
+            margin-left: 4px; cursor: pointer; color: #94a3b8; font-size: 0.7rem;
+            border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .filter-chip .chip-remove:hover { background: #FFEBEE; color: #C62828; }
+        .filter-chips-label { font-size: 0.72rem; font-weight: 700; color: #64748b; margin-right: 4px; }
+        .filter-reset-btn {
+            background: #FFEBEE; border: 1px solid #FFCDD2; border-radius: 20px;
+            padding: 4px 10px; font-size: 0.72rem; font-weight: 700; color: #C62828;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+            transition: all 0.2s; margin-left: auto;
+        }
+        .filter-reset-btn:hover { background: #C62828; color: #fff; border-color: #C62828; }
+
+        /* Empty State */
+        .empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 2.5rem 1rem; text-align: center;
+        }
+        .empty-state-icon {
+            width: 64px; height: 64px; border-radius: 50%; background: #f1f5f9;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 0.75rem; font-size: 1.5rem; color: #94a3b8;
+        }
+        .empty-state-title { font-size: 0.9rem; font-weight: 700; color: #475569; margin-bottom: 0.3rem; }
+        .empty-state-desc { font-size: 0.78rem; color: #94a3b8; max-width: 280px; line-height: 1.4; }
+
+        /* Last Updated Timestamp */
+        .last-updated {
+            font-size: 0.7rem; color: #94a3b8; font-weight: 600;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .last-updated .pulse-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #2E7D32;
+            animation: pulseDot 2s infinite;
+        }
+        @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        /* Collapsible Sections */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+            user-select: none; padding: 0.2rem 0; margin-bottom: 0.5rem;
+        }
+        .section-header:hover .collapse-icon { color: #005d41; }
+        .collapse-icon {
+            font-size: 0.8rem; color: #94a3b8; transition: all 0.3s;
+            width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            background: #f1f3f5;
+        }
+        .collapse-icon.rotated { transform: rotate(180deg); }
+        .collapsible-content { transition: max-height 0.4s ease, opacity 0.3s ease; overflow: hidden; }
+        .collapsible-content.collapsed { max-height: 0 !important; opacity: 0; padding: 0; margin: 0; }
+
+        /* Sell-through tooltip */
+        .mini-bar-wrapper { position: relative; cursor: help; }
+        .mini-bar-tooltip {
+            position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #fff; padding: 3px 8px; border-radius: 5px;
+            font-size: 0.68rem; font-weight: 700; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;
+        }
+        .mini-bar-tooltip::after {
+            content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            border: 4px solid transparent; border-top-color: #1e293b;
+        }
+        .mini-bar-wrapper:hover .mini-bar-tooltip { opacity: 1; }
+
+        /* Mock Map UI */
+        .mock-map { height: 90px; background: #e2e8f0; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid #cbd5e1; margin-top: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
+        .mock-map-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 15px 15px; background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px); }
+        .mock-map-road { position: absolute; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; }
+        .mock-map-pin { position: absolute; top: 40%; left: 45%; transform: translate(-50%, -50%); color: #C62828; font-size: 1.25rem; z-index: 5; animation: mapBounce 1s infinite alternate; }
+        .mock-map-center { position: absolute; top: 52%; left: 55%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: rgba(0, 93, 65, 0.2); border: 2px solid #005d41; z-index: 4; }
+        .mock-map-pulse { position: absolute; top: 52%; left: 55%; transform: translate(-50%, -50%); width: 35px; height: 35px; border-radius: 50%; background: rgba(0, 93, 65, 0.1); border: 1px solid rgba(0,93,65,0.3); animation: mapPulse 1.8s infinite; z-index: 3; }
+        @keyframes mapBounce { from { transform: translate(-50%, -35%); } to { transform: translate(-50%, -60%); } }
+        @keyframes mapPulse { 0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
+
+        /* Nota Attachment Card */
+        .nota-attach-card { background: #ffffff; border: 1.5px dashed #005d41; border-radius: 10px; padding: 0.85rem; text-align: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: all 0.25s ease; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 110px; }
+        .nota-attach-card:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,93,65,0.08); border-color: #00402c; background: #F4FAF7; }
+        .nota-attach-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #005d41, #005d41 6px, transparent 6px, transparent 12px); }
+        .nota-barcode { width: 75%; height: 16px; background: repeating-linear-gradient(90deg, #334155, #334155 2px, transparent 2px, transparent 5px, #334155 5px, #334155 8px); margin-top: 6px; opacity: 0.5; }
+
+        /* SweetAlert custom popup - edge-to-edge header */
+        .swal-audit-popup { padding: 0 !important; border-radius: 14px !important; overflow: hidden; }
+        .swal-audit-popup .swal2-html-container { padding: 1.6em !important; margin: 0 !important; }
+        .swal-audit-popup .swal2-actions { padding: 0.75rem 1.6rem 1.25rem !important; }
+        .swal-audit-popup .audit-pop-header { margin: -1.6em -1.6em 1.25rem -1.6em; border-radius: 0; }
+        .swal-audit-popup .swal2-confirm {
+            background: #005d41 !important; border: none !important; border-radius: 8px !important;
+            font-size: 0.82rem !important; font-weight: 700 !important; padding: 8px 24px !important;
+            box-shadow: 0 2px 6px rgba(0,93,65,0.2) !important; transition: all 0.2s !important;
+            color: #fff !important;
+        }
+        .swal-audit-popup .swal2-confirm:hover { background: #004530 !important; transform: translateY(-1px); }
+
+        /* SweetAlert motoris detail popup */
+        .swal-motoris-popup { padding: 0 !important; border-radius: 14px !important; overflow: hidden; }
+        .swal-motoris-popup .swal2-html-container { padding: 1.5em !important; margin: 0 !important; overflow-y: auto !important; max-height: 80vh !important; }
+        .swal-motoris-popup .swal2-close { color: #fff !important; opacity: 0.8; font-size: 1.5rem; top: 10px; right: 14px; }
+        .swal-motoris-popup .swal2-close:hover { opacity: 1; }
+        .swal-motoris-popup .motoris-pop-header { margin: -1.5em -1.5em 1.25rem -1.5em; border-radius: 0; }
     </style>
 </head>
 <body>
@@ -192,7 +376,11 @@
                     </ol>
                 </nav>
             </div>
-            <div style="display:flex; gap:0.5rem; align-items:center;">
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <div class="last-updated" id="lastUpdated">
+                    <span class="pulse-dot"></span>
+                    <span id="lastUpdatedTime">Terakhir diperbarui: hari ini, --:-- WIB</span>
+                </div>
                 <div class="unit-toggle" id="unitToggle">
                     <button class="active" data-unit="qty" onclick="setUnitMode('qty')">Qty</button>
                     <button data-unit="rp" onclick="setUnitMode('rp')">Rupiah</button>
@@ -226,6 +414,13 @@
             </div>
         </div>
 
+        <!-- Active Filter Chips -->
+        <div class="filter-chips-bar hidden" id="filterChipsBar">
+            <span class="filter-chips-label"><i class="fas fa-filter me-1"></i> Filter Aktif:</span>
+            <div id="filterChipsList"></div>
+            <button class="filter-reset-btn" onclick="resetAllFilters()"><i class="fas fa-times-circle"></i> Reset Semua</button>
+        </div>
+
         <!-- Summary Cards -->
         <div class="dash-grid">
             <div class="dash-card" style="--stripe-color:#005d41;">
@@ -253,7 +448,7 @@
                 <div class="dc-icon" style="background:rgba(142,36,170,0.08); color:#8E24AA;"><i class="fas fa-boxes-stacked"></i></div>
                 <div class="dc-label">Saldo Stok di Motor</div>
                 <div class="dc-value" id="cardSaldoMotor">708 Krt</div>
-                <div class="dc-sub">stok berjalan belum terjual</div>
+                <div class="dc-sub" id="cardSaldoPcs">≈ 50,976 Pcs total</div>
                 <div class="dc-extra"><span class="pill pill-rp" id="cardSaldoRp">≈ Rp 354 Jt</span></div>
             </div>
             <div class="dash-card" style="--stripe-color:#E65100;">
@@ -294,313 +489,529 @@
             </div>
         </div>
 
-        <!-- Charts Row -->
-        <div class="charts-row">
-            <div class="chart-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-                    <h3 style="margin:0;"><i class="fas fa-chart-bar" style="color:#005d41; margin-right:6px;"></i> Pergerakan Stok Nasional / Wilayah</h3>
-                    <button class="drilldown-btn" id="btnBackDrill" onclick="resetDrilldown()"><i class="fas fa-arrow-left"></i> Kembali ke Region</button>
+        <!-- Charts Row (Collapsible) -->
+        <div class="chart-card" style="padding:0.75rem 1.25rem; margin-bottom:0.5rem; background:transparent; border:none; box-shadow:none;">
+            <div class="section-header" onclick="toggleSection('chartsSection')">
+                <h3 style="margin:0; font-size:0.9rem; font-weight:700; color:#343a40; font-family:'Kalbe Geometric',sans-serif;">
+                    <i class="fas fa-chart-area" style="color:#005d41; margin-right:6px;"></i> Grafik & Visualisasi Analitik
+                </h3>
+                <span class="collapse-icon" id="chartsSection-icon"><i class="fas fa-chevron-up"></i></span>
+            </div>
+        </div>
+        <div class="collapsible-content" id="chartsSection" style="max-height:2000px;">
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
+                        <h3 style="margin:0;"><i class="fas fa-chart-bar" style="color:#005d41; margin-right:6px;"></i> Pergerakan Stok Nasional / Wilayah</h3>
+                        <button class="drilldown-btn" id="btnBackDrill" onclick="resetDrilldown()"><i class="fas fa-arrow-left"></i> Kembali ke Region</button>
+                    </div>
+                    <div style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="chartBarSales"></canvas>
+                    </div>
                 </div>
-                <div style="position: relative; height: 280px; width: 100%;">
-                    <canvas id="chartBarSales"></canvas>
+                <div class="chart-card">
+                    <h3><i class="fas fa-trophy" style="color:#F57F17; margin-right:6px;"></i> Top 10 Motoris (Sell-Through)</h3>
+                    <div style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="chartTop10"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="chart-card">
-                <h3><i class="fas fa-medal" style="color:#1565C0; margin-right:6px;"></i> Top 10 Motoris Teraktif (Kulakan & Jual)</h3>
-                <div style="position: relative; height: 280px; width: 100%;">
-                    <canvas id="chartDoughnut"></canvas>
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line" style="color:#1565C0; margin-right:6px;"></i> Tren Penjualan Harian (Pcs)</h3>
+                    <div style="position: relative; height: 220px; width: 100%;">
+                        <canvas id="chartDailyTrend"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fas fa-map-marker-alt" style="color:#C62828; margin-right:6px;"></i> Akurasi GPS Transaksi</h3>
+                    <div style="position: relative; height: 220px; width: 100%;">
+                        <canvas id="chartGPS"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Second Charts Row -->
-        <div class="charts-row" style="grid-template-columns: 1fr 1fr;">
-            <div class="chart-card">
-                <h3><i class="fas fa-chart-line" style="color:#2E7D32; margin-right:6px;"></i> Tren Transaksi Harian (Nasional)</h3>
-                <div style="position: relative; height: 240px; width: 100%;">
-                    <canvas id="chartLine"></canvas>
-                </div>
-            </div>
-            <div class="chart-card">
-                <h3><i class="fas fa-map-marker-alt" style="color:#E65100; margin-right:6px;"></i> Akurasi GPS Check-in Grosir vs Fisik</h3>
-                <div style="position: relative; height: 240px; width: 100%;">
-                    <canvas id="chartGps"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Audit Trail Table -->
-        <div class="audit-card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-                <div style="display:flex; flex-direction:column;">
-                    <h3 style="margin:0;"><i class="fas fa-clipboard-list" style="color:#005d41; margin-right:6px;"></i> Audit Trail Transaksi & Pergerakan Stok</h3>
-                    <span style="font-size:0.75rem; color:#8a92a6; font-weight:600;"><i class="fas fa-info-circle me-1"></i> Klik pada baris tabel untuk memverifikasi detail audit transaksi secara mendalam.</span>
-                </div>
-                <input type="text" placeholder="Cari Motoris, Wilayah, atau Stokis..." style="border:1px solid #e2e8f0; border-radius:8px; padding:0.4rem 0.75rem; font-size:0.82rem; width:250px;" id="searchAudit" oninput="applyAllFilters()"/>
-            </div>
-            <div class="table-responsive">
-                <table class="audit-table" id="tblAudit">
-                    <thead>
-                        <tr>
-                            <th>Tanggal/Waktu</th>
-                            <th>Wilayah</th>
-                            <th>Motoris</th>
-                            <th>Tipe</th>
-                            <th>Partner / Tujuan</th>
-                            <th>Produk Utama</th>
-                            <th>Qty Total</th>
-                            <th>GPS</th>
-                            <th>Nota</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblAuditBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Saldo Stok Berjalan per Motoris -->
+        <!-- Saldo Stok per Motoris (MOVED ABOVE Audit Trail) -->
         <div class="balance-card">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-                <div>
-                    <h3><i class="fas fa-boxes-stacked" style="color:#8E24AA; margin-right:6px;"></i> Saldo Stok Berjalan per Motoris</h3>
-                    <span style="font-size:0.75rem; color:#8a92a6; font-weight:600;"><i class="fas fa-info-circle me-1"></i> Posisi stok yang masih dibawa motoris (aset berjalan), rasio penjualan, dan umur stok untuk deteksi penumpukan.</span>
-                </div>
+            <div class="section-header" onclick="toggleSection('balanceSection')">
+                <h3 style="margin:0;">
+                    <i class="fas fa-balance-scale" style="color:#005d41; margin-right:6px;"></i> Saldo Stok Berjalan per Motoris
+                </h3>
+                <span class="collapse-icon" id="balanceSection-icon"><i class="fas fa-chevron-up"></i></span>
             </div>
-            <div class="table-responsive">
-                <table class="balance-table" id="tblBalance">
-                    <thead>
-                        <tr>
-                            <th>Motoris</th>
-                            <th>Wilayah</th>
-                            <th style="text-align:center;">Kulakan</th>
-                            <th style="text-align:center;">Terjual</th>
-                            <th style="text-align:center;">Saldo di Motor</th>
-                            <th style="text-align:center; min-width:130px;">Sell-Through</th>
-                            <th style="text-align:center;">Umur Stok</th>
-                            <th style="text-align:right;">Nilai Saldo</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblBalanceBody"></tbody>
-                </table>
+            <div class="collapsible-content" id="balanceSection" style="max-height:5000px;">
+                <div style="overflow-x:auto;">
+                    <table class="balance-table" id="balanceTable">
+                        <thead>
+                            <tr>
+                                <th>Motoris</th>
+                                <th>Wilayah</th>
+                                <th>Stok (Krt)</th>
+                                <th>Stok (Dus)</th>
+                                <th>Stok (Pcs)</th>
+                                <th>Total Pcs</th>
+                                <th>Sell-Through</th>
+                                <th>Umur Stok</th>
+                                <th>Nilai Saldo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="balanceTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- Audit Trail (Collapsible, MOVED BELOW Balance) -->
+        <div class="audit-card">
+            <div class="section-header" onclick="toggleSection('auditSection')">
+                <h3 style="margin:0;">
+                    <i class="fas fa-clipboard-list" style="color:#005d41; margin-right:6px;"></i> Audit Trail Pergerakan Stok
+                </h3>
+                <span class="collapse-icon" id="auditSection-icon"><i class="fas fa-chevron-up"></i></span>
+            </div>
+            <div class="collapsible-content" id="auditSection" style="max-height:5000px;">
+                <div style="overflow-x:auto;">
+                    <table class="audit-table" id="auditTable">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Motoris</th>
+                                <th>Tipe</th>
+                                <th>Produk</th>
+                                <th>Qty</th>
+                                <th>Outlet / Stokis</th>
+                                <th>GPS</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
-    let mainChart, topSalesChart, trendChart, gpsChart;
-    let currentLevel = 'region'; // 'region', 'area', 'sales'
-    let currentSelectedRegion = '';
-    let currentSelectedArea = '';
-
-    // Mock Data Areas per Region
-    const regionData = {
-        jabodetabek: { areas: ['Jakarta Timur', 'Jakarta Selatan', 'Jakarta Pusat', 'Bekasi', 'Tangerang', 'Bogor'], salesCount: 120, inbound: 980, outbound: 4500, stokis: 18, warung: 620 },
-        jawa_barat: { areas: ['Bandung', 'Cirebon', 'Tasikmalaya', 'Karawang', 'Sukabumi'], salesCount: 78, inbound: 650, outbound: 2800, stokis: 10, warung: 310 },
-        jawa_tengah: { areas: ['Semarang', 'Solo', 'Yogyakarta', 'Purwokerto', 'Tegal'], salesCount: 52, inbound: 420, outbound: 1950, stokis: 8, warung: 195 },
-        jawa_timur: { areas: ['Surabaya', 'Malang', 'Kediri', 'Jember', 'Madiun'], salesCount: 65, inbound: 580, outbound: 2320, stokis: 9, warung: 275 },
-        sumatera: { areas: ['Medan', 'Palembang', 'Pekanbaru', 'Padang', 'Jambi', 'Lampung'], salesCount: 27, inbound: 210, outbound: 880, stokis: 3, warung: 80 }
-    };
-
-    const auditData = [
-        { id:'TX-IN-260601-001', time:'07:30', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Morinaga Chil*Kid Gold 800g', qty:'+25 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m dari stokis.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'0 Krt',adjust:'+25 Krt',after:'25 Krt'}] },
-        { id:'TX-OUT-260601-002', time:'09:45', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Kelontong Berkah', product:'Morinaga Chil*Kid Gold 800g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 8m dari outlet.', gpsCoords:'-6.230102,106.841220', nota:false, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'25 Krt',adjust:'-3 Krt',after:'22 Krt'}] },
-        { id:'TX-IN-260601-003', time:'08:00', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Morinaga Chil*School Cokelat 400g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-01', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'2 Krt',adjust:'+18 Krt',after:'20 Krt'}] },
-        { id:'TX-OUT-260602-004', time:'10:15', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Ibu Siti', product:'Morinaga Chil*School Cokelat 400g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 5m.', gpsCoords:'-6.918112,107.620010', nota:false, status:'verified', date:'2026-06-02', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'20 Krt',adjust:'-4 Krt',after:'16 Krt'}] },
-        { id:'TX-IN-260602-005', time:'07:45', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'inbound', location:'Grosir Cahaya Abadi (Stokis #22)', product:'Milna Bubur Bayi Pisang 120g', qty:'+30 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 15m.', gpsCoords:'-7.257472,112.752092', nota:true, status:'verified', date:'2026-06-02', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'5 Krt',adjust:'+30 Krt',after:'35 Krt'}] },
-        { id:'TX-OUT-260602-006', time:'11:00', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Warung Pak Joko', product:'Milna Bubur Bayi Pisang 120g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 3m.', gpsCoords:'-7.258100,112.753110', nota:false, status:'verified', date:'2026-06-02', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'35 Krt',adjust:'-6 Krt',after:'29 Krt'}] },
-        { id:'TX-IN-260603-007', time:'08:20', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'inbound', location:'Grosir Harapan Baru (Stokis #07)', product:'Prenagen Mommy Cokelat 400g', qty:'+15 Box', gps:'invalid', gpsDetails:'PERINGATAN: Jarak 1.2 km dari stokis.', gpsCoords:'-7.566639,110.824258', nota:true, status:'pending', date:'2026-06-03', items:[{name:'Prenagen Mommy Cokelat 400g',before:'0 Box',adjust:'+15 Box',after:'15 Box'}] },
-        { id:'TX-OUT-260603-008', time:'10:30', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'outbound', location:'Toko Makmur Sentosa', product:'Prenagen Mommy Cokelat 400g', qty:'-3 Box', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-7.568112,110.825660', nota:false, status:'verified', date:'2026-06-03', items:[{name:'Prenagen Mommy Cokelat 400g',before:'15 Box',adjust:'-3 Box',after:'12 Box'}] },
-        { id:'TX-IN-260603-009', time:'08:10', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'inbound', location:'Grosir Sumatera Sejahtera (Stokis #02)', product:'Entrasol Gold Vanila 600g', qty:'+10 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 11m.', gpsCoords:'3.595196,98.672223', nota:true, status:'verified', date:'2026-06-03', items:[{name:'Entrasol Gold Vanila 600g',before:'2 Krt',adjust:'+10 Krt',after:'12 Krt'}] },
-        { id:'TX-OUT-260604-010', time:'09:20', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Warung Haji Makmur', product:'Entrasol Gold Vanila 600g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'3.596010,98.673111', nota:false, status:'verified', date:'2026-06-04', items:[{name:'Entrasol Gold Vanila 600g',before:'12 Krt',adjust:'-2 Krt',after:'10 Krt'}] },
-        { id:'TX-IN-260604-011', time:'07:50', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'inbound', location:'Grosir Abadi Sentosa (Stokis #05)', product:'Morinaga Chil*Kid Gold 800g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 18m.', gpsCoords:'-6.270110,106.801220', nota:true, status:'verified', date:'2026-06-04', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'3 Krt',adjust:'+20 Krt',after:'23 Krt'}] },
-        { id:'TX-OUT-260604-012', time:'11:30', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Toko Rejeki Jaya', product:'Morinaga Chil*Kid Gold 800g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 19m.', gpsCoords:'-6.271200,106.802001', nota:false, status:'verified', date:'2026-06-04', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'23 Krt',adjust:'-5 Krt',after:'18 Krt'}] },
-        { id:'TX-OUT-260605-013', time:'09:00', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Bu Ani', product:'Morinaga Chil*Kid Gold 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.231001,106.842112', nota:false, status:'verified', date:'2026-06-05', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'22 Krt',adjust:'-4 Krt',after:'18 Krt'}] },
-        { id:'TX-OUT-260605-014', time:'10:40', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Sumber Rejeki', product:'Morinaga Chil*Kid Gold 800g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'-6.232001,106.843100', nota:false, status:'verified', date:'2026-06-05', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'18 Krt',adjust:'-6 Krt',after:'12 Krt'}] },
-        { id:'TX-IN-260605-015', time:'08:30', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'inbound', location:'Grosir Indah Permai (Stokis #09)', product:'Zee RTD Strawberry 185ml', qty:'+40 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 9m.', gpsCoords:'-6.706210,108.556112', nota:true, status:'verified', date:'2026-06-05', items:[{name:'Zee RTD Strawberry 185ml',before:'0 Krt',adjust:'+40 Krt',after:'40 Krt'}] },
-        { id:'TX-OUT-260606-016', time:'09:15', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Toko Mitra Jaya', product:'Zee RTD Strawberry 185ml', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-6.707100,108.557200', nota:false, status:'verified', date:'2026-06-06', items:[{name:'Zee RTD Strawberry 185ml',before:'40 Krt',adjust:'-5 Krt',after:'35 Krt'}] },
-        { id:'TX-OUT-260606-017', time:'10:50', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Warung Pak Iwan', product:'Zee RTD Strawberry 185ml', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 4m.', gpsCoords:'-6.708020,108.558010', nota:false, status:'verified', date:'2026-06-06', items:[{name:'Zee RTD Strawberry 185ml',before:'35 Krt',adjust:'-3 Krt',after:'32 Krt'}] },
-        { id:'TX-IN-260607-018', time:'07:40', region:'Jawa Timur', area:'Malang', sales:'Guntur Hermawan', salesCode:'MTR-145', type:'inbound', location:'Grosir Putera Malang (Stokis #15)', product:'Morinaga BMT 800g', qty:'+22 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 13m.', gpsCoords:'-7.978005,112.630110', nota:true, status:'verified', date:'2026-06-07', items:[{name:'Morinaga BMT 800g',before:'3 Krt',adjust:'+22 Krt',after:'25 Krt'}] },
-        { id:'TX-OUT-260607-019', time:'10:00', region:'Jawa Timur', area:'Malang', sales:'Guntur Hermawan', salesCode:'MTR-145', type:'outbound', location:'Toko Sehat Selalu', product:'Morinaga BMT 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 22m.', gpsCoords:'-7.979100,112.631200', nota:false, status:'verified', date:'2026-06-07', items:[{name:'Morinaga BMT 800g',before:'25 Krt',adjust:'-4 Krt',after:'21 Krt'}] },
-        { id:'TX-OUT-260608-020', time:'08:50', region:'Jabodetabek', area:'Bekasi', sales:'Hendra Kurniawan', salesCode:'MTR-032', type:'outbound', location:'Warung Segar', product:'Hydro Coco 500ml', qty:'-12 Pcs', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-6.241200,107.001100', nota:false, status:'verified', date:'2026-06-08', items:[{name:'Hydro Coco 500ml',before:'48 Pcs',adjust:'-12 Pcs',after:'36 Pcs'}] },
-        { id:'TX-IN-260608-021', time:'07:30', region:'Jabodetabek', area:'Bekasi', sales:'Hendra Kurniawan', salesCode:'MTR-032', type:'inbound', location:'Grosir Jaya Abadi (Stokis #11)', product:'Hydro Coco 500ml', qty:'+5 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 10m.', gpsCoords:'-6.240100,107.000200', nota:true, status:'verified', date:'2026-06-08', items:[{name:'Hydro Coco 500ml (1 Krt = 24 Pcs)',before:'2 Krt',adjust:'+5 Krt',after:'7 Krt'}] },
-        { id:'TX-OUT-260609-022', time:'09:30', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Mang Ujang', product:'Morinaga Chil*School Cokelat 400g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.919200,107.621100', nota:false, status:'verified', date:'2026-06-09', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'16 Krt',adjust:'-3 Krt',after:'13 Krt'}] },
-        { id:'TX-OUT-260609-023', time:'11:10', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Toko Sembako Pak Dede', product:'Morinaga Chil*School Cokelat 400g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 15m.', gpsCoords:'-6.920010,107.622000', nota:false, status:'verified', date:'2026-06-09', items:[{name:'Morinaga Chil*School Cokelat 400g',before:'13 Krt',adjust:'-2 Krt',after:'11 Krt'}] },
-        { id:'TX-IN-260609-024', time:'08:00', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'inbound', location:'Grosir Central Jaya (Stokis #06)', product:'Prenagen Esensis Cokelat 360g', qty:'+12 Box', gps:'valid', gpsDetails:'Akurat. Jarak 16m.', gpsCoords:'-6.966667,110.419444', nota:true, status:'verified', date:'2026-06-09', items:[{name:'Prenagen Esensis Cokelat 360g',before:'0 Box',adjust:'+12 Box',after:'12 Box'}] },
-        { id:'TX-OUT-260610-025', time:'09:50', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'outbound', location:'Warung Bu Tini', product:'Prenagen Esensis Cokelat 360g', qty:'-2 Box', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.967500,110.420100', nota:false, status:'verified', date:'2026-06-10', items:[{name:'Prenagen Esensis Cokelat 360g',before:'12 Box',adjust:'-2 Box',after:'10 Box'}] },
-        { id:'TX-OUT-260610-026', time:'11:20', region:'Jabodetabek', area:'Tangerang', sales:'Joko Susilo', salesCode:'MTR-055', type:'outbound', location:'Toko Anugrah', product:'Morinaga Chil*Kid Vanila 400g', qty:'-7 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'-6.178300,106.631200', nota:false, status:'verified', date:'2026-06-10', items:[{name:'Morinaga Chil*Kid Vanila 400g',before:'20 Krt',adjust:'-7 Krt',after:'13 Krt'}] },
-        { id:'TX-IN-260610-027', time:'07:55', region:'Jabodetabek', area:'Tangerang', sales:'Joko Susilo', salesCode:'MTR-055', type:'inbound', location:'Grosir Bintang Jaya (Stokis #08)', product:'Morinaga Chil*Kid Vanila 400g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 8m.', gpsCoords:'-6.177200,106.630100', nota:true, status:'verified', date:'2026-06-10', items:[{name:'Morinaga Chil*Kid Vanila 400g',before:'0 Krt',adjust:'+20 Krt',after:'20 Krt'}] },
-        { id:'TX-OUT-260611-028', time:'10:10', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Toko Mentari', product:'Milna Bubur Bayi Pisang 120g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-7.259000,112.754000', nota:false, status:'verified', date:'2026-06-11', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'29 Krt',adjust:'-5 Krt',after:'24 Krt'}] },
-        { id:'TX-OUT-260611-029', time:'11:40', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Warung Cak Narto', product:'Milna Bubur Bayi Pisang 120g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 5m.', gpsCoords:'-7.260010,112.755200', nota:false, status:'verified', date:'2026-06-11', items:[{name:'Milna Bubur Bayi Pisang 120g',before:'24 Krt',adjust:'-3 Krt',after:'21 Krt'}] },
-        { id:'TX-IN-260611-030', time:'08:15', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Milna Biskuit Bayi 130g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-11', items:[{name:'Milna Biskuit Bayi 130g',before:'0 Krt',adjust:'+18 Krt',after:'18 Krt'}] },
-        { id:'TX-OUT-260612-031', time:'09:00', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Toko Mitra Bunda', product:'Milna Biskuit Bayi 130g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 10m.', gpsCoords:'-6.230500,106.841500', nota:false, status:'verified', date:'2026-06-12', items:[{name:'Milna Biskuit Bayi 130g',before:'18 Krt',adjust:'-4 Krt',after:'14 Krt'}] },
-        { id:'TX-OUT-260612-032', time:'10:45', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Warung Pak Bambang', product:'Morinaga Chil*Kid Gold 800g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.272000,106.803000', nota:false, status:'verified', date:'2026-06-12', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'18 Krt',adjust:'-3 Krt',after:'15 Krt'}] },
-        { id:'TX-IN-260612-033', time:'08:00', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Zee RTD Vanilla 185ml', qty:'+22 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-12', items:[{name:'Zee RTD Vanilla 185ml',before:'0 Krt',adjust:'+22 Krt',after:'22 Krt'}] },
-        { id:'TX-OUT-260613-034', time:'09:30', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Toko Cendana', product:'Zee RTD Vanilla 185ml', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.918500,107.620500', nota:false, status:'verified', date:'2026-06-13', items:[{name:'Zee RTD Vanilla 185ml',before:'22 Krt',adjust:'-6 Krt',after:'16 Krt'}] },
-        { id:'TX-OUT-260613-035', time:'11:00', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Warung Bunda', product:'Entrasol Gold Vanila 600g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'3.596800,98.674000', nota:false, status:'verified', date:'2026-06-13', items:[{name:'Entrasol Gold Vanila 600g',before:'10 Krt',adjust:'-3 Krt',after:'7 Krt'}] },
-        { id:'TX-IN-260614-036', time:'07:45', region:'Sumatera', area:'Palembang', sales:'Kurnia Sari', salesCode:'MTR-228', type:'inbound', location:'Grosir Palembang Makmur (Stokis #04)', product:'Morinaga Chil*Kid Madu 400g', qty:'+14 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 13m.', gpsCoords:'-2.976111,104.775278', nota:true, status:'verified', date:'2026-06-14', items:[{name:'Morinaga Chil*Kid Madu 400g',before:'1 Krt',adjust:'+14 Krt',after:'15 Krt'}] },
-        { id:'TX-OUT-260614-037', time:'10:20', region:'Sumatera', area:'Palembang', sales:'Kurnia Sari', salesCode:'MTR-228', type:'outbound', location:'Warung Pak Salim', product:'Morinaga Chil*Kid Madu 400g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-2.977000,104.776100', nota:false, status:'verified', date:'2026-06-14', items:[{name:'Morinaga Chil*Kid Madu 400g',before:'15 Krt',adjust:'-4 Krt',after:'11 Krt'}] },
-        { id:'TX-IN-260615-038', time:'08:10', region:'Jawa Timur', area:'Kediri', sales:'Luki Prasetyo', salesCode:'MTR-156', type:'inbound', location:'Grosir Kediri Sejahtera (Stokis #19)', product:'Milna Goodmil 6+ 120g', qty:'+16 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 14m.', gpsCoords:'-7.816700,112.018200', nota:true, status:'verified', date:'2026-06-15', items:[{name:'Milna Goodmil 6+ 120g',before:'2 Krt',adjust:'+16 Krt',after:'18 Krt'}] },
-        { id:'TX-OUT-260615-039', time:'10:30', region:'Jawa Timur', area:'Kediri', sales:'Luki Prasetyo', salesCode:'MTR-156', type:'outbound', location:'Toko Ibu Wati', product:'Milna Goodmil 6+ 120g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-7.817500,112.019000', nota:false, status:'verified', date:'2026-06-15', items:[{name:'Milna Goodmil 6+ 120g',before:'18 Krt',adjust:'-5 Krt',after:'13 Krt'}] },
-        { id:'TX-OUT-260616-040', time:'09:15', region:'Jawa Tengah', area:'Solo', sales:'Dimas Prayoga', salesCode:'MTR-084', type:'outbound', location:'Warung Pak Darmo', product:'Prenagen Mommy Cokelat 400g', qty:'-2 Box', gps:'valid', gpsDetails:'Jarak 10m.', gpsCoords:'-7.567000,110.825000', nota:false, status:'verified', date:'2026-06-16', items:[{name:'Prenagen Mommy Cokelat 400g',before:'12 Box',adjust:'-2 Box',after:'10 Box'}] },
-        { id:'TX-IN-260616-041', time:'07:35', region:'Jawa Tengah', area:'Yogyakarta', sales:'Mega Utami', salesCode:'MTR-099', type:'inbound', location:'Grosir Jogja Raya (Stokis #10)', product:'Morinaga BMT 400g', qty:'+20 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 17m.', gpsCoords:'-7.795580,110.369490', nota:true, status:'verified', date:'2026-06-16', items:[{name:'Morinaga BMT 400g',before:'0 Krt',adjust:'+20 Krt',after:'20 Krt'}] },
-        { id:'TX-OUT-260617-042', time:'10:00', region:'Jawa Tengah', area:'Yogyakarta', sales:'Mega Utami', salesCode:'MTR-099', type:'outbound', location:'Toko Rahayu', product:'Morinaga BMT 400g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-7.796200,110.370100', nota:false, status:'verified', date:'2026-06-17', items:[{name:'Morinaga BMT 400g',before:'20 Krt',adjust:'-6 Krt',after:'14 Krt'}] },
-        { id:'TX-OUT-260617-043', time:'11:30', region:'Jabodetabek', area:'Bogor', sales:'Nanda Firmansyah', salesCode:'MTR-067', type:'outbound', location:'Warung Haji Usman', product:'Morinaga Chil*Kid Gold 800g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-6.595038,106.816635', nota:false, status:'verified', date:'2026-06-17', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'15 Krt',adjust:'-5 Krt',after:'10 Krt'}] },
-        { id:'TX-IN-260617-044', time:'07:50', region:'Jabodetabek', area:'Bogor', sales:'Nanda Firmansyah', salesCode:'MTR-067', type:'inbound', location:'Grosir Bogor Indah (Stokis #14)', product:'Morinaga Chil*Kid Gold 800g', qty:'+15 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 8m.', gpsCoords:'-6.594100,106.815700', nota:true, status:'verified', date:'2026-06-17', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'0 Krt',adjust:'+15 Krt',after:'15 Krt'}] },
-        { id:'TX-OUT-260618-045', time:'09:40', region:'Jawa Barat', area:'Karawang', sales:'Oki Pratama', salesCode:'MTR-081', type:'outbound', location:'Toko Barokah', product:'Zee RTD Cokelat 185ml', qty:'-8 Krt', gps:'valid', gpsDetails:'Jarak 6m.', gpsCoords:'-6.305200,107.312100', nota:false, status:'verified', date:'2026-06-18', items:[{name:'Zee RTD Cokelat 185ml',before:'25 Krt',adjust:'-8 Krt',after:'17 Krt'}] },
-        { id:'TX-IN-260618-046', time:'07:30', region:'Jawa Barat', area:'Karawang', sales:'Oki Pratama', salesCode:'MTR-081', type:'inbound', location:'Grosir Karawang Mas (Stokis #13)', product:'Zee RTD Cokelat 185ml', qty:'+25 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 11m.', gpsCoords:'-6.304100,107.311000', nota:true, status:'verified', date:'2026-06-18', items:[{name:'Zee RTD Cokelat 185ml',before:'0 Krt',adjust:'+25 Krt',after:'25 Krt'}] },
-        { id:'TX-OUT-260619-047', time:'10:20', region:'Jawa Timur', area:'Jember', sales:'Putra Aditya', salesCode:'MTR-167', type:'outbound', location:'Warung Bu Ning', product:'Milna Biskuit 130g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-8.172000,113.700200', nota:false, status:'verified', date:'2026-06-19', items:[{name:'Milna Biskuit 130g',before:'14 Krt',adjust:'-3 Krt',after:'11 Krt'}] },
-        { id:'TX-IN-260619-048', time:'08:05', region:'Jawa Timur', area:'Jember', sales:'Putra Aditya', salesCode:'MTR-167', type:'inbound', location:'Grosir Jember Mandiri (Stokis #21)', product:'Milna Biskuit 130g', qty:'+14 Krt', gps:'invalid', gpsDetails:'PERINGATAN: Jarak 800m dari stokis.', gpsCoords:'-8.168000,113.695000', nota:true, status:'pending', date:'2026-06-19', items:[{name:'Milna Biskuit 130g',before:'0 Krt',adjust:'+14 Krt',after:'14 Krt'}] },
-        { id:'TX-OUT-260620-049', time:'09:10', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Sumber Makmur', product:'Milna Biskuit Bayi 130g', qty:'-3 Krt', gps:'valid', gpsDetails:'Jarak 11m.', gpsCoords:'-6.231200,106.842500', nota:false, status:'verified', date:'2026-06-20', items:[{name:'Milna Biskuit Bayi 130g',before:'14 Krt',adjust:'-3 Krt',after:'11 Krt'}] },
-        { id:'TX-OUT-260620-050', time:'11:15', region:'Jabodetabek', area:'Jakarta Selatan', sales:'Rian Wijaya', salesCode:'MTR-018', type:'outbound', location:'Toko Melati', product:'Morinaga Chil*Kid Gold 800g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 15m.', gpsCoords:'-6.273100,106.804000', nota:false, status:'verified', date:'2026-06-20', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'15 Krt',adjust:'-4 Krt',after:'11 Krt'}] },
-        { id:'TX-IN-260621-051', time:'07:40', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'inbound', location:'Grosir Indah Permai (Stokis #09)', product:'Zee RTD Strawberry 185ml', qty:'+30 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 9m.', gpsCoords:'-6.706210,108.556112', nota:true, status:'verified', date:'2026-06-21', items:[{name:'Zee RTD Strawberry 185ml',before:'32 Krt',adjust:'+30 Krt',after:'62 Krt'}] },
-        { id:'TX-OUT-260621-052', time:'10:30', region:'Jawa Barat', area:'Cirebon', sales:'Fira Anggraini', salesCode:'MTR-077', type:'outbound', location:'Toko Asri', product:'Zee RTD Strawberry 185ml', qty:'-10 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.707500,108.557500', nota:false, status:'verified', date:'2026-06-21', items:[{name:'Zee RTD Strawberry 185ml',before:'62 Krt',adjust:'-10 Krt',after:'52 Krt'}] },
-        { id:'TX-OUT-260622-053', time:'09:00', region:'Jawa Tengah', area:'Semarang', sales:'Indah Permata', salesCode:'MTR-092', type:'outbound', location:'Warung Mbak Sri', product:'Prenagen Esensis Cokelat 360g', qty:'-3 Box', gps:'valid', gpsDetails:'Jarak 7m.', gpsCoords:'-6.968000,110.421000', nota:false, status:'verified', date:'2026-06-22', items:[{name:'Prenagen Esensis Cokelat 360g',before:'10 Box',adjust:'-3 Box',after:'7 Box'}] },
-        { id:'TX-IN-260622-054', time:'08:00', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'inbound', location:'Grosir Cahaya Abadi (Stokis #22)', product:'Milna Toddler Biscuit 110g', qty:'+18 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 15m.', gpsCoords:'-7.257472,112.752092', nota:true, status:'verified', date:'2026-06-22', items:[{name:'Milna Toddler Biscuit 110g',before:'0 Krt',adjust:'+18 Krt',after:'18 Krt'}] },
-        { id:'TX-OUT-260623-055', time:'10:10', region:'Jawa Timur', area:'Surabaya', sales:'Citra Dewi', salesCode:'MTR-108', type:'outbound', location:'Toko Bu Rini', product:'Milna Toddler Biscuit 110g', qty:'-5 Krt', gps:'valid', gpsDetails:'Jarak 12m.', gpsCoords:'-7.258500,112.753500', nota:false, status:'verified', date:'2026-06-23', items:[{name:'Milna Toddler Biscuit 110g',before:'18 Krt',adjust:'-5 Krt',after:'13 Krt'}] },
-        { id:'TX-OUT-260623-056', time:'11:40', region:'Sumatera', area:'Medan', sales:'Eko Wahyudi', salesCode:'MTR-211', type:'outbound', location:'Toko Sinar Baru', product:'Entrasol Gold Vanila 600g', qty:'-2 Krt', gps:'valid', gpsDetails:'Jarak 14m.', gpsCoords:'3.597000,98.674500', nota:false, status:'verified', date:'2026-06-23', items:[{name:'Entrasol Gold Vanila 600g',before:'7 Krt',adjust:'-2 Krt',after:'5 Krt'}] },
-        { id:'TX-IN-260624-057', time:'07:35', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'inbound', location:'Grosir Sinar Jaya (Stokis #12)', product:'Morinaga Chil*Kid Gold 800g', qty:'+28 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 12m.', gpsCoords:'-6.229728,106.840742', nota:true, status:'verified', date:'2026-06-24', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'12 Krt',adjust:'+28 Krt',after:'40 Krt'}] },
-        { id:'TX-OUT-260624-058', time:'09:50', region:'Jabodetabek', area:'Jakarta Timur', sales:'Andi Prasetyo', salesCode:'MTR-009', type:'outbound', location:'Warung Sembako Jaya', product:'Morinaga Chil*Kid Gold 800g', qty:'-6 Krt', gps:'valid', gpsDetails:'Jarak 9m.', gpsCoords:'-6.231500,106.843000', nota:false, status:'verified', date:'2026-06-24', items:[{name:'Morinaga Chil*Kid Gold 800g',before:'40 Krt',adjust:'-6 Krt',after:'34 Krt'}] },
-        { id:'TX-IN-260625-059', time:'08:15', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'inbound', location:'Grosir Maju Bersama (Stokis #03)', product:'Morinaga Chil*School Vanila 200g', qty:'+16 Krt', gps:'valid', gpsDetails:'Akurat. Jarak 20m.', gpsCoords:'-6.917464,107.619122', nota:true, status:'verified', date:'2026-06-25', items:[{name:'Morinaga Chil*School Vanila 200g',before:'5 Krt',adjust:'+16 Krt',after:'21 Krt'}] },
-        { id:'TX-OUT-260625-060', time:'10:40', region:'Jawa Barat', area:'Bandung', sales:'Budi Santoso', salesCode:'MTR-043', type:'outbound', location:'Warung Aa Asep', product:'Morinaga Chil*School Vanila 200g', qty:'-4 Krt', gps:'valid', gpsDetails:'Jarak 8m.', gpsCoords:'-6.918800,107.620800', nota:false, status:'verified', date:'2026-06-25', items:[{name:'Morinaga Chil*School Vanila 200g',before:'21 Krt',adjust:'-4 Krt',after:'17 Krt'}] },
+    // ===================== MOCK DATA =====================
+    const PRODUCTS = [
+        { name: 'Prenagen Mommy Vanilla 400g', pricePerPcs: 52000 },
+        { name: 'Morinaga Chil-Go Strawberry 140ml', pricePerPcs: 8500 },
+        { name: 'Entrasol Gold Plain 580g', pricePerPcs: 98000 },
+        { name: 'Diabetasol Vanilla 600g', pricePerPcs: 112000 },
+        { name: 'Prenagen Esensis Coklat 360g', pricePerPcs: 68000 },
+        { name: 'Morinaga BMT Platinum 800g', pricePerPcs: 185000 },
+        { name: 'Milna Biskuit Bayi Original 130g', pricePerPcs: 15000 },
+        { name: 'Entrasol Active Coklat 350g', pricePerPcs: 45000 },
+        { name: 'Zee Platinum Vanilla 350g', pricePerPcs: 42000 },
+        { name: 'Prenagen Lactamom Mocca 200g', pricePerPcs: 38000 }
     ];
 
-    document.addEventListener('layoutReady', () => {
-        initCharts();
-        populateFilters();
-        populateSalesFilter();
+    const OUTLETS = ['Toko Maju Jaya', 'Warung Barokah', 'Kios Sejahtera', 'Toko Sinar Baru', 'Warung Bu Eni', 'Kios Makmur', 'Toko Harapan', 'Warung Pak De', 'Kios Mentari', 'Toko Berkah', 'Warung Subur', 'Kios Purnama', 'Toko Dua Putri', 'Warung Keluarga', 'Kios Bintang'];
+
+    const STOKIS_LIST = ['PT Sumber Makmur', 'CV Berkah Jaya', 'PT Indo Distribusi', 'CV Mitra Sejahtera', 'PT Kalbe Farma Dist.', 'CV Karya Mandiri'];
+
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function formatRp(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+    function formatNum(n) { return n.toLocaleString('id-ID'); }
+
+    function generateMotorisData() {
+        const names = [
+            { name: 'Andi Prasetyo', code: 'MTR-001', region: 'jabodetabek', area: 'Jakarta Selatan' },
+            { name: 'Budi Santoso', code: 'MTR-002', region: 'jabodetabek', area: 'Jakarta Timur' },
+            { name: 'Cahyo Wibowo', code: 'MTR-003', region: 'jabodetabek', area: 'Tangerang' },
+            { name: 'Dedi Kurniawan', code: 'MTR-004', region: 'jawa_barat', area: 'Bandung' },
+            { name: 'Eko Firmansyah', code: 'MTR-005', region: 'jawa_barat', area: 'Bogor' },
+            { name: 'Fajar Hidayat', code: 'MTR-006', region: 'jawa_barat', area: 'Bekasi' },
+            { name: 'Gunawan Setiadi', code: 'MTR-007', region: 'jawa_tengah', area: 'Semarang' },
+            { name: 'Hendra Wijaya', code: 'MTR-008', region: 'jawa_tengah', area: 'Solo' },
+            { name: 'Irfan Maulana', code: 'MTR-009', region: 'jawa_tengah', area: 'Purwokerto' },
+            { name: 'Joko Purnomo', code: 'MTR-010', region: 'jawa_timur', area: 'Surabaya' },
+            { name: 'Krisna Adi', code: 'MTR-011', region: 'jawa_timur', area: 'Malang' },
+            { name: 'Lukman Hakim', code: 'MTR-012', region: 'jawa_timur', area: 'Sidoarjo' },
+            { name: 'Muhammad Rizki', code: 'MTR-013', region: 'sumatera', area: 'Medan' },
+            { name: 'Naufal Akbar', code: 'MTR-014', region: 'sumatera', area: 'Palembang' },
+            { name: 'Oscar Ramadhan', code: 'MTR-015', region: 'sumatera', area: 'Lampung' },
+            { name: 'Putra Aditya', code: 'MTR-016', region: 'jabodetabek', area: 'Depok' },
+            { name: 'Rendi Saputra', code: 'MTR-017', region: 'jawa_timur', area: 'Gresik' }
+        ];
+
+        return names.map(m => {
+            // Generate products held by this motoris (3-6 products)
+            const numProds = randomInt(3, 6);
+            const selectedProds = [];
+            const usedIdx = new Set();
+            for (let i = 0; i < numProds; i++) {
+                let idx;
+                do { idx = randomInt(0, PRODUCTS.length - 1); } while (usedIdx.has(idx));
+                usedIdx.add(idx);
+                selectedProds.push({
+                    name: PRODUCTS[idx].name,
+                    karton: randomInt(1, 8),
+                    dus: randomInt(0, 11),
+                    pcs: randomInt(0, 5),
+                    pricePerPcs: PRODUCTS[idx].pricePerPcs
+                });
+            }
+
+            // Calculate totals
+            let totalKrt = 0, totalDus = 0, totalPcs = 0;
+            selectedProds.forEach(p => { totalKrt += p.karton; totalDus += p.dus; totalPcs += p.pcs; });
+            const totalPcsAll = (totalKrt * 72) + (totalDus * 6) + totalPcs;
+            const inboundKrt = totalKrt + randomInt(5, 20); // They got more than current stock
+            const soldPcs = (inboundKrt * 72) - totalPcsAll; // difference is what was sold
+            const aging = randomInt(1, 18);
+            const sellThrough = Math.round((soldPcs / (inboundKrt * 72)) * 100);
+
+            // Generate sales history (last 10 transactions)
+            const salesHistory = [];
+            for (let i = 0; i < 10; i++) {
+                const day = randomInt(1, 28);
+                const prod = randomChoice(selectedProds);
+                const qtyPcs = randomInt(2, 24);
+                // Generate coordinates based on region
+                const baseCoords = { jabodetabek: [-6.2, 106.85], jawa_barat: [-6.9, 107.6], jawa_tengah: [-7.0, 110.4], jawa_timur: [-7.3, 112.7], sumatera: [3.6, 98.7] };
+                const base = baseCoords[m.region] || [-6.2, 106.85];
+                const lat = base[0] + (Math.random() - 0.5) * 0.06;
+                const lng = base[1] + (Math.random() - 0.5) * 0.08;
+                salesHistory.push({
+                    date: `2026-06-${String(day).padStart(2, '0')}`,
+                    outlet: randomChoice(OUTLETS),
+                    product: prod.name,
+                    qtyPcs: qtyPcs,
+                    amount: qtyPcs * prod.pricePerPcs,
+                    lat: parseFloat(lat.toFixed(6)),
+                    lng: parseFloat(lng.toFixed(6))
+                });
+            }
+            salesHistory.sort((a, b) => b.date.localeCompare(a.date));
+
+            // Daily sales for mini chart (last 7 days)
+            const dailySales = [];
+            for (let d = 7; d >= 1; d--) {
+                dailySales.push(randomInt(10, 80));
+            }
+
+            // Last kulakan info
+            const lastKulakan = {
+                date: `2026-06-${String(randomInt(10, 25)).padStart(2, '0')}`,
+                stokis: randomChoice(STOKIS_LIST),
+                qty: randomInt(3, 15),
+                gps: Math.random() > 0.15
+            };
+
+            return {
+                ...m,
+                products: selectedProds,
+                totalKrt, totalDus, totalPcs,
+                totalPcsAll,
+                inboundKrt,
+                soldPcs,
+                aging,
+                sellThrough,
+                salesHistory,
+                dailySales,
+                lastKulakan,
+                nilai: selectedProds.reduce((sum, p) => sum + ((p.karton * 72 + p.dus * 6 + p.pcs) * p.pricePerPcs), 0)
+            };
+        });
+    }
+
+    let motorisData = generateMotorisData();
+    let currentUnit = 'qty';
+    let chartInstances = {};
+    let dtBalance = null;
+    let dtAudit = null;
+
+    // ===================== AUDIT TRAIL DATA =====================
+    function generateAuditData() {
+        const audits = [];
+        let txCounter = 1;
+        motorisData.forEach(m => {
+            // Inbound entries (in Krt)
+            const inProd = randomChoice(m.products);
+            const inQty = m.lastKulakan.qty;
+            const afterKrt = inProd.karton + inQty;
+            const lat = (-6.1 - Math.random() * 1.5).toFixed(6);
+            const lng = (106.7 + Math.random() * 1.2).toFixed(6);
+            audits.push({
+                id: `TX-IN-2606${String(randomInt(10,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
+                date: m.lastKulakan.date,
+                time: `0${randomInt(7,9)}:${String(randomInt(0,59)).padStart(2,'0')}`,
+                motoris: m.name,
+                salesCode: m.code,
+                region: regionLabel(m.region),
+                area: m.area,
+                type: 'inbound',
+                product: inProd.name,
+                qty: inQty,
+                qtyUnit: 'Krt',
+                outlet: m.lastKulakan.stokis,
+                gps: m.lastKulakan.gps,
+                gpsCoords: `${lat},${lng}`,
+                gpsDetails: m.lastKulakan.gps ? `Akurat. Jarak ${randomInt(5,25)}m dari stokis.` : `PERINGATAN: Jarak ${(Math.random()*1.5+0.3).toFixed(1)} km dari stokis.`,
+                nota: true,
+                status: 'verified',
+                items: [{ name: inProd.name, before: `${inProd.karton} Krt`, adjust: `+${inQty} Krt`, after: `${afterKrt} Krt` }]
+            });
+            // Outbound entries (in Pcs)
+            const numOut = randomInt(2, 4);
+            for (let i = 0; i < numOut; i++) {
+                const prod = randomChoice(m.products);
+                const qtyPcs = randomInt(6, 48);
+                const beforePcs = (prod.karton * 72) + (prod.dus * 6) + prod.pcs;
+                const afterPcs = beforePcs - qtyPcs;
+                const olat = (-6.1 - Math.random() * 1.5).toFixed(6);
+                const olng = (106.7 + Math.random() * 1.2).toFixed(6);
+                const gpsValid = Math.random() > 0.1;
+                audits.push({
+                    id: `TX-OUT-2606${String(randomInt(12,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
+                    date: `2026-06-${String(randomInt(12, 28)).padStart(2, '0')}`,
+                    time: `${randomInt(9,16)}:${String(randomInt(0,59)).padStart(2,'0')}`,
+                    motoris: m.name,
+                    salesCode: m.code,
+                    region: regionLabel(m.region),
+                    area: m.area,
+                    type: 'outbound',
+                    product: prod.name,
+                    qty: qtyPcs,
+                    qtyUnit: 'Pcs',
+                    outlet: randomChoice(OUTLETS),
+                    gps: gpsValid,
+                    gpsCoords: `${olat},${olng}`,
+                    gpsDetails: gpsValid ? `Jarak ${randomInt(3,20)}m.` : `PERINGATAN: Jarak ${(Math.random()*1.2+0.2).toFixed(1)} km dari outlet.`,
+                    nota: false,
+                    status: Math.random() > 0.2 ? 'verified' : 'pending',
+                    items: [{ name: prod.name, before: `${beforePcs} Pcs`, adjust: `-${qtyPcs} Pcs`, after: `${Math.max(0, afterPcs)} Pcs` }]
+                });
+            }
+        });
+        audits.sort((a, b) => b.date.localeCompare(a.date));
+        return audits;
+    }
+
+    let auditData = generateAuditData();
+
+    // ===================== INITIALIZATION =====================
+    document.addEventListener('layoutReady', function() {
+        updateTimestamp();
         renderBalanceTable();
-        applyAllFilters();
+        renderAuditTable();
+        initCharts();
+        updateSummaryCards();
+        updateCharts();
     });
 
-    /* ============================================================
-       UNIT MODE (Qty / Rupiah) — average value per unit (mock)
-       ============================================================ */
-    let unitMode = 'qty';
-    const RP_PER_KRT = 500000;   // asumsi nilai rata-rata per karton
-    const RP_PER_PCS = 21000;    // asumsi nilai rata-rata per pcs
-
-    function fmtRp(n) {
-        if (n >= 1e9) return 'Rp ' + (n / 1e9).toFixed(2).replace('.', ',') + ' M';
-        if (n >= 1e6) return 'Rp ' + Math.round(n / 1e6) + ' Jt';
-        if (n >= 1e3) return 'Rp ' + Math.round(n / 1e3) + ' Rb';
-        return 'Rp ' + n;
+    function updateTimestamp() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('lastUpdatedTime').textContent = `Terakhir diperbarui: hari ini, ${time} WIB`;
     }
 
+    // ===================== UNIT TOGGLE =====================
     function setUnitMode(mode) {
-        unitMode = mode;
-        document.querySelectorAll('#unitToggle button').forEach(b => {
-            b.classList.toggle('active', b.dataset.unit === mode);
-        });
-
-        // Toggle main summary card values
-        if (mode === 'rp') {
-            document.getElementById('cardInbound').innerText = fmtRp(2840 * RP_PER_KRT);
-            document.getElementById('cardOutbound').innerText = fmtRp(12450 * RP_PER_PCS);
-            document.getElementById('cardSaldoMotor').innerText = fmtRp(624 * RP_PER_KRT);
-        } else {
-            document.getElementById('cardInbound').innerText = '2,840 Krt';
-            document.getElementById('cardOutbound').innerText = '12,450 Pcs';
-            document.getElementById('cardSaldoMotor').innerText = '624 Krt';
-        }
-
-        // Toggle chart axis dataset (multiply by avg rp when in rupiah)
-        if (mainChart) {
-            const factor = mode === 'rp' ? RP_PER_KRT / 1000 : 1; // ribuan rupiah agar skala terbaca
-            mainChart.options.plugins.tooltip = {
-                callbacks: {
-                    label: (ctx) => {
-                        const v = ctx.parsed.y;
-                        return mode === 'rp'
-                            ? `${ctx.dataset.label}: ${fmtRp(v * RP_PER_KRT)}`
-                            : `${ctx.dataset.label}: ${v} unit`;
-                    }
-                }
-            };
-            mainChart.update();
-        }
+        currentUnit = mode;
+        document.querySelectorAll('#unitToggle button').forEach(b => b.classList.remove('active'));
+        document.querySelector(`#unitToggle button[data-unit="${mode}"]`).classList.add('active');
+        updateSummaryCards();
         renderBalanceTable();
+        updateCharts();
     }
 
-    /* ============================================================
-       SALDO STOK BERJALAN PER MOTORIS
-       ============================================================ */
-    const motorisStock = [
-        { name: 'Andi Prasetyo', code: 'MTR-009', region: 'Jabodetabek', area: 'Jakarta Timur', inbound: 71, sold: 26, aging: 4 },
-        { name: 'Budi Santoso', code: 'MTR-043', region: 'Jawa Barat', area: 'Bandung', inbound: 56, sold: 21, aging: 6 },
-        { name: 'Citra Dewi', code: 'MTR-108', region: 'Jawa Timur', area: 'Surabaya', inbound: 68, sold: 27, aging: 3 },
-        { name: 'Dimas Prayoga', code: 'MTR-084', region: 'Jawa Tengah', area: 'Solo', inbound: 27, sold: 9, aging: 17 },
-        { name: 'Eko Wahyudi', code: 'MTR-211', region: 'Sumatera', area: 'Medan', inbound: 18, sold: 7, aging: 9 },
-        { name: 'Rian Wijaya', code: 'MTR-018', region: 'Jabodetabek', area: 'Jakarta Selatan', inbound: 38, sold: 16, aging: 2 },
-        { name: 'Fira Anggraini', code: 'MTR-077', region: 'Jawa Barat', area: 'Cirebon', inbound: 70, sold: 18, aging: 15 },
-        { name: 'Guntur Hermawan', code: 'MTR-145', region: 'Jawa Timur', area: 'Malang', inbound: 22, sold: 4, aging: 12 },
-        { name: 'Hendra Kurniawan', code: 'MTR-032', region: 'Jabodetabek', area: 'Bekasi', inbound: 5, sold: 2, aging: 5 },
-        { name: 'Indah Permata', code: 'MTR-092', region: 'Jawa Tengah', area: 'Semarang', inbound: 12, sold: 5, aging: 8 },
-        { name: 'Joko Susilo', code: 'MTR-055', region: 'Jabodetabek', area: 'Tangerang', inbound: 20, sold: 7, aging: 7 },
-        { name: 'Kurnia Sari', code: 'MTR-228', region: 'Sumatera', area: 'Palembang', inbound: 14, sold: 4, aging: 10 },
-        { name: 'Luki Prasetyo', code: 'MTR-156', region: 'Jawa Timur', area: 'Kediri', inbound: 16, sold: 5, aging: 9 },
-        { name: 'Mega Utami', code: 'MTR-099', region: 'Jawa Tengah', area: 'Yogyakarta', inbound: 20, sold: 6, aging: 7 },
-        { name: 'Nanda Firmansyah', code: 'MTR-067', region: 'Jabodetabek', area: 'Bogor', inbound: 15, sold: 5, aging: 6 },
-        { name: 'Oki Pratama', code: 'MTR-081', region: 'Jawa Barat', area: 'Karawang', inbound: 25, sold: 8, aging: 5 },
-        { name: 'Putra Aditya', code: 'MTR-167', region: 'Jawa Timur', area: 'Jember', inbound: 14, sold: 3, aging: 4 },
-    ];
+    // ===================== SUMMARY CARDS =====================
+    function updateSummaryCards() {
+        const filtered = getFilteredMotoris();
+        const totalInboundKrt = filtered.reduce((s, m) => s + m.inboundKrt, 0);
+        const totalInboundRp = totalInboundKrt * 72 * 55000;
+        const totalSoldPcs = filtered.reduce((s, m) => s + m.soldPcs, 0);
+        const totalSoldRp = filtered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
+        const totalSaldoKrt = filtered.reduce((s, m) => s + m.totalKrt, 0);
+        const totalSaldoPcsAll = filtered.reduce((s, m) => s + m.totalPcsAll, 0);
+        const totalNilai = filtered.reduce((s, m) => s + m.nilai, 0);
+        const avgSellThrough = filtered.length > 0 ? Math.round(filtered.reduce((s, m) => s + m.sellThrough, 0) / filtered.length) : 0;
 
+        document.getElementById('cardActiveMotoris').textContent = formatNum(filtered.length);
+
+        if (currentUnit === 'qty') {
+            document.getElementById('cardInbound').textContent = formatNum(totalInboundKrt) + ' Krt';
+            document.getElementById('cardInboundRp').textContent = '≈ ' + formatRp(totalInboundRp);
+
+            document.getElementById('cardOutbound').textContent = formatNum(totalSoldPcs) + ' Pcs';
+            document.getElementById('cardSellThrough').textContent = 'Sell-Through ' + avgSellThrough + '%';
+
+            document.getElementById('cardSaldoMotor').textContent = formatNum(totalSaldoKrt) + ' Krt';
+            document.getElementById('cardSaldoPcs').textContent = '≈ ' + formatNum(totalSaldoPcsAll) + ' Pcs total';
+            document.getElementById('cardSaldoRp').textContent = '≈ ' + formatRp(totalNilai);
+        } else {
+            document.getElementById('cardInbound').textContent = formatRp(totalInboundRp);
+            document.getElementById('cardInboundRp').textContent = `≈ ${formatNum(totalInboundKrt)} Krt`;
+
+            document.getElementById('cardOutbound').textContent = formatRp(totalSoldRp);
+            document.getElementById('cardSellThrough').textContent = `Sell-Through ${avgSellThrough}% (≈ ${formatNum(totalSoldPcs)} Pcs)`;
+
+            document.getElementById('cardSaldoMotor').textContent = formatRp(totalNilai);
+            document.getElementById('cardSaldoPcs').textContent = `≈ ${formatNum(totalSaldoKrt)} Krt`;
+            document.getElementById('cardSaldoRp').textContent = `≈ ${formatNum(totalSaldoPcsAll)} Pcs total`;
+        }
+    }
+
+    // ===================== FILTER LOGIC =====================
+    function getFilteredMotoris() {
+        const region = document.getElementById('filterRegion').value;
+        const area = document.getElementById('filterArea').value;
+        const sales = document.getElementById('filterSales').value;
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+
+        let data = motorisData;
+        if (region) data = data.filter(m => m.region === region);
+        if (area) data = data.filter(m => m.area === area);
+        if (sales) data = data.filter(m => m.code === sales);
+
+        return data.map(m => {
+            let salesHistory = m.salesHistory;
+            if (dateStart) salesHistory = salesHistory.filter(h => h.date >= dateStart);
+            if (dateEnd) salesHistory = salesHistory.filter(h => h.date <= dateEnd);
+
+            const soldPcs = salesHistory.reduce((sum, h) => sum + h.qtyPcs, 0);
+            const inboundPcs = m.inboundKrt * 72;
+            const remainingPcs = Math.max(0, inboundPcs - soldPcs);
+
+            const totalKrt = Math.floor(remainingPcs / 72);
+            const totalDus = Math.floor((remainingPcs % 72) / 6);
+            const totalPcs = remainingPcs % 6;
+            const totalPcsAll = remainingPcs;
+
+            const sellThrough = inboundPcs > 0 ? Math.round((soldPcs / inboundPcs) * 100) : 0;
+            const avgPrice = m.products.reduce((sum, p) => sum + p.pricePerPcs, 0) / m.products.length;
+            const nilai = remainingPcs * avgPrice;
+
+            return {
+                ...m,
+                salesHistory,
+                soldPcs,
+                totalKrt,
+                totalDus,
+                totalPcs,
+                totalPcsAll,
+                sellThrough,
+                nilai
+            };
+        });
+    }
+
+    function onRegionChange() {
+        const region = document.getElementById('filterRegion').value;
+        const areaSelect = document.getElementById('filterArea');
+        const salesSelect = document.getElementById('filterSales');
+        areaSelect.innerHTML = '<option value="">Semua Area</option>';
+        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
+
+        if (region) {
+            const areas = [...new Set(motorisData.filter(m => m.region === region).map(m => m.area))];
+            areas.forEach(a => { areaSelect.innerHTML += `<option value="${a}">${a}</option>`; });
+        }
+        applyAllFilters();
+    }
+
+    function onAreaChange() {
+        const region = document.getElementById('filterRegion').value;
+        const area = document.getElementById('filterArea').value;
+        const salesSelect = document.getElementById('filterSales');
+        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
+
+        let filtered = motorisData;
+        if (region) filtered = filtered.filter(m => m.region === region);
+        if (area) filtered = filtered.filter(m => m.area === area);
+        filtered.forEach(m => { salesSelect.innerHTML += `<option value="${m.code}">${m.name}</option>`; });
+        applyAllFilters();
+    }
+
+    function applyAllFilters() {
+        updateFilterChips();
+        updateSummaryCards();
+        renderBalanceTable();
+        renderAuditTable();
+        updateCharts();
+    }
+
+    function updateFilterChips() {
+        const region = document.getElementById('filterRegion');
+        const area = document.getElementById('filterArea');
+        const sales = document.getElementById('filterSales');
+        const bar = document.getElementById('filterChipsBar');
+        const list = document.getElementById('filterChipsList');
+        let chips = [];
+
+        if (region.value) chips.push({ label: region.options[region.selectedIndex].text, icon: 'fa-globe', field: 'filterRegion' });
+        if (area.value) chips.push({ label: area.options[area.selectedIndex].text, icon: 'fa-map-marker-alt', field: 'filterArea' });
+        if (sales.value) chips.push({ label: sales.options[sales.selectedIndex].text, icon: 'fa-user', field: 'filterSales' });
+
+        if (chips.length === 0) { bar.classList.add('hidden'); return; }
+        bar.classList.remove('hidden');
+        list.innerHTML = chips.map(c => `<span class="filter-chip"><i class="fas ${c.icon}"></i> ${c.label}<span class="chip-remove" onclick="clearFilter('${c.field}')"><i class="fas fa-times"></i></span></span>`).join('');
+    }
+
+    function clearFilter(field) {
+        document.getElementById(field).value = '';
+        if (field === 'filterRegion') { onRegionChange(); }
+        else if (field === 'filterArea') { onAreaChange(); }
+        else { applyAllFilters(); }
+    }
+
+    function resetAllFilters() {
+        document.getElementById('filterRegion').value = '';
+        document.getElementById('filterArea').value = '';
+        document.getElementById('filterSales').value = '';
+        document.getElementById('filterArea').innerHTML = '<option value="">Semua Area</option>';
+        document.getElementById('filterSales').innerHTML = '<option value="">Semua Motoris</option>';
+        applyAllFilters();
+    }
+
+    // ===================== BALANCE TABLE =====================
     function renderBalanceTable() {
-        // Destroy existing DataTable if already initialized
-        if (dtBalance) {
-            dtBalance.destroy();
-            dtBalance = null;
+        // Destroy existing DataTable instance
+        if (dtBalance) { dtBalance.destroy(); dtBalance = null; }
+
+        const filtered = getFilteredMotoris();
+        const tbody = document.getElementById('balanceTableBody');
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><div class="empty-state-title">Tidak ada data</div><div class="empty-state-desc">Tidak ditemukan data motoris sesuai filter yang dipilih.</div></div></td></tr>`;
+            return;
         }
 
-        const tbody = document.getElementById('tblBalanceBody');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        motorisStock.forEach(m => {
-            const saldo = m.inbound - m.sold;
-            const sellThrough = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
-
-            // sell-through bar color
-            let stClass = 'st-good';
-            if (sellThrough < 50) stClass = 'st-low';
-            else if (sellThrough < 75) stClass = 'st-mid';
-
-            // aging badge
-            let agingClass = 'aging-fresh', agingTxt = `${m.aging} hari`;
-            if (m.aging > 14) agingClass = 'aging-old';
-            else if (m.aging > 7) agingClass = 'aging-warn';
-
-            const saldoVal = unitMode === 'rp' ? fmtRp(saldo * RP_PER_KRT) : `${saldo} Krt`;
-
-            tbody.innerHTML += `<tr>
-                <td><strong>${m.name}</strong><br><small style="color:#8a92a6;">${m.code}</small></td>
-                <td><small>${m.region}</small><br><strong style="font-size:0.78rem;">${m.area}</strong></td>
-                <td style="text-align:center; color:#2E7D32; font-weight:700;">${m.inbound} Krt</td>
-                <td style="text-align:center; color:#1565C0; font-weight:700;">${m.sold} Krt</td>
-                <td style="text-align:center; font-weight:800; color:${saldo > 10 ? '#E65100' : '#0f172a'};">${saldo} Krt</td>
-                <td data-order="${sellThrough}">
-                    <div style="display:flex; align-items:center; gap:8px; justify-content:center;">
-                        <div class="mini-bar"><span class="${stClass}" style="width:${sellThrough}%;"></span></div>
-                        <span style="font-weight:700; font-size:0.76rem; color:#475569;">${sellThrough}%</span>
-                    </div>
-                </td>
-                <td style="text-align:center;" data-order="${m.aging}"><span class="aging-badge ${agingClass}">${agingTxt}</span></td>
-                <td style="text-align:right; font-weight:700; color:#3730A3;" data-order="${saldo * RP_PER_KRT}">${fmtRp(saldo * RP_PER_KRT)}</td>
+        tbody.innerHTML = filtered.map(m => {
+            const stClass = m.sellThrough >= 70 ? 'st-good' : m.sellThrough >= 40 ? 'st-mid' : 'st-low';
+            const agingClass = m.aging <= 7 ? 'aging-fresh' : m.aging <= 14 ? 'aging-warn' : 'aging-old';
+            const nilaiDisplay = formatRp(m.nilai);
+            return `<tr>
+                <td><a class="motoris-link" onclick="showMotorisDetail('${m.code}')">${m.name}</a><br><span style="font-size:0.7rem;color:#94a3b8;">${m.code}</span></td>
+                <td>${m.area}<br><span style="font-size:0.7rem;color:#94a3b8;">${regionLabel(m.region)}</span></td>
+                <td style="font-weight:700;">${m.totalKrt}</td>
+                <td>${m.totalDus}</td>
+                <td>${m.totalPcs}</td>
+                <td style="font-weight:700; color:#005d41;" data-order="${m.totalPcsAll}">${formatNum(m.totalPcsAll)}</td>
+                <td data-order="${m.sellThrough}"><div class="mini-bar-wrapper"><span class="mini-bar-tooltip">${m.sellThrough}% Sell-Through</span><div class="mini-bar"><span class="${stClass}" style="width:${m.sellThrough}%;"></span></div></div><span style="font-size:0.7rem;color:#64748b;margin-top:2px;display:block;">${m.sellThrough}%</span></td>
+                <td data-order="${m.aging}"><span class="aging-badge ${agingClass}">${m.aging} hari</span></td>
+                <td style="font-size:0.78rem; font-weight:600;" data-order="${m.nilai}">${nilaiDisplay}</td>
             </tr>`;
-        });
+        }).join('');
 
-        // Initialize DataTable
-        dtBalance = $('#tblBalance').DataTable({
+        // Initialize DataTables
+        dtBalance = $('#balanceTable').DataTable({
             pageLength: 10,
-            lengthMenu: [5, 10, 25],
-            order: [[4, 'desc']],
+            lengthMenu: [5, 10, 25, 50],
+            order: [[5, 'desc']],
             language: {
                 search: 'Cari:',
                 lengthMenu: 'Tampilkan _MENU_ data',
                 info: 'Menampilkan _START_-_END_ dari _TOTAL_ motoris',
                 infoEmpty: 'Tidak ada data',
+                infoFiltered: '(disaring dari _MAX_ total)',
                 paginate: { first: '«', last: '»', next: '›', previous: '‹' },
                 zeroRecords: 'Tidak ada motoris yang cocok'
             },
@@ -608,281 +1019,211 @@
         });
     }
 
-    function populateFilters() {
-        const areaSelect = document.getElementById('filterArea');
-        const salesSelect = document.getElementById('filterSales');
-        areaSelect.innerHTML = '<option value="">Semua Area</option>';
-        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
+    function regionLabel(key) {
+        const map = { jabodetabek: 'Jabodetabek', jawa_barat: 'Jawa Barat', jawa_tengah: 'Jawa Tengah', jawa_timur: 'Jawa Timur', sumatera: 'Sumatera' };
+        return map[key] || key;
     }
 
-    function populateSalesFilter() {
-        const regionVal = document.getElementById('filterRegion').value;
-        const areaVal = document.getElementById('filterArea').value;
-        const salesSelect = document.getElementById('filterSales');
-        
-        const uniqueSales = new Set();
-        auditData.forEach(r => {
-            if (regionVal && r.region.toLowerCase() !== regionVal.replace('_', ' ')) return;
-            if (areaVal && r.area !== areaVal) return;
-            uniqueSales.add(r.sales);
-        });
+    // ===================== MOTORIS DETAIL POPUP =====================
+    function showMotorisDetail(code) {
+        const m = motorisData.find(x => x.code === code);
+        if (!m) return;
 
-        const currentVal = salesSelect.value;
-        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
-        uniqueSales.forEach(salesName => {
-            salesSelect.innerHTML += `<option value="${salesName}">${salesName}</option>`;
-        });
-        
-        if (uniqueSales.has(currentVal)) {
-            salesSelect.value = currentVal;
-        }
-    }
+        const stokRows = m.products.map(p => {
+            const totalPcsProd = (p.karton * 72) + (p.dus * 6) + p.pcs;
+            return `<tr><td>${p.name}</td><td style="text-align:center;">${p.karton}</td><td style="text-align:center;">${p.dus}</td><td style="text-align:center;">${p.pcs}</td><td style="text-align:right;">${formatRp(totalPcsProd * p.pricePerPcs)}</td></tr>`;
+        }).join('');
 
-    function applyAllFilters() {
-        const regionVal = document.getElementById('filterRegion').value;
-        const areaVal = document.getElementById('filterArea').value;
-        const salesVal = document.getElementById('filterSales').value;
-        const searchVal = document.getElementById('searchAudit').value.toLowerCase();
-        const dateStartVal = document.getElementById('filterDateStart').value;
-        const dateEndVal = document.getElementById('filterDateEnd').value;
+        const historyRows = m.salesHistory.map((h, idx) => {
+            return `<tr><td style="text-align:center; font-weight:700; color:#005d41;">${idx + 1}</td><td>${h.date}</td><td><a href="#" class="motoris-link" onclick="event.preventDefault(); focusMapMarker(${idx})">${h.outlet}</a></td><td style="font-size:0.72rem;">${h.product}</td><td style="text-align:center;">${h.qtyPcs}</td><td style="text-align:right;">${formatRp(h.amount)}</td></tr>`;
+        }).join('');
 
-        let filtered = auditData.filter(r => {
-            // Region
-            if (regionVal && r.region.toLowerCase() !== regionVal.replace('_', ' ')) return false;
-            // Area
-            if (areaVal && r.area !== areaVal) return false;
-            // Motoris
-            if (salesVal && r.sales !== salesVal) return false;
-            // Search
-            if (searchVal) {
-                const matchSearch = r.sales.toLowerCase().includes(searchVal) || 
-                                    r.location.toLowerCase().includes(searchVal) || 
-                                    r.product.toLowerCase().includes(searchVal) ||
-                                    r.region.toLowerCase().includes(searchVal) ||
-                                    r.area.toLowerCase().includes(searchVal) ||
-                                    r.id.toLowerCase().includes(searchVal);
-                if (!matchSearch) return false;
-            }
-            // Date Range
-            if (r.date) {
-                if (dateStartVal && r.date < dateStartVal) return false;
-                if (dateEndVal && r.date > dateEndVal) return false;
-            }
-            return true;
-        });
+        const gpsIcon = m.lastKulakan.gps ? '<span class="gps-dot gps-valid"></span> Valid' : '<span class="gps-dot gps-invalid"></span> Invalid';
 
-        renderAuditTable(filtered);
-    }
-
-    function onRegionChange() {
-        const region = document.getElementById('filterRegion').value;
-        const areaSelect = document.getElementById('filterArea');
-        
-        currentSelectedRegion = region;
-        currentSelectedArea = '';
-        
-        areaSelect.innerHTML = '<option value="">Semua Area</option>';
-        
-        if (region && regionData[region]) {
-            regionData[region].areas.forEach(area => {
-                areaSelect.innerHTML += `<option value="${area}">${area}</option>`;
-            });
-            drilldownToRegion(region);
-        } else {
-            resetDrilldown();
-        }
-        populateSalesFilter();
-        applyAllFilters();
-    }
-
-    function onAreaChange() {
-        const area = document.getElementById('filterArea').value;
-        currentSelectedArea = area;
-        
-        if (area) {
-            drilldownToArea(area);
-        } else if (currentSelectedRegion) {
-            drilldownToRegion(currentSelectedRegion);
-        }
-        populateSalesFilter();
-        applyAllFilters();
-    }
-
-    function printAuditDetail(idx) {
-        const r = auditData[idx];
-        if (!r) return;
-
-        let itemsHtml = '';
-        r.items.forEach(item => {
-            itemsHtml += `<tr>
-                <td style="padding:10px 8px; border-bottom:1px solid #e2e8f0; text-align:left;">${item.name}</td>
-                <td style="padding:10px 8px; border-bottom:1px solid #e2e8f0; text-align:center;">${item.before}</td>
-                <td style="padding:10px 8px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:bold; color:${r.type === 'inbound' ? '#2E7D32' : '#C62828'};">
-                    ${r.type === 'inbound' ? '+' : '-'}${item.adjust.replace(/[^0-9]/g, '')}
-                </td>
-                <td style="padding:10px 8px; border-bottom:1px solid #e2e8f0; text-align:center; font-weight:bold;">${item.after}</td>
-            </tr>`;
-        });
-
-        const printWindow = window.open('', '_blank', 'width=850,height=900');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Audit Trail - ${r.id}</title>
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-                <style>
-                    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: #1e293b; margin: 40px; line-height: 1.5; background: #fff; }
-                    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #005d41; padding-bottom: 16px; margin-bottom: 24px; }
-                    .header h1 { color: #005d41; margin: 0; font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
-                    .header p { margin: 4px 0 0 0; font-size: 0.8rem; color: #64748b; font-weight: 600; text-transform: uppercase; }
-                    .section { margin-bottom: 28px; }
-                    .section h2 { font-size: 0.9rem; color: #005d41; border-bottom: 1.5px solid #005d41; padding-bottom: 6px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
-                    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-                    .meta-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-                    .meta-table td { padding: 6px 0; vertical-align: top; }
-                    .meta-table td.label { font-weight: 700; color: #64748b; width: 140px; }
-                    .mutation-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-                    .mutation-table th { background: #f8fafc; color: #005d41; text-align: left; padding: 12px 8px; border-bottom: 2px solid #cbd5e1; font-weight: 700; }
-                    .gps-box { background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 14px; font-size: 0.85rem; }
-                    .gps-box.deviation { background: #fff5f5; border-color: #fca5a5; }
-                    .footer { border-top: 1px solid #e2e8f0; margin-top: 60px; padding-top: 16px; font-size: 0.75rem; color: #94a3b8; text-align: center; line-height: 1.4; }
-                    .print-btn-bar { display: flex; justify-content: flex-end; margin-bottom: 20px; gap: 8px; }
-                    .btn-print { background: #005d41; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,93,65,0.1); }
-                    .btn-print:hover { background: #004530; }
-                    @media print {
-                        body { margin: 20px; }
-                        .print-btn-bar { display: none; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-btn-bar">
-                    <button class="btn-print" onclick="window.print();"><i class="fas fa-print"></i> Cetak ke Printer / Simpan PDF</button>
-                </div>
-                <div class="header">
-                    <div>
-                        <h1>FALCON SFA - DOKUMEN AUDIT PERGERAKAN STOK</h1>
-                        <p>Head Office Monitoring & Mutasi Persediaan</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <span style="font-weight: 800; font-size: 1.25rem; color: #005d41; letter-spacing: -0.02em;">${r.id}</span>
-                        <p style="color:#64748b; text-transform:none;">Tanggal Transaksi: ${r.date} &mdash; ${r.time} WIB</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Rincian Profil & Wilayah Kerja</h2>
-                    <div class="grid">
-                        <div>
-                            <table class="meta-table">
-                                <tr><td class="label">Nama Motoris (Sales)</td><td>: <strong>${r.sales}</strong></td></tr>
-                                <tr><td class="label">Kode Motoris</td><td>: ${r.salesCode}</td></tr>
-                                <tr><td class="label">Wilayah (Region)</td><td>: ${r.region}</td></tr>
-                                <tr><td class="label">Area Cabang</td><td>: ${r.area}</td></tr>
-                            </table>
-                        </div>
-                        <div>
-                            <table class="meta-table">
-                                <tr><td class="label">Jenis Transaksi</td><td>: <strong>${r.type === 'inbound' ? 'Kulakan (Inbound dari Stokis)' : 'Penjualan (Outbound ke Warung)'}</strong></td></tr>
-                                <tr><td class="label">Lokasi Partner</td><td>: ${r.location}</td></tr>
-                                <tr><td class="label">Status Approval</td><td>: ${r.status === 'verified' ? 'TERVERIFIKASI SISTEM' : 'MENUNGGU REKONSILIASI'}</td></tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Validasi GPS & Jarak Transaksi</h2>
-                    <div class="gps-box ${r.gps === 'invalid' ? 'deviation' : ''}">
-                        <div style="font-weight: 700; margin-bottom: 6px; color: ${r.gps === 'invalid' ? '#C62828' : '#2E7D32'}; font-size:0.9rem;">
-                            <i class="${r.gps === 'invalid' ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i> 
-                            ${r.gps === 'invalid' ? 'PERINGATAN: DEVIASI KOORDINAT GPS TERDETEKSI' : 'STATUS GPS: TERVERIFIKASI (GPS MATCH)'}
-                        </div>
-                        <p style="margin: 0; color: #475569; font-size: 0.82rem;">Detail Jarak: ${r.gpsDetails}</p>
-                        <p style="margin: 4px 0 0 0; font-family: monospace; font-size: 0.78rem; color: #64748b;">Koordinat Lapangan: ${r.gpsCoords}</p>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h2>Rincian Mutasi Fisik Persediaan (Stock Ledger)</h2>
-                    <table class="mutation-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align: left; padding-left: 8px;">Nama SKU Produk Kalbe</th>
-                                <th style="text-align: center; width: 120px;">Stok Awal</th>
-                                <th style="text-align: center; width: 150px;">Mutasi Jumlah</th>
-                                <th style="text-align: center; width: 120px;">Stok Akhir</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsHtml}
-                        </tbody>
+        const html = `
+        <div class="motoris-pop">
+            <div class="motoris-pop-header">
+                <h3><i class="fas fa-motorcycle" style="margin-right:8px;"></i> ${m.name}</h3>
+                <div class="mp-sub">${m.code} &bull; ${m.area} &bull; ${regionLabel(m.region)}</div>
+            </div>
+            <div class="motoris-pop-grid">
+                <div class="motoris-pop-sect">
+                    <h4><i class="fas fa-boxes-stacked"></i> Stok per SKU</h4>
+                    <table>
+                        <thead><tr><th>Produk</th><th style="text-align:center;">Krt</th><th style="text-align:center;">Dus</th><th style="text-align:center;">Pcs</th><th style="text-align:right;">Nilai (Rp)</th></tr></thead>
+                        <tbody>${stokRows}</tbody>
+                        <tfoot><tr style="font-weight:700;border-top:2px solid #005d41;"><td>TOTAL</td><td style="text-align:center;">${m.totalKrt}</td><td style="text-align:center;">${m.totalDus}</td><td style="text-align:center;">${m.totalPcs}</td><td style="text-align:right;">${formatRp(m.nilai)}</td></tr></tfoot>
                     </table>
                 </div>
-
-                <div class="footer">
-                    Dokumen ini merupakan salinan bukti digital mutasi stok resmi dari sistem SFA Falcon.<br>
-                    Segala bentuk penyesuaian stok terikat pada kode otentikasi unik perangkat sales motoris serta validasi koordinat satelit GPS.<br>
-                    <strong>Dicetak secara otomatis pada: ${new Date().toLocaleString('id-ID')} WIB</strong>
+                <div>
+                    <div class="motoris-pop-sect" style="margin-bottom:1rem;">
+                        <h4><i class="fas fa-chart-line"></i> Penjualan 7 Hari Terakhir (Pcs)</h4>
+                        <div style="position:relative; height:140px; width:100%;">
+                            <canvas id="miniChartCanvas"></canvas>
+                        </div>
+                    </div>
+                    <div class="motoris-pop-sect">
+                        <h4><i class="fas fa-truck-loading"></i> Info Kulakan Terakhir</h4>
+                        <div style="font-size:0.78rem; line-height:1.8;">
+                            <div><strong>Tanggal:</strong> ${m.lastKulakan.date}</div>
+                            <div><strong>Stokis:</strong> ${m.lastKulakan.stokis}</div>
+                            <div><strong>Qty:</strong> ${m.lastKulakan.qty} Krt</div>
+                            <div><strong>GPS:</strong> ${gpsIcon}</div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="motoris-pop-sect" style="margin-bottom:1rem;">
+                <h4><i class="fas fa-map-marked-alt"></i> Sebaran Outlet Dikunjungi</h4>
+                <div id="miniMapContainer" style="height:150px; border-radius:8px; overflow:hidden; border:1px solid #e2e8f0;"></div>
+                <span style="font-size:0.68rem; color:#8a92a6; display:block; margin-top:4px;">${m.salesHistory.length} outlet dalam 30 hari terakhir</span>
+            </div>
+            <div class="motoris-pop-sect">
+                <h4><i class="fas fa-history"></i> History Penjualan Terakhir (10 transaksi)</h4>
+                <div style="overflow-x:auto; max-height:220px; overflow-y:auto;">
+                    <table>
+                        <thead><tr><th style="text-align:center; width:30px;">#</th><th>Tanggal</th><th>Outlet</th><th>Produk</th><th style="text-align:center;">Qty (Pcs)</th><th style="text-align:right;">Harga</th></tr></thead>
+                        <tbody>${historyRows}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>`;
 
-                <script>
-                    window.onload = function() {
-                        setTimeout(function() {
-                            window.print();
-                        }, 300);
+        Swal.fire({
+            html: html,
+            width: 900,
+            showConfirmButton: false,
+            showCloseButton: true,
+            customClass: { popup: 'swal-motoris-popup' },
+            didOpen: () => {
+                const ctx = document.getElementById('miniChartCanvas');
+                if (ctx) {
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['H-7','H-6','H-5','H-4','H-3','H-2','H-1'],
+                            datasets: [{
+                                label: 'Pcs Terjual',
+                                data: m.dailySales,
+                                borderColor: '#005d41',
+                                backgroundColor: 'rgba(0,93,65,0.08)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#005d41',
+                                pointRadius: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                                y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+                            }
+                        }
+                    });
+                }
+
+                // Initialize Leaflet mini map
+                const mapEl = document.getElementById('miniMapContainer');
+                if (mapEl && m.salesHistory.length > 0) {
+                    const firstPoint = [m.salesHistory[0].lat, m.salesHistory[0].lng];
+                    const miniMap = L.map(mapEl, { zoomControl: false, attributionControl: false }).setView(firstPoint, 13);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(miniMap);
+                    
+                    const bounds = [];
+                    window._miniMapMarkers = [];
+                    window._miniMap = miniMap;
+                    m.salesHistory.forEach((h, idx) => {
+                        if (h.lat && h.lng) {
+                            const numIcon = L.divIcon({
+                                className: 'numbered-marker',
+                                html: '<div style="background:#005d41; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.65rem; font-weight:800; border:2px solid #fff; box-shadow:0 2px 4px rgba(0,0,0,0.3);">' + (idx + 1) + '</div>',
+                                iconSize: [22, 22],
+                                iconAnchor: [11, 11]
+                            });
+                            const marker = L.marker([h.lat, h.lng], { icon: numIcon }).addTo(miniMap);
+                            marker.bindTooltip('<strong>#' + (idx + 1) + '</strong> ' + h.outlet, { direction: 'top', offset: [0, -12] });
+                            window._miniMapMarkers.push(marker);
+                            bounds.push([h.lat, h.lng]);
+                        }
+                    });
+                    if (bounds.length > 1) {
+                        miniMap.fitBounds(bounds, { padding: [20, 20] });
                     }
-                <\/script>
-            <\/body>
-            <\/html>
-        `);
-        printWindow.document.close();
+                }
+            }
+        });
     }
-    let auditLastData = [];
-    let dtAudit = null;
-    let dtBalance = null;
 
-    function renderAuditTable(data) {
-        auditLastData = data;
+    // Focus map on specific marker when outlet name is clicked in table
+    function focusMapMarker(idx) {
+        if (window._miniMap && window._miniMapMarkers && window._miniMapMarkers[idx]) {
+            const marker = window._miniMapMarkers[idx];
+            const latLng = marker.getLatLng();
+            window._miniMap.setView(latLng, 16, { animate: true });
+            marker.openTooltip();
+            // Scroll map into view
+            const mapEl = document.getElementById('miniMapContainer');
+            if (mapEl) mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
 
-        // Destroy existing DataTable if already initialized
-        if (dtAudit) {
-            dtAudit.destroy();
-            dtAudit = null;
+    // ===================== AUDIT TABLE =====================
+    function renderAuditTable() {
+        // Destroy existing DataTable instance
+        if (dtAudit) { dtAudit.destroy(); dtAudit = null; }
+
+        const filtered = getFilteredMotoris();
+        const names = new Set(filtered.map(m => m.name));
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+
+        let filteredAudit = auditData.filter(a => names.has(a.motoris));
+        if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
+        if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
+
+        const tbody = document.getElementById('auditTableBody');
+
+        if (filteredAudit.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clipboard"></i></div><div class="empty-state-title">Belum ada transaksi</div><div class="empty-state-desc">Audit trail kosong untuk filter yang dipilih.</div></div></td></tr>`;
+            return;
         }
 
-        const tbody = document.getElementById('tblAuditBody');
-        tbody.innerHTML = '';
-
-        data.forEach((r) => {
-            const origIdx = auditData.findIndex(item => item.id === r.id);
-            const typeBadge = r.type === 'inbound'
+        tbody.innerHTML = filteredAudit.map(a => {
+            const typeBadge = a.type === 'inbound'
                 ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-down"></i> Inbound</span>'
                 : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-up"></i> Outbound</span>';
-            const gpsDot = `<span class="gps-dot ${r.gps === 'valid' ? 'gps-valid' : 'gps-invalid'}"></span>${r.gps === 'valid' ? 'Valid' : 'Invalid'}`;
-            const notaIcon = r.nota ? `<a href="#" style="color:#005d41;" onclick="event.stopPropagation(); showAuditDetail(${origIdx});"><i class="fas fa-image"></i></a>` : '<span style="color:#ccc;">-</span>';
-            const statusBadge = r.status === 'verified'
-                ? '<span class="badge-sm badge-verified"><i class="fas fa-check"></i> Verified</span>'
+            const qtyDisplay = a.type === 'inbound'
+                ? `+${a.qty} Krt`
+                : `-${a.qty} Pcs`;
+            const qtyColor = a.type === 'inbound' ? 'color:#2E7D32;' : 'color:#C62828;';
+            const statusBadge = a.status === 'verified'
+                ? '<span class="badge-sm badge-verified"><i class="fas fa-check-circle"></i> Verified</span>'
                 : '<span class="badge-sm badge-pending"><i class="fas fa-clock"></i> Pending</span>';
-            
-            tbody.innerHTML += `<tr onclick="showAuditDetail(${origIdx})" style="cursor:pointer;">
-                <td style="font-weight:600;">${r.date || ''} ${r.time}</td>
-                <td><small>${r.region}</small><br><strong>${r.area}</strong></td>
-                <td><strong>${r.sales}</strong></td>
-                <td>${typeBadge}</td>
-                <td>${r.location}</td>
-                <td>${r.product}</td>
-                <td style="font-weight:700; color:${r.type==='inbound'?'#2E7D32':'#C62828'};">${r.qty}</td>
-                <td>${gpsDot}</td>
-                <td style="text-align:center;">${notaIcon}</td>
-                <td>${statusBadge}</td>
-            </tr>`;
-        });
+            const gpsHtml = a.gps
+                ? '<span class="gps-dot gps-valid"></span> Valid'
+                : '<span class="gps-dot gps-invalid"></span> Invalid';
 
-        // Initialize DataTable
-        dtAudit = $('#tblAudit').DataTable({
+            return `<tr>
+                <td>${a.date}</td>
+                <td>${a.motoris}</td>
+                <td>${typeBadge}</td>
+                <td style="font-size:0.78rem;">${a.product}</td>
+                <td style="font-weight:700; ${qtyColor}">${qtyDisplay}</td>
+                <td>${a.outlet}</td>
+                <td>${gpsHtml}</td>
+                <td>${statusBadge}</td>
+                <td><button class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:2px 8px;" onclick="showAuditDetail(this)" data-id="${a.id}" data-motoris="${a.motoris}" data-salescode="${a.salesCode}" data-date="${a.date}" data-type="${a.type}" data-product="${a.product}" data-qty="${a.qty}" data-unit="${a.qtyUnit}" data-outlet="${a.outlet}" data-gps="${a.gps}" data-status="${a.status}"><i class="fas fa-eye"></i></button></td>
+            </tr>`;
+        }).join('');
+
+        // Initialize DataTables
+        dtAudit = $('#auditTable').DataTable({
             pageLength: 10,
-            lengthMenu: [5, 10, 25, 50],
+            lengthMenu: [10, 25, 50, 100],
             order: [[0, 'desc']],
             language: {
                 search: 'Cari:',
@@ -893,67 +1234,77 @@
                 paginate: { first: '«', last: '»', next: '›', previous: '‹' },
                 zeroRecords: 'Tidak ada transaksi yang cocok'
             },
-            dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rt<"d-flex justify-content-between align-items-center mt-2"ip>',
-            searching: false // We use our own filter bar
+            dom: '<"d-flex justify-content-between align-items-center mb-2"lf>rt<"d-flex justify-content-between align-items-center mt-2"ip>'
         });
     }
 
-    function showAuditDetail(idx) {
-        const r = auditData[idx];
-        if (!r) return;
+    // ===================== AUDIT DETAIL POPUP =====================
+    function showAuditDetail(btn) {
+        const d = btn.dataset;
+        const isInbound = d.type === 'inbound';
 
+        // Find full audit record
+        const record = auditData.find(a => a.id === d.id);
+        const r = record || d;
+
+        const typeBadgeHtml = isInbound
+            ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-alt-circle-down me-1"></i> Kulakan (Inbound)</span>'
+            : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-alt-circle-up me-1"></i> Penjualan (Outbound)</span>';
+
+        const gpsBadgeHtml = (r.gps === true || r.gps === 'true')
+            ? '<span class="badge-sm badge-verified"><i class="fas fa-check me-1"></i> GPS Match</span>'
+            : '<span class="badge-sm badge-pending" style="background:#FFEBEE; color:#C62828;"><i class="fas fa-times me-1"></i> GPS Deviation</span>';
+
+        const gpsDetail = r.gpsDetails || (r.gps ? 'Jarak dalam batas toleransi.' : 'Jarak melebihi batas toleransi.');
+        const gpsCoords = r.gpsCoords || '-6.200000,106.800000';
+        const gpsValid = r.gps === true || r.gps === 'true';
+
+        // Items table
         let itemsHtml = '';
-        r.items.forEach(item => {
+        const items = r.items || [{ name: r.product || d.product, before: '-', adjust: (isInbound ? '+' : '-') + d.qty + ' ' + d.unit, after: '-' }];
+        items.forEach(item => {
             itemsHtml += `<tr>
                 <td style="font-weight:600;">${item.name}</td>
                 <td style="text-align:center; font-weight:600; color:#475569;">${item.before}</td>
-                <td style="text-align:center; font-weight:700; color:${r.type === 'inbound' ? '#2E7D32' : '#C62828'};">
-                    ${r.type === 'inbound' ? '<i class="fas fa-plus-circle me-1"></i>' : '<i class="fas fa-minus-circle me-1"></i>'}${item.adjust}
+                <td style="text-align:center; font-weight:700; color:${isInbound ? '#2E7D32' : '#C62828'};">
+                    ${isInbound ? '<i class="fas fa-plus-circle me-1"></i>' : '<i class="fas fa-minus-circle me-1"></i>'}${item.adjust}
                 </td>
                 <td style="text-align:center; font-weight:700; color:#0f172a;">${item.after}</td>
             </tr>`;
         });
 
-        const statusBadgeHtml = r.status === 'verified'
-            ? '<span class="badge-sm badge-verified"><i class="fas fa-check-circle me-1"></i> Verified</span>'
-            : '<span class="badge-sm badge-pending" style="background:#FFF3CD; color:#856404;"><i class="fas fa-exclamation-circle me-1"></i> Pending Approval</span>';
-
-        const typeBadgeHtml = r.type === 'inbound'
-            ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-alt-circle-down me-1"></i> Kulakan (Inbound)</span>'
-            : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-alt-circle-up me-1"></i> Penjualan (Outbound)</span>';
-
-        const gpsBadgeHtml = r.gps === 'valid'
-            ? '<span class="badge-sm badge-verified"><i class="fas fa-check me-1"></i> GPS Match</span>'
-            : '<span class="badge-sm badge-pending" style="background:#FFEBEE; color:#C62828;"><i class="fas fa-times me-1"></i> GPS Deviation</span>';
-
-        const notaContentHtml = r.nota 
-            ? `<div class="nota-attach-card" onclick="showThermalReceipt(${idx})">
+        // Nota section
+        const notaHtml = (r.nota === true)
+            ? `<div class="nota-attach-card">
                 <i class="fas fa-file-invoice-dollar fa-2x" style="color:#005d41; margin-bottom:2px;"></i>
                 <span style="font-size:0.75rem; font-weight:700; color:#005d41; display:block;">Nota Belanja Terlampir</span>
                 <span style="font-size:0.65rem; color:#64748b; display:block; margin-top:2px;">Klik untuk Pratinjau</span>
                 <div class="nota-barcode"></div>
             </div>`
             : `<div class="nota-attach-card" style="border-color:#cbd5e1; cursor:default;">
-                <i class="fas fa-image-slash fa-2x" style="color:#94a3b8; margin-bottom:5px;"></i>
+                <i class="fas fa-image fa-2x" style="color:#94a3b8; margin-bottom:5px; opacity:0.5;"></i>
                 <span style="font-size:0.75rem; font-weight:600; color:#64748b;">Tidak Ada Bukti</span>
                 <span style="font-size:0.65rem; color:#94a3b8;">Outbound Warung</span>
             </div>`;
+
+        const statusVerified = (r.status === 'verified');
 
         Swal.fire({
             width: '780px',
             confirmButtonColor: '#005d41',
             confirmButtonText: 'Tutup',
             showCancelButton: false,
+            customClass: { popup: 'swal-audit-popup' },
             html: `
                 <div class="audit-pop">
                     <div class="audit-pop-header" style="display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <span style="font-size:0.7rem; text-transform:uppercase; opacity:0.8; font-weight:700; display:block; letter-spacing:0.05em;">ID Transaksi & Pergerakan Stok</span>
                             <h3 style="margin:0; font-size:1.2rem; font-family:'Kalbe Geometric'; font-weight:800; color:white; display:flex; align-items:center; gap:8px;">
-                                <i class="fas fa-receipt"></i> ${r.id}
+                                <i class="fas fa-receipt"></i> ${r.id || d.id || 'TX-000'}
                             </h3>
                         </div>
-                        <button class="btn btn-sm" onclick="printAuditDetail(${idx})" style="background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); border-radius:6px; color:white; font-size:0.75rem; padding:5px 10px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px; transition:all 0.2s; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+                        <button class="btn btn-sm" onclick="printAuditPopup()" style="background:rgba(255,255,255,0.18); border:1px solid rgba(255,255,255,0.3); border-radius:6px; color:white; font-size:0.75rem; padding:5px 10px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:5px;">
                             <i class="fas fa-print"></i> Cetak PDF
                         </button>
                     </div>
@@ -964,12 +1315,12 @@
                             <div class="step-circle"><i class="fas fa-check"></i></div>
                             <div class="step-label">Input Motoris</div>
                         </div>
-                        <div class="step-item ${r.gps === 'invalid' ? 'warning' : 'active'}">
-                            <div class="step-circle"><i class="fas ${r.gps === 'invalid' ? 'fa-exclamation-triangle' : 'fa-map-marker-alt'}"></i></div>
+                        <div class="step-item ${gpsValid ? 'active' : 'warning'}">
+                            <div class="step-circle"><i class="fas ${gpsValid ? 'fa-map-marker-alt' : 'fa-exclamation-triangle'}"></i></div>
                             <div class="step-label">Validasi GPS</div>
                         </div>
-                        <div class="step-item ${r.status === 'verified' ? 'active' : ''}">
-                            <div class="step-circle"><i class="fas ${r.status === 'verified' ? 'fa-sync' : 'fa-hourglass-half'}"></i></div>
+                        <div class="step-item ${statusVerified ? 'active' : ''}">
+                            <div class="step-circle"><i class="fas ${statusVerified ? 'fa-sync' : 'fa-hourglass-half'}"></i></div>
                             <div class="step-label">HO Synced</div>
                         </div>
                     </div>
@@ -978,51 +1329,34 @@
                         <div class="audit-pop-sect">
                             <h4><i class="fas fa-user-tie"></i> Profil Sales & Informasi Lokasi</h4>
                             <table style="width:100%; font-size:0.78rem; border-collapse:collapse;">
-                                <tr>
-                                    <td style="font-weight:600; padding:5px 0; color:#64748b; width:110px;">Motoris (Sales)</td>
-                                    <td style="padding:5px 0; color:#1e293b;">: <strong>${r.sales}</strong> <span style="color:#64748b; font-size:0.72rem;">(${r.salesCode})</span></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600; padding:5px 0; color:#64748b;">Wilayah Kerja</td>
-                                    <td style="padding:5px 0; color:#1e293b;">: ${r.region} &mdash; <strong>${r.area}</strong></td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600; padding:5px 0; color:#64748b;">Jenis Transaksi</td>
-                                    <td style="padding:5px 0;">: ${typeBadgeHtml}</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600; padding:5px 0; color:#64748b;">Partner Tujuan</td>
-                                    <td style="padding:5px 0; color:#1e293b;">: ${r.location}</td>
-                                </tr>
-                                <tr>
-                                    <td style="font-weight:600; padding:5px 0; color:#64748b;">Waktu Unggah</td>
-                                    <td style="padding:5px 0; color:#1e293b;">: Hari ini, ${r.time} WIB</td>
-                                </tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b; width:110px;">Motoris (Sales)</td><td style="padding:5px 0; color:#1e293b;">: <strong>${r.motoris || d.motoris}</strong> <span style="color:#64748b; font-size:0.72rem;">(${r.salesCode || d.salescode || ''})</span></td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Wilayah Kerja</td><td style="padding:5px 0; color:#1e293b;">: ${r.region || ''} &mdash; <strong>${r.area || ''}</strong></td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Jenis Transaksi</td><td style="padding:5px 0;">: ${typeBadgeHtml}</td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Partner Tujuan</td><td style="padding:5px 0; color:#1e293b;">: ${r.outlet || d.outlet}</td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Waktu Unggah</td><td style="padding:5px 0; color:#1e293b;">: Hari ini, ${r.time || '09:00'} WIB</td></tr>
                             </table>
                         </div>
 
-                        <div class="audit-pop-sect ${r.gps === 'invalid' ? 'warning-sect' : ''}">
+                        <div class="audit-pop-sect ${gpsValid ? '' : 'warning-sect'}">
                             <h4><i class="fas fa-map-marked-alt"></i> Pemantauan Jarak & Akurasi GPS</h4>
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                                 <span style="font-size:0.75rem; font-weight:600; color:#64748b;">Verifikasi Sistem:</span>
                                 ${gpsBadgeHtml}
                             </div>
-                            <p style="font-size:0.75rem; margin:2px 0 6px 0; line-height:1.35; font-weight:600; color:${r.gps === 'invalid' ? '#C62828' : '#2e7d32'}">
-                                <i class="fas ${r.gps === 'invalid' ? 'fa-times-circle' : 'fa-check-circle'} me-1"></i> ${r.gpsDetails}
+                            <p style="font-size:0.75rem; margin:2px 0 6px 0; line-height:1.35; font-weight:600; color:${gpsValid ? '#2e7d32' : '#C62828'}">
+                                <i class="fas ${gpsValid ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${gpsDetail}
                             </p>
-                            
-                            <!-- Mock Mini Map Visual -->
                             <div class="mock-map">
                                 <div class="mock-map-grid"></div>
                                 <div class="mock-map-road" style="width:160px; height:8px; top:35px; left:-20px; transform:rotate(8deg);"></div>
                                 <div class="mock-map-road" style="width:100px; height:8px; top:15px; left:140px; transform:rotate(-45deg);"></div>
                                 <div class="mock-map-center" title="Target Outlet"></div>
                                 <div class="mock-map-pulse"></div>
-                                <div class="mock-map-pin" style="${r.gps === 'invalid' ? 'top:20%; left:22%;' : 'top:52%; left:55%;'}" title="Lokasi Sales">
+                                <div class="mock-map-pin" style="${gpsValid ? '' : 'top:20%; left:22%;'}" title="Lokasi Sales">
                                     <i class="fas fa-motorcycle"></i>
                                 </div>
                             </div>
-                            <span style="font-size:0.7rem; color:#8a92a6; display:block; margin-top:4px; font-family:monospace; text-align:center;">Koordinat: ${r.gpsCoords}</span>
+                            <span style="font-size:0.7rem; color:#8a92a6; display:block; margin-top:4px; font-family:monospace; text-align:center;">Koordinat: ${gpsCoords}</span>
                         </div>
                     </div>
 
@@ -1030,23 +1364,18 @@
                         <div class="audit-pop-sect">
                             <h4><i class="fas fa-boxes"></i> Log Mutasi Fisik Persediaan (Stock Ledger)</h4>
                             <table class="audit-pop-table">
-                               <thead>
-                                   <tr>
-                                       <th>Nama SKU Produk Kalbe</th>
-                                       <th style="text-align:center; width:60px;">Sebelum</th>
-                                       <th style="text-align:center; width:95px;">Mutasi</th>
-                                       <th style="text-align:center; width:60px;">Sesudah</th>
-                                   </tr>
-                               </thead>
-                               <tbody>
-                                   ${itemsHtml}
-                               </tbody>
+                               <thead><tr>
+                                   <th>Nama SKU Produk Kalbe</th>
+                                   <th style="text-align:center; width:60px;">Sebelum</th>
+                                   <th style="text-align:center; width:95px;">Mutasi</th>
+                                   <th style="text-align:center; width:60px;">Sesudah</th>
+                               </tr></thead>
+                               <tbody>${itemsHtml}</tbody>
                             </table>
                         </div>
-
-                        <div class="audit-pop-sect" style="display:flex; flex-direction:column; justify-content:space-between; height: 100%;">
+                        <div class="audit-pop-sect" style="display:flex; flex-direction:column; justify-content:space-between;">
                             <h4><i class="fas fa-file-invoice"></i> Dokumen Pendukung (Bukti)</h4>
-                            ${notaContentHtml}
+                            ${notaHtml}
                             <span style="font-size:0.68rem; color:#8a92a6; text-align:center; display:block; margin-top:6px;"><i class="fas fa-lock"></i> Tanda tangan elektronik tersimpan aman</span>
                         </div>
                     </div>
@@ -1055,343 +1384,345 @@
         });
     }
 
-    function showThermalReceipt(idx) {
-        const r = auditData[idx];
-        if (!r) return;
-        
-        let rows = '';
-        r.items.forEach(item => {
-            rows += `<tr>
-                <td style="text-align:left; padding:6px 0;">${item.name}</td>
-                <td style="text-align:right; padding:6px 0; font-weight:bold;">${item.adjust}</td>
-            </tr>`;
-        });
-
-        Swal.fire({
-            title: 'Pratinjau Nota Digital',
-            confirmButtonColor: '#005d41',
-            confirmButtonText: 'Tutup',
-            showCancelButton: false,
-            html: `
-                <div style="text-align:left; font-family:monospace; font-size:0.82rem; border:1px solid #ddd; padding:15px; background:#fff; border-radius:4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); color:#333;">
-                    <div style="text-align:center; font-weight:bold; font-size:1.05rem; color:#005d41; margin-bottom: 2px;">${r.location}</div>
-                    <div style="text-align:center; color:#666; font-size:0.75rem; margin-bottom:10px;">Jl. Raya Pembangunan No. 12, Area ${r.area}</div>
-                    <div style="border-top:1px dashed #ccc; margin:8px 0;"></div>
-                    <div style="display:flex; justify-content:space-between; color:#555; font-size:0.75rem; margin-bottom:4px;">
-                        <span>No: ${r.id}</span>
-                        <span>Waktu: ${r.time} WIB</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; color:#555; font-size:0.75rem; margin-bottom:4px;">
-                        <span>Sales: ${r.sales}</span>
-                        <span>Code: ${r.salesCode}</span>
-                    </div>
-                    <div style="border-top:1px dashed #ccc; margin:8px 0;"></div>
-                    <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
-                        <thead>
-                            <tr style="border-bottom:1px dashed #ccc; color:#555;">
-                                <th style="text-align:left; padding-bottom:5px;">Nama Item</th>
-                                <th style="text-align:right; padding-bottom:5px;">Qty</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${rows}
-                        </tbody>
-                    </table>
-                    <div style="border-top:1px dashed #ccc; margin:8px 0;"></div>
-                    <div style="text-align:center; font-size:0.75rem; color:#888; margin-top:10px; line-height: 1.3;">
-                        *** STRUK KULAKAN RESMI SFA FALCON ***<br>
-                        KALBE NUTRITIONALS
-                    </div>
-                </div>
-            `,
-            didClose: () => {
-                showAuditDetail(idx);
-            }
-        });
+    // ===================== PRINT AUDIT =====================
+    function printAuditPopup() {
+        const content = document.querySelector('.swal-audit-popup .swal2-html-container');
+        if (!content) return;
+        const printWindow = window.open('', '_blank', 'width=850,height=900');
+        const styleBlock = '<' + 'style>' +
+            'body { font-family: Segoe UI, system-ui, sans-serif; padding: 30px; color: #1e293b; font-size: 14px; }' +
+            '.audit-pop-header { background: #005d41; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }' +
+            '.audit-pop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }' +
+            '.audit-pop-sect { border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; }' +
+            '.audit-pop-sect h4 { color: #005d41; font-size: 14px; margin: 0 0 10px 0; border-bottom: 1px dashed #C8E099; padding-bottom: 6px; }' +
+            '.audit-pop-table { width: 100%; border-collapse: collapse; font-size: 13px; }' +
+            '.audit-pop-table th { background: #f1f5f9; padding: 8px; text-align: left; border-bottom: 2px solid #e2e8f0; }' +
+            '.audit-pop-table td { padding: 8px; border-bottom: 1px solid #f1f5f9; }' +
+            '.badge-sm { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }' +
+            '.badge-inbound { background: #E8F5E9; color: #2E7D32; }' +
+            '.badge-outbound { background: #FFEBEE; color: #C62828; }' +
+            '.badge-verified { background: #E3F2FD; color: #1565C0; }' +
+            '.audit-stepper, .mock-map, .nota-attach-card { display: none; }' +
+            '@media print { body { padding: 15px; } }' +
+            '<' + '/style>';
+        const headHtml = '<html><head><title>Cetak Audit Trail<' + '/title>' +
+            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">' +
+            styleBlock + '<' + '/head><body>';
+        const footHtml = '<div style="text-align:center; margin-top:30px; font-size:11px; color:#94a3b8; border-top:1px solid #e2e8f0; padding-top:12px;">' +
+            'Dicetak dari Falcon FPRS — ' + new Date().toLocaleString('id-ID') + ' WIB</div><' + '/body><' + '/html>';
+        printWindow.document.write(headHtml + content.innerHTML + footHtml);
+        printWindow.document.close();
+        setTimeout(function() { printWindow.print(); }, 400);
     }
 
+    // ===================== CHARTS =====================
     function initCharts() {
-        // Main bar chart (Region scale initially)
-        mainChart = new Chart(document.getElementById('chartBarSales'), {
+        initBarChart();
+        initTop10Chart();
+        initDailyTrendChart();
+        initGPSChart();
+    }
+
+    function initBarChart() {
+        const ctx = document.getElementById('chartBarSales');
+        if (!ctx) return;
+        const regions = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera'];
+        const regionKeys = ['jabodetabek', 'jawa_barat', 'jawa_tengah', 'jawa_timur', 'sumatera'];
+        
+        const isRp = currentUnit === 'rp';
+        const inboundData = regionKeys.map(r => {
+            const krt = motorisData.filter(m => m.region === r).reduce((s, m) => s + m.inboundKrt, 0);
+            return isRp ? krt * 72 * 55000 : krt;
+        });
+        const outboundData = regionKeys.map(r => {
+            const rFiltered = motorisData.filter(m => m.region === r);
+            if (isRp) {
+                return rFiltered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
+            } else {
+                return rFiltered.reduce((s, m) => s + m.soldPcs, 0) / 72; // normalize to Krt equiv
+            }
+        });
+
+        chartInstances.bar = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera'],
+                labels: regions,
                 datasets: [
-                    { label: 'Kulakan (Inbound)', data: [980, 650, 420, 580, 210], backgroundColor: 'rgba(0,93,65,0.75)', borderRadius: 6 },
-                    { label: 'Jual (Outbound)', data: [870, 580, 390, 520, 180], backgroundColor: 'rgba(21,101,192,0.65)', borderRadius: 6 }
+                    { label: isRp ? 'Inbound (Rp)' : 'Inbound (Krt)', data: inboundData, backgroundColor: 'rgba(21,101,192,0.7)', borderRadius: 4 },
+                    { label: isRp ? 'Outbound (Rp)' : 'Outbound (Krt equiv)', data: outboundData, backgroundColor: 'rgba(46,125,50,0.7)', borderRadius: 4 }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top', labels: { usePointStyle: true, font: { size: 10 } } } },
-                scales: { y: { beginAtZero: true, grid: { color: '#f1f3f5' } }, x: { grid: { display: false } } },
+                plugins: { legend: { position: 'top', labels: { font: { size: 11, weight: '600' } } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+                },
                 onClick: (e, elements) => {
-                    if (elements.length > 0 && currentLevel === 'region') {
+                    if (elements.length > 0) {
                         const idx = elements[0].index;
-                        const regionKey = ['jabodetabek', 'jawa_barat', 'jawa_tengah', 'jawa_timur', 'sumatera'][idx];
-                        document.getElementById('filterRegion').value = regionKey;
-                        onRegionChange();
+                        const isDrilledDown = document.getElementById('btnBackDrill').style.display === 'inline-flex';
+                        if (!isDrilledDown) {
+                            drilldownToRegion(regionKeys[idx], regions[idx]);
+                        }
                     }
                 }
             }
         });
-
-        // Top 10 Sales (Leaderboard — will be populated by updateTopSalesChart)
-        topSalesChart = new Chart(document.getElementById('chartDoughnut'), {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Sell-Through (%)',
-                    data: [],
-                    backgroundColor: 'rgba(21, 101, 192, 0.7)',
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, indexAxis: 'y',
-                plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true, max: 100 }, y: { grid: { display: false } } }
-            }
-        });
-
-        // Initialize Top 10 with national data
-        updateTopSalesChart(null, null);
-
-        // Tren Line (25 hari Juni)
-        const days = Array.from({length:25}, (_,i) => `${i+1}/6`);
-        trendChart = new Chart(document.getElementById('chartLine'), {
-            type: 'line',
-            data: {
-                labels: days,
-                datasets: [
-                    { label: 'Kulakan', data: [25,18,27,20,40,25,22,26,24,32,18,28,22,14,16,20,35,25,14,28,30,18,22,28,16], borderColor: '#005d41', backgroundColor: 'rgba(0,93,65,0.05)', fill: true, tension: 0.3, pointRadius: 2 },
-                    { label: 'Jual', data: [7,4,9,7,8,12,8,12,5,14,10,15,9,8,5,8,11,8,6,10,10,8,6,10,4], borderColor: '#1565C0', backgroundColor: 'rgba(21,101,192,0.03)', fill: true, tension: 0.3, pointRadius: 2 }
-                ]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: 'top' } },
-                scales: { y: { beginAtZero: true } }
-            }
-        });
-
-        // GPS Accuracy Chart
-        gpsChart = new Chart(document.getElementById('chartGps'), {
-            type: 'doughnut',
-            data: {
-                labels: ['Akurat (< 50m)', 'Dalam Batas Toleransi', 'Luar Batas (Deviasi)'],
-                datasets: [{
-                    data: [88, 9, 3],
-                    backgroundColor: ['#2E7D32', '#FFE082', '#C62828'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false, cutout: '70%',
-                plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 8 } } }
-            }
-        });
     }
 
-    function drilldownToRegion(regionKey) {
-        currentLevel = 'area';
+    function drilldownToRegion(regionKey, regionName) {
+        const filtered = motorisData.filter(m => m.region === regionKey);
+        const labels = filtered.map(m => m.name);
+        const isRp = currentUnit === 'rp';
+        const data = filtered.map(m => {
+            if (isRp) {
+                return m.salesHistory.reduce((s, h) => s + h.amount, 0);
+            } else {
+                return m.soldPcs;
+            }
+        });
+        chartInstances.bar.data.labels = labels;
+        chartInstances.bar.data.datasets = [{
+            label: isRp ? `Penjualan (Rp) - ${regionName}` : `Penjualan (Pcs) - ${regionName}`,
+            data: data,
+            backgroundColor: 'rgba(0,93,65,0.7)',
+            borderRadius: 4
+        }];
+        chartInstances.bar.update();
         document.getElementById('btnBackDrill').style.display = 'inline-flex';
-        
-        const data = regionData[regionKey];
-        
-        // Update summary cards
-        document.getElementById('cardActiveMotoris').innerText = data.salesCount;
-        document.getElementById('cardInbound').innerText = `${data.inbound} Krt`;
-        document.getElementById('cardOutbound').innerText = `${data.outbound} Pcs`;
-        
-        // Update Flow info
-        document.getElementById('flowStokis').innerText = `${data.stokis} Outlet`;
-        document.getElementById('flowMotoris').innerText = `${data.salesCount} Sales`;
-        document.getElementById('flowWarung').innerText = `${data.warung} Outlet`;
-
-        // Generate Areas chart data
-        const areaValues = data.areas.map(() => Math.floor(Math.random() * 150) + 50);
-        const outboundValues = areaValues.map(v => Math.floor(v * 0.85));
-
-        mainChart.data.labels = data.areas;
-        mainChart.data.datasets[0].data = areaValues;
-        mainChart.data.datasets[1].data = outboundValues;
-        mainChart.update();
-
-        // Update Top 10 to show only this region's motoris
-        updateTopSalesChart(regionKey, null);
-
-        // Update list table to show only this region
-        const filtered = auditData.filter(r => r.region.toLowerCase() === regionKey.replace('_', ' '));
-        renderAuditTable(filtered);
-    }
-
-    function drilldownToArea(areaName) {
-        currentLevel = 'sales';
-        document.getElementById('btnBackDrill').style.display = 'inline-flex';
-
-        // Generate random sales list for this area
-        const sales = ['Rian Wijaya', 'Soni Kurniawan', 'Yudiantara', 'Anisa Fitri', 'Teguh Iman'];
-        const values = [45, 38, 30, 28, 22];
-        const outVal = [40, 32, 28, 24, 18];
-
-        mainChart.data.labels = sales;
-        mainChart.data.datasets[0].data = values;
-        mainChart.data.datasets[1].data = outVal;
-        mainChart.update();
-
-        // Update Top 10 to show only this area's motoris
-        updateTopSalesChart(currentSelectedRegion, areaName);
-
-        const filtered = auditData.filter(r => r.area === areaName);
-        renderAuditTable(filtered);
     }
 
     function resetDrilldown() {
-        currentLevel = 'region';
-        currentSelectedRegion = '';
-        currentSelectedArea = '';
         document.getElementById('btnBackDrill').style.display = 'none';
-        document.getElementById('filterRegion').value = '';
-        document.getElementById('filterArea').innerHTML = '<option value="">Semua Area</option>';
+        chartInstances.bar.destroy();
+        initBarChart();
+    }
+
+    function updateCharts() {
+        const filtered = getFilteredMotoris();
+        const names = new Set(filtered.map(m => m.name));
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
         
-        // Reset summary card values
-        document.getElementById('cardActiveMotoris').innerText = "342";
-        document.getElementById('cardInbound').innerText = "3,810 Krt";
-        document.getElementById('cardOutbound').innerText = "14,820 Pcs";
-        
-        document.getElementById('flowStokis').innerText = "48 Outlet";
-        document.getElementById('flowMotoris').innerText = "342 Sales";
-        document.getElementById('flowWarung').innerText = "1,580 Outlet";
+        let filteredAudit = auditData.filter(a => names.has(a.motoris));
+        if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
+        if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
 
-        // Restore original chart data
-        mainChart.data.labels = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera'];
-        mainChart.data.datasets[0].data = [980, 650, 420, 580, 210];
-        mainChart.data.datasets[1].data = [870, 580, 390, 520, 180];
-        mainChart.update();
+        const isRp = currentUnit === 'rp';
 
-        // Reset Top 10 to national
-        updateTopSalesChart(null, null);
-
-        renderAuditTable(auditData);
-    }
-
-    /**
-     * Updates the Top 10 Motoris chart based on the selected region/area.
-     * Calculates sell-through from motorisStock data filtered by region/area.
-     */
-    function updateTopSalesChart(regionKey, areaName) {
-        // Filter motoris data based on region/area
-        let filtered = motorisStock;
-
-        if (regionKey) {
-            const regionLabel = regionKey.replace('_', ' ');
-            filtered = filtered.filter(m => m.region.toLowerCase() === regionLabel);
-        }
-        if (areaName) {
-            filtered = filtered.filter(m => m.area === areaName);
+        // 1. Update Bar Chart
+        if (chartInstances.bar) {
+            const isDrilledDown = document.getElementById('btnBackDrill').style.display === 'inline-flex';
+            if (!isDrilledDown) {
+                const regionKeys = ['jabodetabek', 'jawa_barat', 'jawa_tengah', 'jawa_timur', 'sumatera'];
+                const inboundData = regionKeys.map(r => {
+                    const rFiltered = filtered.filter(m => m.region === r);
+                    const krt = rFiltered.reduce((s, m) => s + m.inboundKrt, 0);
+                    return isRp ? krt * 72 * 55000 : krt;
+                });
+                const outboundData = regionKeys.map(r => {
+                    const rFiltered = filtered.filter(m => m.region === r);
+                    if (isRp) {
+                        return rFiltered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
+                    } else {
+                        return rFiltered.reduce((s, m) => s + m.soldPcs, 0) / 72;
+                    }
+                });
+                chartInstances.bar.data.datasets[0].label = isRp ? 'Inbound (Rp)' : 'Inbound (Krt)';
+                chartInstances.bar.data.datasets[0].data = inboundData;
+                chartInstances.bar.data.datasets[1].label = isRp ? 'Outbound (Rp)' : 'Outbound (Krt equiv)';
+                chartInstances.bar.data.datasets[1].data = outboundData;
+                chartInstances.bar.update();
+            } else {
+                resetDrilldown();
+            }
         }
 
-        // Calculate sell-through % for each and sort descending
-        const ranked = filtered.map(m => {
-            const st = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
-            return { name: m.name.split(' ')[0] + ' ' + m.name.split(' ')[1]?.charAt(0) + '.', fullName: m.name, sellThrough: st, sold: m.sold };
-        }).sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
-
-        // Update chart title context
-        const chartTitle = document.querySelector('#chartDoughnut')?.closest('.chart-card')?.querySelector('h3');
-        if (chartTitle) {
-            let titleText = '<i class="fas fa-medal" style="color:#1565C0; margin-right:6px;"></i> Top Motoris Teraktif';
-            if (areaName) titleText += ` — ${areaName}`;
-            else if (regionKey) titleText += ` — ${regionKey.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
-            else titleText += ' (Nasional)';
-            chartTitle.innerHTML = titleText;
+        // 2. Update Top 10 Chart
+        if (chartInstances.top10) {
+            const sorted = [...filtered].sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
+            chartInstances.top10.data.labels = sorted.map(m => m.name);
+            chartInstances.top10.data.datasets[0].data = sorted.map(m => m.sellThrough);
+            chartInstances.top10.data.datasets[0].backgroundColor = sorted.map(m => m.sellThrough >= 70 ? 'rgba(46,125,50,0.7)' : m.sellThrough >= 40 ? 'rgba(245,127,23,0.7)' : 'rgba(198,40,40,0.7)');
+            chartInstances.top10.update();
         }
 
-        // Update chart data
-        topSalesChart.data.labels = ranked.map(r => r.name);
-        topSalesChart.data.datasets[0].data = ranked.map(r => r.sellThrough);
-        topSalesChart.data.datasets[0].label = 'Sell-Through (%)';
+        // 3. Update Daily Trend Chart
+        if (chartInstances.daily) {
+            const dayMap = {};
+            const startDay = dateStart ? parseInt(dateStart.split('-')[2]) : 1;
+            const endDay = dateEnd ? parseInt(dateEnd.split('-')[2]) : 30;
+            for (let d = startDay; d <= endDay; d++) {
+                dayMap[`${d} Jun`] = 0;
+            }
+            filtered.forEach(m => {
+                m.salesHistory.forEach(h => {
+                    const dayNum = parseInt(h.date.split('-')[2]);
+                    const key = `${dayNum} Jun`;
+                    if (key in dayMap) {
+                        dayMap[key] += isRp ? h.amount : h.qtyPcs;
+                    }
+                });
+            });
+            chartInstances.daily.data.labels = Object.keys(dayMap);
+            chartInstances.daily.data.datasets[0].label = isRp ? 'Penjualan (Rp)' : 'Penjualan (Pcs)';
+            chartInstances.daily.data.datasets[0].data = Object.values(dayMap);
+            chartInstances.daily.update();
+        }
 
-        // Color by performance
-        topSalesChart.data.datasets[0].backgroundColor = ranked.map(r => {
-            if (r.sellThrough >= 70) return 'rgba(46, 125, 50, 0.7)';
-            if (r.sellThrough >= 50) return 'rgba(245, 127, 23, 0.7)';
-            return 'rgba(198, 40, 40, 0.7)';
-        });
-
-        topSalesChart.update();
+        // 4. Update GPS Chart
+        if (chartInstances.gps) {
+            const validCount = filteredAudit.filter(a => a.gps).length;
+            const invalidCount = filteredAudit.filter(a => !a.gps).length;
+            chartInstances.gps.data.datasets[0].data = [validCount, invalidCount];
+            chartInstances.gps.update();
+        }
     }
 
-    function exportToExcel() {
-        // Export currently filtered audit data + saldo motoris to CSV (Excel-compatible)
-        const rows = auditLastData.length ? auditLastData : auditData;
-
-        let csv = 'AUDIT TRAIL PERGERAKAN STOK MOTORIS\n';
-        csv += `Diekspor: ${new Date().toLocaleString('id-ID')}\n\n`;
-        csv += 'Tanggal,Waktu,Wilayah,Area,Motoris,Kode,Tipe,Partner/Tujuan,Produk,Qty,GPS,Status\n';
-        rows.forEach(r => {
-            const line = [
-                r.date || '', r.time, r.region, r.area, r.sales, r.salesCode,
-                r.type === 'inbound' ? 'Kulakan' : 'Penjualan',
-                r.location, r.product, r.qty,
-                r.gps === 'valid' ? 'Valid' : 'Invalid',
-                r.status === 'verified' ? 'Verified' : 'Pending'
-            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
-            csv += line + '\n';
-        });
-
-        csv += '\nSALDO STOK BERJALAN PER MOTORIS\n';
-        csv += 'Motoris,Kode,Wilayah,Area,Kulakan(Krt),Terjual(Krt),Saldo(Krt),Sell-Through(%),Umur Stok(hari),Nilai Saldo(Rp)\n';
-        motorisStock.forEach(m => {
-            const saldo = m.inbound - m.sold;
-            const st = m.inbound > 0 ? Math.round((m.sold / m.inbound) * 100) : 0;
-            const line = [
-                m.name, m.code, m.region, m.area, m.inbound, m.sold, saldo, st, m.aging, saldo * RP_PER_KRT
-            ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',');
-            csv += line + '\n';
-        });
-
-        // BOM for Excel UTF-8 compatibility
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `StokMotoris_${new Date().toISOString().slice(0, 10)}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Export Berhasil',
-            text: `${rows.length} transaksi & ${motorisStock.length} data saldo motoris diekspor ke CSV.`,
-            confirmButtonColor: '#005d41',
-            timer: 2000
-        });
-    }
-
-    function refreshDashboard() {
-        Swal.fire({
-            title: 'Memperbarui Data...',
-            html: 'Menghubungkan ke server pusat Falcon SFA...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-                setTimeout(() => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Data Terkini Diperbarui!',
-                        text: 'Grafik pergerakan stok berhasil dimuat ulang.',
-                        confirmButtonColor: '#005d41',
-                        timer: 1500
-                    });
-                }, 1000);
+    function initTop10Chart() {
+        const ctx = document.getElementById('chartTop10');
+        if (!ctx) return;
+        const sorted = [...motorisData].sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
+        chartInstances.top10 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(m => m.name),
+                datasets: [{
+                    label: 'Sell-Through %',
+                    data: sorted.map(m => m.sellThrough),
+                    backgroundColor: sorted.map(m => m.sellThrough >= 70 ? 'rgba(46,125,50,0.7)' : m.sellThrough >= 40 ? 'rgba(245,127,23,0.7)' : 'rgba(198,40,40,0.7)'),
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, callback: v => v + '%' } },
+                    y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                }
             }
         });
     }
+
+    function initDailyTrendChart() {
+        const ctx = document.getElementById('chartDailyTrend');
+        if (!ctx) return;
+        const days = [];
+        const values = [];
+        for (let d = 1; d <= 28; d++) {
+            days.push(`${d} Jun`);
+            values.push(randomInt(300, 900));
+        }
+        chartInstances.daily = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Penjualan (Pcs)',
+                    data: values,
+                    borderColor: '#1565C0',
+                    backgroundColor: 'rgba(21,101,192,0.06)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 2,
+                    pointBackgroundColor: '#1565C0'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 14 } },
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    function initGPSChart() {
+        const ctx = document.getElementById('chartGPS');
+        if (!ctx) return;
+        const validCount = auditData.filter(a => a.gps).length;
+        const invalidCount = auditData.filter(a => !a.gps).length;
+        chartInstances.gps = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['GPS Valid', 'GPS Invalid'],
+                datasets: [{
+                    data: [validCount, invalidCount],
+                    backgroundColor: ['#2E7D32', '#C62828'],
+                    borderWidth: 0,
+                    spacing: 2
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 11, weight: '600' }, padding: 16 } }
+                }
+            }
+        });
+    }
+
+    // ===================== COLLAPSIBLE SECTIONS =====================
+    function toggleSection(id) {
+        const el = document.getElementById(id);
+        const icon = document.getElementById(id + '-icon');
+        if (el.classList.contains('collapsed')) {
+            el.classList.remove('collapsed');
+            el.style.maxHeight = el.scrollHeight + 'px';
+            icon.classList.remove('rotated');
+        } else {
+            el.classList.add('collapsed');
+            icon.classList.add('rotated');
+        }
+    }
+
+    // ===================== EXPORT & REFRESH =====================
+    function exportToExcel() {
+        const filtered = getFilteredMotoris();
+        let csv = 'sep=,\nMotoris,Kode,Wilayah,Area,Stok Krt,Stok Dus,Stok Pcs,Total Pcs,Sell-Through %,Umur Stok (Hari),Nilai Saldo\n';
+        filtered.forEach(m => {
+            csv += `"${m.name}","${m.code}","${regionLabel(m.region)}","${m.area}",${m.totalKrt},${m.totalDus},${m.totalPcs},${m.totalPcsAll},${m.sellThrough},${m.aging},${Math.round(m.nilai)}\n`;
+        });
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'stok_motoris_' + new Date().toISOString().slice(0, 10) + '.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+
+        Swal.fire({ icon: 'success', title: 'Export Berhasil', text: `${filtered.length} data motoris berhasil di-export.`, timer: 2000, showConfirmButton: false });
+    }
+
+    function refreshDashboard() {
+        const btn = document.querySelector('.btn-success .fa-sync-alt') || document.querySelector('.fa-sync-alt');
+        if (btn) btn.classList.add('fa-spin');
+
+        setTimeout(() => {
+            motorisData = generateMotorisData();
+            auditData = generateAuditData();
+            updateTimestamp();
+
+            // Rebuild charts
+            Object.values(chartInstances).forEach(c => { if (c && c.destroy) c.destroy(); });
+            chartInstances = {};
+            initCharts();
+
+            applyAllFilters();
+
+            if (btn) btn.classList.remove('fa-spin');
+            Swal.fire({ icon: 'success', title: 'Data Diperbarui', text: 'Dashboard telah di-refresh dengan data terbaru.', timer: 1500, showConfirmButton: false });
+        }, 800);
+    }
+
     </script>
 </body>
 </html>

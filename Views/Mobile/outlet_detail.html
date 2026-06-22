@@ -139,6 +139,13 @@
 
         </div>
     </div>
+
+    <!-- Bottom Action: Mulai Kunjungan (only if not from visit route) -->
+    <div id="visitActionBar" class="d-none" style="position:sticky; bottom:0; background:#fff; border-top:1px solid var(--color-border); padding:14px 16px;">
+        <button class="btn-mobile-primary w-100" onclick="startOutletVisit()">
+            <i class="fas fa-map-marker-alt me-2"></i>Mulai Kunjungan ke Outlet Ini
+        </button>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -154,6 +161,7 @@
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
         outletId = params.get('id');
+        const fromVisitRoute = params.get('fromVisit') === '1';
 
         if (!outletId) { history.back(); return; }
 
@@ -163,9 +171,27 @@
         // Edit button
         $('#editBtn').attr('href', `outlet_add.html?id=${outletId}`);
 
+        // Show visit action bar only when accessed outside visit route
+        if (!fromVisitRoute) {
+            $('#visitActionBar').removeClass('d-none');
+        }
+
         populateData();
         initMap();
     });
+
+    function startOutletVisit() {
+        // Check if already has active visit today
+        const existing = SfaStore.getTodayVisitByCustomerId(outletId);
+        if (existing) {
+            window.location.href = `visit_detail.html?id=${outletId}`;
+            return;
+        }
+        // Create a new out-of-route visit
+        SfaStore.saveVisit({ customerId: outletId, customerName: outlet.name, isOutOfRoute: true });
+        Swal.fire({ icon: 'success', title: 'Kunjungan Dimulai', text: `Check-in ke ${outlet.name}`, timer: 1000, showConfirmButton: false })
+            .then(() => { window.location.href = `visit_detail.html?id=${outletId}`; });
+    }
 
     function populateData() {
         $('#headerTitle').text(outlet.name);
@@ -228,54 +254,50 @@
             function(pos) {
                 const lat = pos.coords.latitude;
                 const lng = pos.coords.longitude;
-
-                SfaStore.updateCustomerGps(outletId, lat, lng);
-                outlet.lat = lat;
-                outlet.lng = lng;
-                outlet.hasGps = true;
-
-                // Update map
-                if (!map) {
-                    $('#map').show();
-                    $('#mapPlaceholder').hide();
-                    map = L.map('map').setView([lat, lng], 16);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '© OpenStreetMap contributors'
-                    }).addTo(map);
-                } else {
-                    map.setView([lat, lng], 16);
-                    if (marker) map.removeLayer(marker);
-                }
-                marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup(`<b>${outlet.name}</b><br>GPS diperbarui`).openPopup();
-
-                $('#gpsStatus').removeClass('gps-missing').addClass('gps-ok');
-                $('#gpsStatusText').text('Koordinat GPS Diperbarui');
-                $('#gpsCoordText').text(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'GPS Berhasil Diperbarui',
-                    text: `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                _applyGpsUpdate(lat, lng);
             },
             function(err) {
                 // Simulasi GPS jika ditolak (untuk demo di browser desktop)
                 const simLat = -6.1954 + (Math.random() - 0.5) * 0.01;
                 const simLng = 106.8231 + (Math.random() - 0.5) * 0.01;
-                SfaStore.updateCustomerGps(outletId, simLat, simLng);
-
-                Swal.fire({
-                    icon: 'info',
-                    title: 'GPS Simulasi',
-                    text: `Izin GPS ditolak. Menggunakan koordinat simulasi: ${simLat.toFixed(4)}, ${simLng.toFixed(4)}`,
-                    confirmButtonColor: '#005D41'
-                });
+                _applyGpsUpdate(simLat, simLng, true);
             },
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
+    }
+
+    function _applyGpsUpdate(lat, lng, isSimulation) {
+        SfaStore.updateCustomerGps(outletId, lat, lng);
+        outlet.lat = lat;
+        outlet.lng = lng;
+        outlet.hasGps = true;
+
+        // Update or init map
+        if (!map) {
+            $('#map').show();
+            $('#mapPlaceholder').hide();
+            map = L.map('map').setView([lat, lng], 16);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        } else {
+            map.setView([lat, lng], 16);
+            if (marker) map.removeLayer(marker);
+        }
+        marker = L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<b>${outlet.name}</b><br>${isSimulation ? 'GPS Simulasi' : 'GPS diperbarui'}`).openPopup();
+
+        $('#gpsStatus').removeClass('gps-missing').addClass('gps-ok');
+        $('#gpsStatusText').text(isSimulation ? 'GPS Simulasi Aktif' : 'Koordinat GPS Diperbarui');
+        $('#gpsCoordText').text(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+
+        Swal.fire({
+            icon: 'success',
+            title: isSimulation ? 'GPS Simulasi Berhasil' : 'GPS Berhasil Diperbarui',
+            text: `Koordinat: ${lat.toFixed(6)}, ${lng.toFixed(6)}${isSimulation ? ' (simulasi)' : ''}`,
+            timer: 2000,
+            showConfirmButton: false
+        });
     }
 </script>
 </body>
