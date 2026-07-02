@@ -43,7 +43,8 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/libs/sweetalert2/sweetalert2.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-bs5/datatables.bootstrap5.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css',
-            'wwwroot/css/styles-vuexy.css'
+            'wwwroot/css/styles-vuexy.css',
+            'wwwroot/css/prototype-chat.css'
         ];
 
         // Contextual loading of module CSS stylesheets
@@ -488,7 +489,8 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/js/extensions/i18nextBrowserLanguageDetector.min.js',
             'wwwroot/lib/vuexy/vendor/js/extensions/jquery-i18next.min.js',
             'wwwroot/lib/vuexy/vendor/js/unison-js/unison-js.min.js',
-            'wwwroot/js/role-manager.js'
+            'wwwroot/js/role-manager.js',
+            'wwwroot/js/prototype-chat.js'
         ];
 
         for (const src of scripts) {

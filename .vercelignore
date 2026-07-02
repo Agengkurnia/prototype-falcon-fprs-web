@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+node_modules
+Mobile/MobileApp/android
+Mobile/MobileApp/build
+Mobile/MobileApp_capacitor
+falcon_sfa_mobile
+Testing
+*.apk
+.git
