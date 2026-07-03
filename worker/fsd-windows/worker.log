@@ -1,0 +1,2 @@
+[2026-07-03T07:09:36.081Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-03T07:09:36.089Z] [INFO] Poll loop started {"intervalMs":10000}
