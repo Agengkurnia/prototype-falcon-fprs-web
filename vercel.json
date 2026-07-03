@@ -6,7 +6,7 @@
     },
     "api/generate-fsd/**/*.js": {
       "maxDuration": 120,
-      "includeFiles": "Views/FPRS/**"
+      "includeFiles": "{Views/FPRS/**,wwwroot/document/FSD/FalconWebPortal/screenshots/**}"
     }
   }
 }

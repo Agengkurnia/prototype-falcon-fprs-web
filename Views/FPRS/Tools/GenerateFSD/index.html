@@ -32,8 +32,9 @@
 
         <div class="alert alert-info border-0 shadow-sm mb-3">
             <i class="fa fa-file-word me-2"></i>
-            Generate Functional Specification Document (FSD) dari HTML modul prototype.
-            Output format ItemSpec RM v1.2 — unduh sebagai file DOCX.
+            Generate FSD via <strong>Windows Server worker</strong> (Playwright screenshot live, Gemini analisis flow, Pandoc + Word COM).
+            Production: job diantre ke worker — estimasi 2–5 menit (single) atau 10–30 menit (full portal).
+            Dev lokal: set <code>FSD_EXECUTOR=local</code> di .env untuk fallback Node.
         </div>
 
         <div class="row g-3">
@@ -81,6 +82,9 @@
                             Memuat registry modul...
                         </div>
                         <div class="fsd-progress mt-3" id="fsdProgress">
+                            <div id="fsdProgressBarWrap" class="progress mb-2" style="height:8px;display:none;">
+                                <div id="fsdProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%"></div>
+                            </div>
                             <div class="d-flex align-items-center gap-2 text-muted small">
                                 <div class="spinner-border spinner-border-sm" role="status"></div>
                                 <span id="fsdProgressText">Memproses...</span>

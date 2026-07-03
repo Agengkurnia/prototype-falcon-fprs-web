@@ -1,18 +1,15 @@
 /**
- * Falcon Prototype — AI Chat Proxy (local dev)
- *
- * Usage:
- *   Copy .env.example to .env and set GEMINI_API_KEY
- *   node scripts/chat-proxy.js
- *
- * Production (Vercel): uses /api/chat and /api/health serverless functions.
+ * Falcon Prototype — AI Chat + FSD Proxy (local dev)
  */
-
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChatRequest, getHealthStatus } = require('../lib/chat-llm');
-const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob } = require('../lib/fsd/orchestrator');
+const {
+    handleGetRegistry,
+    handleGetJob,
+    handlePostGenerate,
+} = require('../lib/fsd/fsd-api');
 
 const PORT = 3847;
 const ENV_PATH = path.join(__dirname, '..', '.env');
@@ -35,6 +32,7 @@ function loadEnvFile() {
 }
 
 loadEnvFile();
+if (!process.env.FSD_EXECUTOR) process.env.FSD_EXECUTOR = 'local';
 
 function corsHeaders(res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,6 +47,10 @@ function readBody(req) {
         req.on('end', () => resolve(data));
         req.on('error', reject);
     });
+}
+
+function mockReq(headers) {
+    return { headers: headers || {} };
 }
 
 const server = http.createServer(async (req, res) => {
@@ -73,7 +75,6 @@ const server = http.createServer(async (req, res) => {
             res.end(JSON.stringify({ error: 'Set GEMINI_API_KEY or OPENAI_API_KEY in .env' }));
             return;
         }
-
         try {
             const body = JSON.parse(await readBody(req));
             const result = await handleChatRequest(body);
@@ -87,73 +88,33 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    if (req.method === 'GET' && req.url.startsWith('/api/generate-fsd')) {
-        const url = new URL(req.url, 'http://localhost');
-        const jobId = url.searchParams.get('jobId');
-        if (jobId) {
-            const job = getJob(jobId);
-            if (!job) {
-                res.writeHead(404, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ error: 'Job tidak ditemukan atau sudah expired' }));
-                return;
-            }
-            if (job.status === 'processing') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ jobId, status: 'processing' }));
-                return;
-            }
-            if (job.status === 'error') {
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ jobId, status: 'error', error: job.error }));
-                return;
-            }
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ jobId, status: 'done', ...job.result }));
-            return;
-        }
-        const registry = loadRegistry();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-            version: registry.version,
-            sectionLabels: registry.sectionLabels,
-            modules: registry.modules.map(m => ({
-                id: m.id,
-                label: m.label,
-                group: m.group,
-                enabled: m.enabled !== false,
-                sections: m.sections,
-            })),
-        }));
-        return;
-    }
-
-    if (req.method === 'POST' && req.url === '/api/generate-fsd') {
+    if (req.url.startsWith('/api/generate-fsd')) {
         try {
-            const body = JSON.parse(await readBody(req));
-            if (body.async) {
-                const jobId = createJob();
-                runGenerateAsync(jobId, {
-                    moduleId: body.moduleId,
-                    moduleIds: body.moduleIds,
-                    sections: body.sections,
-                    mode: body.mode || 'single',
-                });
-                res.writeHead(202, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ jobId, status: 'processing' }));
+            if (req.method === 'GET') {
+                const url = new URL(req.url, 'http://localhost');
+                const jobId = url.searchParams.get('jobId');
+                if (jobId) {
+                    const { status, body } = await handleGetJob(jobId);
+                    res.writeHead(status, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify(body));
+                    return;
+                }
+                const registry = await handleGetRegistry();
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(registry));
                 return;
             }
-            const result = await runGenerate({
-                moduleId: body.moduleId,
-                moduleIds: body.moduleIds,
-                sections: body.sections,
-                mode: body.mode || 'single',
-            });
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(result));
+
+            if (req.method === 'POST') {
+                const body = JSON.parse(await readBody(req));
+                const { status, body: out } = await handlePostGenerate(mockReq(req.headers), body);
+                res.writeHead(status, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(out));
+                return;
+            }
         } catch (err) {
-            console.error('FSD generate error:', err.message);
-            const code = err.message.includes('Quota') ? 429 : 500;
-            res.writeHead(code, { 'Content-Type': 'application/json' });
+            console.error('FSD API error:', err.message);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify({ error: err.message }));
         }
         return;
@@ -166,14 +127,12 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
     const health = getHealthStatus();
     console.log('Falcon chat proxy running at http://localhost:' + PORT);
+    console.log('  FSD_EXECUTOR=' + (process.env.FSD_EXECUTOR || 'local'));
     console.log('  GET  /health');
     console.log('  POST /api/chat');
     console.log('  GET  /api/generate-fsd');
     console.log('  POST /api/generate-fsd');
     if (!health.hasApiKey) {
         console.warn('  WARNING: No API key — copy .env.example to .env and set GEMINI_API_KEY');
-    } else {
-        console.log('  Provider: ' + health.provider);
-        console.log('  Model: ' + health.model);
     }
 });

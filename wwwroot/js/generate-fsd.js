@@ -3,17 +3,24 @@ const GenerateFSD = {
     registry: null,
     lastResult: null,
     pollTimer: null,
+    SESSION_KEY: 'falcon_fsd_active_job',
+    isLocal: false,
 
     resolveApiUrl() {
         const host = window.location.hostname;
-        const isLocal = host === 'localhost' || host === '127.0.0.1';
-        return isLocal ? 'http://localhost:3847/api/generate-fsd' : '/api/generate-fsd';
+        this.isLocal = host === 'localhost' || host === '127.0.0.1';
+        return this.isLocal ? 'http://localhost:3847/api/generate-fsd' : '/api/generate-fsd';
+    },
+
+    isProductionWorker() {
+        return !this.isLocal && (this.registry?.executor === 'worker' || true);
     },
 
     async init() {
         this.API_URL = this.resolveApiUrl();
         this.bindEvents();
         await this.loadRegistry();
+        this.resumeJobIfAny();
     },
 
     bindEvents() {
@@ -23,6 +30,16 @@ const GenerateFSD = {
         document.getElementById('fsdModule').addEventListener('change', () => this.updatePreview());
         document.getElementById('btnGenerateFsd').addEventListener('click', () => this.generate());
         document.getElementById('btnDownloadFsd').addEventListener('click', () => this.download());
+    },
+
+    resumeJobIfAny() {
+        try {
+            const jobId = sessionStorage.getItem(this.SESSION_KEY);
+            if (jobId) {
+                this.setLoading(true, 'Melanjutkan job sebelumnya...');
+                this.pollJob(jobId).catch(() => sessionStorage.removeItem(this.SESSION_KEY));
+            }
+        } catch { /* ignore */ }
     },
 
     async loadRegistry() {
@@ -118,13 +135,16 @@ const GenerateFSD = {
         const sections = this.getSelectedSections();
         const mod = this.getSelectedModule();
         const el = document.getElementById('fsdPreview');
+        const executor = this.registry?.executor || (this.isLocal ? 'local' : 'worker');
 
         if (mode === 'full') {
             const count = (this.registry.modules || []).filter(m => m.enabled !== false).length;
             el.innerHTML = `
+                <strong>Executor:</strong> ${executor}<br>
                 <strong>Mode:</strong> Full Web Portal<br>
                 <strong>Modul:</strong> ${count} modul enabled<br>
                 <strong>Section:</strong> ${sections.length} terpilih<br>
+                <strong>Estimasi:</strong> 10–30 menit (Windows worker)<br>
                 <strong>Output:</strong> {timestamp}_FSD_AKS_MAN_POWER_GT_WEB.docx
             `;
             return;
@@ -136,8 +156,8 @@ const GenerateFSD = {
         }
 
         el.innerHTML = `
+            <strong>Executor:</strong> ${executor}<br>
             <strong>Modul:</strong> ${mod.label}<br>
-            <strong>Path:</strong> <code>${mod.id}</code><br>
             <strong>Section:</strong> ${sections.join(', ') || '(none)'}<br>
             <strong>Output:</strong> {timestamp}_FSD_AKS_MAN_POWER_GT_WEB.docx
         `;
@@ -153,6 +173,19 @@ const GenerateFSD = {
         }
     },
 
+    setProgress(percent, message) {
+        const bar = document.getElementById('fsdProgressBar');
+        const wrap = document.getElementById('fsdProgressBarWrap');
+        if (wrap) wrap.style.display = 'block';
+        if (bar) {
+            bar.style.width = Math.min(100, percent || 0) + '%';
+            bar.setAttribute('aria-valuenow', String(percent || 0));
+        }
+        if (message) {
+            document.getElementById('fsdProgressText').textContent = message;
+        }
+    },
+
     async generate() {
         const sections = this.getSelectedSections();
         if (!sections.length) {
@@ -161,15 +194,14 @@ const GenerateFSD = {
         }
 
         const mode = this.getMode();
-        const body = { mode, sections };
+        const body = { mode, sections, async: true };
 
         if (mode === 'single') {
             body.moduleId = document.getElementById('fsdModule').value;
-        } else {
-            body.async = true;
         }
 
-        this.setLoading(true, mode === 'full' ? 'Generate full portal (async)...' : 'Extract HTML + AI + DOCX...');
+        this.setLoading(true, 'Mengantrekan job FSD...');
+        this.setProgress(0, 'Menunggu worker Windows...');
 
         try {
             const res = await fetch(this.API_URL, {
@@ -180,7 +212,14 @@ const GenerateFSD = {
 
             const data = await res.json();
 
-            if (body.async && data.jobId) {
+            if (data.jobId) {
+                sessionStorage.setItem(this.SESSION_KEY, data.jobId);
+                if (res.status === 200 && data.contentBase64) {
+                    this.setLoading(false);
+                    sessionStorage.removeItem(this.SESSION_KEY);
+                    this.onSuccess(data);
+                    return;
+                }
                 await this.pollJob(data.jobId);
                 return;
             }
@@ -193,25 +232,42 @@ const GenerateFSD = {
         } catch (err) {
             this.onError(err.message);
         } finally {
-            this.setLoading(false);
+            if (!this.pollTimer) this.setLoading(false);
         }
     },
 
     pollJob(jobId) {
         return new Promise((resolve, reject) => {
+            const start = Date.now();
+            let interval = 2000;
+            const maxMs = 30 * 60 * 1000;
+            const terminal = ['done', 'error'];
+
             const poll = async () => {
                 try {
+                    if (Date.now() - start > maxMs) {
+                        throw new Error('Timeout — job masih berjalan. Cek lagi nanti dengan jobId yang sama.');
+                    }
+
                     const res = await fetch(this.API_URL + '?jobId=' + encodeURIComponent(jobId));
                     const data = await res.json();
 
-                    if (data.status === 'processing') {
-                        document.getElementById('fsdProgressText').textContent =
-                            'Full portal sedang diproses...';
-                        this.pollTimer = setTimeout(poll, 2000);
+                    if (res.status === 404) {
+                        sessionStorage.removeItem(this.SESSION_KEY);
+                        throw new Error('Job tidak ditemukan atau expired.');
+                    }
+
+                    if (!terminal.includes(data.status)) {
+                        this.setProgress(data.progress || 5, data.message || 'Memproses di Windows worker...');
+                        interval = Math.min(interval + 500, 10000);
+                        this.pollTimer = setTimeout(poll, interval);
                         return;
                     }
 
+                    this.pollTimer = null;
                     this.setLoading(false);
+                    sessionStorage.removeItem(this.SESSION_KEY);
+
                     if (data.status === 'error') {
                         this.onError(data.error || 'Job gagal');
                         reject(new Error(data.error));
@@ -221,6 +277,7 @@ const GenerateFSD = {
                     this.onSuccess(data);
                     resolve(data);
                 } catch (err) {
+                    this.pollTimer = null;
                     this.setLoading(false);
                     this.onError(err.message);
                     reject(err);
@@ -233,8 +290,10 @@ const GenerateFSD = {
     onSuccess(data) {
         this.lastResult = data;
         document.getElementById('fsdResult').style.display = 'block';
+        const via = data.downloadUrl ? 'Blob URL' : 'base64';
         document.getElementById('fsdSuccessMsg').textContent =
-            'FSD berhasil digenerate (' + (data.durationMs || '?') + ' ms). File: ' + data.filename;
+            'FSD berhasil (' + (data.durationMs || '?') + ' ms, ' + via + '). File: ' + (data.filename || 'FSD.docx');
+        this.setProgress(100, 'Selesai');
     },
 
     onError(msg) {
@@ -243,13 +302,28 @@ const GenerateFSD = {
         if (msg.includes('Quota') || msg.includes('429')) {
             text = 'Quota Gemini habis. Coba lagi nanti atau ganti GEMINI_MODEL di environment.';
         }
+        if (msg.includes('Batas generate')) {
+            text = msg;
+        }
         document.getElementById('fsdError').textContent = text;
     },
 
     download() {
-        if (!this.lastResult?.contentBase64) return;
+        if (!this.lastResult) return;
+
+        if (this.lastResult.downloadUrl) {
+            const a = document.createElement('a');
+            a.href = this.lastResult.downloadUrl;
+            a.download = this.lastResult.filename || 'FSD.docx';
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.click();
+            return;
+        }
+
+        if (!this.lastResult.contentBase64) return;
         const bytes = Uint8Array.from(atob(this.lastResult.contentBase64), c => c.charCodeAt(0));
-        const blob = new Blob([bytes], { type: this.lastResult.mime });
+        const blob = new Blob([bytes], { type: this.lastResult.mime || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

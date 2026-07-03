@@ -18,6 +18,7 @@ import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
+import argparse
 import base64
 import os
 import re
@@ -48,6 +49,7 @@ MASTER_DEEP = os.path.join(SCRIPT_DIR, '_master_data_deep.md')
 DOCX_BASENAME = 'FSD_AKS_MAN_POWER_GT_WEB.docx'
 DOCX_LOCAL = os.path.join(SCRIPT_DIR, DOCX_BASENAME)
 DOCX_OUT = ''
+JOB_CONFIG = None
 
 
 def build_docx_filename() -> str:
@@ -140,27 +142,36 @@ def step1_render_diagrams(md_content: str):
 def step0_generate_master_deep():
     print('\n[STEP 0] Generate deep Master Data spec (§7.2)...')
     gen_script = os.path.join(SCRIPT_DIR, 'generate_master_data_deep_spec.py')
-    result = subprocess.run([sys.executable, gen_script], capture_output=True, text=True, cwd=SCRIPT_DIR)
+    cmd = [sys.executable, gen_script]
+    if JOB_CONFIG:
+        cmd += ['--job-config', JOB_CONFIG]
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=SCRIPT_DIR)
     if result.returncode != 0:
         print(result.stderr[:600])
-        raise RuntimeError('generate_master_data_deep_spec.py failed')
-    print(result.stdout.strip() or '   [OK] Master data deep spec generated')
+        if not JOB_CONFIG:
+            raise RuntimeError('generate_master_data_deep_spec.py failed')
+        print('   [WARN] deep spec partial failure — lanjut dengan template')
+    else:
+        print(result.stdout.strip() or '   [OK] Master data deep spec generated')
 
 
 def merge_master_data_deep(text: str) -> str:
-    if not os.path.exists(MASTER_DEEP):
-        print('   [WARN] _master_data_deep.md tidak ditemukan – lewati merge §7.2')
+    deep_path = MASTER_DEEP if os.path.exists(MASTER_DEEP) else os.path.join(SCRIPT_DIR, '_job_build.md')
+    if not os.path.exists(deep_path):
+        print('   [WARN] deep spec MD tidak ditemukan – lewati merge §7.2')
         return text
-    with open(MASTER_DEEP, 'r', encoding='utf-8') as f:
+    with open(deep_path, 'r', encoding='utf-8') as f:
         deep = f.read()
-    # Hapus heading duplikat (sudah ada di MD sumber)
-    deep_body = re.sub(r'^### 7\.2[^\n]*\n+', '', deep, count=1)
-    return re.sub(
-        r'<!-- MASTER_DATA_DEEP:.*?-->\s*',
-        deep_body + '\n',
-        text,
-        flags=re.DOTALL,
-    )
+    deep_body = re.sub(r'^# FUNCTIONAL SPECIFICATION[^\n]*\n+', '', deep, count=1)
+    deep_body = re.sub(r'^## Riwayat Revisi[\s\S]*?(?=## 7\.|## \d+\.)', '', deep_body, count=1)
+    if '<!-- MASTER_DATA_DEEP:' in text:
+        return re.sub(
+            r'<!-- MASTER_DATA_DEEP:.*?-->\s*',
+            deep_body + '\n',
+            text,
+            flags=re.DOTALL,
+        )
+    return text.replace('## 7. Spesifikasi Modul Web Portal', '## 7. Spesifikasi Modul Web Portal\n\n' + deep_body, 1)
 
 
 def fix_list_formatting(text: str) -> str:
@@ -570,16 +581,30 @@ def step5_publish_artifacts():
 # ──────────────────────────────────────────────────
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--job-config', default=None, help='Path to FSD job JSON from Windows worker')
+    args = parser.parse_args()
+    JOB_CONFIG = args.job_config
+
     print('=' * 65)
     print('  BUILD START: FSD Web Portal Falcon FPRS')
-    print('  Modul: Web Portal Modules Specification')
+    if JOB_CONFIG:
+        print(f'  Job config: {JOB_CONFIG}')
     print('=' * 65)
+
+    if not os.path.exists(MD_SRC) and not JOB_CONFIG:
+        print(f'\n  ERROR: Source MD tidak ditemukan: {MD_SRC}')
+        exit(1)
+
+    step0_generate_master_deep()
+    if JOB_CONFIG and os.path.exists(os.path.join(SCRIPT_DIR, '_job_build.md')):
+        MD_SRC = os.path.join(SCRIPT_DIR, '_job_build.md')
+        print(f'  Using job build MD: {MD_SRC}')
 
     if not os.path.exists(MD_SRC):
         print(f'\n  ERROR: Source MD tidak ditemukan: {MD_SRC}')
         exit(1)
 
-    step0_generate_master_deep()
     step2_preprocess_markdown()
     step3_run_pandoc()
     step4_postprocess_docx()
