@@ -4,6 +4,7 @@
     "fsd:capture": "node scripts/capture-fsd-screenshots.js",
     "fsd:prewarm": "node scripts/fsd-prewarm.js",
     "fsd:check": "node scripts/fsd-check.js",
+    "fsd:clear-ratelimit": "node scripts/fsd-clear-ratelimit.js",
     "fsd:worker": "node scripts/fsd-worker-start.js"
   },
   "devDependencies": {

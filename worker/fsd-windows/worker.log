@@ -19,3 +19,15 @@
 [2026-07-03T09:06:18.032Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
 [2026-07-03T09:06:18.039Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
 [2026-07-03T09:06:18.040Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-03T09:08:48.384Z] [INFO] Poll claimed job {"jobId":"fsd_1783069721548_rq3e7u"}
+[2026-07-03T09:08:48.385Z] [INFO] Job started {"jobId":"fsd_1783069721548_rq3e7u"}
+[2026-07-03T09:08:48.529Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783069721548_rq3e7u.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T09:09:11.299Z] [ERROR] Job failed {"jobId":"fsd_1783069721548_rq3e7u","error":"Quota Gemini habis"}
+[2026-07-03T09:20:49.133Z] [INFO] Poll claimed job {"jobId":"fsd_1783070443423_1tnxkd"}
+[2026-07-03T09:20:49.135Z] [INFO] Job started {"jobId":"fsd_1783070443423_1tnxkd"}
+[2026-07-03T09:20:49.497Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783070443423_1tnxkd.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T09:21:12.365Z] [ERROR] Job failed {"jobId":"fsd_1783070443423_1tnxkd","error":"Quota Gemini habis"}
+[2026-07-03T09:25:29.070Z] [INFO] Poll claimed job {"jobId":"fsd_1783070720593_llxhxb"}
+[2026-07-03T09:25:29.071Z] [INFO] Job started {"jobId":"fsd_1783070720593_llxhxb"}
+[2026-07-03T09:25:29.204Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783070720593_llxhxb.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T09:25:52.148Z] [ERROR] Job failed {"jobId":"fsd_1783070720593_llxhxb","error":"Quota Gemini habis"}

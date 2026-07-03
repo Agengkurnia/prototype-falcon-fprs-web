@@ -7,11 +7,11 @@
       "screenshots": {
         "master_produk.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T08:46:55.888099+00:00"
+          "capturedAt": "2026-07-03T09:25:36.697350+00:00"
         },
         "master_produk_add.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T08:46:55.888099+00:00"
+          "capturedAt": "2026-07-03T09:25:36.697350+00:00"
         }
       },
       "ai": {
@@ -236,5 +236,5 @@
       }
     }
   },
-  "updatedAt": "2026-07-03T08:46:55.888376+00:00"
+  "updatedAt": "2026-07-03T09:25:36.697739+00:00"
 }
