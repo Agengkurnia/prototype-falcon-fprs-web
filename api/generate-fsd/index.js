@@ -1,4 +1,4 @@
-const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob } = require('../lib/fsd/orchestrator');
+const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob } = require('../../lib/fsd/orchestrator');
 
 module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') {
