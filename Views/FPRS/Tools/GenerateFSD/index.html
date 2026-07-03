@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Generate FSD – Tools | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+        .fsd-card { border: 1px solid #e9ecef; border-radius: 8px; background: #fff; }
+        .fsd-section-list { max-height: 320px; overflow-y: auto; }
+        .fsd-preview { font-size: 0.85rem; color: #495057; background: #f8f9fa; border-radius: 6px; padding: 12px 16px; }
+        .fsd-progress { display: none; }
+        .fsd-progress.active { display: block; }
+        .mode-option { cursor: pointer; }
+        .badge-soon { font-size: 0.65rem; }
+    </style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1">Generate FSD</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Tools</li>
+                        <li class="breadcrumb-item active">Generate FSD</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="alert alert-info border-0 shadow-sm mb-3">
+            <i class="fa fa-file-word me-2"></i>
+            Generate Functional Specification Document (FSD) dari HTML modul prototype.
+            Output format ItemSpec RM v1.2 — unduh sebagai file DOCX.
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-7">
+                <div class="card fsd-card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Mode Generate</h5>
+                        <div class="d-flex gap-4 mb-4">
+                            <label class="mode-option d-flex align-items-center gap-2">
+                                <input type="radio" name="fsdMode" value="single" checked/>
+                                <span>Satu Modul</span>
+                            </label>
+                            <label class="mode-option d-flex align-items-center gap-2">
+                                <input type="radio" name="fsdMode" value="full"/>
+                                <span>Full Web Portal</span>
+                            </label>
+                        </div>
+
+                        <div class="mb-3" id="moduleSelectWrap">
+                            <label class="form-label fw-semibold">Pilih Modul</label>
+                            <select class="form-select" id="fsdModule"></select>
+                        </div>
+
+                        <div class="mb-3" id="fullPortalNote" style="display:none;">
+                            <div class="alert alert-warning py-2 mb-0 small">
+                                Mode Full Portal akan generate semua modul enabled. Untuk build besar, gunakan opsi async (otomatis jika timeout).
+                            </div>
+                        </div>
+
+                        <h5 class="card-title mb-2">Konten Section</h5>
+                        <div class="fsd-section-list border rounded p-3 mb-3" id="fsdSections"></div>
+
+                        <button type="button" class="btn btn-primary" id="btnGenerateFsd">
+                            <i class="fa fa-cog me-1"></i> Generate FSD
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card fsd-card shadow-sm mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Preview</h5>
+                        <div class="fsd-preview" id="fsdPreview">
+                            Memuat registry modul...
+                        </div>
+                        <div class="fsd-progress mt-3" id="fsdProgress">
+                            <div class="d-flex align-items-center gap-2 text-muted small">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                <span id="fsdProgressText">Memproses...</span>
+                            </div>
+                        </div>
+                        <div class="mt-3" id="fsdResult" style="display:none;">
+                            <div class="alert alert-success py-2 mb-2" id="fsdSuccessMsg"></div>
+                            <button type="button" class="btn btn-success btn-sm" id="btnDownloadFsd">
+                                <i class="fa fa-download me-1"></i> Unduh DOCX
+                            </button>
+                        </div>
+                        <div class="mt-3 alert alert-danger py-2" id="fsdError" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script src="../../../../wwwroot/js/generate-fsd.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+            GenerateFSD.init();
+        });
+    </script>
+</body>
+</html>

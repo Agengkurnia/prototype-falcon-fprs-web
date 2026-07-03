@@ -12,6 +12,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { handleChatRequest, getHealthStatus } = require('../lib/chat-llm');
+const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob } = require('../lib/fsd/orchestrator');
 
 const PORT = 3847;
 const ENV_PATH = path.join(__dirname, '..', '.env');
@@ -86,6 +87,78 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
+    if (req.method === 'GET' && req.url.startsWith('/api/generate-fsd')) {
+        const url = new URL(req.url, 'http://localhost');
+        const jobId = url.searchParams.get('jobId');
+        if (jobId) {
+            const job = getJob(jobId);
+            if (!job) {
+                res.writeHead(404, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Job tidak ditemukan atau sudah expired' }));
+                return;
+            }
+            if (job.status === 'processing') {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ jobId, status: 'processing' }));
+                return;
+            }
+            if (job.status === 'error') {
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ jobId, status: 'error', error: job.error }));
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ jobId, status: 'done', ...job.result }));
+            return;
+        }
+        const registry = loadRegistry();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            version: registry.version,
+            sectionLabels: registry.sectionLabels,
+            modules: registry.modules.map(m => ({
+                id: m.id,
+                label: m.label,
+                group: m.group,
+                enabled: m.enabled !== false,
+                sections: m.sections,
+            })),
+        }));
+        return;
+    }
+
+    if (req.method === 'POST' && req.url === '/api/generate-fsd') {
+        try {
+            const body = JSON.parse(await readBody(req));
+            if (body.async) {
+                const jobId = createJob();
+                runGenerateAsync(jobId, {
+                    moduleId: body.moduleId,
+                    moduleIds: body.moduleIds,
+                    sections: body.sections,
+                    mode: body.mode || 'single',
+                });
+                res.writeHead(202, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ jobId, status: 'processing' }));
+                return;
+            }
+            const result = await runGenerate({
+                moduleId: body.moduleId,
+                moduleIds: body.moduleIds,
+                sections: body.sections,
+                mode: body.mode || 'single',
+            });
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(result));
+        } catch (err) {
+            console.error('FSD generate error:', err.message);
+            const code = err.message.includes('Quota') ? 429 : 500;
+            res.writeHead(code, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: err.message }));
+        }
+        return;
+    }
+
     res.writeHead(404, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ error: 'Not found' }));
 });
@@ -95,6 +168,8 @@ server.listen(PORT, () => {
     console.log('Falcon chat proxy running at http://localhost:' + PORT);
     console.log('  GET  /health');
     console.log('  POST /api/chat');
+    console.log('  GET  /api/generate-fsd');
+    console.log('  POST /api/generate-fsd');
     if (!health.hasApiKey) {
         console.warn('  WARNING: No API key — copy .env.example to .env and set GEMINI_API_KEY');
     } else {

@@ -362,6 +362,14 @@ class Layout {
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/Kunjungan/Rute/index.html" class="menu-link"><div data-i18n="Management Rute">Management Rute</div></a></li>
                         </ul>
                     </li>
+
+                    <!-- Tools -->
+                    <li class="menu-item">
+                        <a href="${this.basePath}Views/FPRS/Tools/GenerateFSD/index.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-file-word" style="color:#6f42c1;"></i>
+                            <div data-i18n="Generate FSD">Generate FSD</div>
+                        </a>
+                    </li>
                 </ul>
             </aside>
         `;
