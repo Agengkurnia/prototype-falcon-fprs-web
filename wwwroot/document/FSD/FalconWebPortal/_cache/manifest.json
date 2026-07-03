@@ -1,0 +1,235 @@
+{
+  "version": 1,
+  "promptVersion": "fsd-flow-v2",
+  "modules": {
+    "master-produk": {
+      "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
+      "screenshots": {
+        "master_produk.png": {
+          "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
+          "capturedAt": "2026-07-03T06:45:58.788Z"
+        },
+        "master_produk_add.png": {
+          "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
+          "capturedAt": "2026-07-03T06:45:58.788Z"
+        }
+      }
+    },
+    "master-akun": {
+      "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
+      "screenshots": {
+        "master_akun.png": {
+          "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
+          "capturedAt": "2026-07-03T06:45:58.794Z"
+        },
+        "master_akun_modal_tambah.png": {
+          "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
+          "capturedAt": "2026-07-03T06:45:58.794Z"
+        }
+      }
+    },
+    "master-alasan": {
+      "sourceHash": "2b54ac372cbc4ef39c3bb0431acaee78673fa805eb4ca426cc17e0ae644a1337",
+      "screenshots": {
+        "master_alasan.png": {
+          "sourceHash": "2b54ac372cbc4ef39c3bb0431acaee78673fa805eb4ca426cc17e0ae644a1337",
+          "capturedAt": "2026-07-03T06:45:58.797Z"
+        }
+      }
+    },
+    "master-brand": {
+      "sourceHash": "b932a8805100aee73dc8c6911691620fb8a0f115bd23b867356f6ae80478f165",
+      "screenshots": {
+        "master_brand.png": {
+          "sourceHash": "b932a8805100aee73dc8c6911691620fb8a0f115bd23b867356f6ae80478f165",
+          "capturedAt": "2026-07-03T06:45:58.800Z"
+        }
+      }
+    },
+    "master-daftar-harga": {
+      "sourceHash": "db434ca717071ac6db6dcb00936b78d5ef66efedf35237a1d54ad0b01137bf25",
+      "screenshots": {
+        "master_daftar_harga.png": {
+          "sourceHash": "db434ca717071ac6db6dcb00936b78d5ef66efedf35237a1d54ad0b01137bf25",
+          "capturedAt": "2026-07-03T06:45:58.802Z"
+        }
+      }
+    },
+    "master-divisi": {
+      "sourceHash": "0cfea9c0cb556d647d563ca608d30b5d7e83f6bf2ea71051d082ba6790b55b5d",
+      "screenshots": {
+        "master_divisi.png": {
+          "sourceHash": "0cfea9c0cb556d647d563ca608d30b5d7e83f6bf2ea71051d082ba6790b55b5d",
+          "capturedAt": "2026-07-03T06:45:58.804Z"
+        }
+      }
+    },
+    "master-grup-pelanggan": {
+      "sourceHash": "fb57cc5baf24df9e0e6f794c7c1ffba974e35b21da2a4b92b33b49b54615330c",
+      "screenshots": {
+        "master_grup_pelanggan.png": {
+          "sourceHash": "fb57cc5baf24df9e0e6f794c7c1ffba974e35b21da2a4b92b33b49b54615330c",
+          "capturedAt": "2026-07-03T06:45:58.806Z"
+        }
+      }
+    },
+    "master-kategori-produk": {
+      "sourceHash": "edfc75f2053f4b7695df2027c65f4c4fe4b327c0a86a08dbc83f81d62f10d1b0",
+      "screenshots": {
+        "master_kategori_produk.png": {
+          "sourceHash": "edfc75f2053f4b7695df2027c65f4c4fe4b327c0a86a08dbc83f81d62f10d1b0",
+          "capturedAt": "2026-07-03T06:45:58.807Z"
+        }
+      }
+    },
+    "master-konfigurasi-akses": {
+      "sourceHash": "41eeea0f8e999a20b26d36c3ddce9b6aa4aff1e208f755e3dfbb84354b09e0d9",
+      "screenshots": {
+        "master_konfigurasi_akses.png": {
+          "sourceHash": "41eeea0f8e999a20b26d36c3ddce9b6aa4aff1e208f755e3dfbb84354b09e0d9",
+          "capturedAt": "2026-07-03T06:45:58.809Z"
+        }
+      }
+    },
+    "master-metode-pembayaran": {
+      "sourceHash": "5c9c64d67811bf88adea74e35e1afbdb54827551c18f88c254d6f779ed8540ce",
+      "screenshots": {
+        "master_metode_pembayaran.png": {
+          "sourceHash": "5c9c64d67811bf88adea74e35e1afbdb54827551c18f88c254d6f779ed8540ce",
+          "capturedAt": "2026-07-03T06:45:58.812Z"
+        }
+      }
+    },
+    "master-pajak": {
+      "sourceHash": "7935a97b398f9d90302c7429d66731e12f168728e85720549c55fe5ca5e48902",
+      "screenshots": {
+        "master_pajak.png": {
+          "sourceHash": "7935a97b398f9d90302c7429d66731e12f168728e85720549c55fe5ca5e48902",
+          "capturedAt": "2026-07-03T06:45:58.814Z"
+        }
+      }
+    },
+    "master-pegawai": {
+      "sourceHash": "7389075c8871ce5f931fbfd546ce20b82851c1a0ea80265ae34d769290dc35cd",
+      "screenshots": {
+        "master_pegawai.png": {
+          "sourceHash": "7389075c8871ce5f931fbfd546ce20b82851c1a0ea80265ae34d769290dc35cd",
+          "capturedAt": "2026-07-03T06:45:58.816Z"
+        }
+      }
+    },
+    "master-pelanggan": {
+      "sourceHash": "043d61f97681599d7c6c0244042af102090396191c1f9a3562ecf802ea706c85",
+      "screenshots": {
+        "master_pelanggan.png": {
+          "sourceHash": "043d61f97681599d7c6c0244042af102090396191c1f9a3562ecf802ea706c85",
+          "capturedAt": "2026-07-03T06:45:58.818Z"
+        }
+      }
+    },
+    "master-posisi": {
+      "sourceHash": "8ae2f8d9e3f291ff1f3957ab9f210666c70df056fc2b143f36e2b266421a3a66",
+      "screenshots": {
+        "master_posisi.png": {
+          "sourceHash": "8ae2f8d9e3f291ff1f3957ab9f210666c70df056fc2b143f36e2b266421a3a66",
+          "capturedAt": "2026-07-03T06:45:58.821Z"
+        }
+      }
+    },
+    "master-supplier": {
+      "sourceHash": "45283f07663077e3ba60579c33c901ddd7e8d5b14616ea4f45051d9ff039faf3",
+      "screenshots": {
+        "master_supplier.png": {
+          "sourceHash": "45283f07663077e3ba60579c33c901ddd7e8d5b14616ea4f45051d9ff039faf3",
+          "capturedAt": "2026-07-03T06:45:58.823Z"
+        }
+      }
+    },
+    "master-unit": {
+      "sourceHash": "69fb528ebf6569cc67a2f13531a6d39f32ab08e670967410145e5ae1df035683",
+      "screenshots": {
+        "master_unit.png": {
+          "sourceHash": "69fb528ebf6569cc67a2f13531a6d39f32ab08e670967410145e5ae1df035683",
+          "capturedAt": "2026-07-03T06:45:58.825Z"
+        }
+      }
+    },
+    "master-waktu-pembayaran": {
+      "sourceHash": "0e930afb12c09eb77247fe5cb59fcdf58bdbba5b31193f12797c261d5bb41d31",
+      "screenshots": {
+        "master_waktu_pembayaran.png": {
+          "sourceHash": "0e930afb12c09eb77247fe5cb59fcdf58bdbba5b31193f12797c261d5bb41d31",
+          "capturedAt": "2026-07-03T06:45:58.828Z"
+        }
+      }
+    },
+    "dashboard": {
+      "sourceHash": "86c8b977699bea9d755389ecf43c300ba169491b146d4e63bf0029924603739c",
+      "screenshots": {
+        "dashboard_home.png": {
+          "sourceHash": "86c8b977699bea9d755389ecf43c300ba169491b146d4e63bf0029924603739c",
+          "capturedAt": "2026-07-03T06:45:58.831Z"
+        }
+      }
+    },
+    "penjualan-faktur": {
+      "sourceHash": "c3d2ca37f977a56ba0cc290b277b1006d2b1adb796dbe6e164ba318069af0607",
+      "screenshots": {
+        "faktur_index.png": {
+          "sourceHash": "c3d2ca37f977a56ba0cc290b277b1006d2b1adb796dbe6e164ba318069af0607",
+          "capturedAt": "2026-07-03T06:45:58.833Z"
+        },
+        "faktur_add.png": {
+          "sourceHash": "c3d2ca37f977a56ba0cc290b277b1006d2b1adb796dbe6e164ba318069af0607",
+          "capturedAt": "2026-07-03T06:45:58.833Z"
+        }
+      }
+    },
+    "penjualan-stok-motoris": {
+      "sourceHash": "25cebae923473a05c2995ea11a3d0efa53033a76de763dcbac084f96a4e495a2",
+      "screenshots": {
+        "motoris_index.png": {
+          "sourceHash": "25cebae923473a05c2995ea11a3d0efa53033a76de763dcbac084f96a4e495a2",
+          "capturedAt": "2026-07-03T06:45:58.836Z"
+        }
+      }
+    },
+    "canvassing": {
+      "sourceHash": "f6d1a38bb8902d98f8a32b02ed2ebea98fdf5124a2f8384ad17408e1581a6a6c",
+      "screenshots": {
+        "canvassing_index.png": {
+          "sourceHash": "f6d1a38bb8902d98f8a32b02ed2ebea98fdf5124a2f8384ad17408e1581a6a6c",
+          "capturedAt": "2026-07-03T06:45:58.838Z"
+        }
+      }
+    },
+    "kunjungan-informasi": {
+      "sourceHash": "3fd97ac153fea6c323b489e195ce6e3b405e886e00e1f1287bfbe6ccd1456e0e",
+      "screenshots": {
+        "kunjungan_informasi.png": {
+          "sourceHash": "3fd97ac153fea6c323b489e195ce6e3b405e886e00e1f1287bfbe6ccd1456e0e",
+          "capturedAt": "2026-07-03T06:45:58.840Z"
+        }
+      }
+    },
+    "kunjungan-geografis": {
+      "sourceHash": "f2f9c6909527b10a4109a20f27d7e9f98b06aee63da30944e80bd87360840e07",
+      "screenshots": {
+        "kunjungan_geografis.png": {
+          "sourceHash": "f2f9c6909527b10a4109a20f27d7e9f98b06aee63da30944e80bd87360840e07",
+          "capturedAt": "2026-07-03T06:45:58.842Z"
+        }
+      }
+    },
+    "kunjungan-rute": {
+      "sourceHash": "8914cfda3f715dafdc46d9dcc6cc05d85e4e060a383ac1ea483f2f16479efd0f",
+      "screenshots": {
+        "kunjungan_rute.png": {
+          "sourceHash": "8914cfda3f715dafdc46d9dcc6cc05d85e4e060a383ac1ea483f2f16479efd0f",
+          "capturedAt": "2026-07-03T06:45:58.846Z"
+        }
+      }
+    }
+  },
+  "updatedAt": "2026-07-03T06:45:58.846Z"
+}

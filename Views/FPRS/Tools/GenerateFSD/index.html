@@ -32,9 +32,9 @@
 
         <div class="alert alert-info border-0 shadow-sm mb-3">
             <i class="fa fa-file-word me-2"></i>
-            Generate FSD via <strong>Windows Server worker</strong> (Playwright screenshot live, Gemini analisis flow, Pandoc + Word COM).
-            Production: job diantre ke worker — estimasi 2–5 menit (single) atau 10–30 menit (full portal).
-            Dev lokal: set <code>FSD_EXECUTOR=local</code> di .env untuk fallback Node.
+            Generate FSD via <strong>Windows Server worker</strong> (smart cache AI + screenshot, Pandoc + Word COM).
+            <strong>Smart Generate</strong> (default): pakai cache Git — full portal ~3–8 menit jika cache fresh.
+            <strong>Full Refresh</strong>: regenerate AI + screenshot live. Dev lokal: <code>FSD_EXECUTOR=local</code>.
         </div>
 
         <div class="row g-3">
@@ -60,12 +60,35 @@
 
                         <div class="mb-3" id="fullPortalNote" style="display:none;">
                             <div class="alert alert-warning py-2 mb-0 small">
-                                Mode Full Portal akan generate semua modul enabled. Untuk build besar, gunakan opsi async (otomatis jika timeout).
+                                Full Portal: Smart ~3–8 menit (cache fresh), Full Refresh ~15–30+ menit.
+                                UI timeout 90 menit — job bisa masih berjalan di worker.
                             </div>
                         </div>
 
                         <h5 class="card-title mb-2">Konten Section</h5>
                         <div class="fsd-section-list border rounded p-3 mb-3" id="fsdSections"></div>
+
+                        <h5 class="card-title mb-2">Kebijakan Cache</h5>
+                        <div class="mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="fsdRefresh" id="fsdRefreshSmart" value="smart" checked/>
+                                <label class="form-check-label" for="fsdRefreshSmart">
+                                    <strong>Smart Generate</strong> — pakai cache AI &amp; screenshot (cepat)
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="fsdRefresh" id="fsdRefreshFull" value="full"/>
+                                <label class="form-check-label" for="fsdRefreshFull">
+                                    <strong>Full Refresh</strong> — regenerate semua AI + screenshot live
+                                </label>
+                            </div>
+                            <div class="form-check" id="refreshScreenshotWrap">
+                                <input class="form-check-input" type="checkbox" id="fsdRefreshScreenshots"/>
+                                <label class="form-check-label" for="fsdRefreshScreenshots">
+                                    Refresh screenshot live (Smart mode — hanya modul stale/missing)
+                                </label>
+                            </div>
+                        </div>
 
                         <button type="button" class="btn btn-primary" id="btnGenerateFsd">
                             <i class="fa fa-cog me-1"></i> Generate FSD

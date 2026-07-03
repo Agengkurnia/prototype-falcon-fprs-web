@@ -16,6 +16,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const REGISTRY = path.join(ROOT, 'lib', 'fsd', 'module-registry.json');
 const DEFAULT_OUT = path.join(ROOT, 'wwwroot', 'document', 'FSD', 'FalconWebPortal', 'screenshots');
+const { updateScreenshotCache } = require('../lib/fsd/fsd-cache');
 
 const args = process.argv.slice(2);
 const baseArg = args.find(a => a.startsWith('--base='));
@@ -61,14 +62,15 @@ async function captureModule(browser, mod) {
 
     const indexUrl = `${BASE}/${mod.htmlPath.replace(/\\/g, '/')}`;
     const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+    const captured = [];
 
     try {
         await page.goto(indexUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
         await waitReady(page);
 
-        const indexShot = shots.find(s => s.includes('index') || s.endsWith('.png') && !s.includes('add') && !s.includes('edit') && !s.includes('validation') && !s.includes('delete') && !s.includes('modal'));
         const mainShot = shots[0];
         await capture(page, path.join(outDir, mainShot));
+        captured.push(mainShot);
 
         if (mod.type === 'modal') {
             const tambahBtn = page.locator('button.btn-success, a.btn-success').first();
@@ -76,7 +78,10 @@ async function captureModule(browser, mod) {
                 await tambahBtn.click({ timeout: 5000 }).catch(() => {});
                 await page.waitForTimeout(600);
                 const modalShot = shots.find(s => s.includes('modal_tambah') || s.includes('modal'));
-                if (modalShot) await capture(page, path.join(outDir, modalShot));
+                if (modalShot) {
+                    await capture(page, path.join(outDir, modalShot));
+                    captured.push(modalShot);
+                }
             }
         }
 
@@ -85,7 +90,14 @@ async function captureModule(browser, mod) {
             await page.goto(formUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
             await waitReady(page);
             const addShot = shots.find(s => s.includes('_add') || s.includes('add'));
-            if (addShot) await capture(page, path.join(outDir, addShot));
+            if (addShot) {
+                await capture(page, path.join(outDir, addShot));
+                captured.push(addShot);
+            }
+        }
+
+        if (captured.length) {
+            updateScreenshotCache(ROOT, mod, captured);
         }
     } catch (err) {
         console.warn(`  WARN ${mod.id}: ${err.message}`);

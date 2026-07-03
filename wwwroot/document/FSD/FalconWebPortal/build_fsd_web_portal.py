@@ -20,6 +20,7 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='repla
 
 import argparse
 import base64
+import hashlib
 import os
 import re
 import shutil
@@ -65,7 +66,9 @@ REF_DOCX_CANDIDATES = [
 REF_DOCX = next((p for p in REF_DOCX_CANDIDATES if os.path.exists(p)), None)
 
 SCREENSHOTS = os.path.join(SCRIPT_DIR, 'screenshots')
+DIAGRAM_CACHE = os.path.join(SCRIPT_DIR, '_cache', 'diagrams')
 os.makedirs(SCREENSHOTS, exist_ok=True)
+os.makedirs(DIAGRAM_CACHE, exist_ok=True)
 
 # Output diagram paths
 FLOW_MAIN_PNG     = os.path.join(SCREENSHOTS, 'web_portal_flow_main.png')
@@ -91,7 +94,13 @@ FONT_SIZE_TABLE = 9
 # ──────────────────────────────────────────────────
 
 def render_kroki(mermaid_code: str, output_path: str, label: str) -> bool:
-    """Render Mermaid code to PNG via Kroki.io API."""
+    """Render Mermaid code to PNG via Kroki.io API (with local cache)."""
+    code_hash = hashlib.sha256(mermaid_code.strip().encode('utf-8')).hexdigest()
+    cache_path = os.path.join(DIAGRAM_CACHE, f'{code_hash}.png')
+    if os.path.exists(cache_path):
+        shutil.copy2(cache_path, output_path)
+        print(f'   [{label}] [CACHE] -> {os.path.basename(output_path)}')
+        return True
     try:
         compressed = zlib.compress(mermaid_code.strip().encode('utf-8'), 9)
         b64 = base64.urlsafe_b64encode(compressed).decode('ascii')
@@ -99,6 +108,9 @@ def render_kroki(mermaid_code: str, output_path: str, label: str) -> bool:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=45) as resp:
             data = resp.read()
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        with open(cache_path, 'wb') as f:
+            f.write(data)
         with open(output_path, 'wb') as f:
             f.write(data)
         print(f'   [{label}] [OK] {len(data):,} bytes -> {os.path.basename(output_path)}')

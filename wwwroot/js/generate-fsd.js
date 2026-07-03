@@ -30,6 +30,34 @@ const GenerateFSD = {
         document.getElementById('fsdModule').addEventListener('change', () => this.updatePreview());
         document.getElementById('btnGenerateFsd').addEventListener('click', () => this.generate());
         document.getElementById('btnDownloadFsd').addEventListener('click', () => this.download());
+        document.querySelectorAll('input[name="fsdRefresh"]').forEach(r => {
+            r.addEventListener('change', () => this.onRefreshPolicyChange());
+        });
+        document.getElementById('fsdRefreshScreenshots').addEventListener('change', () => this.updatePreview());
+    },
+
+    onRefreshPolicyChange() {
+        const full = document.getElementById('fsdRefreshFull').checked;
+        const shotWrap = document.getElementById('refreshScreenshotWrap');
+        const shotCb = document.getElementById('fsdRefreshScreenshots');
+        if (full) {
+            shotWrap.style.display = 'none';
+            shotCb.checked = true;
+        } else {
+            shotWrap.style.display = 'block';
+            shotCb.checked = false;
+        }
+        this.updatePreview();
+    },
+
+    getRefreshPolicy() {
+        const el = document.querySelector('input[name="fsdRefresh"]:checked');
+        return el?.value === 'full' ? 'full' : 'smart';
+    },
+
+    getRefreshScreenshots() {
+        if (this.getRefreshPolicy() === 'full') return true;
+        return document.getElementById('fsdRefreshScreenshots')?.checked === true;
     },
 
     resumeJobIfAny() {
@@ -139,12 +167,17 @@ const GenerateFSD = {
 
         if (mode === 'full') {
             const count = (this.registry.modules || []).filter(m => m.enabled !== false).length;
+            const policy = this.getRefreshPolicy();
+            const est = policy === 'full'
+                ? '15–30+ menit (full refresh)'
+                : '3–8 menit (smart cache)';
             el.innerHTML = `
                 <strong>Executor:</strong> ${executor}<br>
                 <strong>Mode:</strong> Full Web Portal<br>
+                <strong>Cache:</strong> ${policy === 'full' ? 'Full Refresh' : 'Smart'}<br>
                 <strong>Modul:</strong> ${count} modul enabled<br>
                 <strong>Section:</strong> ${sections.length} terpilih<br>
-                <strong>Estimasi:</strong> 10–30 menit (Windows worker)<br>
+                <strong>Estimasi:</strong> ${est}<br>
                 <strong>Output:</strong> {timestamp}_FSD_AKS_MAN_POWER_GT_WEB.docx
             `;
             return;
@@ -194,7 +227,13 @@ const GenerateFSD = {
         }
 
         const mode = this.getMode();
-        const body = { mode, sections, async: true };
+        const body = {
+            mode,
+            sections,
+            async: true,
+            refreshPolicy: this.getRefreshPolicy(),
+            refreshScreenshots: this.getRefreshScreenshots(),
+        };
 
         if (mode === 'single') {
             body.moduleId = document.getElementById('fsdModule').value;
@@ -240,13 +279,16 @@ const GenerateFSD = {
         return new Promise((resolve, reject) => {
             const start = Date.now();
             let interval = 2000;
-            const maxMs = 30 * 60 * 1000;
+            const isFull = this.getMode() === 'full';
+            const maxMs = isFull ? 90 * 60 * 1000 : 45 * 60 * 1000;
             const terminal = ['done', 'error'];
 
             const poll = async () => {
                 try {
                     if (Date.now() - start > maxMs) {
-                        throw new Error('Timeout — job masih berjalan. Cek lagi nanti dengan jobId yang sama.');
+                        throw new Error(
+                            'Timeout UI — job masih berjalan di worker. Refresh halaman atau poll ulang dengan jobId yang sama.',
+                        );
                     }
 
                     const res = await fetch(this.API_URL + '?jobId=' + encodeURIComponent(jobId));
@@ -291,8 +333,15 @@ const GenerateFSD = {
         this.lastResult = data;
         document.getElementById('fsdResult').style.display = 'block';
         const via = data.downloadUrl ? 'Blob URL' : 'base64';
-        document.getElementById('fsdSuccessMsg').textContent =
-            'FSD berhasil (' + (data.durationMs || '?') + ' ms, ' + via + '). File: ' + (data.filename || 'FSD.docx');
+        let msg = 'FSD berhasil (' + (data.durationMs || '?') + ' ms, ' + via + '). File: ' + (data.filename || 'FSD.docx');
+        if (data.cacheStats) {
+            const cs = data.cacheStats;
+            msg += '. Cache: AI ' + (cs.aiHits || 0) + ' hit / ' + (cs.aiRefreshed || 0) + ' refresh';
+            if (cs.screenshotCached != null) {
+                msg += ', screenshot ' + (cs.screenshotCached || 0) + ' cached / ' + (cs.screenshotRefreshed || 0) + ' capture';
+            }
+        }
+        document.getElementById('fsdSuccessMsg').textContent = msg;
         this.setProgress(100, 'Selesai');
     },
 

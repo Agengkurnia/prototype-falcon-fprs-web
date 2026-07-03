@@ -10,6 +10,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROTOTYPE_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..', '..'))
 REGISTRY_PATH = os.path.join(PROTOTYPE_ROOT, 'lib', 'fsd', 'module-registry.json')
 OUTPUT_MD = os.path.join(SCRIPT_DIR, '_job_build.md')
+TEMPLATE_MD = os.path.join(SCRIPT_DIR, 'FSD_Falcon_Web_Portal.md')
 
 
 def load_json(path):
@@ -120,30 +121,61 @@ def module_section(num, mod, sections, ai_dir, shot_dir):
     return '\n'.join(lines)
 
 
+def load_template_preamble():
+    """Sections 1–6 from static template (full portal mode)."""
+    if not os.path.exists(TEMPLATE_MD):
+        return []
+    with open(TEMPLATE_MD, 'r', encoding='utf-8') as f:
+        text = f.read()
+    # Strip placeholder comment and everything from ## 7 onward if present
+    text = re.sub(r'<!--.*?-->\s*', '', text, flags=re.DOTALL)
+    m = re.search(r'^(.*?)(?:##\s*7\.|$)', text, flags=re.DOTALL)
+    block = (m.group(1).strip() if m else text.strip())
+    if not block:
+        return []
+    return block.split('\n')
+
+
 def generate(job_cfg):
     reg = load_json(REGISTRY_PATH)
     ids = job_cfg.get('moduleIds') or []
     sections = job_cfg.get('sections') or []
+    mode = job_cfg.get('mode', 'single')
     ai_dir = job_cfg.get('aiMarkdownDir') or os.path.join(SCRIPT_DIR, '_job_ai')
     shot_dir = job_cfg.get('screenshotDir') or os.path.join(SCRIPT_DIR, 'screenshots')
 
     mods = [m for m in reg['modules'] if m['id'] in ids]
-    parts = [
-        '# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)',
-        '',
-        '**Modul:** Web Portal Falcon FPRS (Field Partner Relation System)',
-        '',
-        '**Sistem:** Falcon FPRS',
-        '',
-        '## Riwayat Revisi',
-        '',
-        '| Versi | Tanggal | Penulis | Keterangan |',
-        '|-------|---------|---------|------------|',
-        f'| 1.0 | Auto | FSD Worker | Job {job_cfg.get("jobId", "")} |',
-        '',
-        '## 7. Spesifikasi Modul Web Portal',
-        '',
-    ]
+
+    if mode == 'full':
+        parts = load_template_preamble()
+        if not parts:
+            parts = [
+                '# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)',
+                '',
+                '**Modul:** Web Portal Falcon FPRS (Field Partner Relation System)',
+                '',
+                '**Sistem:** Falcon FPRS',
+                '',
+            ]
+        # Ensure revision row reflects job
+        parts.append('')
+        parts.append('## 7. Spesifikasi Modul Web Portal')
+        parts.append('')
+    else:
+        parts = [
+            '# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)',
+            '',
+            '**Modul:** Web Portal Falcon FPRS (Field Partner Relation System)',
+            '',
+            '**Sistem:** Falcon FPRS',
+            '',
+            '## Riwayat Revisi',
+            '',
+            '| Versi | Tanggal | Penulis | Keterangan |',
+            '|-------|---------|---------|------------|',
+            f'| 1.0 | Auto | FSD Worker | Job {job_cfg.get("jobId", "")} |',
+            '',
+        ]
 
     for i, mod in enumerate(mods, 1):
         parts.append(module_section(i, mod, sections, ai_dir, shot_dir))

@@ -6,7 +6,8 @@ const { optionalGitPull, runCapture, runBuild, ensureStaticServer } = require('.
 const { updateJob } = require('../../lib/fsd/job-store');
 const { uploadDocxFromFile } = require('../../lib/fsd/blob-store');
 const { loadRegistry } = require('../../lib/fsd/orchestrator');
-const { generateAllFlowAnalyses } = require('../../lib/fsd/fsd-flow-llm');
+const { generateAllFlowAnalysesCached } = require('../../lib/fsd/fsd-flow-llm');
+const { planModuleRefresh, copyCachedAiToJobDir } = require('../../lib/fsd/fsd-cache');
 const { listStuckJobs } = require('../../lib/fsd/job-store');
 
 let busy = false;
@@ -28,7 +29,7 @@ function resolveModules(payload) {
     return [mod];
 }
 
-function writeJobConfig(job, modules) {
+function writeJobConfig(job, modules, captureModuleIds) {
     const jobDir = path.join(config.fsdDir, '_jobs');
     fs.mkdirSync(jobDir, { recursive: true });
     const jobConfigPath = path.join(jobDir, job.jobId + '.json');
@@ -41,6 +42,8 @@ function writeJobConfig(job, modules) {
         aiMarkdownDir: path.join(config.fsdDir, '_job_ai'),
         screenshotDir: path.join(config.fsdDir, 'screenshots'),
         outputDir: path.join(config.prototypeRoot, 'Document'),
+        captureModuleIds: captureModuleIds || [],
+        prototypeRoot: config.prototypeRoot,
     };
 
     fs.writeFileSync(jobConfigPath, JSON.stringify(jobConfig, null, 2));
@@ -63,21 +66,46 @@ async function runJob(job) {
     const start = Date.now();
     logInfo('Job started', { jobId: job.jobId });
 
+    const cacheStats = {
+        aiHits: 0,
+        aiRefreshed: 0,
+        screenshotRefreshed: 0,
+        screenshotCached: 0,
+    };
+
     try {
         await optionalGitPull();
 
         const modules = resolveModules(job.payload);
-        const jobConfigPath = writeJobConfig(job, modules);
+        const refreshOptions = {
+            refreshPolicy: job.payload.refreshPolicy || 'smart',
+            refreshScreenshots: job.payload.refreshScreenshots === true,
+            sections: job.payload.sections,
+        };
+        const plan = planModuleRefresh(modules, refreshOptions, config.prototypeRoot);
 
-        if (!(await ensureStaticServer())) {
+        const captureIds = plan.screenshotMisses.map(m => m.id);
+        cacheStats.screenshotRefreshed = captureIds.length;
+        cacheStats.screenshotCached = plan.screenshotHits.length;
+
+        const jobConfigPath = writeJobConfig(job, modules, captureIds);
+
+        if (!(await ensureStaticServer()) && captureIds.length > 0) {
             throw new Error('Static server tidak jalan di ' + config.staticBaseUrl);
         }
 
-        if (job.payload.sections.includes('screenshots')) {
+        await updateJob(job.jobId, {
+            status: 'processing',
+            progress: 5,
+            message: `Cache plan: AI ${plan.aiHits.length} hit / ${plan.aiMisses.length} refresh, ` +
+                `screenshot ${plan.screenshotHits.length} cached / ${captureIds.length} capture`,
+        });
+
+        if (job.payload.sections.includes('screenshots') && captureIds.length > 0) {
             await updateJob(job.jobId, {
                 status: 'capturing',
                 progress: 15,
-                message: 'Capture screenshot UI...',
+                message: `Capture screenshot (${captureIds.length} modul)...`,
             });
             await runCapture(jobConfigPath);
         }
@@ -86,17 +114,26 @@ async function runJob(job) {
             await updateJob(job.jobId, {
                 status: 'ai_analysis',
                 progress: 40,
-                message: 'Analisis flow Gemini...',
+                message: `Analisis flow Gemini (${plan.aiMisses.length} refresh, ${plan.aiHits.length} cache)...`,
             });
-            await generateAllFlowAnalyses(
+
+            const aiResult = await generateAllFlowAnalysesCached(
                 modules,
                 job.payload.sections,
                 config.prototypeRoot,
+                {
+                    refreshPolicy: refreshOptions.refreshPolicy,
+                    modulesToRefresh: plan.aiMisses,
+                },
                 p => updateJob(job.jobId, {
                     progress: 40 + Math.round((p.current / p.total) * 25),
                     message: p.message,
                 }),
             );
+            cacheStats.aiHits = aiResult.stats.aiHits;
+            cacheStats.aiRefreshed = aiResult.stats.aiRefreshed;
+        } else {
+            copyCachedAiToJobDir(modules, config.prototypeRoot);
         }
 
         await updateJob(job.jobId, {
@@ -127,10 +164,11 @@ async function runJob(job) {
                 blobPath: uploaded.blobPath,
                 modules: modules.map(m => m.id),
                 durationMs: Date.now() - start,
+                cacheStats,
             },
         });
 
-        logInfo('Job completed', { jobId: job.jobId, ms: Date.now() - start });
+        logInfo('Job completed', { jobId: job.jobId, ms: Date.now() - start, cacheStats });
         return true;
     } catch (err) {
         logError('Job failed', { jobId: job.jobId, error: err.message });

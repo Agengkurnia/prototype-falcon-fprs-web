@@ -2,6 +2,7 @@
   "scripts": {
     "capture-fsd-screenshots": "node scripts/capture-fsd-screenshots.js",
     "fsd:capture": "node scripts/capture-fsd-screenshots.js",
+    "fsd:prewarm": "node scripts/fsd-prewarm.js",
     "fsd:worker": "node worker/fsd-windows/index.js"
   },
   "devDependencies": {
