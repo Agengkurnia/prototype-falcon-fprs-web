@@ -1,4 +1,12 @@
-const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob } = require('../../lib/fsd/orchestrator');
+const { loadRegistry, runGenerate, createJob, runGenerateAsync, getJob, setStaticBaseUrl } = require('../../lib/fsd/orchestrator');
+
+function applyStaticBaseUrl(req) {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    if (host) {
+        setStaticBaseUrl(`${proto}://${host}`);
+    }
+}
 
 module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') {
@@ -50,6 +58,7 @@ module.exports = async (req, res) => {
     const { moduleId, moduleIds, sections, mode, async: asyncMode } = body;
 
     if (asyncMode) {
+        applyStaticBaseUrl(req);
         const jobId = createJob();
         runGenerateAsync(jobId, { moduleId, moduleIds, sections, mode: mode || 'single' });
         res.status(202).json({ jobId, status: 'processing' });
@@ -57,6 +66,7 @@ module.exports = async (req, res) => {
     }
 
     try {
+        applyStaticBaseUrl(req);
         const result = await runGenerate({
             moduleId,
             moduleIds,

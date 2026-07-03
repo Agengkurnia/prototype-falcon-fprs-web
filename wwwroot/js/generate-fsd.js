@@ -120,7 +120,7 @@ const GenerateFSD = {
         const el = document.getElementById('fsdPreview');
 
         if (mode === 'full') {
-            const count = (this.registry.modules || []).filter(m => m.enabled).length;
+            const count = (this.registry.modules || []).filter(m => m.enabled !== false).length;
             el.innerHTML = `
                 <strong>Mode:</strong> Full Web Portal<br>
                 <strong>Modul:</strong> ${count} modul enabled<br>
