@@ -1,8 +1,9 @@
 const http = require('http');
 const config = require('./config');
 const { handleWebhook } = require('./webhook');
-const { startPollLoop, startStuckMonitor } = require('./poll');
-const { logInfo } = require('./logger');
+const { startPollLoop, startStuckMonitor, pollOnce } = require('./poll');
+const { logInfo, logWarn } = require('./logger');
+const { hasKvConfig, resolveKvCredentials, resolveBlobToken } = require('../../lib/fsd/resolve-env');
 
 function readBody(req) {
     return new Promise((resolve, reject) => {
@@ -15,8 +16,16 @@ function readBody(req) {
 
 const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url === '/health') {
+        const kv = resolveKvCredentials();
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ status: 'ok', service: 'fsd-windows-worker' }));
+        res.end(JSON.stringify({
+            status: 'ok',
+            service: 'fsd-windows-worker',
+            kvConnected: hasKvConfig(),
+            kvUrl: kv.url ? kv.url.replace(/\/\/.*@/, '//***@') : null,
+            blobConfigured: !!resolveBlobToken(),
+            pollIntervalMs: config.pollIntervalMs,
+        }));
         return;
     }
 
@@ -37,6 +46,16 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(config.port, () => {
     logInfo('FSD Windows Worker listening', { port: config.port, root: config.prototypeRoot });
+    if (!hasKvConfig()) {
+        logWarn('KV tidak dikonfigurasi — worker tidak bisa ambil job dari Vercel. '
+            + 'Set KV_REST_API_URL + KV_REST_API_TOKEN (atau upstash_* prefix) di .env lalu restart.');
+    } else {
+        logInfo('KV configured', { url: resolveKvCredentials().url });
+    }
+    if (!resolveBlobToken()) {
+        logWarn('BLOB_READ_WRITE_TOKEN tidak diset — upload DOCX akan gagal di akhir job.');
+    }
     startPollLoop();
     startStuckMonitor();
+    pollOnce().catch(err => logWarn('Initial poll: ' + err.message));
 });

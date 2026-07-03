@@ -300,7 +300,11 @@ const GenerateFSD = {
                     }
 
                     if (!terminal.includes(data.status)) {
-                        this.setProgress(data.progress || 5, data.message || 'Memproses di Windows worker...');
+                        let msg = data.message || 'Memproses di Windows worker...';
+                        if (data.status === 'queued' && Date.now() - start > 30000) {
+                            msg = 'Job masih antre — pastikan worker laptop jalan + KV di .env (npm run fsd:check)';
+                        }
+                        this.setProgress(data.progress || 5, msg);
                         interval = Math.min(interval + 500, 10000);
                         this.pollTimer = setTimeout(poll, interval);
                         return;

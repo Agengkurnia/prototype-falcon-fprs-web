@@ -1,2 +1,21 @@
 [2026-07-03T07:09:36.081Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
 [2026-07-03T07:09:36.089Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-03T08:33:38.417Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-03T08:33:38.429Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-03T08:33:38.435Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-03T08:33:38.905Z] [INFO] Poll claimed job {"jobId":"fsd_1783065451336_w72x3o"}
+[2026-07-03T08:33:38.908Z] [INFO] Job started {"jobId":"fsd_1783065451336_w72x3o"}
+[2026-07-03T08:33:39.159Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783065451336_w72x3o.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T08:34:16.924Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\build_fsd_web_portal.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783065451336_w72x3o.json"]}
+[2026-07-03T08:34:37.391Z] [ERROR] Job failed {"jobId":"fsd_1783065451336_w72x3o","error":"Vercel Blob: Cannot use public access on a private store. The store is configured with private access."}
+[2026-07-03T08:43:29.040Z] [INFO] Poll claimed job {"jobId":"fsd_1783068206321_2ozr2g"}
+[2026-07-03T08:43:29.041Z] [INFO] Job started {"jobId":"fsd_1783068206321_2ozr2g"}
+[2026-07-03T08:43:29.175Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783068206321_2ozr2g.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T08:43:52.557Z] [ERROR] Job failed {"jobId":"fsd_1783068206321_2ozr2g","error":"Quota Gemini habis"}
+[2026-07-03T08:46:49.257Z] [INFO] Poll claimed job {"jobId":"fsd_1783068401632_glw13y"}
+[2026-07-03T08:46:49.258Z] [INFO] Job started {"jobId":"fsd_1783068401632_glw13y"}
+[2026-07-03T08:46:49.387Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783068401632_glw13y.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T08:47:11.498Z] [ERROR] Job failed {"jobId":"fsd_1783068401632_glw13y","error":"Quota Gemini habis"}
+[2026-07-03T09:06:18.032Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-03T09:06:18.039Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-03T09:06:18.040Z] [INFO] Poll loop started {"intervalMs":10000}

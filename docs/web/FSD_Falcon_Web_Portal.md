@@ -1,10 +1,10 @@
-# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
+**FUNCTIONAL SPECIFICATION DOCUMENT (FSD)**
 
 **Modul:** Web Portal Falcon FPRS (Field Partner Relation System)
 
 **Sistem:** Falcon FPRS
 
-## Riwayat Revisi
+**Riwayat Revisi**
 
 | Versi | Tanggal | Penulis | Keterangan |
 |-------|---------|---------|------------|
@@ -63,42 +63,42 @@ Fungsi utama modul ini adalah memfasilitasi operasi CRUD (Create, Read, Update, 
 
 Berikut adalah daftar aturan bisnis yang diterapkan pada modul Master Data Produk:
 
-*   **BR-001 (Kode Produk Wajib Diisi):** Kolom `Kode Produk (#kode)` wajib diisi.
+- **BR-001 (Kode Produk Wajib Diisi):** Kolom `Kode Produk (#kode)` wajib diisi.
     *   *Validasi:* `showFieldError('kode', 'Kode produk wajib diisi.')`
-*   **BR-002 (Kode Produk Minimal Karakter):** Kolom `Kode Produk (#kode)` harus memiliki minimal 3 karakter.
+- **BR-002 (Kode Produk Minimal Karakter):** Kolom `Kode Produk (#kode)` harus memiliki minimal 3 karakter.
     *   *Validasi:* `showFieldError('kode', 'Kode produk minimal 3 karakter.')`
-*   **BR-003 (Format Kode Produk):** Kolom `Kode Produk (#kode)` hanya boleh berisi huruf (a-z, A-Z), angka (0-9), tanda hubung (`-`), atau garis bawah (`_`).
+- **BR-003 (Format Kode Produk):** Kolom `Kode Produk (#kode)` hanya boleh berisi huruf (a-z, A-Z), angka (0-9), tanda hubung (`-`), atau garis bawah (`_`).
     *   *Validasi:* `showFieldError('kode', 'Kode hanya boleh berisi huruf, angka, dash (-)')`
-*   **BR-004 (Kode Produk Unik):** Kolom `Kode Produk (#kode)` harus unik dan tidak boleh sama dengan kode produk lain yang sudah ada.
+- **BR-004 (Kode Produk Unik):** Kolom `Kode Produk (#kode)` harus unik dan tidak boleh sama dengan kode produk lain yang sudah ada.
     *   *Validasi:* `showFieldError('kode', 'Kode "${kode}" sudah digunakan oleh produk lain.')`
-*   **BR-005 (Nama Produk Wajib Diisi):** Kolom `Nama Produk (#nama)` wajib diisi.
+- **BR-005 (Nama Produk Wajib Diisi):** Kolom `Nama Produk (#nama)` wajib diisi.
     *   *Validasi:* `showFieldError('nama', 'Nama produk wajib diisi.')`
-*   **BR-006 (Nama Produk Minimal Karakter):** Kolom `Nama Produk (#nama)` harus memiliki minimal 3 karakter.
+- **BR-006 (Nama Produk Minimal Karakter):** Kolom `Nama Produk (#nama)` harus memiliki minimal 3 karakter.
     *   *Validasi:* `showFieldError('nama', 'Nama produk minimal 3 karakter.')`
-*   **BR-007 (Kategori Wajib Dipilih):** Kolom `Kategori Produk (#kategori)` wajib dipilih.
+- **BR-007 (Kategori Wajib Dipilih):** Kolom `Kategori Produk (#kategori)` wajib dipilih.
     *   *Validasi:* `showFieldError('kategori', 'Kategori wajib dipilih.')`
-*   **BR-008 (Brand Wajib Dipilih):** Kolom `Brand (#brand)` wajib dipilih.
+- **BR-008 (Brand Wajib Dipilih):** Kolom `Brand (#brand)` wajib dipilih.
     *   *Validasi:* `showFieldError('brand', 'Brand wajib dipilih.')`
-*   **BR-009 (Harga Beli Positif):** Kolom `Harga Beli (#hargaBeli)` harus lebih besar dari 0.
+- **BR-009 (Harga Beli Positif):** Kolom `Harga Beli (#hargaBeli)` harus lebih besar dari 0.
     *   *Validasi:* `showFieldError('hargaBeli', 'Harga beli harus lebih dari 0.')`
-*   **BR-010 (Harga Jual Positif):** Kolom `Harga Jual (#hargaJual)` harus lebih besar dari 0.
+- **BR-010 (Harga Jual Positif):** Kolom `Harga Jual (#hargaJual)` harus lebih besar dari 0.
     *   *Validasi:* `showFieldError('hargaJual', 'Harga jual harus lebih dari 0.')`
-*   **BR-011 (Harga Jual vs Harga Beli):** Kolom `Harga Jual (#hargaJual)` tidak boleh lebih kecil dari `Harga Beli (#hargaBeli)`.
+- **BR-011 (Harga Jual vs Harga Beli):** Kolom `Harga Jual (#hargaJual)` tidak boleh lebih kecil dari `Harga Beli (#hargaBeli)`.
     *   *Validasi:* `showFieldError('hargaJual', 'Harga jual tidak boleh lebih kecil dari harga beli.')`
-*   **BR-012 (Berat Tidak Negatif):** Kolom `Berat (kg) (#berat)` tidak boleh bernilai negatif.
+- **BR-012 (Berat Tidak Negatif):** Kolom `Berat (kg) (#berat)` tidak boleh bernilai negatif.
     *   *Validasi:* `showFieldError('berat', 'Berat tidak boleh negatif.')`
 
 ## Integrasi
 
-*   **API Endpoint:**
+- **API Endpoint:**
     *   Untuk pemuatan data awal (jika `localStorage` kosong), sistem melakukan panggilan `fetch` ke `../../../../wwwroot/data/produk.json`.
     *   Endpoint `/api/v1/Sku` disebutkan dalam spesifikasi, namun tidak digunakan dalam implementasi JavaScript yang disediakan.
 
-*   **Penyimpanan Data (Storage):**
+- **Penyimpanan Data (Storage):**
     *   Data produk disimpan secara lokal di peramban menggunakan `localStorage`.
     *   Kunci yang digunakan untuk menyimpan data produk di `localStorage` adalah `md_produk`.
 
-*   **Efek Samping (Side Effects):**
+- **Efek Samping (Side Effects):**
     *   Setiap kali data produk di `localStorage` diubah (ditambah, diedit, atau dihapus), fungsi `render()` akan dipanggil untuk memperbarui tampilan tabel produk di halaman indeks secara otomatis.
     *   Operasi simpan, edit, dan hapus akan menampilkan dialog notifikasi (menggunakan Swal.fire) kepada pengguna untuk memberikan umpan balik mengenai keberhasilan atau kegagalan operasi.
     *   Setelah operasi simpan atau edit berhasil, pengguna akan secara otomatis diarahkan kembali ke halaman indeks `index.html`.
@@ -148,11 +148,11 @@ Berikut adalah daftar aturan bisnis yang diterapkan pada modul Master Data Produ
 ### Screenshot UI
 ![master_produk.png](screenshots/master_produk.png)
 
-![master_produk_add.png](screenshots/master_produk_add.png)
+![master_produk_add.png](screenshots/master_produk_add.png){width=55%}
 
-![master_produk_edit.png](screenshots/master_produk_edit.png)
+![master_produk_edit.png](screenshots/master_produk_edit.png){width=55%}
 
-![master_produk_validation.png](screenshots/master_produk_validation.png)
+![master_produk_validation.png](screenshots/master_produk_validation.png){width=55%}
 
-![master_produk_delete_confirm.png](screenshots/master_produk_delete_confirm.png)
+![master_produk_delete_confirm.png](screenshots/master_produk_delete_confirm.png){width=55%}
 

@@ -3,16 +3,21 @@
   "promptVersion": "fsd-flow-v2",
   "modules": {
     "master-produk": {
-      "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
+      "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
       "screenshots": {
         "master_produk.png": {
-          "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
-          "capturedAt": "2026-07-03T06:45:58.788Z"
+          "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
+          "capturedAt": "2026-07-03T08:46:55.888099+00:00"
         },
         "master_produk_add.png": {
-          "sourceHash": "436745c8c568935a9df4a1eae3a0ade57e85db24b3a6c5c0a4c8094929d6ea78",
-          "capturedAt": "2026-07-03T06:45:58.788Z"
+          "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
+          "capturedAt": "2026-07-03T08:46:55.888099+00:00"
         }
+      },
+      "ai": {
+        "model": "gemini-2.5-flash",
+        "path": "_cache/ai/master-produk.md",
+        "generatedAt": "2026-07-03T08:34:16.713Z"
       }
     },
     "master-akun": {
@@ -231,5 +236,5 @@
       }
     }
   },
-  "updatedAt": "2026-07-03T06:45:58.846Z"
+  "updatedAt": "2026-07-03T08:46:55.888376+00:00"
 }

@@ -1,17 +1,3 @@
-# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
-
-**Modul:** Web Portal Falcon FPRS (Field Partner Relation System)
-
-**Sistem:** Falcon FPRS
-
-## Riwayat Revisi
-
-| Versi | Tanggal | Penulis | Keterangan |
-|-------|---------|---------|------------|
-| 1.0 | Auto | FSD Worker | Job fsd_1783065451336_w72x3o |
-
-## 1. Master Data — Produk
-
 ## Tujuan Fungsional
 
 Modul Master Data Produk ini bertujuan untuk menyediakan antarmuka yang komprehensif bagi pengguna untuk mengelola data induk produk. Modul ini memungkinkan pengguna untuk melihat daftar produk yang ada, menambahkan produk baru, mengedit informasi produk yang sudah ada, dan menghapus produk dari sistem. Dengan demikian, modul ini memastikan ketersediaan data produk yang akurat dan terkini untuk mendukung operasional bisnis.
@@ -102,57 +88,3 @@ Berikut adalah daftar aturan bisnis yang diterapkan pada modul Master Data Produ
     *   Setiap kali data produk di `localStorage` diubah (ditambah, diedit, atau dihapus), fungsi `render()` akan dipanggil untuk memperbarui tampilan tabel produk di halaman indeks secara otomatis.
     *   Operasi simpan, edit, dan hapus akan menampilkan dialog notifikasi (menggunakan Swal.fire) kepada pengguna untuk memberikan umpan balik mengenai keberhasilan atau kegagalan operasi.
     *   Setelah operasi simpan atau edit berhasil, pengguna akan secara otomatis diarahkan kembali ke halaman indeks `index.html`.
-
-### Kolom DataTable Index
-- NO
-- KODE
-- PRODUK
-- KATEGORI
-- BRAND
-- UNIT
-- HARGA JUAL
-- PAJAK
-- STATUS
-
-### Field Form
-| Field |
-|-------|
-| Kode Produk |
-| Nama Produk |
-| Kategori Produk |
-| Brand |
-| Divisi |
-| Harga Beli |
-| Harga Jual |
-| Skema Pajak |
-| Unit Konversi |
-| Status Produk |
-| Berat (kg) |
-| Panjang (cm) |
-| Lebar (cm) |
-| Tinggi (cm) |
-
-### Validasi Simpan
-- Kode produk wajib diisi.
-- Kode produk minimal 3 karakter.
-- Kode hanya boleh berisi huruf, angka, dash (-), atau underscore (_).
-- Nama produk wajib diisi.
-- Nama produk minimal 3 karakter.
-- Kategori wajib dipilih.
-- Brand wajib dipilih.
-- Harga beli harus lebih dari 0.
-- Harga jual harus lebih dari 0.
-- Harga jual tidak boleh lebih kecil dari harga beli.
-- Berat tidak boleh negatif.
-
-### Screenshot UI
-![master_produk.png](screenshots/master_produk.png)
-
-![master_produk_add.png](screenshots/master_produk_add.png)
-
-![master_produk_edit.png](screenshots/master_produk_edit.png)
-
-![master_produk_validation.png](screenshots/master_produk_validation.png)
-
-![master_produk_delete_confirm.png](screenshots/master_produk_delete_confirm.png)
-
