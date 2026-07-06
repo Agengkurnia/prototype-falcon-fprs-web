@@ -84,15 +84,25 @@ async function runJob(job) {
         };
         const plan = planModuleRefresh(modules, refreshOptions, config.prototypeRoot);
 
-        const captureIds = plan.screenshotMisses.map(m => m.id);
+        let captureIds = plan.screenshotMisses.map(m => m.id);
         cacheStats.screenshotRefreshed = captureIds.length;
         cacheStats.screenshotCached = plan.screenshotHits.length;
 
-        const jobConfigPath = writeJobConfig(job, modules, captureIds);
-
-        if (!(await ensureStaticServer()) && captureIds.length > 0) {
-            throw new Error('Static server tidak jalan di ' + config.staticBaseUrl);
+        let captureBaseUrl = null;
+        if (captureIds.length > 0) {
+            captureBaseUrl = await ensureStaticServer();
+            if (!captureBaseUrl) {
+                if (refreshOptions.refreshPolicy === 'smart') {
+                    logWarn('Smart mode: skip screenshot capture — pakai file cache yang ada');
+                    captureIds = [];
+                    cacheStats.screenshotRefreshed = 0;
+                } else {
+                    throw new Error('Capture server tidak tersedia. Jalankan npm run fsd:dev atau set FSD_VERCEL_BASE_URL.');
+                }
+            }
         }
+
+        const jobConfigPath = writeJobConfig(job, modules, captureIds);
 
         await updateJob(job.jobId, {
             status: 'processing',
@@ -107,7 +117,7 @@ async function runJob(job) {
                 progress: 15,
                 message: `Capture screenshot (${captureIds.length} modul)...`,
             });
-            await runCapture(jobConfigPath);
+            await runCapture(jobConfigPath, captureBaseUrl);
         }
 
         if (job.payload.sections.some(s => ['overview', 'businessRules'].includes(s))) {

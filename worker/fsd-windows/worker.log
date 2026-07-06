@@ -31,3 +31,36 @@
 [2026-07-03T09:25:29.071Z] [INFO] Job started {"jobId":"fsd_1783070720593_llxhxb"}
 [2026-07-03T09:25:29.204Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783070720593_llxhxb.json","--base-url","http://127.0.0.1:5500"]}
 [2026-07-03T09:25:52.148Z] [ERROR] Job failed {"jobId":"fsd_1783070720593_llxhxb","error":"Quota Gemini habis"}
+[2026-07-03T09:33:39.457Z] [INFO] Poll claimed job {"jobId":"fsd_1783071212596_lwfkpy"}
+[2026-07-03T09:33:39.458Z] [INFO] Job started {"jobId":"fsd_1783071212596_lwfkpy"}
+[2026-07-03T09:33:39.815Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783071212596_lwfkpy.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T09:34:01.610Z] [ERROR] Job failed {"jobId":"fsd_1783071212596_lwfkpy","error":"Quota Gemini habis"}
+[2026-07-03T10:03:00.888Z] [INFO] Poll claimed job {"jobId":"fsd_1783072979548_c2gvxi"}
+[2026-07-03T10:03:00.889Z] [INFO] Job started {"jobId":"fsd_1783072979548_c2gvxi"}
+[2026-07-03T10:03:01.138Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783072979548_c2gvxi.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T10:03:23.179Z] [ERROR] Job failed {"jobId":"fsd_1783072979548_c2gvxi","error":"Quota Gemini habis"}
+[2026-07-03T10:03:40.812Z] [INFO] Poll claimed job {"jobId":"fsd_1783073016706_bel669"}
+[2026-07-03T10:03:40.814Z] [INFO] Job started {"jobId":"fsd_1783073016706_bel669"}
+[2026-07-03T10:03:41.022Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783073016706_bel669.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T10:04:05.668Z] [ERROR] Job failed {"jobId":"fsd_1783073016706_bel669","error":"Quota Gemini habis"}
+[2026-07-03T10:40:14.211Z] [INFO] Poll claimed job {"jobId":"fsd_1783075211367_qe0k3m"}
+[2026-07-03T10:40:14.213Z] [INFO] Job started {"jobId":"fsd_1783075211367_qe0k3m"}
+[2026-07-03T10:40:14.623Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783075211367_qe0k3m.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-03T10:40:39.281Z] [ERROR] Job failed {"jobId":"fsd_1783075211367_qe0k3m","error":"Quota Gemini habis"}
+[2026-07-03T12:48:28.527Z] [INFO] Poll claimed job {"jobId":"fsd_1783082901186_gdnxlv"}
+[2026-07-03T12:48:28.532Z] [INFO] Job started {"jobId":"fsd_1783082901186_gdnxlv"}
+[2026-07-03T12:48:28.754Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783082901186_gdnxlv.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-06T01:41:44.718Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-06T01:41:44.726Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-06T01:41:44.727Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-06T01:41:45.271Z] [INFO] Poll claimed job {"jobId":"fsd_1783301909104_vprk7b"}
+[2026-07-06T01:41:45.273Z] [INFO] Job started {"jobId":"fsd_1783301909104_vprk7b"}
+[2026-07-06T01:41:45.291Z] [ERROR] Static server not reachable at http://127.0.0.1:5500
+[2026-07-06T01:41:45.292Z] [INFO] Start: npx http-server -p 5500 -c-1 in prototype root
+[2026-07-06T01:41:45.293Z] [ERROR] Job failed {"jobId":"fsd_1783301909104_vprk7b","error":"Static server tidak jalan di http://127.0.0.1:5500"}
+[2026-07-06T01:42:32.215Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-06T01:42:32.222Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-06T01:42:32.223Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-06T01:48:02.594Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-06T01:48:02.599Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-06T01:48:02.601Z] [INFO] Poll loop started {"intervalMs":10000}

@@ -7,11 +7,11 @@
       "screenshots": {
         "master_produk.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T09:25:36.697350+00:00"
+          "capturedAt": "2026-07-03T10:40:23.839206+00:00"
         },
         "master_produk_add.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T09:25:36.697350+00:00"
+          "capturedAt": "2026-07-03T10:40:23.839206+00:00"
         }
       },
       "ai": {
@@ -21,15 +21,15 @@
       }
     },
     "master-akun": {
-      "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
+      "sourceHash": "3cf9b5daf567d40b5beecb43d3755a5366222f80112c0800681208a9d6993aa5",
       "screenshots": {
         "master_akun.png": {
-          "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
-          "capturedAt": "2026-07-03T06:45:58.794Z"
+          "sourceHash": "3cf9b5daf567d40b5beecb43d3755a5366222f80112c0800681208a9d6993aa5",
+          "capturedAt": "2026-07-03T10:03:50.332237+00:00"
         },
         "master_akun_modal_tambah.png": {
-          "sourceHash": "a0d9445bf2daa9b4d4c2de4ff3bf3866ef3a97cafffc6cf440a127ba23160577",
-          "capturedAt": "2026-07-03T06:45:58.794Z"
+          "sourceHash": "3cf9b5daf567d40b5beecb43d3755a5366222f80112c0800681208a9d6993aa5",
+          "capturedAt": "2026-07-03T10:03:50.332237+00:00"
         }
       }
     },
@@ -236,5 +236,5 @@
       }
     }
   },
-  "updatedAt": "2026-07-03T09:25:36.697739+00:00"
+  "updatedAt": "2026-07-03T10:40:23.839612+00:00"
 }

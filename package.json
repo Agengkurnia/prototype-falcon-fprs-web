@@ -5,7 +5,8 @@
     "fsd:prewarm": "node scripts/fsd-prewarm.js",
     "fsd:check": "node scripts/fsd-check.js",
     "fsd:clear-ratelimit": "node scripts/fsd-clear-ratelimit.js",
-    "fsd:worker": "node scripts/fsd-worker-start.js"
+    "fsd:worker": "node scripts/fsd-worker-start.js",
+    "fsd:dev": "node scripts/fsd-dev.js"
   },
   "devDependencies": {
     "exceljs": "^4.4.0"
