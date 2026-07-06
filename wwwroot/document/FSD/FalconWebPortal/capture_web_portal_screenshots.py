@@ -16,7 +16,7 @@ PROMPT_VERSION = os.environ.get('FSD_PROMPT_VERSION', 'fsd-flow-v2')
 
 
 def load_job_config(path):
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r', encoding='utf-8-sig') as f:
         return json.load(f)
 
 
@@ -104,6 +104,101 @@ def wait_ready(page):
     time.sleep(0.8)
 
 
+def shot_by_pattern(shots, *patterns):
+    for s in shots:
+        low = s.lower()
+        if any(p in low for p in patterns):
+            return s
+    return None
+
+
+def capture_page_module(page, mod, base_url, out_dir, shots):
+    """Capture index, add, edit, validation, delete for page+form modules."""
+    captured = []
+    index_url = base_url.rstrip('/') + '/' + mod['htmlPath'].replace('\\', '/')
+
+    page.goto(index_url, wait_until='domcontentloaded', timeout=30000)
+    wait_ready(page)
+    if shots:
+        page.screenshot(path=os.path.join(out_dir, shots[0]))
+        captured.append(shots[0])
+
+    form_path = mod.get('formPath')
+    if not form_path:
+        return captured
+
+    form_url = base_url.rstrip('/') + '/' + form_path.replace('\\', '/')
+
+    add_shot = shot_by_pattern(shots, '_add')
+    if add_shot:
+        page.goto(form_url, wait_until='domcontentloaded', timeout=30000)
+        wait_ready(page)
+        page.screenshot(path=os.path.join(out_dir, add_shot))
+        captured.append(add_shot)
+
+    edit_shot = shot_by_pattern(shots, '_edit')
+    if edit_shot:
+        page.goto(index_url, wait_until='domcontentloaded', timeout=30000)
+        wait_ready(page)
+        edit_href = page.evaluate('''() => {
+            const a = document.querySelector('a.btn-action-edit, a[href*="add.html?id="]');
+            return a ? a.getAttribute('href') : null;
+        }''')
+        if edit_href:
+            if edit_href.startswith('http'):
+                target = edit_href
+            else:
+                base = index_url.rsplit('/', 1)[0]
+                target = base + '/' + edit_href.lstrip('/')
+            page.goto(target, wait_until='domcontentloaded', timeout=30000)
+            wait_ready(page)
+            page.screenshot(path=os.path.join(out_dir, edit_shot))
+            captured.append(edit_shot)
+
+    val_shot = shot_by_pattern(shots, 'validation')
+    if val_shot:
+        page.goto(form_url, wait_until='domcontentloaded', timeout=30000)
+        wait_ready(page)
+        submit = page.locator('button[type="submit"], #formProduk button[type="submit"]').first
+        if submit.count():
+            submit.click(timeout=5000)
+            time.sleep(1.0)
+            page.screenshot(path=os.path.join(out_dir, val_shot))
+            captured.append(val_shot)
+
+    del_shot = shot_by_pattern(shots, 'delete')
+    if del_shot:
+        page.goto(index_url, wait_until='domcontentloaded', timeout=30000)
+        wait_ready(page)
+        del_btn = page.locator('.btn-action-delete, button.btn-action-delete').first
+        if del_btn.count():
+            del_btn.click(timeout=5000)
+            time.sleep(0.8)
+            page.screenshot(path=os.path.join(out_dir, del_shot))
+            captured.append(del_shot)
+
+    return captured
+
+
+def capture_modal_module(page, mod, base_url, out_dir, shots):
+    captured = []
+    url = base_url.rstrip('/') + '/' + mod['htmlPath'].replace('\\', '/')
+    page.goto(url, wait_until='domcontentloaded', timeout=30000)
+    wait_ready(page)
+    page.screenshot(path=os.path.join(out_dir, shots[0]))
+    captured.append(shots[0])
+
+    btn = page.locator('button.btn-success, a.btn-success').first
+    if btn.count():
+        btn.click(timeout=5000)
+        time.sleep(0.6)
+        modal = shot_by_pattern(shots, 'modal')
+        if modal:
+            page.screenshot(path=os.path.join(out_dir, modal))
+            captured.append(modal)
+    return captured
+
+
 def capture_modules(base_url, job_cfg):
     try:
         from playwright.sync_api import sync_playwright
@@ -129,34 +224,14 @@ def capture_modules(base_url, job_cfg):
             captured = []
             page = browser.new_page(viewport={'width': 1366, 'height': 768})
             try:
-                url = base_url.rstrip('/') + '/' + mod['htmlPath'].replace('\\', '/')
-                page.goto(url, wait_until='domcontentloaded', timeout=30000)
-                wait_ready(page)
-                main_path = os.path.join(out_dir, shots[0])
-                page.screenshot(path=main_path)
-                captured.append(shots[0])
-
                 if mod.get('type') == 'modal':
-                    btn = page.locator('button.btn-success, a.btn-success').first
-                    if btn.count():
-                        btn.click(timeout=5000)
-                        time.sleep(0.6)
-                        modal = next((s for s in shots if 'modal' in s), None)
-                        if modal:
-                            page.screenshot(path=os.path.join(out_dir, modal))
-                            captured.append(modal)
-
-                if mod.get('formPath'):
-                    form_url = base_url.rstrip('/') + '/' + mod['formPath'].replace('\\', '/')
-                    page.goto(form_url, wait_until='domcontentloaded', timeout=30000)
-                    wait_ready(page)
-                    add_shot = next((s for s in shots if '_add' in s or 'add' in s), None)
-                    if add_shot:
-                        page.screenshot(path=os.path.join(out_dir, add_shot))
-                        captured.append(add_shot)
+                    captured = capture_modal_module(page, mod, base_url, out_dir, shots)
+                else:
+                    captured = capture_page_module(page, mod, base_url, out_dir, shots)
 
                 if captured:
                     update_manifest_screenshots(mod, captured)
+                    print(f'  captured {len(captured)}/{len(shots)}: {", ".join(captured)}')
             except Exception as e:
                 print(f'  WARN {mod["id"]}: {e}')
             finally:

@@ -29,7 +29,7 @@
         "validation": { "default": true, "source": "html" },
         "screenshots": { "default": true },
         "businessRules": { "default": true, "source": "ai" },
-        "erd": { "default": false }
+        "erd": { "default": true }
       }
     },
     {

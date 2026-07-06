@@ -14,7 +14,7 @@ TEMPLATE_MD = os.path.join(SCRIPT_DIR, 'FSD_Falcon_Web_Portal.md')
 
 
 def load_json(path):
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, 'r', encoding='utf-8-sig') as f:
         return json.load(f)
 
 
@@ -64,6 +64,30 @@ def load_ai_md(ai_dir, module_id):
     return ''
 
 
+def extract_portal_erd_mermaid():
+    """ERD portal dari template FSD (section ## 6)."""
+    if not os.path.exists(TEMPLATE_MD):
+        return ''
+    with open(TEMPLATE_MD, 'r', encoding='utf-8') as f:
+        text = f.read()
+    m = re.search(r'```mermaid\s*\n(erDiagram.*?)```', text, re.DOTALL)
+    return m.group(1).strip() if m else ''
+
+
+def module_erd_section(mod):
+    """ERD ringkas per modul master data."""
+    label = mod.get('label', mod.get('id', ''))
+    if mod.get('group') == 'masterData':
+        entity = 'M_' + re.sub(r'[^a-zA-Z0-9]', '', mod.get('id', 'Modul').replace('master-', '').title())
+        return f'''erDiagram
+    {entity} {{
+        string kode
+        string nama
+        string status
+    }}'''
+    return extract_portal_erd_mermaid()
+
+
 def module_section(num, mod, sections, ai_dir, shot_dir):
     index_html = read_html(mod['htmlPath'])
     form_html = read_html(mod.get('formPath') or '')
@@ -106,12 +130,26 @@ def module_section(num, mod, sections, ai_dir, shot_dir):
 
     if 'screenshots' in sections:
         shots = mod.get('screenshots') or []
-        if shots:
+        existing = [s for s in shots if os.path.exists(os.path.join(shot_dir, s))]
+        if existing:
             lines.append('### Screenshot UI')
-            for s in shots:
+            for s in existing:
                 rel = os.path.relpath(os.path.join(shot_dir, s), SCRIPT_DIR).replace('\\', '/')
                 lines.append(f'![{s}]({rel})')
                 lines.append('')
+        elif shots:
+            lines.append('### Screenshot UI')
+            lines.append('_Screenshot belum tersedia — aktifkan Refresh screenshot lalu generate ulang._')
+            lines.append('')
+
+    if 'erd' in sections:
+        mermaid = module_erd_section(mod) or extract_portal_erd_mermaid()
+        if mermaid:
+            lines.append('### Diagram ERD')
+            lines.append('```mermaid')
+            lines.append(mermaid)
+            lines.append('```')
+            lines.append('')
 
     if 'businessRules' in sections and ai and 'Business Rules' not in ai:
         lines.append('### Business Rules')

@@ -1,0 +1,8 @@
+﻿{
+  "jobId": "capture_fix",
+  "mode": "single",
+  "moduleIds": ["master-produk"],
+  "sections": ["overview", "columns", "fields", "validation", "screenshots", "businessRules", "erd"],
+  "captureModuleIds": ["master-produk"],
+  "screenshotDir": "D:/Work/Source/Comsup/falcon/Prototype/wwwroot/document/FSD/FalconWebPortal/screenshots"
+}

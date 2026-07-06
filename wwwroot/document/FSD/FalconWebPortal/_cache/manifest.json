@@ -7,17 +7,29 @@
       "screenshots": {
         "master_produk.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T10:40:23.839206+00:00"
+          "capturedAt": "2026-07-06T01:57:19.618288+00:00"
         },
         "master_produk_add.png": {
           "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
-          "capturedAt": "2026-07-03T10:40:23.839206+00:00"
+          "capturedAt": "2026-07-06T01:57:19.618288+00:00"
+        },
+        "master_produk_edit.png": {
+          "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
+          "capturedAt": "2026-07-06T01:57:19.618288+00:00"
+        },
+        "master_produk_validation.png": {
+          "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
+          "capturedAt": "2026-07-06T01:57:19.618288+00:00"
+        },
+        "master_produk_delete_confirm.png": {
+          "sourceHash": "f193811fb9912212719777111a32ab99f28bfc7874ae857a0fd7d23f92dfd75b",
+          "capturedAt": "2026-07-06T01:57:19.618288+00:00"
         }
       },
       "ai": {
         "model": "gemini-2.5-flash",
         "path": "_cache/ai/master-produk.md",
-        "generatedAt": "2026-07-03T08:34:16.713Z"
+        "generatedAt": "2026-07-06T01:51:19.698Z"
       }
     },
     "master-akun": {
@@ -236,5 +248,5 @@
       }
     }
   },
-  "updatedAt": "2026-07-03T10:40:23.839612+00:00"
+  "updatedAt": "2026-07-06T01:57:19.618534+00:00"
 }

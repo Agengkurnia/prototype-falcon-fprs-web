@@ -64,3 +64,8 @@
 [2026-07-06T01:48:02.594Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
 [2026-07-06T01:48:02.599Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
 [2026-07-06T01:48:02.601Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-06T01:50:13.130Z] [INFO] Poll claimed job {"jobId":"fsd_1783302611088_eeryvu"}
+[2026-07-06T01:50:13.132Z] [INFO] Job started {"jobId":"fsd_1783302611088_eeryvu"}
+[2026-07-06T01:50:13.288Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783302611088_eeryvu.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-06T01:51:31.367Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\build_fsd_web_portal.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783302611088_eeryvu.json"]}
+[2026-07-06T01:51:51.444Z] [INFO] Job completed {"jobId":"fsd_1783302611088_eeryvu","ms":98312,"cacheStats":{"aiHits":0,"aiRefreshed":1,"screenshotRefreshed":1,"screenshotCached":0}}
