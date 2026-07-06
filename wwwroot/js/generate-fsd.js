@@ -355,6 +355,9 @@ const GenerateFSD = {
         if (msg.includes('Quota') || msg.includes('429')) {
             text = 'Quota Gemini habis. Coba lagi nanti atau ganti GEMINI_MODEL di environment.';
         }
+        if (msg.includes('503') || msg.includes('Gemini sibuk')) {
+            text = 'Gemini sedang sibuk (503). Tunggu 2–5 menit lalu Generate lagi, atau pakai Smart Generate (cache AI) jika sudah pernah berhasil.';
+        }
         if (msg.includes('Batas generate')) {
             text = msg;
         }

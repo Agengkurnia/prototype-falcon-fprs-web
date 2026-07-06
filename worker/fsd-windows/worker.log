@@ -69,3 +69,10 @@
 [2026-07-06T01:50:13.288Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783302611088_eeryvu.json","--base-url","http://127.0.0.1:5500"]}
 [2026-07-06T01:51:31.367Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\build_fsd_web_portal.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783302611088_eeryvu.json"]}
 [2026-07-06T01:51:51.444Z] [INFO] Job completed {"jobId":"fsd_1783302611088_eeryvu","ms":98312,"cacheStats":{"aiHits":0,"aiRefreshed":1,"screenshotRefreshed":1,"screenshotCached":0}}
+[2026-07-06T02:01:03.697Z] [INFO] Poll claimed job {"jobId":"fsd_1783303261145_o2liuj"}
+[2026-07-06T02:01:03.700Z] [INFO] Job started {"jobId":"fsd_1783303261145_o2liuj"}
+[2026-07-06T02:01:03.911Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783303261145_o2liuj.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-06T02:01:36.792Z] [ERROR] Job failed {"jobId":"fsd_1783303261145_o2liuj","error":"Gemini error 503: {\n  \"error\": {\n    \"code\": 503,\n    \"message\": \"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\n    \"status\": \"UNAVAILABLE\"\n  }\n}\n"}
+[2026-07-06T02:02:49.438Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
+[2026-07-06T02:02:49.446Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
+[2026-07-06T02:02:49.447Z] [INFO] Poll loop started {"intervalMs":10000}
