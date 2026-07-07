@@ -1,0 +1,37 @@
+{
+  "kota": "Jakarta Pusat",
+  "kecamatan": [
+    {
+      "name": "Gambir",
+      "kelurahan": ["Gambir", "Kebon Kelapa", "Petojo Selatan", "Petojo Utara", "Cideng"]
+    },
+    {
+      "name": "Menteng",
+      "kelurahan": ["Menteng", "Pegangsaan", "Cikini", "Gondangdia", "Kebon Sirih"]
+    },
+    {
+      "name": "Senen",
+      "kelurahan": ["Senen", "Kramat", "Kenari", "Paseban", "Kwitang", "Bungur Besar"]
+    },
+    {
+      "name": "Cempaka Putih",
+      "kelurahan": ["Cempaka Putih Timur", "Cempaka Putih Barat", "Rawasari"]
+    },
+    {
+      "name": "Kemayoran",
+      "kelurahan": ["Kemayoran", "Kebon Kosong", "Harapan Mulya", "Serdang", "Gunung Sahari Selatan", "Gunung Sahari Utara", "Cempaka Baru", "Sumur Batu"]
+    },
+    {
+      "name": "Johar Baru",
+      "kelurahan": ["Johar Baru", "Kampung Rawa", "Galur", "Tanah Tinggi"]
+    },
+    {
+      "name": "Tanah Abang",
+      "kelurahan": ["Bendungan Hilir", "Karet Tengsin", "Kebon Melati", "Kebon Kacang", "Kampung Bali", "Petamburan", "Gelora"]
+    },
+    {
+      "name": "Sawah Besar",
+      "kelurahan": ["Pasar Baru", "Gunung Sahari Utara", "Kartini", "Karang Anyar"]
+    }
+  ]
+}

@@ -14,7 +14,9 @@ Dalam perjalanannya, prototipe ini telah melewati beberapa fase penyempurnaan:
 3. **Fase Penjualan & Canvassing**: Pengembangan modul Canvassing desktop yang responsif dengan kartu ringkasan interaktif, pencarian, dan konfirmasi SweetAlert.
 4. **Fase Pelacakan Geografis Kunjungan**: Penambahan modul Geografis Kunjungan desktop dengan visualisasi peta rute sales menggunakan MapLibre GL JS dan panel interaktif.
 5. **Fase Mobile SFA & Pembayaran**: Pembuatan prototipe antarmuka mobile khusus untuk sales lapangan (`Views/Mobile/`) yang mencakup pemesanan barang, tagihan piutang, pelacakan GPS, dan dasbor target.
-6. **Fase Kemasan Flutter APK**: Pengintegrasian modul mobile ke dalam pembungkus (wrapper) Flutter untuk menghasilkan aplikasi Android mandiri (`app-release.apk`).
+6. **Fase Feedback Stakeholder Mobile**: Penyelarasan UI/UX beranda (Periode Penjualan), alur Visit (single active, cek stok wajib), form outlet (NPWP mask, wilayah JSON), dan seed data demo.
+7. **Fase Kemasan Flutter APK**: Pengintegrasian modul mobile ke dalam pembungkus (wrapper) Flutter untuk menghasilkan aplikasi Android mandiri (`app-release.apk`).
+8. **Fase Juli 2026 (Web & Mobile)**: Master Stokis web (CSV), unduh data server di beranda mobile, role MD/Motoris di rute kunjungan, dual mode beli/cek stok, antrean upload. Lihat [changelog_web_mobile_jul2026.md](changelog_web_mobile_jul2026.md).
 
 ---
 
@@ -45,13 +47,13 @@ Prototype/
 │   ├── FPRS/                   # [WEB] Panel Admin Desktop
 │   │   ├── Canvassing/         # Modul Transaksi Canvassing
 │   │   ├── Kunjungan/          # Modul Geografis Kunjungan & Rute
-│   │   └── MasterData/         # 17 Sub-modul Master Data (Produk, Pelanggan, dll)
+│   │   └── MasterData/         # 18 Sub-modul Master Data (Produk, Pelanggan, Stokis, dll)
 │   └── Mobile/                 # [MOBILE] Antarmuka Client Sales Lapangan
-│       ├── login.html          # Form login mobile
-│       ├── home.html           # Menu utama, detail kanvas, & notifikasi
+│       ├── login.html          # Form login mobile (role MD / motoris)
+│       ├── home.html           # Beranda: KPI, unduh data server, 3 menu
 │       ├── dasbor.html         # Statistik performa harian & chart
-│       ├── visit_list.html     # Daftar target rute kunjungan harian
-│       ├── visit_detail.html   # Detail outlet & alur check-in radius GPS/kamera
+│       ├── visit_list.html     # Rute kunjungan (MD: Rute Harian+Overdue; motoris: GPS)
+│       ├── visit_detail.html   # Visit outlet: cek stok, single active
 │       ├── order_input.html    # Form input transaksi penjualan sales
 │       ├── invoice_list.html   # Daftar riwayat faktur penjualan periode terpilih
 │       ├── invoice_detail.html # Detail review faktur penjualan (read-only)
@@ -59,12 +61,12 @@ Prototype/
 │       └── collection_input.html # Pencatatan pembayaran tagihan piutang
 │       ├── outlet_list.html    # Daftar pelanggan basis data & filter category
 │       ├── outlet_detail.html  # Detail profile outlet & geotagging map
-│       ├── outlet_add.html     # Registrasi outlet baru lapangan
-│       ├── product_catalog.html # Grid katalog produk & stock info
+│       ├── outlet_add.html     # Registrasi outlet: foto wajib, NPWP mask, dropdown wilayah
+│       ├── product_catalog.html # Beli stok / cek stok stokis + picker GPS
 │       ├── product_detail.html # Detail produk & UOM info
 │       ├── profil.html         # Detail akun canvasser & Developer Tools
 │       ├── restock_review.html # Form audit & input stok fisik outlet
-│       ├── sync_detail.html    # Log & antrean data sync offline
+│       ├── sync_detail.html    # Antrean upload offline (retry, hapus, kosongkan)
 │       └── target.html         # Target KPI bulanan canvasser (Visit, EC, Value)
 ├── Mobile/
 │   └── MobileApp/              # Proyek Flutter WebView Wrapper
@@ -95,12 +97,22 @@ Untuk mereplikasi perilaku backend (Create, Read, Update, Delete), prototipe men
 ### B. Data Layer Mobile SFA (`sfa-store.js`)
 Mengelola seluruh state operasional sales lapangan melalui objek global `window.SfaStore`:
 - **Auth**: Informasi akun sales dan status login (`getUser()`, `saveUser()`).
-- **Customer & GPS**: Daftar outlet, pencarian, serta pembaruan koordinat latitude/longitude secara lokal (`updateCustomerGps()`).
-- **Transaction**: Penulisan faktur penjualan baru (`saveInvoice()`) dan pembayaran piutang/AR (`saveCollection()`).
-- **Offline Sync Queue**: 
-  Setiap transaksi mobile yang disimpan saat sales di lapangan akan masuk ke dalam **Antrean Sinkronisasi (Sync Queue)** lokal. 
-  - `addToSyncQueue(type, payload)`: Menyimpan data offline berstatus `pending`.
-  - `processQueue(onProgress)`: Mensimulasikan upload data satu per satu ke server mock dengan delay 350ms per item dan simulasi tingkat kegagalan 5% untuk menguji fitur *Retry*.
+- **Periode Penjualan**: `getActiveSalesPeriod()` — bulan berjalan untuk banner beranda.
+- **Stockist**: `getStockists()`, `getNearestStockists()` — dari web `md_stokis`; dipilih di `product_catalog.html`.
+- **Download dari server**: `getDownloadStatus()`, `runDownloadFromServer()` — unduh paket master ke perangkat (`sfa_download_status`).
+- **Role MD**: `isModernTradeUser()`, `getTodayRouteIds()`, `getOverdueRouteCustomers()`.
+- **Visit**: `saveVisit()`, `getActiveVisit()` — single active visit per hari.
+- **Customer & GPS**: Daftar outlet, pencarian, serta pembaruan koordinat (`updateCustomerGps()`).
+- **Transaction**: Faktur penjualan (`saveInvoice()`) dan pembayaran piutang (`saveCollection()`).
+- **Seed**: Key `sfa_seeded_v9_today` — auto-refresh data demo harian (sync queue dipertahankan jika sudah dimodifikasi).
+- **Antrean Upload (Sync Queue)**:
+  Transaksi offline masuk antrean upload ke server.
+  - `addToSyncQueue(type, payload)`: Menyimpan data berstatus `pending`.
+  - `processQueue(onProgress)`: Simulasi upload per item.
+  - `retryQueueItem(id)`: Retry in-place tanpa menambah baris.
+  - `clearSuccessfulQueue()` / `clearAllSyncQueue()`: Hapus selesai atau kosongkan semua.
+
+> Detail perubahan Juli 2026: [changelog_web_mobile_jul2026.md](changelog_web_mobile_jul2026.md)
 
 ### C. Kontrak Skema Data JSON (Mock Database Payload)
 
@@ -116,6 +128,8 @@ Untuk memfasilitasi integrasi Backend API nyata di kemudian hari, berikut adalah
   "createdAt": "2026-06-17T08:00:00.000Z",
   "status": "checked_out",
   "hasOrder": true,
+  "stockistId": "STK-001",
+  "stockCheckDone": true,
   "hasCollection": false,
   "orderAmount": 755200,
   "collectionAmount": 0,
@@ -184,9 +198,18 @@ Penyatuan kode web HTML/CSS/JS mobile ke dalam format aplikasi Android (.apk) me
    - Script masuk ke dalam direktori `Mobile/MobileApp`.
    - Menjalankan perintah `flutter build apk --release` untuk memaketkan seluruh webview lokal ke dalam binary Android.
 3. **Penyalinan APK**:
-   - Menyalin file output `app-release.apk` kembali ke root folder proyek utama agar mudah didistribusikan.
+   - Menyalin file output `build/app/outputs/flutter-apk/app-release.apk` ke root folder proyek.
 
-Semua alur di atas dapat dijalankan hanya dengan sekali klik melalui file batch **`build-apk.bat`** di root direktori.
+Semua alur di atas dapat dijalankan melalui file batch **`build-apk.bat`** di root direktori.
+
+### Source of Truth Mobile
+
+| Edit di | Digunakan oleh |
+|---------|----------------|
+| `Views/Mobile/` + `wwwroot/` | Live Server, testing |
+| `Mobile/MobileApp/assets/www/` | Flutter build (hasil sync otomatis) |
+
+Jangan mengedit `assets/www/` secara manual — jalankan `build-apk.bat` atau `create-flutter-wrapper.js` setelah mengubah source utama.
 
 ---
 
@@ -200,5 +223,5 @@ Pustaka pendukung dimuat melalui CDN untuk keefektifan akses, atau disalin secar
 | **FontAwesome 6.4.2** | Ikon visual tombol dan menu sidebar | Digunakan di Web & Mobile |
 | **jQuery 3.7.1** | Manipulasi DOM & pemrosesan event | Digunakan di Web & Mobile |
 | **SweetAlert2 (v11)** | Notifikasi pop-up konfirmasi aksi dan status | Digunakan di Web & Mobile |
-| **Leaflet.js (1.9.4)** | Peta OpenStreetMap interaktif, Leaflet Routing Machine (OSRM) untuk plotting rute jalan riil, & layer switching. | Digunakan di Mobile (`outlet_detail.html`) & FPRS Web (`Kunjungan/Rute/index.html`) |
+| **Leaflet.js (1.9.4)** | Peta OpenStreetMap interaktif | Mobile (`outlet_detail.html`) & FPRS Web (`Kunjungan/Rute`) |
 | **MapLibre GL JS** | Engine render peta vektor untuk plotting rute sales | Digunakan di Web (`Geografis Kunjungan`) |

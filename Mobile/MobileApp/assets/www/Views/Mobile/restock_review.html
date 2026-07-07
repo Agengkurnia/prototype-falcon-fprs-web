@@ -309,7 +309,7 @@
         </div>
 
         <!-- Section: Summary Products -->
-        <div class="section-title"><i class="fas fa-box"></i> Ringkasan Penyesuaian Stok</div>
+        <div class="section-title"><i class="fas fa-box"></i> Ringkasan Tambahan Stok</div>
         <div class="info-card">
             <div class="product-summary-list" id="summaryList">
                 <!-- Dynamically populated summary table per product -->
@@ -352,24 +352,30 @@
         renderSummaryList();
     });
 
+    function getAddition(adj) {
+        if (!adj) return { addKarton: 0, addPcs: 0 };
+        if (adj.addKarton !== undefined || adj.addPcs !== undefined) {
+            return { addKarton: adj.addKarton || 0, addPcs: adj.addPcs || 0 };
+        }
+        return { addKarton: 0, addPcs: 0 };
+    }
+
     function renderSummaryList() {
         const container = $('#summaryList');
         container.empty();
 
         const productCodes = Object.keys(tempAdjustments);
         if (productCodes.length === 0) {
-            container.html('<div style="text-align:center; padding: 12px; color: #888;">Tidak ada data penyesuaian.</div>');
+            container.html('<div style="text-align:center; padding: 12px; color: #888;">Tidak ada data tambahan stok.</div>');
             return;
         }
 
         productCodes.forEach(code => {
             const adj = tempAdjustments[code];
-            const originalProduct = SfaStore.getProductById(code) || { stockKarton: 0, stockBox: 0, stockPcs: 0 };
-
-            // Check if there are changes
-            const changeKarton = adj.karton !== originalProduct.stockKarton;
-            const changeBox = adj.box !== originalProduct.stockBox;
-            const changePcs = adj.pcs !== originalProduct.stockPcs;
+            const add = getAddition(adj);
+            const originalProduct = SfaStore.getProductById(code) || { stockKarton: 0, stockPcs: 0 };
+            const newKarton = originalProduct.stockKarton + add.addKarton;
+            const newPcs = originalProduct.stockPcs + add.addPcs;
 
             container.append(`
                 <div class="summary-item">
@@ -382,7 +388,7 @@
                             <tr>
                                 <th>Satuan</th>
                                 <th>Stok Lama</th>
-                                <th></th>
+                                <th>Tambahan</th>
                                 <th>Stok Baru</th>
                             </tr>
                         </thead>
@@ -390,20 +396,14 @@
                             <tr>
                                 <td>Karton</td>
                                 <td class="val-old">${originalProduct.stockKarton}</td>
-                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
-                                <td class="val-new ${changeKarton ? 'val-changed' : ''}">${adj.karton}</td>
-                            </tr>
-                            <tr>
-                                <td>Box</td>
-                                <td class="val-old">${originalProduct.stockBox}</td>
-                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
-                                <td class="val-new ${changeBox ? 'val-changed' : ''}">${adj.box}</td>
+                                <td class="val-new val-changed">+${add.addKarton}</td>
+                                <td class="val-new">${newKarton}</td>
                             </tr>
                             <tr>
                                 <td>Pcs</td>
                                 <td class="val-old">${originalProduct.stockPcs}</td>
-                                <td><i class="fas fa-arrow-right change-arrow"></i></td>
-                                <td class="val-new ${changePcs ? 'val-changed' : ''}">${adj.pcs}</td>
+                                <td class="val-new val-changed">+${add.addPcs}</td>
+                                <td class="val-new">${newPcs}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -415,7 +415,7 @@
     function submitRestockReport() {
         Swal.fire({
             title: 'Kirim Data Kulakan?',
-            text: 'Data penyesuaian stok fisik di motor Anda akan segera dikirim dan diperbarui di sistem.',
+            text: 'Data tambahan stok dari kulakan akan dikirim dan ditambahkan ke stok motor Anda.',
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#005D41',
@@ -439,15 +439,23 @@
                             // Update persistent database SfaStore stocks
                             for (const code in tempAdjustments) {
                                 const adj = tempAdjustments[code];
-                                // We update the main stock in Karton conversion
-                                SfaStore.updateProductStock(code, adj.karton);
+                                const add = getAddition(adj);
+                                const original = SfaStore.getProductById(code) || { stockKarton: 0, stockPcs: 0 };
+                                SfaStore.updateProductStock(
+                                    code,
+                                    original.stockKarton + add.addKarton,
+                                    original.stockPcs + add.addPcs
+                                );
                             }
 
-                            // Generate history entries detail list
                             const logDetails = [];
                             for (const code in tempAdjustments) {
                                 const adj = tempAdjustments[code];
-                                logDetails.push(`${adj.name}: ${adj.karton} Karton, ${adj.box} Box, ${adj.pcs} Pcs (Stok Baru)`);
+                                const add = getAddition(adj);
+                                const parts = [];
+                                if (add.addKarton) parts.push(`+${add.addKarton} Karton`);
+                                if (add.addPcs) parts.push(`+${add.addPcs} Pcs`);
+                                logDetails.push(`${adj.name}: ${parts.join(', ')}`);
                             }
 
                             const notes = $('#notesInput').val().trim();

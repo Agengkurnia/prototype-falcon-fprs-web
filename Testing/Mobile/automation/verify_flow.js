@@ -83,6 +83,34 @@ async function run() {
             routeBtnVisible ? 'PASS' : 'FAIL'
         );
 
+        const periodeTitle = await page.locator('.canvas-banner-title').innerText();
+        const menuCount = await page.locator('#main-menu .circle-menu-label').count();
+        const menuLabels = (await page.locator('#main-menu .circle-menu-label').allTextContents()).join(', ');
+
+        recordResult(
+            2, 'Beranda', 'TC-HOME-01', 'Periode Penjualan & 4 Menu Utama',
+            'Periksa banner periode dan grid menu utama',
+            'Banner "Periode Penjualan" + 4 menu (Cek Stok, Faktur, Visit, Sync)',
+            `Periode: "${periodeTitle}", Menu (${menuCount}): ${menuLabels}`,
+            (periodeTitle.includes('Periode Penjualan') && menuCount === 4) ? 'PASS' : 'FAIL'
+        );
+
+        // Go to visit_list for FAB test
+        await page.goto(`${BASE_URL}/Views/Mobile/visit_list.html`);
+        await page.waitForLoadState('networkidle');
+        await page.click('#fabMain');
+        await page.waitForTimeout(200);
+        const fabVisit = await page.locator('.fab-option-label:has-text("Tambah Kunjungan")').isVisible();
+        const fabOutlet = await page.locator('.fab-option-label:has-text("Tambah Outlet Baru")').isVisible();
+
+        recordResult(
+            3, 'Beranda', 'TC-HOME-02', 'FAB 2 Opsi di Rute Kunjungan',
+            'Klik tombol + di visit_list',
+            'Menu floating: Tambah Kunjungan & Tambah Outlet Baru',
+            `Kunjungan: ${fabVisit}, Outlet: ${fabOutlet}`,
+            (fabVisit && fabOutlet) ? 'PASS' : 'FAIL'
+        );
+
         // Go to dasbor.html
         await page.goto(`${BASE_URL}/Views/Mobile/dasbor.html`);
         await page.waitForLoadState('networkidle');

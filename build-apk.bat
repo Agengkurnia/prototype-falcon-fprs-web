@@ -19,7 +19,7 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo [3/3] Copying APK to Prototype root directory...
-copy /Y "build\app\outputs\apk\release\app-release.apk" "%~dp0app-release.apk"
+copy /Y "build\app\outputs\flutter-apk\app-release.apk" "%~dp0app-release.apk"
 if %ERRORLEVEL% neq 0 (
     echo Failed to copy APK to root directory.
     exit /b %ERRORLEVEL%

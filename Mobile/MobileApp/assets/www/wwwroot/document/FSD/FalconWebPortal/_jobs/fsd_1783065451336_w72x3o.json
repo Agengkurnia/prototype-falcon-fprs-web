@@ -1,0 +1,22 @@
+{
+  "jobId": "fsd_1783065451336_w72x3o",
+  "mode": "single",
+  "moduleIds": [
+    "master-produk"
+  ],
+  "sections": [
+    "overview",
+    "columns",
+    "fields",
+    "validation",
+    "screenshots",
+    "businessRules"
+  ],
+  "aiMarkdownDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_job_ai",
+  "screenshotDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\screenshots",
+  "outputDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\Document",
+  "captureModuleIds": [
+    "master-produk"
+  ],
+  "prototypeRoot": "D:\\Work\\Source\\Comsup\\falcon\\Prototype"
+}

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Stokis – Master Data | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+    </style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1">Stokis / Grosir</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Data Master</li>
+                        <li class="breadcrumb-item active">Stokis</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-primary" onclick="downloadStokis()">
+                    <i class="fa fa-download me-1"></i> Download Data
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="triggerUploadStokis()">
+                    <i class="fa fa-upload me-1"></i> Upload Data
+                </button>
+                <input type="file" id="uploadStokisInput" accept=".csv,text/csv" class="d-none" onchange="handleUploadStokis(event)"/>
+                <a href="add.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Stokis</a>
+            </div>
+        </div>
+
+        <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+            <i class="fa fa-store me-2 text-info"></i>
+            Master <strong>Stokis/Grosir</strong> digunakan untuk kulakan salesman dan cek stok di lapangan (Mobile SFA).
+            Data disinkronkan ke aplikasi mobile via <code>md_stokis</code>.
+            Gunakan <strong>Download Data</strong> untuk ekspor CSV, edit di Excel, lalu <strong>Upload Data</strong> untuk input massal.
+            Duplikat dicek dari <strong>latitude &amp; longitude</strong> — koordinat yang sudah terdaftar tidak akan dimasukkan lagi.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="tbl">
+                        <thead>
+                            <tr>
+                                <th style="width:50px;">NO</th>
+                                <th>KODE</th>
+                                <th>NAMA STOKIS</th>
+                                <th>TIPE</th>
+                                <th>KOTA</th>
+                                <th>TELEPON</th>
+                                <th style="width:80px;">STATUS</th>
+                                <th style="width:100px;text-align:center;">AKSI</th>
+                            </tr>
+                            <tr class="filter-row">
+                                <th></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
+                                <th><input type="text" class="form-control form-control-sm" placeholder="Nama..."></th>
+                                <th><select class="form-select form-select-sm"><option value="">Semua</option><option>Grosir</option><option>Distributor</option><option>Principal</option></select></th>
+                                <th></th>
+                                <th></th>
+                                <th><select class="form-select form-select-sm"><option value="">Semua</option><option>Active</option><option>Inactive</option></select></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+            const KEY = 'md_stokis';
+
+            function getData() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+            function saveData(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+
+            function loadData() {
+                if (!localStorage.getItem(KEY)) {
+                    fetch('../../../../wwwroot/data/stokis.json')
+                        .then(r => r.json())
+                        .then(d => { saveData(d); render(); });
+                } else {
+                    render();
+                }
+            }
+
+            let table;
+            function render() {
+                if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
+                $('#tblBody').empty();
+                getData().forEach((item, i) => {
+                    const badge = item.status === 'Active'
+                        ? '<span class="badge-status badge-active">Active</span>'
+                        : '<span class="badge-status badge-inactive">Inactive</span>';
+                    $('#tblBody').append(`<tr>
+                        <td>${i + 1}</td>
+                        <td><code>${item.kode}</code></td>
+                        <td><strong>${item.nama}</strong><br><small class="text-muted">${item.alamat || ''}</small></td>
+                        <td>${item.tipe || '-'}</td>
+                        <td>${item.kota || '-'}</td>
+                        <td>${item.telepon || '-'}</td>
+                        <td>${badge}</td>
+                        <td><div class="row-actions">
+                            <a href="add.html?id=${item.id}" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>
+                            <button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.nama.replace(/'/g, "\\'")}')" title="Hapus"><i class="fa fa-trash"></i></button>
+                        </div></td>
+                    </tr>`);
+                });
+                table = $('#tbl').DataTable({
+                    language: { search: '', searchPlaceholder: 'Cari global...', lengthMenu: '_MENU_ entri', info: '_START_-_END_ dari _TOTAL_', paginate: { previous: '‹', next: '›' }, zeroRecords: 'Tidak ada data' },
+                    pageLength: 10,
+                    columnDefs: [{ orderable: false, targets: [4, 5, 7] }],
+                    dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
+                });
+                $('.filter-row input').on('keyup change', function() { table.column($(this).closest('th').index()).search(this.value).draw(); });
+                $('.filter-row select').on('change', function() { table.column($(this).closest('th').index()).search(this.value).draw(); });
+                $('.filter-row input,.filter-row select').on('click', function(e) { e.stopPropagation(); });
+            }
+
+            function del(id, nama) {
+                Swal.fire({
+                    title: `Hapus Stokis "${nama}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal'
+                }).then(r => {
+                    if (r.isConfirmed) {
+                        saveData(getData().filter(d => String(d.id) !== String(id)));
+                        render();
+                        Swal.fire({ icon: 'success', title: 'Dihapus!', timer: 1200, showConfirmButton: false });
+                    }
+                });
+            }
+
+            const CSV_HEADERS = ['kode', 'nama', 'tipe', 'alamat', 'kota', 'telepon', 'lat', 'lng', 'status'];
+
+            function csvEscape(val) {
+                const s = val == null ? '' : String(val);
+                return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            }
+
+            function normalizeCoord(val) {
+                const n = parseFloat(val);
+                return Number.isFinite(n) ? Math.round(n * 1e6) / 1e6 : null;
+            }
+
+            function coordKey(lat, lng) {
+                const la = normalizeCoord(lat);
+                const ln = normalizeCoord(lng);
+                if (la == null || ln == null) return null;
+                return `${la},${ln}`;
+            }
+
+            function existingCoordSet(data) {
+                const set = new Set();
+                data.forEach(d => {
+                    const key = coordKey(d.lat, d.lng);
+                    if (key) set.add(key);
+                });
+                return set;
+            }
+
+            function nextStokisKode(data) {
+                let max = 0;
+                data.forEach(d => {
+                    const m = String(d.kode || '').match(/^STK-(\d+)$/i);
+                    if (m) max = Math.max(max, parseInt(m[1], 10));
+                });
+                return 'STK-' + String(max + 1).padStart(3, '0');
+            }
+
+            function splitCsvLine(line) {
+                const out = [];
+                let cur = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    if (ch === '"') {
+                        if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+                        else inQuotes = !inQuotes;
+                    } else if (ch === ',' && !inQuotes) {
+                        out.push(cur);
+                        cur = '';
+                    } else {
+                        cur += ch;
+                    }
+                }
+                out.push(cur);
+                return out;
+            }
+
+            function parseCsv(text) {
+                const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim());
+                if (!lines.length) return [];
+                if (lines[0].toLowerCase().startsWith('sep=')) lines.shift();
+                const header = splitCsvLine(lines[0]).map(h => h.trim().toLowerCase());
+                const rows = [];
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = splitCsvLine(lines[i]);
+                    if (!cols.some(c => c.trim())) continue;
+                    const row = {};
+                    header.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
+                    rows.push(row);
+                }
+                return rows;
+            }
+
+            function downloadStokis() {
+                const data = getData();
+                let csv = 'sep=,\n' + CSV_HEADERS.join(',') + '\n';
+                data.forEach(item => {
+                    csv += CSV_HEADERS.map(h => csvEscape(item[h])).join(',') + '\n';
+                });
+                const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'stokis_' + new Date().toISOString().slice(0, 10) + '.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Download Berhasil',
+                    text: `${data.length} baris data stokis diunduh.`,
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+
+            function triggerUploadStokis() {
+                document.getElementById('uploadStokisInput').value = '';
+                document.getElementById('uploadStokisInput').click();
+            }
+
+            function handleUploadStokis(event) {
+                const file = event.target.files && event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        importStokisCsv(e.target.result, file.name);
+                    } catch (err) {
+                        Swal.fire('Gagal', 'File tidak dapat dibaca: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file, 'UTF-8');
+            }
+
+            function importStokisCsv(text, fileName) {
+                const rows = parseCsv(text);
+                if (!rows.length) {
+                    Swal.fire('Peringatan', 'File kosong atau format header tidak dikenali.', 'warning');
+                    return;
+                }
+
+                const data = getData();
+                const usedCoords = existingCoordSet(data);
+                const batchCoords = new Set();
+                const imported = [];
+                const skipped = [];
+                const invalid = [];
+
+                rows.forEach((row, idx) => {
+                    const lineNo = idx + 2;
+                    const nama = (row.nama || '').trim();
+                    const lat = normalizeCoord(row.lat);
+                    const lng = normalizeCoord(row.lng);
+
+                    if (!nama) {
+                        invalid.push({ lineNo, reason: 'Nama stokis wajib diisi' });
+                        return;
+                    }
+                    if (lat == null || lng == null) {
+                        invalid.push({ lineNo, reason: 'Latitude & longitude wajib diisi' });
+                        return;
+                    }
+
+                    const key = coordKey(lat, lng);
+                    if (usedCoords.has(key)) {
+                        skipped.push({ lineNo, nama, reason: 'Koordinat GPS sudah terdaftar' });
+                        return;
+                    }
+                    if (batchCoords.has(key)) {
+                        skipped.push({ lineNo, nama, reason: 'Koordinat GPS duplikat dalam file upload' });
+                        return;
+                    }
+
+                    batchCoords.add(key);
+                    usedCoords.add(key);
+
+                    let kode = (row.kode || '').trim();
+                    const takenKodes = new Set([...data, ...imported].map(d => d.kode));
+                    if (!kode || takenKodes.has(kode)) {
+                        do { kode = nextStokisKode([...data, ...imported]); } while (takenKodes.has(kode));
+                    }
+
+                    const tipe = ['Grosir', 'Distributor', 'Principal'].includes(row.tipe) ? row.tipe : 'Grosir';
+                    const status = String(row.status || 'Active').toLowerCase() === 'inactive' ? 'Inactive' : 'Active';
+
+                    imported.push({
+                        id: Date.now() + imported.length,
+                        kode,
+                        nama,
+                        tipe,
+                        alamat: (row.alamat || '').trim(),
+                        kota: (row.kota || '').trim(),
+                        telepon: (row.telepon || '').trim(),
+                        lat,
+                        lng,
+                        status
+                    });
+                });
+
+                if (!imported.length && !skipped.length && !invalid.length) {
+                    Swal.fire('Peringatan', 'Tidak ada baris data yang dapat diproses.', 'warning');
+                    return;
+                }
+
+                if (imported.length) {
+                    saveData(data.concat(imported));
+                    render();
+                }
+
+                const detailLines = [];
+                if (imported.length) detailLines.push(`<li><strong>${imported.length}</strong> data berhasil diimpor</li>`);
+                if (skipped.length) {
+                    detailLines.push(`<li><strong>${skipped.length}</strong> dilewati (koordinat GPS sudah terdaftar)</li>`);
+                    skipped.slice(0, 5).forEach(s => {
+                        detailLines.push(`<li class="text-muted" style="font-size:12px;">Baris ${s.lineNo}: ${s.nama} — ${s.reason}</li>`);
+                    });
+                    if (skipped.length > 5) detailLines.push(`<li class="text-muted" style="font-size:12px;">...dan ${skipped.length - 5} lainnya</li>`);
+                }
+                if (invalid.length) {
+                    detailLines.push(`<li><strong>${invalid.length}</strong> baris tidak valid</li>`);
+                    invalid.slice(0, 3).forEach(s => {
+                        detailLines.push(`<li class="text-muted" style="font-size:12px;">Baris ${s.lineNo}: ${s.reason}</li>`);
+                    });
+                }
+
+                Swal.fire({
+                    icon: imported.length ? 'success' : 'warning',
+                    title: imported.length ? 'Upload Selesai' : 'Tidak Ada Data Baru',
+                    html: `<div style="text-align:left;font-size:13px;"><ul style="margin:0;padding-left:18px;">${detailLines.join('')}</ul><p class="text-muted mb-0 mt-2" style="font-size:11px;">File: ${fileName}</p></div>`,
+                    confirmButtonColor: '#005D41'
+                });
+            }
+
+            $(document).ready(loadData);
+            window.del = del;
+            window.downloadStokis = downloadStokis;
+            window.triggerUploadStokis = triggerUploadStokis;
+            window.handleUploadStokis = handleUploadStokis;
+        });
+    </script>
+</body>
+</html>

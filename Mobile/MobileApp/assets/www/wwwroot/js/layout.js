@@ -43,7 +43,8 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/libs/sweetalert2/sweetalert2.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-bs5/datatables.bootstrap5.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css',
-            'wwwroot/css/styles-vuexy.css'
+            'wwwroot/css/styles-vuexy.css',
+            'wwwroot/css/prototype-chat.css'
         ];
 
         // Contextual loading of module CSS stylesheets
@@ -319,6 +320,7 @@ class Layout {
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Supplier/index.html" class="menu-link"><div data-i18n="Supplier">Supplier</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Stokis/index.html" class="menu-link"><div data-i18n="Stokis">Stokis / Grosir</div></a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -360,6 +362,14 @@ class Layout {
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/Kunjungan/Geografis/index.html" class="menu-link"><div data-i18n="Geografis Kunjungan">Geografis Kunjungan</div></a></li>
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/Kunjungan/Rute/index.html" class="menu-link"><div data-i18n="Management Rute">Management Rute</div></a></li>
                         </ul>
+                    </li>
+
+                    <!-- Tools -->
+                    <li class="menu-item">
+                        <a href="${this.basePath}Views/FPRS/Tools/GenerateFSD/index.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-file-word" style="color:#6f42c1;"></i>
+                            <div data-i18n="Generate FSD">Generate FSD</div>
+                        </a>
                     </li>
                 </ul>
             </aside>
@@ -488,7 +498,8 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/js/extensions/i18nextBrowserLanguageDetector.min.js',
             'wwwroot/lib/vuexy/vendor/js/extensions/jquery-i18next.min.js',
             'wwwroot/lib/vuexy/vendor/js/unison-js/unison-js.min.js',
-            'wwwroot/js/role-manager.js'
+            'wwwroot/js/role-manager.js',
+            'wwwroot/js/prototype-chat.js'
         ];
 
         for (const src of scripts) {

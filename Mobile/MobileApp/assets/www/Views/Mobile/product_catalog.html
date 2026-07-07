@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Katalog Produk - Falcon SFA Mobile</title>
+    <title>Cek Stok dan Belanja Stokis - Falcon SFA Mobile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
@@ -169,6 +169,13 @@
         .product-uom-table .stok-row td:last-child {
             border-top-right-radius: 4px; border-bottom-right-radius: 4px;
         }
+        .product-uom-table .stok-row.stokist-recorded td {
+            color: #F57F17;
+            background-color: #FFF8E1;
+        }
+        .product-uom-table .stok-row.stokist-recorded td:first-child {
+            border-top-left-radius: 4px; border-bottom-left-radius: 4px;
+        }
         .product-uom-table .harga-row td {
             color: #555; padding-top: 6px;
         }
@@ -304,6 +311,29 @@
             box-shadow: 0 2px 6px rgba(0, 93, 65, 0.1);
         }
 
+        .stockist-pick-card {
+            display: block;
+            border: 1.5px solid var(--color-border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .stockist-pick-card.selected {
+            border-color: #005D41;
+            background: #EBF8F4;
+        }
+        .stockist-pick-card strong { font-size: 13px; color: #231F20; }
+        .stockist-pick-meta { font-size: 11px; color: #7B6F72; margin-top: 2px; line-height: 1.35; }
+        .stockist-pick-dist {
+            font-size: 11px; color: #005D41; font-weight: 700; margin-top: 6px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .stockist-pick-dist.in-radius { color: #2E7D32; }
+        .stockist-pick-dist.out-radius { color: #C62828; }
+
         /* Stock History Styles */
         .history-item {
             border-bottom: 1px solid var(--color-border);
@@ -365,7 +395,7 @@
     <!-- SimpliDOTS SFA Header -->
     <div class="mobile-header-red">
         <button class="header-action-white" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
-        <span class="header-title-white">Stok Motoris</span>
+        <span class="header-title-white" id="pageHeaderTitle">Cek Stok dan Belanja Stokis</span>
         <div style="display: flex; gap: 12px; align-items: center;">
             <button class="header-action-white" onclick="openHistorySheet()"><i class="fas fa-history"></i></button>
             <button class="header-action-white"><i class="fas fa-search"></i></button>
@@ -398,6 +428,12 @@
 
     <!-- Main Content List -->
     <div class="mobile-content no-nav" style="padding-top: 0; padding-bottom: 100px;">
+        <div id="stockCheckBanner" class="d-none" style="margin: 12px 16px 0; padding: 10px 14px; background: #EBF8F4; border: 1px solid #C2ECE0; border-radius: 10px; font-size: 12px; color: #005D41;">
+            <i class="fas fa-info-circle me-1"></i> Mode <strong>Cek Stok Visit</strong> — verifikasi stok fisik di outlet. Belanja stokis bersifat opsional.
+        </div>
+        <div id="stockistCheckBanner" class="d-none" style="margin: 12px 16px 0; padding: 10px 14px; background: #FFF8E1; border: 1px solid #FFE082; border-radius: 10px; font-size: 12px; color: #7A5C00;">
+            <i class="fas fa-warehouse me-1"></i> Mode <strong>Cek Stok di Stokis</strong> — catat stok fisik barang di gudang <span id="stockistCheckName">stokis</span>.
+        </div>
         <!-- Actions Row -->
         <div class="action-row">
             <button class="btn-print-outline" onclick="window.print()"><i class="fas fa-print"></i> Cetak Opname</button>
@@ -417,25 +453,36 @@
             <span class="bottom-sheet-title" id="sheetProductName">Nama Produk</span>
             <button class="bottom-sheet-close" onclick="closeBottomSheet()"><i class="fas fa-times"></i></button>
         </div>
-        <div style="font-size: 12px; color: #7B6F72; margin-bottom: 18px; line-height: 1.4;">
-            Sesuaikan jumlah fisik barang yang berada di motor Anda saat ini.
+        <div id="sheetBuyHint" style="font-size: 12px; color: #7B6F72; margin-bottom: 8px; line-height: 1.4;">
+            Masukkan <strong>stok tambahan</strong> dari belanja stokis (bukan penyesuaian absolut).
         </div>
+        <div id="sheetCheckHint" class="d-none" style="font-size: 12px; color: #7B6F72; margin-bottom: 8px; line-height: 1.4;">
+            Catat <strong>stok fisik</strong> yang terlihat di gudang stokis saat ini.
+        </div>
+        <div id="sheetCurrentStock" style="font-size: 11px; color: #555; margin-bottom: 14px; padding: 8px 10px; background: #F7F9FA; border-radius: 8px;"></div>
         <input type="hidden" id="sheetProductCode">
-        <div class="sheet-input-group">
+        <input type="hidden" id="sheetMode" value="buy">
+        <div class="sheet-input-group" id="sheetBuyInputs">
             <div class="sheet-input-col">
-                <label>KARTON</label>
-                <input type="number" id="inputKarton" min="0" value="0">
+                <label>TAMBAH KARTON</label>
+                <input type="number" id="inputKarton" min="0" value="0" placeholder="0">
             </div>
             <div class="sheet-input-col">
-                <label>BOX</label>
-                <input type="number" id="inputBox" min="0" value="0">
-            </div>
-            <div class="sheet-input-col">
-                <label>PCS</label>
-                <input type="number" id="inputPcs" min="0" value="0">
+                <label>TAMBAH PCS</label>
+                <input type="number" id="inputPcs" min="0" value="0" placeholder="0">
             </div>
         </div>
-        <button class="btn-mobile-primary" onclick="saveStockAdjustment()">Simpan Penyesuaian</button>
+        <div class="sheet-input-group d-none" id="sheetCheckInputs">
+            <div class="sheet-input-col">
+                <label>STOK KARTON</label>
+                <input type="number" id="inputCheckKarton" min="0" value="0" placeholder="0">
+            </div>
+            <div class="sheet-input-col">
+                <label>STOK PCS</label>
+                <input type="number" id="inputCheckPcs" min="0" value="0" placeholder="0">
+            </div>
+        </div>
+        <button class="btn-mobile-primary" id="sheetSaveBtn" onclick="saveSheet()">Simpan Tambahan Stok</button>
     </div>
 
     <!-- History Bottom Sheet Backdrop & Container -->
@@ -446,7 +493,7 @@
             <button class="bottom-sheet-close" onclick="closeHistorySheet()"><i class="fas fa-times"></i></button>
         </div>
         <div style="font-size: 11px; color: #7B6F72; margin-bottom: 16px;">
-            Daftar penyesuaian (masuk/keluar) stok motor Anda hari ini.
+            Daftar tambahan stok (masuk) ke motor Anda hari ini.
         </div>
         <div id="historyList" style="display: flex; flex-direction: column; max-height: 380px; overflow-y: auto; padding-right: 4px;">
             <!-- Will be dynamically populated -->
@@ -458,9 +505,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    let currentCat = 'Semua';
-    let restockState = localStorage.getItem('restock_state') || 'idle'; 
-    let tempAdjustments = JSON.parse(localStorage.getItem('temp_restock_adjustments')) || {}; 
+    let currentBrand = 'Semua';
+    let restockState = localStorage.getItem('restock_state') || 'idle';
+    let restockMode = localStorage.getItem('restock_mode') || null;
+    let tempAdjustments = JSON.parse(localStorage.getItem('temp_restock_adjustments') || '{}');
+    let tempStockistCheck = JSON.parse(localStorage.getItem('temp_stockist_check') || '{}');
+    let isStockCheckMode = false;
+    let stockCheckVisitId = null;
+    let stockCheckOutletId = null;
     
     // Seed and load history entries
     const defaultHistory = [
@@ -496,20 +548,118 @@
     let historyEntries = JSON.parse(localStorage.getItem('restock_history'));
 
     $(document).ready(function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'stockcheck') {
+            isStockCheckMode = true;
+            stockCheckVisitId = params.get('visitId');
+            stockCheckOutletId = params.get('outletId');
+            document.title = 'Cek Stok Outlet - Falcon SFA Mobile';
+            $('#pageHeaderTitle').text('Cek Stok Outlet');
+            $('#stockCheckBanner').removeClass('d-none');
+        }
         buildChips();
         renderGrid();
         updateRestockUI();
+        updateModeBanners();
     });
 
+    function getStockistLabel() {
+        const s = SfaStore.getActiveStockist() || SfaStore.getStockists()[0];
+        return s ? s.name : 'Grosir Sinar Jaya';
+    }
+
+    function updateModeBanners() {
+        syncRestockFromStorage();
+        if (isStockCheckMode) return;
+        if (isStockistCheckMode()) {
+            $('#stockistCheckBanner').removeClass('d-none');
+            $('#stockistCheckName').text(getStockistLabel());
+        } else {
+            $('#stockistCheckBanner').addClass('d-none');
+        }
+    }
+
+    function syncRestockFromStorage() {
+        restockState = localStorage.getItem('restock_state') || 'idle';
+        restockMode = localStorage.getItem('restock_mode') || null;
+        // Migrasi state lama: stockist_check → checked_in + mode check
+        if (restockState === 'stockist_check') {
+            restockState = 'checked_in';
+            restockMode = restockMode || 'check';
+            localStorage.setItem('restock_state', 'checked_in');
+            localStorage.setItem('restock_mode', restockMode);
+        }
+        try {
+            tempAdjustments = JSON.parse(localStorage.getItem('temp_restock_adjustments') || '{}');
+            tempStockistCheck = JSON.parse(localStorage.getItem('temp_stockist_check') || '{}');
+        } catch (e) {
+            tempAdjustments = {};
+            tempStockistCheck = {};
+        }
+    }
+
+    function isBuyMode() {
+        return restockState === 'restocking' && (restockMode === 'buy' || !restockMode);
+    }
+
+    function isStockistCheckMode() {
+        return restockMode === 'check' && (restockState === 'checked_in' || restockState === 'stockist_check');
+    }
+
+    function renderStockistCheckBar() {
+        const checkedCount = Object.keys(tempStockistCheck).length;
+        return `
+            <div style="width:100%;">
+                <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+                    <span class="restock-status-badge status-started"><i class="fas fa-check-circle"></i> GPS Valid</span>
+                    <span class="restock-status-badge" style="background:#FFF8E1; color:#7A5C00;"><i class="fas fa-warehouse"></i> Cek Stok Stokis</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%;">
+                    <div style="flex:1; display:flex; align-items:center; gap:8px;">
+                        <div style="width:36px; height:36px; background:#FFF8E1; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative;">
+                            <i class="fas fa-warehouse" style="color:#F9A825; font-size:16px;"></i>
+                            ${checkedCount > 0 ? `<span style="position:absolute; top:-6px; right:-6px; background:#C62828; color:#fff; font-size:9px; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">${checkedCount}</span>` : ''}
+                        </div>
+                        <div>
+                            <div style="font-size:12px; font-weight:700; color:#231F20;">${checkedCount} Produk tercatat</div>
+                            <div style="font-size:10px; color:var(--color-gray); font-weight:500;">${getStockistLabel()}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="btn-restock-action" style="background-color:#E0E0E0; color:#555; padding:10px 12px; font-size:12px; margin-top:0;" onclick="cancelRestock()">Batal</button>
+                        <button class="btn-restock-action" style="background-color:#F9A825; padding:10px 16px; font-size:12px; margin-top:0;" onclick="completeStockistCheck()">
+                            Selesai <i class="fas fa-check" style="margin-left:4px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+    }
+
     function updateRestockUI() {
+        syncRestockFromStorage();
         const container = $('#restockContainer');
         container.empty();
+
+        if (isStockCheckMode) {
+            container.html(`
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div style="flex: 1;">
+                        <span class="restock-status-badge status-started" style="margin-bottom: 2px;"><i class="fas fa-clipboard-check"></i> Cek Stok Visit</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">Wajib sebelum selesai visit</div>
+                    </div>
+                    <button class="btn-restock-action" style="padding: 10px 16px; font-size:12px; margin-top:0;" onclick="completeStockCheck()">
+                        <i class="fas fa-check"></i> Selesai Cek Stok
+                    </button>
+                </div>
+            `);
+            return;
+        }
 
         if (restockState === 'idle') {
             container.html(`
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
                     <div style="flex: 1;">
-                        <span class="restock-status-badge status-not-started" style="margin-bottom: 2px;"><i class="fas fa-times-circle"></i> Belum Check-in</span>
+                        <span class="restock-status-badge status-not-started" style="margin-bottom: 2px;"><i class="fas fa-times-circle"></i> Belum Check-in Stokis</span>
                         <div style="font-size:11px; color:#555; font-weight:500;">Kulakan di Grosir/Stokis</div>
                     </div>
                     <button class="btn-restock-action" style="padding: 10px 16px; font-size:12px; margin-top:0;" onclick="startCheckIn()">
@@ -517,18 +667,39 @@
                     </button>
                 </div>
             `);
-        } else if (restockState === 'checked_in') {
+        } else if (restockState === 'checked_in' && !restockMode) {
             container.html(`
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
-                    <div style="flex: 1;">
-                        <span class="restock-status-badge status-started" style="margin-bottom: 2px;"><i class="fas fa-check-circle"></i> GPS Valid</span>
-                        <div style="font-size:11px; color:#555; font-weight:500;">Grosir Sinar Jaya</div>
+                <div style="width:100%;">
+                    <div style="margin-bottom:10px;">
+                        <span class="restock-status-badge status-started" style="margin-bottom:4px;"><i class="fas fa-check-circle"></i> GPS Valid</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">${getStockistLabel()} — pilih aktivitas:</div>
                     </div>
-                    <button class="btn-restock-action" style="background-color: #78B500; padding: 10px 16px; font-size:12px; margin-top:0;" onclick="uploadReceiptMock()">
-                        <i class="fas fa-camera"></i> Foto Nota
-                    </button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-restock-action" style="flex:1; padding:10px 8px; font-size:11px;" onclick="selectRestockMode('buy')">
+                            <i class="fas fa-shopping-cart"></i> Tambah Stok (Beli)
+                        </button>
+                        <button class="btn-restock-action" style="flex:1; background:#78B500; padding:10px 8px; font-size:11px;" onclick="selectRestockMode('check')">
+                            <i class="fas fa-clipboard-list"></i> Cek Stok Stokis
+                        </button>
+                    </div>
                 </div>
             `);
+        } else if (restockState === 'checked_in' && restockMode === 'buy') {
+            container.html(`
+                <div style="width:100%;">
+                    <div style="margin-bottom:10px;">
+                        <span class="restock-status-badge status-started" style="margin-bottom:4px;"><i class="fas fa-check-circle"></i> GPS Valid</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">${getStockistLabel()} — mode beli stok</div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button class="btn-restock-action" style="background-color:#78B500; padding:10px 16px; font-size:12px; margin-top:0;" onclick="uploadReceiptMock()">
+                            <i class="fas fa-camera"></i> Foto Nota
+                        </button>
+                    </div>
+                </div>
+            `);
+        } else if (isStockistCheckMode()) {
+            container.html(renderStockistCheckBar());
         } else if (restockState === 'restocking') {
             const adjustedCount = Object.keys(tempAdjustments).length;
             container.html(`
@@ -539,8 +710,8 @@
                             ${adjustedCount > 0 ? `<span style="position:absolute; top:-6px; right:-6px; background:#C62828; color:#fff; font-size:9px; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff;">${adjustedCount}</span>` : ''}
                         </div>
                         <div>
-                            <div style="font-size:12px; font-weight:700; color:#231F20;">${adjustedCount} Produk di-adjust</div>
-                            <div style="font-size:10px; color:var(--color-gray); font-weight:500;">Sesuaikan stok fisik motor</div>
+                            <div style="font-size:12px; font-weight:700; color:#231F20;">${adjustedCount} Produk ditambah</div>
+                            <div style="font-size:10px; color:var(--color-gray); font-weight:500;">Input stok tambahan dari kulakan</div>
                         </div>
                     </div>
                     <div style="display:flex; gap:6px;">
@@ -553,31 +724,83 @@
                     </div>
                 </div>
             `);
+        } else {
+            restockState = 'idle';
+            restockMode = null;
+            localStorage.removeItem('restock_state');
+            localStorage.removeItem('restock_mode');
+            container.html(`
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
+                    <div style="flex: 1;">
+                        <span class="restock-status-badge status-not-started" style="margin-bottom: 2px;"><i class="fas fa-times-circle"></i> Belum Check-in Stokis</span>
+                        <div style="font-size:11px; color:#555; font-weight:500;">Kulakan di Grosir/Stokis</div>
+                    </div>
+                    <button class="btn-restock-action" style="padding: 10px 16px; font-size:12px; margin-top:0;" onclick="startCheckIn()">
+                        <i class="fas fa-map-marker-alt"></i> Check-in GPS
+                    </button>
+                </div>
+            `);
         }
     }
 
+    function selectRestockMode(mode) {
+        if (restockState !== 'checked_in') return;
+        restockMode = mode;
+        localStorage.setItem('restock_mode', mode);
+        if (mode === 'check') {
+            tempStockistCheck = {};
+            localStorage.removeItem('temp_stockist_check');
+        } else {
+            tempAdjustments = {};
+            localStorage.removeItem('temp_restock_adjustments');
+        }
+        syncRestockFromStorage();
+        updateRestockUI();
+        updateModeBanners();
+        renderGrid();
+    }
+
     function buildChips() {
-        const cats = ['Semua', ...SfaStore.getProductCategories()];
+        const brands = ['Semua', ...SfaStore.getProductBrands()];
         const container = $('#categoryChips');
         container.empty();
-        cats.forEach(c => {
-            container.append(`<div class="cat-chip ${c === 'Semua' ? 'active' : ''}" onclick="setCategory('${c}')">${c}</div>`);
+        brands.forEach(b => {
+            const safe = b.replace(/'/g, "\\'");
+            container.append(`<div class="cat-chip ${b === 'Semua' ? 'active' : ''}" onclick="setBrand('${safe}')">${b}</div>`);
         });
     }
 
-    function setCategory(cat) {
-        currentCat = cat;
+    function setBrand(brand) {
+        currentBrand = brand;
         $('.cat-chip').removeClass('active');
-        $(`.cat-chip`).filter(function() { return $(this).text() === cat; }).addClass('active');
+        $(`.cat-chip`).filter(function() { return $(this).text() === brand; }).addClass('active');
         renderGrid();
     }
 
     function resetProductFilter() {
         $('#searchInput').val('');
-        setCategory('Semua');
+        setBrand('Semua');
+    }
+
+    function getAddition(adj) {
+        if (!adj) return { addKarton: 0, addPcs: 0 };
+        if (adj.addKarton !== undefined || adj.addPcs !== undefined) {
+            return { addKarton: adj.addKarton || 0, addPcs: adj.addPcs || 0 };
+        }
+        return { addKarton: 0, addPcs: 0 };
+    }
+
+    function getDisplayStock(p) {
+        const adj = tempAdjustments[p.code];
+        const add = getAddition(adj);
+        return {
+            karton: p.stockKarton + add.addKarton,
+            pcs: p.stockPcs + add.addPcs
+        };
     }
 
     function renderGrid() {
+        syncRestockFromStorage();
         const query = $('#searchInput').val().toLowerCase();
         const products = SfaStore.getProducts();
         const container = $('#productGrid');
@@ -585,14 +808,14 @@
 
         const filtered = products.filter(p => {
             const matchSearch = p.name.toLowerCase().includes(query) || p.code.toLowerCase().includes(query);
-            const matchCat = currentCat === 'Semua' || p.category === currentCat;
-            return matchSearch && matchCat;
+            const matchBrand = currentBrand === 'Semua' || p.brand === currentBrand;
+            return matchSearch && matchBrand;
         });
 
         $('#productCountLabel').text(`Jumlah: ${filtered.length}`);
 
         if (filtered.length === 0) {
-            const isFiltered = query !== '' || currentCat !== 'Semua';
+            const isFiltered = query !== '' || currentBrand !== 'Semua';
             const resetBtn = isFiltered
                 ? `<button class="empty-state-action" onclick="resetProductFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
                 : '';
@@ -609,14 +832,43 @@
             
             // Format numbers to Indonesian standard without Rp symbol
             const formattedKarton = new Intl.NumberFormat('id-ID').format(p.priceKarton);
-            const formattedBox = new Intl.NumberFormat('id-ID').format(p.priceBox);
             const formattedPcs = new Intl.NumberFormat('id-ID').format(p.pricePcs);
 
-            // Use temp adjustments if available
-            const adj = tempAdjustments[p.code];
-            const stockK = adj ? adj.karton : p.stockKarton;
-            const stockB = adj ? adj.box : p.stockBox;
-            const stockP = adj ? adj.pcs : p.stockPcs;
+            const inStokisCheck = isStockistCheckMode();
+            const stokisRec = tempStockistCheck[p.code];
+            const hasCheck = Object.prototype.hasOwnProperty.call(tempStockistCheck, p.code);
+
+            let stockK, stockP, stokLabel, stokRowClass;
+            if (inStokisCheck) {
+                stockK = hasCheck ? stokisRec.karton : '—';
+                stockP = hasCheck ? stokisRec.pcs : '—';
+                stokLabel = 'Stok Stokis';
+                stokRowClass = hasCheck ? 'stok-row stokist-recorded' : 'stok-row';
+            } else {
+                const display = getDisplayStock(p);
+                stockK = display.karton;
+                stockP = display.pcs;
+                stokLabel = 'Stok';
+                stokRowClass = 'stok-row';
+            }
+
+            const add = getAddition(tempAdjustments[p.code]);
+            const hasAddition = add.addKarton > 0 || add.addPcs > 0;
+
+            let actionHtml;
+            if (inStokisCheck) {
+                actionHtml = `
+                    <span style="font-size: 11px; color: var(--color-gray); font-weight: 500;"><i class="fas fa-warehouse" style="color: #F9A825; margin-right: 4px;"></i> Stok di stokis</span>
+                    <button onclick="openStockSheet('${p.code}', '${p.name.replace(/'/g, "\\'")}', 'check')" style="background: #FFF8E1; color: #7A5C00; border: 1px solid #FFE082; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                        <i class="fas fa-clipboard-check"></i> Catat Stok${hasCheck ? ' ✓' : ''}
+                    </button>`;
+            } else {
+                actionHtml = `
+                    <span style="font-size: 11px; color: var(--color-gray); font-weight: 500;"><i class="fas fa-motorcycle" style="color: #78B500; margin-right: 4px;"></i> Stok fisik di motor</span>
+                    <button onclick="openStockSheet('${p.code}', '${p.name.replace(/'/g, "\\'")}', 'buy')" style="background: #F1F7E5; color: #005D41; border: 1px solid #DDE8C1; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Tambah Stok${hasAddition ? ' ✓' : ''}
+                    </button>`;
+            }
 
             container.append(`
                 <div class="product-card">
@@ -637,21 +889,18 @@
                                 <tr>
                                     <th>Unit <i class="far fa-question-circle text-muted ms-1" style="font-size: 9px;"></i></th>
                                     <th>KARTON</th>
-                                    <th>BOX</th>
                                     <th>PCS</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="stok-row">
-                                    <td>Stok</td>
+                                <tr class="${stokRowClass}">
+                                    <td>${stokLabel}</td>
                                     <td id="stok-karton-${p.code}">${stockK}</td>
-                                    <td id="stok-box-${p.code}">${stockB}</td>
                                     <td id="stok-pcs-${p.code}">${stockP}</td>
                                 </tr>
                                 <tr class="harga-row">
                                     <td>Harga</td>
                                     <td>${formattedKarton}</td>
-                                    <td>${formattedBox}</td>
                                     <td>${formattedPcs}</td>
                                 </tr>
                             </tbody>
@@ -659,40 +908,68 @@
                     </a>
                     <div class="product-divider" style="margin-top: 10px; margin-bottom: 8px;"></div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; color: var(--color-gray); font-weight: 500;"><i class="fas fa-motorcycle" style="color: #78B500; margin-right: 4px;"></i> Stok fisik di motor</span>
-                        <button onclick="adjustStock('${p.code}', '${p.name.replace(/'/g, "\\'")}', ${stockK}, ${stockB}, ${stockP})" style="background: #F1F7E5; color: #005D41; border: 1px solid #DDE8C1; border-radius: 6px; padding: 6px 14px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.2s;">
-                            <i class="fas fa-edit"></i> Sesuaikan
-                        </button>
+                        ${actionHtml}
                     </div>
                 </div>
             `);
         });
     }
-    function adjustStock(code, name, currentKarton, currentBox, currentPcs) {
-        if (restockState !== 'restocking') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Akses Terkunci',
-                text: 'Harap lakukan Check-in Grosir dan unggah Foto Nota terlebih dahulu sebelum menyesuaikan stok barang.',
-                confirmButtonColor: '#005D41'
-            });
-            return;
+    function openStockSheet(code, name, mode) {
+        syncRestockFromStorage();
+        if (!isStockCheckMode) {
+            if (mode === 'buy' && !isBuyMode()) {
+                Swal.fire({ icon: 'warning', title: 'Akses Terkunci', text: 'Harap pilih mode Beli Stok dan unggah Foto Nota terlebih dahulu.', confirmButtonColor: '#005D41' });
+                return;
+            }
+            if (mode === 'check' && !isStockistCheckMode()) {
+                Swal.fire({ icon: 'warning', title: 'Akses Terkunci', text: 'Harap pilih mode Cek Stok Stokis setelah check-in GPS.', confirmButtonColor: '#005D41' });
+                return;
+            }
         }
 
+        $('#sheetMode').val(mode);
         $('#sheetProductCode').val(code);
         $('#sheetProductName').text(name);
-        // Load original stock if they adjust again, or use current value
-        $('#inputKarton').val(tempAdjustments[code] ? tempAdjustments[code].karton : currentKarton);
-        $('#inputBox').val(tempAdjustments[code] ? tempAdjustments[code].box : currentBox);
-        $('#inputPcs').val(tempAdjustments[code] ? tempAdjustments[code].pcs : currentPcs);
 
-        // Slide up bottom sheet
+        if (mode === 'check') {
+            $('#sheetBuyHint').addClass('d-none');
+            $('#sheetCheckHint').removeClass('d-none');
+            $('#sheetBuyInputs').addClass('d-none');
+            $('#sheetCheckInputs').removeClass('d-none');
+            $('#sheetSaveBtn').text('Simpan Catatan Stok');
+            const rec = tempStockistCheck[code] || { karton: 0, pcs: 0 };
+            $('#sheetCurrentStock').html(`Catat stok fisik di <strong>${getStockistLabel()}</strong>`);
+            $('#inputCheckKarton').val(rec.karton || 0);
+            $('#inputCheckPcs').val(rec.pcs || 0);
+        } else {
+            $('#sheetBuyHint').removeClass('d-none');
+            $('#sheetCheckHint').addClass('d-none');
+            $('#sheetBuyInputs').removeClass('d-none');
+            $('#sheetCheckInputs').addClass('d-none');
+            $('#sheetSaveBtn').text('Simpan Tambahan Stok');
+            const product = SfaStore.getProducts().find(p => p.code === code);
+            const display = product ? getDisplayStock(product) : { karton: 0, pcs: 0 };
+            const add = getAddition(tempAdjustments[code]);
+            $('#sheetCurrentStock').html(
+                `Stok motor saat ini: <strong>${display.karton}</strong> Karton, <strong>${display.pcs}</strong> Pcs` +
+                (add.addKarton || add.addPcs ? ` &nbsp;|&nbsp; Sudah ditambah: <strong>+${add.addKarton}</strong> Karton, <strong>+${add.addPcs}</strong> Pcs` : '')
+            );
+            $('#inputKarton').val(0);
+            $('#inputPcs').val(0);
+        }
+
         $('#sheetBackdrop').show();
         $('#stockSheet').show();
         setTimeout(() => {
             $('#sheetBackdrop').css('opacity', 1);
             $('#stockSheet').addClass('show');
         }, 10);
+    }
+
+    function saveSheet() {
+        const mode = $('#sheetMode').val();
+        if (mode === 'check') saveStockistCheck();
+        else saveStockAddition();
     }
 
     function closeBottomSheet() {
@@ -704,44 +981,100 @@
         }, 280);
     }
 
-    function saveStockAdjustment() {
+    function saveStockAddition() {
         const code = $('#sheetProductCode').val();
         const name = $('#sheetProductName').text();
-        const karton = parseInt($('#inputKarton').val()) || 0;
-        const box = parseInt($('#inputBox').val()) || 0;
-        const pcs = parseInt($('#inputPcs').val()) || 0;
+        const addKarton = parseInt($('#inputKarton').val(), 10) || 0;
+        const addPcs = parseInt($('#inputPcs').val(), 10) || 0;
 
-        // Save to temp adjustments for history log
+        if (addKarton === 0 && addPcs === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input Kosong',
+                text: 'Masukkan minimal 1 Karton atau 1 Pcs stok tambahan.',
+                confirmButtonColor: '#005D41'
+            });
+            return;
+        }
+
+        const prev = getAddition(tempAdjustments[code]);
         tempAdjustments[code] = {
             name: name,
-            karton: karton,
-            box: box,
-            pcs: pcs
+            addKarton: prev.addKarton + addKarton,
+            addPcs: prev.addPcs + addPcs
         };
         localStorage.setItem('temp_restock_adjustments', JSON.stringify(tempAdjustments));
         updateRestockUI();
-
-        // Update values in DOM
-        $(`#stok-karton-${code}`).text(karton).hide().fadeIn();
-        $(`#stok-box-${code}`).text(box).hide().fadeIn();
-        $(`#stok-pcs-${code}`).text(pcs).hide().fadeIn();
-
-        // Update button onclick parameters dynamically
-        const card = $(`#stok-karton-${code}`).closest('.product-card');
-        const btn = card.find('button');
-        const escapedName = name.replace(/'/g, "\\'");
-        btn.attr('onclick', `adjustStock('${code}', '${escapedName}', ${karton}, ${box}, ${pcs})`);
-
+        renderGrid();
         closeBottomSheet();
 
-        // Toast feedback
         Swal.fire({
             toast: true,
             position: 'top',
             icon: 'success',
-            title: 'Stok berhasil dimasukkan',
+            title: `+${addKarton} Karton, +${addPcs} Pcs ditambahkan`,
             showConfirmButton: false,
             timer: 1500
+        });
+    }
+
+    function saveStockistCheck() {
+        const code = $('#sheetProductCode').val();
+        const name = $('#sheetProductName').text();
+        const karton = parseInt($('#inputCheckKarton').val(), 10) || 0;
+        const pcs = parseInt($('#inputCheckPcs').val(), 10) || 0;
+
+        tempStockistCheck[code] = { name, karton, pcs };
+        localStorage.setItem('temp_stockist_check', JSON.stringify(tempStockistCheck));
+        updateRestockUI();
+        renderGrid();
+        closeBottomSheet();
+
+        Swal.fire({
+            toast: true,
+            position: 'top',
+            icon: 'success',
+            title: 'Stok stokis tercatat',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+
+    function completeStockistCheck() {
+        if (Object.keys(tempStockistCheck).length === 0) {
+            Swal.fire({ icon: 'warning', title: 'Belum Ada Data', text: 'Catat stok minimal 1 produk di stokis.', confirmButtonColor: '#005D41' });
+            return;
+        }
+        const details = Object.keys(tempStockistCheck).map(code => {
+            const r = tempStockistCheck[code];
+            return `${r.name}: ${r.karton} Karton, ${r.pcs} Pcs`;
+        });
+        const now = new Date();
+        const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+        historyEntries.unshift({
+            time: timeStr,
+            type: 'system',
+            title: `Cek Stok: ${getStockistLabel()}`,
+            details: details
+        });
+        localStorage.setItem('restock_history', JSON.stringify(historyEntries));
+
+        restockState = 'idle';
+        restockMode = null;
+        tempStockistCheck = {};
+        localStorage.removeItem('restock_state');
+        localStorage.removeItem('restock_mode');
+        localStorage.removeItem('temp_stockist_check');
+        updateRestockUI();
+        updateModeBanners();
+        renderGrid();
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Cek Stok Selesai',
+            text: 'Data stok stokis telah dicatat.',
+            timer: 1600,
+            showConfirmButton: false
         });
     }
 
@@ -757,19 +1090,111 @@
             showConfirmButton: false,
             allowOutsideClick: false,
             didOpen: () => {
-                setTimeout(() => {
-                    restockState = 'checked_in';
-                    localStorage.setItem('restock_state', 'checked_in');
-                    updateRestockUI();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'GPS Terverifikasi!',
-                        text: 'Anda berada di radius Grosir Sinar Jaya.',
-                        showConfirmButton: false,
-                        timer: 1800
-                    });
-                }, 1500);
+                obtainGpsPosition().then(pos => {
+                    Swal.close();
+                    const nearby = SfaStore.getNearestStockists(pos.lat, pos.lng, 5);
+                    if (!nearby.length) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stokis Tidak Ditemukan',
+                            text: 'Tidak ada data stokis/grosir aktif. Hubungi admin.',
+                            confirmButtonColor: '#005D41'
+                        });
+                        return;
+                    }
+                    showNearestStockistPicker(nearby);
+                });
             }
+        });
+    }
+
+    function obtainGpsPosition() {
+        return new Promise(resolve => {
+            const fallback = () => resolve({
+                lat: -6.1628 + (Math.random() - 0.5) * 0.004,
+                lng: 106.8345 + (Math.random() - 0.5) * 0.004
+            });
+            if (!navigator.geolocation) {
+                setTimeout(fallback, 1200);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                () => setTimeout(fallback, 800),
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 30000 }
+            );
+        });
+    }
+
+    function showNearestStockistPicker(nearby) {
+        const cards = nearby.map((s, idx) => {
+            const inRadius = s.distanceM != null && s.distanceM <= 150;
+            const distClass = s.distanceM == null ? '' : (inRadius ? 'in-radius' : 'out-radius');
+            const distIcon = inRadius ? 'fa-check-circle' : 'fa-location-arrow';
+            const distText = s.distanceM == null
+                ? 'Jarak tidak diketahui'
+                : (inRadius ? `Dalam radius · ${s.distanceLabel}` : `${s.distanceLabel} dari lokasi Anda`);
+            const tipe = s.tipe ? `<span style="color:#999;"> · ${s.tipe}</span>` : '';
+            return `
+                <label class="stockist-pick-card${idx === 0 ? ' selected' : ''}" data-stockist-id="${s.id}">
+                    <input type="radio" name="pickStockist" value="${s.id}" ${idx === 0 ? 'checked' : ''} style="display:none;">
+                    <strong>${s.name}</strong>${tipe}
+                    <div class="stockist-pick-meta">${s.address || s.kota || ''}</div>
+                    <div class="stockist-pick-dist ${distClass}"><i class="fas ${distIcon}"></i> ${distText}</div>
+                </label>`;
+        }).join('');
+
+        Swal.fire({
+            title: 'Stokis/Grosir Terdekat',
+            html: `
+                <p style="font-size:12px; color:#666; margin:0 0 12px; text-align:left; line-height:1.4;">
+                    Pilih lokasi stokis/grosir tempat Anda berada sekarang:
+                </p>
+                <div id="stockistPickList" style="max-height:280px; overflow-y:auto; text-align:left;">${cards}</div>
+            `,
+            showCancelButton: true,
+            cancelButtonText: 'Batal',
+            confirmButtonText: 'Konfirmasi Check-in',
+            confirmButtonColor: '#005D41',
+            width: '360px',
+            didOpen: () => {
+                $('#stockistPickList .stockist-pick-card').on('click', function() {
+                    $('#stockistPickList .stockist-pick-card').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(this).find('input[type=radio]').prop('checked', true);
+                });
+            },
+            preConfirm: () => {
+                const selected = document.querySelector('input[name="pickStockist"]:checked');
+                if (!selected) {
+                    Swal.showValidationMessage('Pilih stokis/grosir terlebih dahulu');
+                    return false;
+                }
+                return selected.value;
+            }
+        }).then(result => {
+            if (result.isConfirmed && result.value) {
+                completeRestockCheckIn(result.value);
+            }
+        });
+    }
+
+    function completeRestockCheckIn(stockistId) {
+        SfaStore.setActiveStockist(stockistId);
+        const stockist = SfaStore.getStockistById(stockistId);
+        restockState = 'checked_in';
+        restockMode = null;
+        localStorage.setItem('restock_state', 'checked_in');
+        localStorage.removeItem('restock_mode');
+        localStorage.setItem('temp_restock_grosir', stockist ? stockist.name : getStockistLabel());
+        updateRestockUI();
+        updateModeBanners();
+        Swal.fire({
+            icon: 'success',
+            title: 'GPS Terverifikasi!',
+            text: `Check-in di ${stockist ? stockist.name : getStockistLabel()}. Pilih aktivitas selanjutnya.`,
+            showConfirmButton: false,
+            timer: 2000
         });
     }
 
@@ -810,7 +1235,9 @@
                     didOpen: () => {
                         setTimeout(() => {
                             restockState = 'restocking';
+                            restockMode = 'buy';
                             localStorage.setItem('restock_state', 'restocking');
+                            localStorage.setItem('restock_mode', 'buy');
                             updateRestockUI();
                             Swal.fire({
                                 icon: 'success',
@@ -839,10 +1266,15 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 restockState = 'idle';
+                restockMode = null;
                 tempAdjustments = {};
+                tempStockistCheck = {};
                 localStorage.removeItem('restock_state');
+                localStorage.removeItem('restock_mode');
                 localStorage.removeItem('temp_restock_adjustments');
+                localStorage.removeItem('temp_stockist_check');
                 updateRestockUI();
+                updateModeBanners();
                 renderGrid();
             }
         });
@@ -852,8 +1284,8 @@
         if (Object.keys(tempAdjustments).length === 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Belum Ada Penyesuaian',
-                text: 'Harap lakukan penyesuaian stok minimal pada 1 produk sebelum mengirim.',
+                title: 'Belum Ada Tambahan Stok',
+                text: 'Harap tambah stok minimal pada 1 produk sebelum mengirim.',
                 confirmButtonColor: '#005D41'
             });
             return;
@@ -863,11 +1295,30 @@
         localStorage.setItem('restock_state', restockState);
         localStorage.setItem('temp_restock_adjustments', JSON.stringify(tempAdjustments));
         localStorage.setItem('temp_restock_receipt', 'nota_belanja_stokis.jpg');
-        localStorage.setItem('temp_restock_grosir', 'Grosir Sinar Jaya');
+        localStorage.setItem('temp_restock_grosir', getStockistLabel());
         localStorage.setItem('temp_restock_time', new Date().toISOString());
 
         // Redirect to Gojek-like checkout review page
         window.location.href = 'restock_review.html';
+    }
+
+    function completeStockCheck() {
+        if (stockCheckVisitId) {
+            SfaStore.updateVisit(stockCheckVisitId, { stockCheckDone: true });
+        }
+        Swal.fire({
+            icon: 'success',
+            title: 'Cek Stok Selesai',
+            text: 'Stok outlet telah diverifikasi.',
+            timer: 1200,
+            showConfirmButton: false
+        }).then(() => {
+            if (stockCheckOutletId) {
+                window.location.href = `visit_detail.html?id=${stockCheckOutletId}`;
+            } else {
+                history.back();
+            }
+        });
     }
 
     function openHistorySheet() {

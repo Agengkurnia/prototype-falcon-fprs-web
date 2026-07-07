@@ -55,7 +55,7 @@ sessionStorage.clear();
 - **Ekspektasi**: Redirect ke `home.html` setelah login berhasil
 
 ### 4. Data Seeding Verification
-Pastikan key `sfa_seeded_v8_today` terisi di localStorage. Jika belum ada, buka halaman `home.html` dan biarkan proses seeding berjalan otomatis.
+Pastikan key `sfa_seeded_v9_today` terisi di localStorage. Jika belum ada, buka halaman `home.html` dan biarkan proses seeding berjalan otomatis.
 
 ---
 
@@ -84,16 +84,23 @@ Pastikan key `sfa_seeded_v8_today` terisi di localStorage. Jika belum ada, buka 
 
 | TC | Skenario | Langkah | Ekspektasi | Kategori |
 |:---|:---|:---|:---|:---|
-| TC-HOME-01 | Tampilan kartu menu | Buka `home.html` | 6 kartu menu terlihat (Rute Kunjungan, Faktur Penjualan, Penagihan AR, Geo Tag Outlet, Target, Sync Status) | UI |
+| TC-HOME-01 | Periode Penjualan & menu utama | Buka `home.html` | Banner "Periode Penjualan" + 4 kartu: Cek Stok dan Belanja Stokis, Faktur Penjualan, Visit, Sinkronisasi Data | UI |
 | TC-HOME-02 | Bottom navigation | Cek bar navigasi bawah | Tab Home, Dasbor, Profil terlihat dan bisa diklik | UI/Nav |
 | TC-HOME-03 | Header info | Cek header halaman | Nama salesman dan tanggal tampil (tidak `undefined`) | UI |
-| TC-HOME-04 | Navigasi ke Rute Kunjungan | Klik kartu "Rute Kunjungan" | Berpindah ke `visit_list.html` | Navigasi |
-| TC-HOME-05 | Navigasi ke Faktur Penjualan | Klik kartu "Faktur Penjualan" | Berpindah ke `invoice_list.html?backTo=home` | Navigasi |
-| TC-HOME-06 | Navigasi ke Penagihan AR | Klik kartu "Penagihan AR" | Berpindah ke `collection_list.html` | Navigasi |
-| TC-HOME-07 | Navigasi ke Geo Tag | Klik kartu "Geo Tag Outlet" | Berpindah ke `outlet_list.html?mode=geotag` | Navigasi |
-| TC-HOME-08 | Navigasi ke Target | Klik kartu "Target" | Berpindah ke `target.html` | Navigasi |
-| TC-HOME-09 | Navigasi ke Sync | Klik kartu "Sync Status" | Berpindah ke `sync_detail.html` | Navigasi |
+| TC-HOME-04 | Tombol Rute Kunjungan Hari Ini | Klik tombol utama hijau | Berpindah ke `visit_list.html` | Navigasi |
+| TC-HOME-05 | Navigasi ke Cek Stok | Klik kartu "Cek Stok dan Belanja Stokis" | Berpindah ke `product_catalog.html` | Navigasi |
+| TC-HOME-06 | Navigasi ke Faktur Penjualan | Klik kartu "Faktur Penjualan" | Berpindah ke `invoice_list.html?backTo=home` | Navigasi |
+| TC-HOME-07 | Navigasi ke Visit | Klik kartu "Visit" | Berpindah ke `visit_list.html` | Navigasi |
+| TC-HOME-08 | Navigasi ke Sinkronisasi | Klik kartu "Sinkronisasi Data" | Berpindah ke `sync_detail.html` | Navigasi |
+| TC-HOME-09 | FAB 2 opsi (visit_list) | Di `visit_list.html`, klik tombol `+` | Muncul "Tambah Kunjungan" dan "Tambah Outlet Baru" | Fungsional |
 | TC-HOME-10 | Tombol Dasbor (bottom nav) | Klik tab "Dasbor" di bottom nav | Berpindah ke `dasbor.html` | Navigasi |
+
+#### Checklist Feedback PDF — Halaman 1 (Beranda)
+
+- [ ] Periode Penjualan menampilkan bulan berjalan
+- [ ] Modal detail: list stockist, tanpa siklus kanvas & kendaraan
+- [ ] Tombol utama Rute Kunjungan Hari Ini
+- [ ] Accordion Sinkronisasi: Data Master, Data Pelanggan, Transaksi Offline
 
 ---
 
@@ -125,7 +132,7 @@ Pastikan key `sfa_seeded_v8_today` terisi di localStorage. Jika belum ada, buka 
 | TC-VISIT-01 | Daftar outlet rute | Buka `visit_list.html` | Daftar outlet/rute tampil dengan nama, alamat, dan status | UI |
 | TC-VISIT-02 | Filter status "Belum Kunjungan" | Klik chip filter "Belum" | Hanya outlet belum dikunjungi tampil | Fungsional |
 | TC-VISIT-03 | Buka detail kunjungan | Klik salah satu kartu outlet | Berpindah ke `visit_detail.html` dengan state "Belum Kunjungan" | Navigasi |
-| TC-VISIT-04 | Check-In | Di `visit_detail.html`, klik tombol "Check In" | State berubah ke "Sedang Kunjungan", UI berubah | Fungsional |
+| TC-VISIT-04 | Mulai Visit | Di `visit_detail.html`, pilih stokis lalu klik "Mulai Visit" | State berubah ke "Sedang Visit", UI berubah | Fungsional |
 | TC-VISIT-05 | Aktivitas Sales Order | Klik kartu "Sales Order" saat sedang kunjungan | Berpindah ke `order_input.html?outletId=XX&backUrl=...` | Navigasi |
 | TC-VISIT-06 | Input order + submit | Pilih 1 produk, set qty, kirim order | Order berhasil disimpan, kembali ke `visit_detail.html` | CRUD |
 | TC-VISIT-07 | Aktivitas Penagihan | Klik kartu "Penagihan AR" saat sedang kunjungan | Berpindah ke `collection_input.html?customerId=XX&backUrl=...` | Navigasi |
@@ -133,6 +140,13 @@ Pastikan key `sfa_seeded_v8_today` terisi di localStorage. Jika belum ada, buka 
 | TC-VISIT-09 | Rekam No Order | Klik "No Order" saat sedang kunjungan | Dialog konfirmasi muncul, setelah konfirmasi terekam | Fungsional |
 | TC-VISIT-10 | Check-Out | Klik tombol "Check Out" | State berubah ke "Selesai", semua aksi terkunci | Fungsional |
 | TC-VISIT-11 | Kembali ke daftar | Klik tombol back dari `visit_detail.html` | Kembali ke `visit_list.html` | Navigasi |
+
+#### Checklist Feedback PDF — Halaman 2 (Visit)
+
+- [ ] FAB `+` membuka Tambah Kunjungan & Tambah Outlet Baru
+- [ ] Hanya 1 outlet dengan status "Sedang Visit" pada satu waktu
+- [ ] Selesai visit wajib cek stok outlet terlebih dahulu
+- [ ] Alasan tidak beli "Lainnya" wajib isi teks custom
 
 ---
 
@@ -212,7 +226,15 @@ Pastikan key `sfa_seeded_v8_today` terisi di localStorage. Jika belum ada, buka 
 | TC-OUTLET-07 | Update GPS | Klik "Update GPS" | Koordinat tersimpan, badge berubah ke "GPS OK" | CRUD |
 | TC-OUTLET-08 | Kembali ke daftar | Klik back dari detail | Kembali ke `outlet_list.html` | Navigasi |
 | TC-OUTLET-09 | Tambah Outlet Baru | Klik FAB "+" di daftar | Buka `outlet_add.html` | Navigasi |
-| TC-OUTLET-10 | Form tambah outlet | Isi form dan submit | Outlet baru tersimpan, kembali ke daftar | CRUD |
+| TC-OUTLET-10 | Form tambah outlet | Isi form (foto wajib, NPWP mask, dropdown wilayah) dan submit | Outlet baru tersimpan, kembali ke detail | CRUD |
+
+#### Checklist Feedback PDF — Halaman 3 (Form Outlet & Order)
+
+- [ ] NPWP: separator titik/dash permanen saat mengetik (`00.000.000.0-000.000`)
+- [ ] Dropdown searchable: Kota, Kecamatan, Kelurahan dari `wilayah-jakarta.json`
+- [ ] RT/RW: pemisah `/` permanen di antara field
+- [ ] Foto toko wajib sebelum simpan
+- [ ] Tanggal pengiriman di `order_input.html` read-only (hari transaksi)
 
 ---
 

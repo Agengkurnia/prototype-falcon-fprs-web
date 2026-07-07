@@ -1,0 +1,8 @@
+[
+  { "id": 1, "kode": "STK-001", "nama": "Grosir Sinar Jaya", "tipe": "Grosir", "alamat": "Jl. Pasar Baru No.12, Jakarta Pusat", "kota": "Jakarta Pusat", "telepon": "0213849201", "lat": -6.1625, "lng": 106.8342, "status": "Active" },
+  { "id": 2, "kode": "STK-002", "nama": "PT Sumber Makmur", "tipe": "Distributor", "alamat": "Jl. Mangga Dua Raya, Jakarta Utara", "kota": "Jakarta Utara", "telepon": "0216123456", "lat": -6.1350, "lng": 106.8230, "status": "Active" },
+  { "id": 3, "kode": "STK-003", "nama": "CV Berkah Jaya", "tipe": "Grosir", "alamat": "Jl. Rawa Belong, Jakarta Barat", "kota": "Jakarta Barat", "telepon": "0215890123", "lat": -6.1980, "lng": 106.7720, "status": "Active" },
+  { "id": 4, "kode": "STK-004", "nama": "PT Indo Distribusi", "tipe": "Distributor", "alamat": "Jl. Cakung Cilincing, Jakarta Timur", "kota": "Jakarta Timur", "telepon": "0214409876", "lat": -6.1520, "lng": 106.9450, "status": "Active" },
+  { "id": 5, "kode": "STK-005", "nama": "PT Kalbe Farma Dist.", "tipe": "Principal", "alamat": "Jl. Letjen S. Parman, Jakarta Barat", "kota": "Jakarta Barat", "telepon": "02153653737", "lat": -6.1890, "lng": 106.7980, "status": "Active" },
+  { "id": 6, "kode": "STK-006", "nama": "CV Karya Mandiri", "tipe": "Grosir", "alamat": "Jl. Condet Raya, Jakarta Timur", "kota": "Jakarta Timur", "telepon": "0218091234", "lat": -6.2780, "lng": 106.8520, "status": "Inactive" }
+]

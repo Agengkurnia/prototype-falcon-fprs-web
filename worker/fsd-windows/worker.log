@@ -76,3 +76,12 @@
 [2026-07-06T02:02:49.438Z] [INFO] FSD Windows Worker listening {"port":3950,"root":"D:\\Work\\Source\\Comsup\\falcon\\Prototype"}
 [2026-07-06T02:02:49.446Z] [INFO] KV configured {"url":"https://relevant-python-93635.upstash.io"}
 [2026-07-06T02:02:49.447Z] [INFO] Poll loop started {"intervalMs":10000}
+[2026-07-06T02:11:00.100Z] [INFO] Poll claimed job {"jobId":"fsd_1783303849576_18u3on"}
+[2026-07-06T02:11:00.102Z] [INFO] Job started {"jobId":"fsd_1783303849576_18u3on"}
+[2026-07-06T02:11:00.443Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783303849576_18u3on.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-06T02:11:50.701Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\build_fsd_web_portal.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783303849576_18u3on.json"]}
+[2026-07-06T02:12:11.395Z] [INFO] Job completed {"jobId":"fsd_1783303849576_18u3on","ms":71293,"cacheStats":{"aiHits":0,"aiRefreshed":1,"screenshotRefreshed":1,"screenshotCached":0}}
+[2026-07-06T02:26:50.951Z] [INFO] Poll claimed job {"jobId":"fsd_1783304803307_0298ny"}
+[2026-07-06T02:26:50.953Z] [INFO] Job started {"jobId":"fsd_1783304803307_0298ny"}
+[2026-07-06T02:26:51.303Z] [INFO] exec {"cmd":"py","args":["D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\capture_web_portal_screenshots.py","--job-config","D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_jobs\\fsd_1783304803307_0298ny.json","--base-url","http://127.0.0.1:5500"]}
+[2026-07-06T02:36:52.361Z] [ERROR] Job failed {"jobId":"fsd_1783304803307_0298ny","error":"Gemini sibuk (503) — coba lagi beberapa menit atau set FSD_GEMINI_FALLBACK_MODEL=gemini-2.5-flash-lite"}

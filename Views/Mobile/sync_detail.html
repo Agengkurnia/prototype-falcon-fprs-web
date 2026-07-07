@@ -105,11 +105,16 @@
 
     <div class="mobile-content no-nav" style="padding-bottom:80px;">
         <div class="p-16">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
                 <span style="font-size:13px; font-weight:700; color:var(--color-gray);">ANTREAN SINKRONISASI</span>
-                <button onclick="clearDone()" style="background:none; border:none; font-size:12px; color:var(--color-primary); font-weight:600; cursor:pointer;">
-                    Hapus Selesai
-                </button>
+                <div style="display:flex; gap:10px; align-items:center; flex-shrink:0;">
+                    <button type="button" onclick="clearDone()" style="background:none; border:none; font-size:12px; color:var(--color-primary); font-weight:600; cursor:pointer; padding:4px 0;">
+                        Hapus Selesai
+                    </button>
+                    <button type="button" onclick="clearAllQueue()" style="background:none; border:none; font-size:12px; color:#C62828; font-weight:600; cursor:pointer; padding:4px 0;">
+                        Kosongkan Semua
+                    </button>
+                </div>
             </div>
             <div id="queueList"></div>
         </div>
@@ -154,7 +159,7 @@
 
         // Update summary
         const pending = queue.filter(q => q.status === 'pending').length;
-        const success = queue.filter(q => q.status === 'success').length;
+        const success = queue.filter(q => SfaStore.isQueueItemDone(q)).length;
         const failed = queue.filter(q => q.status === 'failed').length;
         $('#kpiPending').text(pending);
         $('#kpiSuccess').text(success);
@@ -190,7 +195,7 @@
             let retryBtn = '';
             if (item.status === 'pending') statusIconHtml = `<i class="fas fa-clock status-icon si-pending"></i>`;
             else if (item.status === 'uploading') statusIconHtml = `<i class="fas fa-spinner fa-spin status-icon si-uploading"></i>`;
-            else if (item.status === 'success') statusIconHtml = `<i class="fas fa-check-circle status-icon si-success"></i>`;
+            else if (SfaStore.isQueueItemDone(item)) statusIconHtml = `<i class="fas fa-check-circle status-icon si-success"></i>`;
             else if (item.status === 'failed') {
                 statusIconHtml = `<i class="fas fa-times-circle status-icon si-failed"></i>`;
                 retryBtn = `<button class="btn-retry" onclick="retryItem('${item.id}')"><i class="fas fa-redo me-1"></i>Retry</button>`;
@@ -216,13 +221,86 @@
     }
 
     function retryItem(id) {
-        SfaStore.retryQueueItem(id);
-        renderQueue();
+        const $row = $(`#qi_${id}`);
+        $row.find('.btn-retry').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+        SfaStore.retryQueueItem(id).then(function(result) {
+            renderQueue();
+            if (result && result.status === 'failed') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Unggah Gagal',
+                    text: result.errorMessage || 'Gagal mengunggah ke server. Coba lagi.',
+                    confirmButtonColor: '#005D41',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            }
+        });
+    }
+
+    function clearAllQueue() {
+        const count = SfaStore.getSyncQueue().length;
+        if (count === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Antrean Sudah Kosong',
+                text: 'Tidak ada item dalam antrean sinkronisasi.',
+                confirmButtonColor: '#005D41',
+                timer: 1400,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Kosongkan Antrean?',
+            html: `Semua <b>${count}</b> item akan dihapus dari antrean<br>(pending, gagal, dan selesai).`,
+            showCancelButton: true,
+            confirmButtonColor: '#C62828',
+            cancelButtonColor: '#6B6063',
+            confirmButtonText: 'Ya, Kosongkan',
+            cancelButtonText: 'Batal'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+            const removed = SfaStore.clearAllSyncQueue();
+            renderQueue();
+            Swal.fire({
+                icon: 'success',
+                title: 'Antrean Dikosongkan',
+                text: `${removed} item dihapus dari antrean.`,
+                confirmButtonColor: '#005D41',
+                timer: 1400,
+                showConfirmButton: false
+            });
+        });
     }
 
     function clearDone() {
-        SfaStore.clearSuccessfulQueue();
+        const removed = SfaStore.clearSuccessfulQueue();
         renderQueue();
+
+        if (removed === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Tidak Ada Item Selesai',
+                text: 'Tidak ada item berstatus selesai yang bisa dihapus.',
+                confirmButtonColor: '#005D41',
+                timer: 1600,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil Dihapus',
+            text: `${removed} item selesai dihapus dari antrean.`,
+            confirmButtonColor: '#005D41',
+            timer: 1400,
+            showConfirmButton: false
+        });
     }
 
     function startSync() {

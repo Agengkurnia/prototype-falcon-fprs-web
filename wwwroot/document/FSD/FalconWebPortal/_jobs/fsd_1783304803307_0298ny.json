@@ -1,0 +1,47 @@
+{
+  "jobId": "fsd_1783304803307_0298ny",
+  "mode": "full",
+  "moduleIds": [
+    "master-produk",
+    "master-akun",
+    "master-alasan",
+    "master-brand",
+    "master-daftar-harga",
+    "master-divisi",
+    "master-grup-pelanggan",
+    "master-kategori-produk",
+    "master-konfigurasi-akses",
+    "master-metode-pembayaran",
+    "master-pajak",
+    "master-pegawai",
+    "master-pelanggan",
+    "master-posisi",
+    "master-supplier",
+    "master-unit",
+    "master-waktu-pembayaran",
+    "dashboard",
+    "penjualan-faktur",
+    "penjualan-stok-motoris",
+    "canvassing",
+    "kunjungan-informasi",
+    "kunjungan-geografis",
+    "kunjungan-rute"
+  ],
+  "sections": [
+    "overview",
+    "columns",
+    "fields",
+    "validation",
+    "screenshots",
+    "businessRules",
+    "erd"
+  ],
+  "aiMarkdownDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\_job_ai",
+  "screenshotDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\wwwroot\\document\\FSD\\FalconWebPortal\\screenshots",
+  "outputDir": "D:\\Work\\Source\\Comsup\\falcon\\Prototype\\Document",
+  "captureModuleIds": [
+    "master-produk",
+    "master-akun"
+  ],
+  "prototypeRoot": "D:\\Work\\Source\\Comsup\\falcon\\Prototype"
+}

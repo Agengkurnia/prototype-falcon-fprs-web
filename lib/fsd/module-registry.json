@@ -21,15 +21,37 @@
       "apiEndpoint": "/api/v1/Sku",
       "storageKey": "md_produk",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_produk.png", "master_produk_add.png", "master_produk_edit.png", "master_produk_validation.png", "master_produk_delete_confirm.png"],
+      "screenshots": [
+        "ss_02_master_produk_index.png",
+        "ss_03_master_produk_add.png",
+        "ss_04_master_produk_edit.png"
+      ],
       "sections": {
-        "overview": { "default": true },
-        "columns": { "default": true, "source": "html" },
-        "fields": { "default": true, "source": "html" },
-        "validation": { "default": true, "source": "html" },
-        "screenshots": { "default": true },
-        "businessRules": { "default": true, "source": "ai" },
-        "erd": { "default": true }
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        },
+        "erd": {
+          "default": true
+        }
       }
     },
     {
@@ -42,8 +64,35 @@
       "apiEndpoint": "/api/v1/Account",
       "storageKey": "md_akun",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_akun.png", "master_akun_modal_tambah.png", "master_akun_modal_edit.png", "master_akun_validation.png", "master_akun_delete_confirm.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_21_master_akun_index.png",
+        "ss_22_master_akun_modal_tambah.png",
+        "ss_23_master_akun_modal_edit.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-alasan",
@@ -55,8 +104,31 @@
       "apiEndpoint": "/api/v1/Reason",
       "storageKey": "md_alasan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_alasan.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_34_master_alasan_index.png",
+        "ss_35_master_alasan_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-brand",
@@ -68,8 +140,31 @@
       "apiEndpoint": "/api/v1/Brand",
       "storageKey": "md_brand",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_brand.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_13_master_brand_index.png",
+        "ss_14_master_brand_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-daftar-harga",
@@ -81,8 +176,31 @@
       "apiEndpoint": "/api/v1/PriceList",
       "storageKey": "md_daftar_harga",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_daftar_harga.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_09_master_daftar_harga_index.png",
+        "ss_10_master_daftar_harga_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-divisi",
@@ -94,8 +212,31 @@
       "apiEndpoint": "/api/v1/Division",
       "storageKey": "md_divisi",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_divisi.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_07_master_divisi_index.png",
+        "ss_08_master_divisi_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-grup-pelanggan",
@@ -107,8 +248,31 @@
       "apiEndpoint": "/api/v1/CustomerGroup",
       "storageKey": "md_grup_pelanggan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_grup_pelanggan.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_17_master_grup_pelanggan_index.png",
+        "ss_18_master_grup_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-kategori-produk",
@@ -120,8 +284,31 @@
       "apiEndpoint": "/api/v1/ProductCategory",
       "storageKey": "md_kategori_produk",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_kategori_produk.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_11_master_kategori_index.png",
+        "ss_12_master_kategori_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-konfigurasi-akses",
@@ -133,8 +320,31 @@
       "apiEndpoint": "/api/v1/AccessConfig",
       "storageKey": "md_konfigurasi_akses",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_konfigurasi_akses.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_26_master_konfig_akses_index.png",
+        "ss_27_master_konfig_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-metode-pembayaran",
@@ -146,8 +356,31 @@
       "apiEndpoint": "/api/v1/PaymentMethod",
       "storageKey": "md_metode_pembayaran",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_metode_pembayaran.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_28_master_metode_index.png",
+        "ss_29_master_metode_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-pajak",
@@ -159,8 +392,31 @@
       "apiEndpoint": "/api/v1/Tax",
       "storageKey": "md_pajak",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_pajak.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_32_master_pajak_index.png",
+        "ss_33_master_pajak_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-pegawai",
@@ -173,8 +429,31 @@
       "apiEndpoint": "/api/v1/Employee",
       "storageKey": "md_pegawai",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_pegawai.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_19_master_pegawai_index.png",
+        "ss_20_master_pegawai_add.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-pelanggan",
@@ -187,8 +466,31 @@
       "apiEndpoint": "/api/v1/Customer",
       "storageKey": "md_pelanggan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_pelanggan.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_15_master_pelanggan_index.png",
+        "ss_16_master_pelanggan_add.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-posisi",
@@ -200,8 +502,31 @@
       "apiEndpoint": "/api/v1/Position",
       "storageKey": "md_posisi",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_posisi.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_24_master_posisi_index.png",
+        "ss_25_master_posisi_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-supplier",
@@ -214,8 +539,53 @@
       "apiEndpoint": "/api/v1/Supplier",
       "storageKey": "md_supplier",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_supplier.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_36_master_supplier_index.png",
+        "ss_37_master_supplier_add.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
+    },
+    {
+      "id": "master-stokis",
+      "label": "Master Data — Stokis",
+      "group": "masterData",
+      "enabled": true,
+      "type": "page",
+      "htmlPath": "Views/FPRS/MasterData/Stokis/index.html",
+      "formPath": "Views/FPRS/MasterData/Stokis/add.html",
+      "storageKey": "md_stokis",
+      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
+      "screenshots": [
+        "ss_45_master_stokis_index.png",
+        "ss_46_master_stokis_add.png"
+      ],
+      "sections": {
+        "overview": { "default": true },
+        "columns": { "default": true, "source": "html" },
+        "fields": { "default": true, "source": "html" },
+        "validation": { "default": true, "source": "html" },
+        "businessRules": { "default": true, "source": "ai" }
+      }
     },
     {
       "id": "master-unit",
@@ -227,8 +597,31 @@
       "apiEndpoint": "/api/v1/Unit",
       "storageKey": "md_unit",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_unit.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_05_master_unit_index.png",
+        "ss_06_master_unit_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "master-waktu-pembayaran",
@@ -240,8 +633,31 @@
       "apiEndpoint": "/api/v1/PaymentTerm",
       "storageKey": "md_waktu_pembayaran",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["master_waktu_pembayaran.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_30_master_waktu_index.png",
+        "ss_31_master_waktu_modal.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "dashboard",
@@ -253,8 +669,30 @@
       "apiEndpoint": null,
       "storageKey": null,
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["dashboard_home.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": false }, "fields": { "default": false }, "validation": { "default": false }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_01_dashboard.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": false
+        },
+        "fields": {
+          "default": false
+        },
+        "validation": {
+          "default": false
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "penjualan-faktur",
@@ -267,8 +705,34 @@
       "apiEndpoint": "/api/v1/Invoice",
       "storageKey": "md_faktur",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["faktur_index.png", "faktur_add.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "validation": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_38_faktur_index.png",
+        "ss_39_faktur_add.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "penjualan-stok-motoris",
@@ -280,8 +744,25 @@
       "apiEndpoint": null,
       "storageKey": "md_stok_motoris",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["motoris_index.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_40_stok_motoris_index.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "canvassing",
@@ -294,8 +775,29 @@
       "apiEndpoint": null,
       "storageKey": "canvassing",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["canvassing_index.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "fields": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_41_canvassing_index.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "kunjungan-informasi",
@@ -307,8 +809,25 @@
       "apiEndpoint": null,
       "storageKey": null,
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["kunjungan_informasi.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_42_kunjungan_informasi.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "kunjungan-geografis",
@@ -320,8 +839,21 @@
       "apiEndpoint": null,
       "storageKey": null,
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["kunjungan_geografis.png"],
-      "sections": { "overview": { "default": true }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_43_kunjungan_geografis.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     },
     {
       "id": "kunjungan-rute",
@@ -333,8 +865,25 @@
       "apiEndpoint": null,
       "storageKey": null,
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": ["kunjungan_rute.png"],
-      "sections": { "overview": { "default": true }, "columns": { "default": true, "source": "html" }, "screenshots": { "default": true }, "businessRules": { "default": true, "source": "ai" } }
+      "screenshots": [
+        "ss_44_kunjungan_rute.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "screenshots": {
+          "default": true
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
     }
   ]
 }

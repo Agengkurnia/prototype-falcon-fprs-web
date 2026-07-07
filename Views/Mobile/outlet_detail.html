@@ -181,15 +181,27 @@
     });
 
     function startOutletVisit() {
-        // Check if already has active visit today
         const existing = SfaStore.getTodayVisitByCustomerId(outletId);
         if (existing) {
             window.location.href = `visit_detail.html?id=${outletId}`;
             return;
         }
-        // Create a new out-of-route visit
-        SfaStore.saveVisit({ customerId: outletId, customerName: outlet.name, isOutOfRoute: true });
-        Swal.fire({ icon: 'success', title: 'Kunjungan Dimulai', text: `Check-in ke ${outlet.name}`, timer: 1000, showConfirmButton: false })
+        const active = SfaStore.getActiveVisit();
+        if (active) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Visit Aktif di Outlet Lain',
+                text: `Selesaikan visit di ${active.customerName} terlebih dahulu.`,
+                confirmButtonColor: '#005D41'
+            });
+            return;
+        }
+        const result = SfaStore.saveVisit({ customerId: outletId, customerName: outlet.name, isOutOfRoute: true });
+        if (result.error) {
+            Swal.fire('Gagal', 'Tidak dapat memulai visit. Periksa visit yang sedang berjalan.', 'warning');
+            return;
+        }
+        Swal.fire({ icon: 'success', title: 'Kunjungan Dimulai', text: `Visit ke ${outlet.name}`, timer: 1000, showConfirmButton: false })
             .then(() => { window.location.href = `visit_detail.html?id=${outletId}`; });
     }
 

@@ -75,22 +75,58 @@
         }
         .gps-ok { background: #e2f0d9; color: #385723; }
         .gps-missing { background: #FFF2CC; color: #B25900; }
+        .outlet-dist {
+            font-size: 11px; font-weight: 700; margin-top: 6px;
+            display: flex; align-items: center; gap: 4px;
+            color: #005D41;
+        }
+        .outlet-dist.in-radius { color: #2E7D32; }
+        .outlet-dist.far { color: #7B6F72; }
+        .outlet-dist.unknown { color: #B25900; font-weight: 600; }
+        .gps-loc-banner {
+            margin: 0 0 12px; padding: 10px 12px;
+            background: #EBF8F4; border: 1px solid #C2ECE0;
+            border-radius: 10px; font-size: 12px; color: #005D41;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .gps-loc-banner.loading { background: #F7F9FA; border-color: #E0E0E0; color: #666; }
 
-        .fab {
+        .fab-wrap {
             position: fixed;
             bottom: 24px; right: calc(50% - 225px + 16px);
-            width: 52px; height: 52px;
-            background: var(--color-accent);
-            border-radius: 50%;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        @media (max-width: 480px) { .fab-wrap { right: 16px; } }
+        .fab-menu { display: none; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .fab-menu.open { display: flex; }
+        .fab-option { display: flex; align-items: center; gap: 8px; text-decoration: none; color: inherit; }
+        .fab-option-label {
+            background: #fff; border: 1px solid var(--color-border); border-radius: 20px;
+            padding: 6px 12px; font-size: 12px; font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); white-space: nowrap;
+        }
+        .fab-option-btn {
+            width: 44px; height: 44px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(120,181,0,0.35);
-            cursor: pointer; z-index: 200;
-            text-decoration: none; color: #fff;
-            font-size: 22px;
+            font-size: 16px; color: #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.15);
         }
-        @media (max-width: 480px) {
-            .fab { right: 16px; }
+        .fab-option-btn.visit { background: #78B500; }
+        .fab-option-btn.outlet { background: var(--color-accent); }
+        .fab {
+            position: static; width: 52px; height: 52px;
+            background: #005D41; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,93,65,0.35);
+            cursor: pointer; border: none; color: #fff; font-size: 22px;
+            transition: transform 0.2s;
         }
+        .fab.open { transform: rotate(45deg); }
+        .fab-backdrop { display: none; position: fixed; inset: 0; z-index: 199; }
+        .fab-backdrop.open { display: block; }
     </style>
 </head>
 <body style="background:#f7f9fa;">
@@ -122,26 +158,103 @@
     </div>
 </div>
 
-<!-- FAB: Tambah Outlet Baru -->
-<a href="outlet_add.html" class="fab" title="Tambah Outlet Baru">
-    <i class="fas fa-plus"></i>
-</a>
+<!-- FAB Speed Dial -->
+<div class="fab-backdrop" id="fabBackdrop" onclick="toggleFab(false)"></div>
+<div class="fab-wrap">
+    <div class="fab-menu" id="fabMenu">
+        <a href="outlet_list.html?mode=pickVisit" class="fab-option">
+            <span class="fab-option-label">Tambah Kunjungan</span>
+            <span class="fab-option-btn visit"><i class="fas fa-route"></i></span>
+        </a>
+        <a href="outlet_add.html" class="fab-option">
+            <span class="fab-option-label">Tambah Outlet Baru</span>
+            <span class="fab-option-btn outlet"><i class="fas fa-store"></i></span>
+        </a>
+    </div>
+    <button type="button" class="fab" id="fabMain" onclick="toggleFab()" aria-label="Menu tambah">
+        <i class="fas fa-plus"></i>
+    </button>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
     let currentFilter = 'semua';
     let isGeoTagMode = false;
+    let isPickVisitMode = false;
+    let devicePos = null;
+    let devicePosLoading = false;
 
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
         isGeoTagMode = params.get('mode') === 'geotag';
+        isPickVisitMode = params.get('mode') === 'pickVisit';
         if (isGeoTagMode) {
             $('#pageTitle').text('Geo Tag Outlet');
             setFilter('nogps');
+        } else if (isPickVisitMode) {
+            $('#pageTitle').text('Pilih Outlet Kunjungan');
+            document.title = 'Tambah Kunjungan - Falcon SFA Mobile';
+            devicePosLoading = true;
+            renderList();
+            obtainGpsPosition().then(pos => {
+                devicePos = pos;
+                devicePosLoading = false;
+                renderList();
+            });
+            return;
+        } else {
+            $('#pageTitle').text('Daftar Pelanggan');
         }
         renderList();
     });
+
+    function obtainGpsPosition() {
+        return new Promise(resolve => {
+            const fallback = () => resolve({
+                lat: -6.2088 + (Math.random() - 0.5) * 0.01,
+                lng: 106.8290 + (Math.random() - 0.5) * 0.01
+            });
+            if (!navigator.geolocation) {
+                setTimeout(fallback, 800);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                () => setTimeout(fallback, 600),
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 30000 }
+            );
+        });
+    }
+
+    function distanceForOutlet(c) {
+        const hasGps = c.lat && c.lng && c.lat !== 0 && c.lng !== 0;
+        if (!devicePos || !hasGps) return { distanceM: null, distanceLabel: null };
+        const distanceM = SfaStore.haversineMeters(devicePos.lat, devicePos.lng, c.lat, c.lng);
+        return { distanceM, distanceLabel: SfaStore.formatDistanceMeters(distanceM) };
+    }
+
+    function renderDistanceHtml(c) {
+        if (!isPickVisitMode) return '';
+        if (devicePosLoading) {
+            return `<div class="outlet-dist far"><i class="fas fa-spinner fa-spin"></i> Menghitung jarak...</div>`;
+        }
+        if (!c.distanceLabel) {
+            return `<div class="outlet-dist unknown"><i class="fas fa-exclamation-circle"></i> GPS outlet belum tersedia</div>`;
+        }
+        const inRadius = c.distanceM <= 100;
+        const cls = inRadius ? 'in-radius' : 'far';
+        const icon = inRadius ? 'fa-check-circle' : 'fa-location-arrow';
+        const suffix = inRadius ? ' · dalam radius' : ' dari Anda';
+        return `<div class="outlet-dist ${cls}"><i class="fas ${icon}"></i> ${c.distanceLabel}${suffix}</div>`;
+    }
+
+    function toggleFab(forceOpen) {
+        const open = forceOpen === true ? true : forceOpen === false ? false : !$('#fabMenu').hasClass('open');
+        $('#fabMenu').toggleClass('open', open);
+        $('#fabBackdrop').toggleClass('open', open);
+        $('#fabMain').toggleClass('open', open);
+    }
 
     function setFilter(f) {
         currentFilter = f;
@@ -180,7 +293,25 @@
             return;
         }
 
-        filtered.forEach(c => {
+        let list = filtered.map(c => ({ ...c, ...distanceForOutlet(c) }));
+        if (isPickVisitMode && devicePos && !devicePosLoading) {
+            list.sort((a, b) => {
+                if (a.distanceM == null) return 1;
+                if (b.distanceM == null) return -1;
+                return a.distanceM - b.distanceM;
+            });
+        }
+
+        if (isPickVisitMode) {
+            const bannerClass = devicePosLoading ? 'gps-loc-banner loading' : 'gps-loc-banner';
+            const bannerIcon = devicePosLoading ? 'fa-spinner fa-spin' : 'fa-crosshairs';
+            const bannerText = devicePosLoading
+                ? 'Mendeteksi lokasi perangkat...'
+                : 'Outlet diurutkan dari yang terdekat dengan lokasi Anda';
+            container.append(`<div class="${bannerClass}"><i class="fas ${bannerIcon}"></i> ${bannerText}</div>`);
+        }
+
+        list.forEach(c => {
             const hasGps = (c.lat && c.lng && c.lat !== 0 && c.lng !== 0);
             const gpsBadge = hasGps
                 ? `<span class="gps-badge gps-ok"><i class="fas fa-check-circle me-1"></i>GPS OK</span>`
@@ -192,8 +323,12 @@
 
             const imgUrl = c.imageUrl || '../../wwwroot/assets/images/img_not_found.jpg';
 
+            const detailHref = isPickVisitMode
+                ? `visit_detail.html?id=${c.id}`
+                : `outlet_detail.html?id=${c.id}`;
+
             container.append(`
-                <a href="outlet_detail.html?id=${c.id}" class="outlet-card">
+                <a href="${detailHref}" class="outlet-card">
                     <div class="outlet-img-container">
                         <img src="${imgUrl}" alt="${c.name}" onerror="this.src='../../wwwroot/assets/images/img_not_found.jpg'"/>
                     </div>
@@ -215,6 +350,7 @@
                             <i class="fas fa-map-marker-alt" style="color:var(--color-primary); margin-right: 4px;"></i>
                             ${c.address || ''}, ${c.kota}
                         </div>
+                        ${renderDistanceHtml(c)}
                     </div>
                 </a>
             `);

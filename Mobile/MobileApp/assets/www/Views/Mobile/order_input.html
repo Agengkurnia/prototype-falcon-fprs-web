@@ -293,8 +293,8 @@
             <button class="header-action" onclick="goBack()" aria-label="Kembali">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <span class="header-title">Input Order</span>
-            <span class="header-action" style="font-size: 11px; font-weight: 700; color: #fff;" id="outletTag">OL-10283</span>
+            <span class="header-title" style="flex: 1; margin-left: 16px; font-size: 16px;">Input Order</span>
+            <span class="header-action" style="font-size: 12px; font-weight: 700; color: #fff; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 12px; cursor: pointer; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="outletTag" onclick="clickOutletTag()">Pilih Pelanggan <i class="fas fa-chevron-down ms-1" style="font-size: 9px;"></i></span>
         </div>
 
         <!-- Order Tabs -->
@@ -354,7 +354,7 @@
                 <div class="mobile-card">
                     <div class="mb-3">
                         <label class="form-label fw-bold fs-7 text-muted">Tanggal Pengiriman</label>
-                        <input type="date" class="form-control fs-7" id="deliveryDate" required/>
+                        <input type="text" class="form-control fs-7" id="deliveryDate" readonly style="background:#f7f9fa;"/>
                     </div>
                     <div class="mb-1">
                         <label class="form-label fw-bold fs-7 text-muted">Catatan Salesman</label>
@@ -406,36 +406,124 @@
     <script>
         // Produk dari SfaStore
         let products = [];
-        let currentOutletId = "OL-10283";
+        let currentOutletId = "";
         let currentOutlet = null;
         let cart = {}; // maps productCode -> { qty: Number, uom: 'PCS'|'KARTON' }
         let currentCategory = 'All';
         let draftInvoiceId = null;
+        let isOutletLocked = false;
+        let selectCustomerModal = null;
 
         $(document).ready(function() {
+            selectCustomerModal = new bootstrap.Modal(document.getElementById('selectCustomerModal'));
+
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('outletId');
-            if (id) {
-                currentOutletId = id;
-                $('#outletTag').text(id);
-            }
 
             // Load produk dari SfaStore
             products = SfaStore.getProducts();
-            currentOutlet = SfaStore.getCustomerById(currentOutletId);
 
-            if (currentOutlet) {
-                $('#outletTag').text(currentOutlet.id);
+            if (id) {
+                currentOutletId = id;
+                currentOutlet = SfaStore.getCustomerById(currentOutletId);
+                isOutletLocked = true;
+                $('#outletTag').html(`${currentOutlet ? currentOutlet.name : id}`);
+            } else {
+                currentOutletId = "";
+                currentOutlet = null;
+                isOutletLocked = false;
+                $('#outletTag').html(`Pilih Pelanggan <i class="fas fa-chevron-down ms-1" style="font-size: 9px;"></i>`);
+                // Automatically prompt customer list
+                setTimeout(() => {
+                    showCustomerSelection();
+                }, 300);
             }
 
-            // Set default delivery date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            $('#deliveryDate').val(tomorrow.toISOString().split('T')[0]);
+            // Hook close button on modal to back navigate if no customer selected
+            $('#closeCustModalBtn').click(function() {
+                if (!currentOutletId) {
+                    goBack();
+                }
+            });
+
+            // Tanggal pengiriman = hari ini (fixed, tidak bisa diubah)
+            const today = SfaStore.todayStr();
+            const todayLabel = new Date(today + 'T12:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $('#deliveryDate').val(todayLabel).data('iso', today);
 
             renderCatalog();
             updateCartSummary();
         });
+
+        function showCustomerSelection() {
+            if (isOutletLocked) return;
+            $('#custSearchInput').val('');
+            renderCustomerList();
+            selectCustomerModal.show();
+        }
+
+        function clickOutletTag() {
+            if (isOutletLocked) return;
+            if (Object.keys(cart).length > 0) {
+                Swal.fire({
+                    title: 'Ganti Pelanggan?',
+                    text: 'Mengubah pelanggan akan mengosongkan keranjang belanja Anda saat ini.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#005D41',
+                    confirmButtonText: 'Ya, Ganti',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        cart = {};
+                        renderCatalog();
+                        showCustomerSelection();
+                    }
+                });
+            } else {
+                showCustomerSelection();
+            }
+        }
+
+        function renderCustomerList() {
+            const query = $('#custSearchInput').val().toLowerCase();
+            const customers = SfaStore.getCustomers();
+            const container = $('#customerListContainer');
+            container.empty();
+
+            const filtered = customers.filter(c => {
+                return c.name.toLowerCase().includes(query) || c.id.toLowerCase().includes(query);
+            });
+
+            if (filtered.length === 0) {
+                container.append('<div class="text-center py-4 text-muted fs-7">Pelanggan tidak ditemukan.</div>');
+                return;
+            }
+
+            filtered.forEach(c => {
+                const isSelected = c.id === currentOutletId;
+                const activeStyle = isSelected ? 'background-color: var(--color-bg-light); border-left: 4px solid var(--color-primary);' : '';
+                container.append(`
+                    <div class="p-3 border-bottom cursor-pointer d-flex justify-content-between align-items-center" 
+                         style="${activeStyle}" 
+                         onclick="selectCustomer('${c.id}')">
+                        <div>
+                            <div class="fw-bold fs-7 text-dark">${c.name}</div>
+                            <div class="text-muted fs-8">${c.id} • ${c.address || '-'}</div>
+                        </div>
+                        ${isSelected ? '<i class="fas fa-check text-success fs-7"></i>' : ''}
+                    </div>
+                `);
+            });
+        }
+
+        function selectCustomer(id) {
+            currentOutletId = id;
+            currentOutlet = SfaStore.getCustomerById(currentOutletId);
+            $('#outletTag').html(`${currentOutlet ? currentOutlet.name : id} <i class="fas fa-chevron-down ms-1" style="font-size: 9px;"></i>`);
+            selectCustomerModal.hide();
+            updateCartSummary();
+        }
 
         function switchTab(tab) {
             $('.order-tab').removeClass('active');
@@ -467,9 +555,9 @@
 
         // Render foto produk asli (imageUrl) jika tersedia; fallback ke ikon FontAwesome jika kosong/gagal load
         function productImgHtml(p) {
-            const iconHtml = `<i class="fa-solid ${p.icon || 'fa-box'}"></i>`;
-            if (!p.imageUrl) return iconHtml;
-            return `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.outerHTML='${iconHtml.replace(/'/g, "\\'")}'"/>`;
+            if (!p.imageUrl) return `<i class="fa-solid ${p.icon || 'fa-box'}"></i>`;
+            return `<img src="${p.imageUrl}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'; $(this).next().show();"/>` +
+                   `<i class="fa-solid ${p.icon || 'fa-box'}" style="display:none;"></i>`;
         }
 
         function renderCatalog() {
@@ -884,7 +972,7 @@
                             totalGross: totalGross,
                             discount: discount,
                             totalNet: totalNet,
-                            deliveryDate: $('#deliveryDate').val(),
+                            deliveryDate: $('#deliveryDate').data('iso') || SfaStore.todayStr(),
                             notes: $('#salesNote').val(),
                             status: 'draft'
                         });
@@ -898,7 +986,7 @@
                             timer: 1500,
                             showConfirmButton: false
                         }).then(() => {
-                            window.location.href = `visit_detail.html?id=${currentOutletId}`;
+                            handleRedirect();
                         });
 
                     }, 1200);
@@ -906,8 +994,18 @@
             });
         }
 
+        function handleRedirect() {
+            const params = new URLSearchParams(window.location.search);
+            const backUrl = params.get('backUrl');
+            if (backUrl) {
+                window.location.href = backUrl;
+            } else {
+                window.location.href = `visit_detail.html?id=${currentOutletId}`;
+            }
+        }
+
         function goBack() {
-            window.location.href = `visit_detail.html?id=${currentOutletId}`;
+            handleRedirect();
         }
     </script>
 
@@ -1023,6 +1121,29 @@
                             <div class="col-3"><button class="btn w-100 py-3 border text-white" onclick="saveModalItem()" style="background-color: var(--color-primary); height: 100%;"><i class="fa-solid fa-check fs-5"></i></button></div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Pilih Pelanggan (SimpliDOTS Style) -->
+    <div class="modal fade" id="selectCustomerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px; padding: 16px;">
+            <div class="modal-content border-0" style="border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); max-height: 80vh; display: flex; flex-direction: column;">
+                <!-- Header -->
+                <div class="modal-header border-0 bg-light py-3 px-3 d-flex align-items-center justify-content-between" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                    <h5 class="modal-title fw-bold text-dark fs-6 mb-0">Pilih Pelanggan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeCustModalBtn" aria-label="Close" style="font-size: 12px;"></button>
+                </div>
+                <div class="p-3 bg-white border-bottom">
+                    <!-- Search Box -->
+                    <div style="background:var(--color-gray-light); border-radius:20px; display:flex; align-items:center; padding:0 14px;">
+                        <i class="fas fa-search" style="color:var(--color-gray); margin-right:8px;"></i>
+                        <input type="text" id="custSearchInput" placeholder="Cari nama atau kode pelanggan..." style="border:none; background:transparent; padding:8px 0; width:100%; font-size:13px; outline:none;" oninput="renderCustomerList()"/>
+                    </div>
+                </div>
+                <div class="modal-body p-0 bg-white" style="overflow-y: auto; flex: 1;" id="customerListContainer">
+                    <!-- Will be populated dynamically -->
                 </div>
             </div>
         </div>

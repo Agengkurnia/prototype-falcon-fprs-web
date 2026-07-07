@@ -8,90 +8,80 @@
 
 | Versi | Tanggal | Penulis | Keterangan |
 |-------|---------|---------|------------|
-| 1.0 | Auto | FSD Worker | Job fsd_1783302611088_eeryvu |
+| 1.0 | Auto | FSD Worker | Job fsd_1783303849576_18u3on |
 
 ## 1. Master Data — Produk
 
-# ItemSpec RM v1.2: Modul Master Data — Produk
-
 ## Tujuan Fungsional
-Modul Master Data Produk ini dirancang untuk menyediakan antarmuka terpusat bagi pengelolaan informasi produk. Tujuannya adalah untuk memastikan ketersediaan data produk yang akurat dan terkini, yang menjadi dasar bagi berbagai proses bisnis lainnya seperti penjualan, pembelian, dan inventaris. Modul ini memungkinkan pengguna untuk melihat, menambah, mengubah, dan menghapus data produk secara efisien.
+Modul Master Data Produk ini bertujuan untuk menyediakan antarmuka yang komprehensif bagi pengguna untuk mengelola informasi produk inti perusahaan. Pengguna dapat melihat daftar produk yang ada, menambahkan produk baru, mengedit detail produk yang sudah ada, dan menghapus produk yang tidak lagi relevan. Modul ini dirancang untuk memastikan integritas dan konsistensi data produk melalui mekanisme validasi yang ketat.
 
-Selain fungsi CRUD (Create, Read, Update, Delete) dasar, modul ini juga menyajikan ringkasan statistik penting terkait produk, seperti jumlah total produk, produk aktif dan tidak aktif, jumlah kategori dan brand, serta rata-rata harga jual. Informasi ini membantu dalam pemantauan dan analisis cepat terhadap portofolio produk yang ada.
-
-Dengan adanya modul ini, diharapkan integritas data produk dapat terjaga melalui serangkaian validasi input, serta mempermudah pengguna dalam mengelola katalog produk PT Kalbe Nutritionals.
+Selain fungsi CRUD (Create, Read, Update, Delete) dasar, modul ini juga menyajikan ringkasan statistik produk, seperti jumlah total produk, kategori, brand, status aktif/tidak aktif, dan rata-rata harga jual. Hal ini membantu pengguna mendapatkan gambaran umum yang cepat mengenai inventaris produk. Dengan demikian, modul ini mendukung pengelolaan data master produk yang efisien dan akurat, yang krusial untuk operasional bisnis seperti penjualan, pembelian, dan pelaporan.
 
 ## Alur Pengguna
 
-1.  **Melihat Daftar Produk (Index):**
-    *   Pengguna mengakses `Views/FPRS/MasterData/Produk/index.html`.
-    *   Sistem akan memuat data produk dari `localStorage` (atau dari `produk.json` jika `localStorage` kosong) dan menampilkannya dalam format tabel.
-    *   Tabel menampilkan kolom NO, KODE, PRODUK, KATEGORI, BRAND, UNIT, HARGA JUAL, PAJAK, dan STATUS.
-    *   Di bagian atas tabel, ditampilkan ringkasan statistik produk seperti total produk, jumlah kategori, produk aktif/tidak aktif, rata-rata harga, dan jumlah brand.
-    *   Pengguna dapat menggunakan fitur pencarian global dan filter per kolom untuk menemukan produk tertentu.
-    *   Setiap baris produk memiliki tombol aksi untuk "Detail" (`detail.html?id={id}`), "Edit" (`add.html?id={id}`), dan "Hapus".
+1.  **Halaman Indeks (Views/FPRS/MasterData/Produk/index.html)**
+    *   Pengguna mengakses halaman indeks modul Produk.
+    *   Sistem akan mencoba memuat data produk dari `localStorage` dengan kunci `md_produk`.
+    *   Jika `localStorage` kosong, sistem akan mengambil data awal dari `../../../../wwwroot/data/produk.json` dan menyimpannya ke `localStorage`.
+    *   Data produk ditampilkan dalam tabel (`#tbl`) yang mencakup kolom NO, KODE, PRODUK (nama dan divisi), KATEGORI, BRAND, UNIT, HARGA JUAL, PAJAK, dan STATUS.
+    *   Ringkasan statistik produk (jumlah total, kategori, produk aktif/tidak aktif, rata-rata harga, jumlah brand) ditampilkan di bagian atas halaman.
+    *   Tabel dilengkapi dengan fitur pencarian global dan filter per kolom untuk memudahkan pencarian data.
+    *   Setiap baris produk memiliki tombol aksi untuk:
+        *   **Detail:** Mengarahkan pengguna ke halaman `detail.html?id={productId}` untuk melihat detail produk.
+        *   **Edit:** Mengarahkan pengguna ke halaman `add.html?id={productId}` untuk mengedit data produk.
+        *   **Hapus:** Memunculkan dialog konfirmasi penghapusan produk.
 
-2.  **Menambah Produk Baru (Tambah):**
-    *   Pengguna mengklik tombol "Tambah Produk" (implisit dari `add.html`).
-    *   Pengguna diarahkan ke `Views/FPRS/MasterData/Produk/add.html` untuk mengisi formulir penambahan produk baru.
-    *   Pengguna mengisi data pada kolom Kode Produk, Nama Produk, Kategori Produk, Brand, Divisi, Harga Beli, Harga Jual, Skema Pajak, Unit Konversi, Status Produk, serta opsional Berat, Panjang, Lebar, dan Tinggi.
+2.  **Tambah/Edit Produk (Views/FPRS/MasterData/Produk/add.html)**
+    *   **Tambah Produk:** Pengguna mengklik tombol "Tambah Produk" (implied) atau menavigasi langsung ke `add.html`.
+    *   **Edit Produk:** Pengguna mengklik tombol "Edit" pada baris produk di halaman indeks, yang akan mengarahkan ke `add.html?id={productId}`. Form akan terisi otomatis dengan data produk yang dipilih.
+    *   Pengguna mengisi atau mengubah detail produk pada form yang mencakup: Kode Produk, Nama Produk, Kategori Produk, Brand, Divisi, Harga Beli, Harga Jual, Skema Pajak, Unit Konversi, Status Produk, Berat, Panjang, Lebar, dan Tinggi.
 
-3.  **Validasi Formulir:**
-    *   Saat pengguna mencoba menyimpan formulir, sistem akan melakukan validasi terhadap setiap input.
-    *   Jika ada input yang tidak memenuhi kriteria validasi (misalnya, kolom wajib kosong, format salah, atau nilai tidak valid), sistem akan menampilkan pesan kesalahan di bawah kolom terkait (`showFieldError`) dan menampilkan dialog peringatan "Validasi Gagal" menggunakan `Swal.fire`.
+3.  **Validasi Form**
+    *   Saat pengguna mencoba menyimpan form, sistem akan melakukan validasi terhadap input yang diberikan.
+    *   Jika ada input yang tidak memenuhi kriteria validasi (misalnya, kolom wajib tidak diisi, format salah, atau nilai di luar rentang), sistem akan:
+        *   Menampilkan pesan kesalahan spesifik di bawah kolom yang bermasalah (`showFieldError`).
+        *   Menampilkan dialog peringatan umum (`Swal.fire`) yang menyatakan bahwa validasi gagal dan meminta pengguna untuk memperbaiki kesalahan.
 
-4.  **Menyimpan Produk:**
-    *   Jika semua validasi berhasil, data produk akan disimpan ke `localStorage` dengan kunci `md_produk`.
-    *   Setelah berhasil disimpan, sistem menampilkan dialog sukses "Berhasil!" menggunakan `Swal.fire` dan secara otomatis mengarahkan pengguna kembali ke halaman daftar produk (`index.html`).
+4.  **Simpan Produk**
+    *   Jika semua validasi berhasil, sistem akan menyimpan data produk yang baru atau yang telah diubah ke `localStorage` dengan kunci `md_produk`.
+    *   Setelah berhasil disimpan, sistem akan menampilkan dialog sukses (`Swal.fire`) dan mengarahkan pengguna kembali ke halaman indeks (`index.html`).
 
-5.  **Mengedit Produk (Edit):**
-    *   Dari halaman daftar produk, pengguna mengklik tombol "Edit" (<i class="fa fa-pen"></i>) pada baris produk yang ingin diubah.
-    *   Pengguna diarahkan ke `Views/FPRS/MasterData/Produk/add.html?id={id_produk}` dengan formulir yang sudah terisi data produk yang dipilih.
-    *   Pengguna melakukan perubahan pada kolom yang diinginkan.
-    *   Proses validasi dan penyimpanan akan sama seperti saat menambah produk baru.
-
-6.  **Menghapus Produk (Hapus):**
-    *   Dari halaman daftar produk, pengguna mengklik tombol "Hapus" (<i class="fa fa-trash"></i>) pada baris produk yang ingin dihapus.
-    *   Sistem menampilkan dialog konfirmasi "Hapus Produk {nama_produk}?" menggunakan `Swal.fire`, dengan opsi "Ya, Hapus" atau "Batal".
-    *   Jika pengguna memilih "Ya, Hapus", sistem akan menghapus data produk dari `localStorage`.
-    *   Setelah berhasil dihapus, sistem menampilkan dialog sukses "Dihapus!" menggunakan `Swal.fire` dan memperbarui tampilan daftar produk secara otomatis.
+5.  **Hapus Produk**
+    *   Pengguna mengklik tombol "Hapus" pada baris produk di halaman indeks.
+    *   Sistem akan menampilkan dialog konfirmasi (`Swal.fire`) yang menanyakan apakah pengguna yakin ingin menghapus produk tersebut.
+    *   Jika pengguna mengkonfirmasi, produk akan dihapus dari `localStorage`.
+    *   Sistem akan menampilkan dialog sukses penghapusan (`Swal.fire`) dan kemudian memperbarui tampilan tabel produk di halaman indeks.
 
 ## Business Rules
 
-Berikut adalah daftar aturan bisnis yang diterapkan pada modul Master Data Produk:
-
-- **BR-001: Kode Produk Wajib Diisi.** Kolom Kode Produk (`#kode`) tidak boleh kosong.
-- **BR-002: Panjang Minimal Kode Produk.** Kode Produk (`#kode`) harus memiliki minimal 3 karakter.
-- **BR-003: Format Kode Produk.** Kode Produk (`#kode`) hanya boleh berisi huruf (a-z, A-Z), angka (0-9), tanda hubung (`-`), atau garis bawah (`_`).
-- **BR-004: Keunikan Kode Produk.** Kode Produk (`#kode`) harus unik; tidak boleh ada dua produk dengan kode yang sama.
-- **BR-005: Nama Produk Wajib Diisi.** Kolom Nama Produk (`#nama`) tidak boleh kosong.
-- **BR-006: Panjang Minimal Nama Produk.** Nama Produk (`#nama`) harus memiliki minimal 3 karakter.
-- **BR-007: Kategori Produk Wajib Dipilih.** Kolom Kategori Produk (`#kategori`) harus dipilih dari daftar yang tersedia.
-- **BR-008: Brand Wajib Dipilih.** Kolom Brand (`#brand`) harus dipilih dari daftar yang tersedia.
-- **BR-009: Harga Beli Positif.** Harga Beli (`#hargaBeli`) harus lebih besar dari 0.
-- **BR-010: Harga Jual Positif.** Harga Jual (`#hargaJual`) harus lebih besar dari 0.
-- **BR-011: Harga Jual Lebih Besar atau Sama dengan Harga Beli.** Harga Jual (`#hargaJual`) tidak boleh lebih kecil dari Harga Beli (`#hargaBeli`).
-- **BR-012: Berat Tidak Negatif.** Kolom Berat (`#berat`) tidak boleh memiliki nilai negatif.
-- **BR-013: Penentuan Status Produk.** Status produk ditampilkan sebagai "Active" jika nilai `status` adalah 'active', dan "Inactive" jika nilai `status` bukan 'active'.
-- **BR-014: Perhitungan Statistik Produk Aktif.** Jumlah produk aktif dihitung berdasarkan produk dengan `status` 'active', dan persentasenya dihitung dari total produk.
-- **BR-015: Perhitungan Statistik Produk Tidak Aktif.** Jumlah produk tidak aktif dihitung berdasarkan produk dengan `status` bukan 'active', dan menampilkan pesan "Perlu review" jika ada produk tidak aktif.
-- **BR-016: Perhitungan Harga Rata-rata.** Harga rata-rata dihitung dari total `hargaJual` semua produk dibagi dengan jumlah total produk.
-- **BR-017: Perhitungan Jumlah Kategori dan Brand Unik.** Statistik jumlah kategori dan brand dihitung berdasarkan nilai unik dari kolom `kategori` dan `brand` yang ada pada data produk.
+- **BR-001:** Kode Produk wajib diisi.
+- **BR-002:** Kode Produk minimal harus memiliki 3 karakter.
+- **BR-003:** Kode Produk hanya boleh berisi huruf (a-z, A-Z), angka (0-9), tanda hubung (-), atau garis bawah (\_).
+- **BR-004:** Kode Produk harus unik; tidak boleh ada produk lain yang menggunakan kode yang sama.
+- **BR-005:** Nama Produk wajib diisi.
+- **BR-006:** Nama Produk minimal harus memiliki 3 karakter.
+- **BR-007:** Kategori Produk wajib dipilih.
+- **BR-008:** Brand wajib dipilih.
+- **BR-009:** Harga Beli harus lebih besar dari 0.
+- **BR-010:** Harga Jual harus lebih besar dari 0.
+- **BR-011:** Harga Jual tidak boleh lebih kecil dari Harga Beli.
+- **BR-012:** Berat (kg) tidak boleh bernilai negatif.
 
 ## Integrasi
 
 - **API Endpoint:**
-    *   API yang ditujukan untuk modul ini adalah `/api/v1/Sku`.
-    *   **Catatan:** Pada prototipe ini, data awal dimuat dari `../../../../wwwroot/data/produk.json` jika `localStorage` kosong. Operasi CRUD selanjutnya (simpan, edit, hapus) dilakukan secara lokal menggunakan `localStorage`.
+    *   `GET ../../../../wwwroot/data/produk.json`: Digunakan untuk memuat data awal produk jika `localStorage` dengan kunci `md_produk` kosong.
+    *   `/api/v1/Sku`: Endpoint API yang ditujukan untuk modul ini, namun dalam prototipe yang disediakan, operasi CRUD (Tambah, Edit, Hapus) ditangani secara lokal menggunakan `localStorage`.
 
-- **Storage Key:**
-    *   Data produk disimpan dan diambil dari `localStorage` menggunakan kunci `md_produk`.
+- **Storage:**
+    *   `localStorage` dengan kunci `md_produk`: Digunakan untuk menyimpan dan mengambil data produk secara lokal di sisi klien.
 
 - **Side Effects:**
-    *   **Persistensi Data:** Semua perubahan data (penambahan, pengeditan, penghapusan) disimpan secara persisten di `localStorage` peramban pengguna.
-    *   **Notifikasi Pengguna:** Penggunaan pustaka `SweetAlert2` (`Swal.fire`) untuk menampilkan notifikasi sukses, peringatan validasi, dan konfirmasi penghapusan kepada pengguna.
-    *   **Navigasi Otomatis:** Setelah berhasil menyimpan produk baru atau mengedit produk yang sudah ada, pengguna akan secara otomatis diarahkan kembali ke halaman daftar produk (`index.html`).
-    *   **Tampilan Tabel Dinamis:** Penggunaan pustaka `jQuery DataTables` untuk rendering tabel yang interaktif, termasuk fitur pencarian, paginasi, pengurutan, dan filter kolom.
+    *   **Persistensi Data:** Data produk disimpan dan diperbarui di `localStorage`.
+    *   **Pembaruan UI:** Tabel produk dan statistik ringkasan diperbarui secara dinamis setelah operasi CRUD.
+    *   **Navigasi:** Pengguna diarahkan kembali ke halaman indeks setelah berhasil menyimpan produk.
+    *   **Umpan Balik Pengguna:** Penggunaan `Swal.fire` untuk menampilkan notifikasi sukses, peringatan, atau konfirmasi kepada pengguna.
+    *   **Validasi Form:** Pesan kesalahan spesifik ditampilkan di bawah kolom input yang tidak valid menggunakan `showFieldError`.
 
 ### Kolom DataTable Index
 - NO
@@ -145,4 +135,9 @@ Berikut adalah daftar aturan bisnis yang diterapkan pada modul Master Data Produ
 ![master_produk_validation.png](screenshots/master_produk_validation.png){width=55%}
 
 ![master_produk_delete_confirm.png](screenshots/master_produk_delete_confirm.png){width=55%}
+
+### Diagram ERD
+
+![Diagram 1](screenshots/web_portal_diagram_1.png)
+
 

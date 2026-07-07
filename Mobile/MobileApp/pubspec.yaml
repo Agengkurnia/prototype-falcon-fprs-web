@@ -87,6 +87,31 @@ flutter:
     - assets/www/wwwroot/css/vertical-layout-light/
     - assets/www/wwwroot/css/
     - assets/www/wwwroot/data/
+    - assets/www/wwwroot/document/FSD/FalconMobile/lib/__pycache__/
+    - assets/www/wwwroot/document/FSD/FalconMobile/lib/
+    - assets/www/wwwroot/document/FSD/FalconMobile/output/
+    - assets/www/wwwroot/document/FSD/FalconMobile/screenshots/
+    - assets/www/wwwroot/document/FSD/FalconMobile/scripts/
+    - assets/www/wwwroot/document/FSD/FalconMobile/source/
+    - assets/www/wwwroot/document/FSD/FalconMobile/templates/
+    - assets/www/wwwroot/document/FSD/FalconMobile/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/archive/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/lib/__pycache__/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/lib/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/output/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/screenshots/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/scripts/__pycache__/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/scripts/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/source/_fragments/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/source/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/templates/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_cache/ai/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_cache/diagrams/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_cache/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_jobs/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_job_ai/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/
+    - assets/www/wwwroot/document/FSD/
     - assets/www/wwwroot/fonts/KalbeGeometric/
     - assets/www/wwwroot/fonts/Karla/
     - assets/www/wwwroot/fonts/Roboto/

@@ -1,0 +1,25 @@
+{
+  "jobId": "capture_all",
+  "mode": "full",
+  "moduleIds": [
+    "dashboard",
+    "master-produk", "master-unit", "master-divisi", "master-daftar-harga",
+    "master-kategori-produk", "master-brand", "master-pelanggan", "master-grup-pelanggan",
+    "master-pegawai", "master-akun", "master-posisi", "master-konfigurasi-akses",
+    "master-metode-pembayaran", "master-waktu-pembayaran", "master-pajak", "master-alasan",
+    "master-supplier",
+    "penjualan-faktur", "penjualan-stok-motoris", "canvassing",
+    "kunjungan-informasi", "kunjungan-geografis", "kunjungan-rute"
+  ],
+  "captureModuleIds": [
+    "dashboard",
+    "master-produk", "master-unit", "master-divisi", "master-daftar-harga",
+    "master-kategori-produk", "master-brand", "master-pelanggan", "master-grup-pelanggan",
+    "master-pegawai", "master-akun", "master-posisi", "master-konfigurasi-akses",
+    "master-metode-pembayaran", "master-waktu-pembayaran", "master-pajak", "master-alasan",
+    "master-supplier",
+    "penjualan-faktur", "penjualan-stok-motoris", "canvassing",
+    "kunjungan-informasi", "kunjungan-geografis", "kunjungan-rute"
+  ],
+  "screenshotDir": "D:/Work/Source/Comsup/falcon/Prototype/wwwroot/document/FSD/FalconWebPortal/screenshots"
+}

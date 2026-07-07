@@ -157,6 +157,15 @@
         }
     ];
 
+    const SEED_STOCKISTS = [
+        { id: 'STK-001', name: 'Grosir Sinar Jaya',    address: 'Jl. Pasar Baru No.12, Jakarta Pusat',      kota: 'Jakarta Pusat',  tipe: 'Grosir',        lat: -6.1625, lng: 106.8342 },
+        { id: 'STK-002', name: 'PT Sumber Makmur',     address: 'Jl. Mangga Dua Raya, Jakarta Utara',       kota: 'Jakarta Utara',  tipe: 'Distributor',   lat: -6.1350, lng: 106.8230 },
+        { id: 'STK-003', name: 'CV Berkah Jaya',       address: 'Jl. Rawa Belong, Jakarta Barat',           kota: 'Jakarta Barat',  tipe: 'Grosir',        lat: -6.1980, lng: 106.7720 },
+        { id: 'STK-004', name: 'PT Indo Distribusi',   address: 'Jl. Cakung Cilincing, Jakarta Timur',      kota: 'Jakarta Timur',  tipe: 'Distributor',   lat: -6.1520, lng: 106.9450 },
+        { id: 'STK-005', name: 'PT Kalbe Farma Dist.', address: 'Jl. Letjen S. Parman, Jakarta Barat',      kota: 'Jakarta Barat',  tipe: 'Principal',     lat: -6.1890, lng: 106.7980 },
+        { id: 'STK-006', name: 'CV Karya Mandiri',     address: 'Jl. Condet Raya, Jakarta Timur',           kota: 'Jakarta Timur',  tipe: 'Grosir',        lat: -6.2780, lng: 106.8520 }
+    ];
+
     const SEED_COLLECTIONS = [
         // AR outstanding untuk beberapa outlet
         { id: 'AR-2026-0011', customerId: 'OL-10511', invoiceNo: 'FKT-2026-0045', date: '2026-05-12', amount: 1850000, balance: 1850000, status: 'outstanding', dueDate: '2026-06-11' },
@@ -182,7 +191,10 @@
         CUSTOMERS:   'sfa_customers',
         PRODUCTS:    'sfa_products',
         SYNC_QUEUE:  'sfa_sync_queue',
-        SEEDED:      'sfa_seeded_v8_today'
+        SYNC_QUEUE_CLEARED: 'sfa_sync_queue_cleared',
+        DOWNLOAD_STATUS: 'sfa_download_status',
+        SEEDED:      'sfa_seeded_v9_today',
+        ACTIVE_STOCKIST: 'sfa_active_stockist'
     };
 
     // =========================================================
@@ -201,6 +213,88 @@
         return new Date().toISOString().slice(0, 10);
     }
 
+    function getActiveSalesPeriod(date) {
+        const d = date ? new Date(date) : new Date();
+        const year = d.getFullYear();
+        const month = d.getMonth();
+        const start = new Date(year, month, 1);
+        const end = new Date(year, month + 1, 0);
+        const fmt = (dt) => dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        return {
+            label: fmt(start) + ' — ' + fmt(end),
+            startDate: start.toISOString().slice(0, 10),
+            endDate: end.toISOString().slice(0, 10),
+            monthName: start.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+        };
+    }
+
+    function getStockists() {
+        try {
+            const raw = localStorage.getItem('md_stokis');
+            if (raw) {
+                const list = JSON.parse(raw);
+                return list
+                    .filter(s => (s.status || 'Active') === 'Active')
+                    .map(s => ({
+                        id: s.kode || String(s.id),
+                        name: s.nama,
+                        address: s.alamat || '',
+                        kota: s.kota || '',
+                        telepon: s.telepon || '',
+                        tipe: s.tipe || 'Grosir',
+                        lat: s.lat,
+                        lng: s.lng
+                    }));
+            }
+        } catch (e) { /* fallback seed */ }
+        return SEED_STOCKISTS;
+    }
+    function getStockistById(id) {
+        return getStockists().find(s => s.id === id) || SEED_STOCKISTS.find(s => s.id === id) || null;
+    }
+
+    function getActiveStockist() {
+        const id = localStorage.getItem(KEYS.ACTIVE_STOCKIST);
+        return id ? getStockistById(id) : null;
+    }
+    function setActiveStockist(id) {
+        if (id) localStorage.setItem(KEYS.ACTIVE_STOCKIST, id);
+        else localStorage.removeItem(KEYS.ACTIVE_STOCKIST);
+    }
+
+    function haversineMeters(lat1, lng1, lat2, lng2) {
+        const R = 6371000;
+        const toRad = d => d * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLng = toRad(lng2 - lng1);
+        const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function formatDistanceMeters(m) {
+        if (m == null || !isFinite(m)) return '—';
+        if (m < 1000) return Math.round(m) + ' m';
+        return (m / 1000).toFixed(1) + ' km';
+    }
+
+    function getNearestStockists(lat, lng, limit = 5) {
+        return getStockists()
+            .map(s => {
+                if (s.lat == null || s.lng == null) {
+                    return { ...s, distanceM: null, distanceLabel: '—' };
+                }
+                const distanceM = haversineMeters(lat, lng, s.lat, s.lng);
+                return { ...s, distanceM, distanceLabel: formatDistanceMeters(distanceM) };
+            })
+            .sort((a, b) => {
+                if (a.distanceM == null) return 1;
+                if (b.distanceM == null) return -1;
+                return a.distanceM - b.distanceM;
+            })
+            .slice(0, limit);
+    }
+
     // =========================================================
     // SEED: Run once per session install
     // =========================================================
@@ -214,15 +308,177 @@
         write(KEYS.COLLECTIONS, SEED_COLLECTIONS);
         write(KEYS.VISITS,      buildSeedVisits());
         write(KEYS.INVOICES,    buildSeedInvoices());
-        write(KEYS.SYNC_QUEUE,  []);
+        if (!Array.isArray(read(KEYS.SYNC_QUEUE)) || read(KEYS.SYNC_QUEUE).length === 0) {
+            write(KEYS.SYNC_QUEUE, buildSeedSyncQueue());
+            localStorage.removeItem(KEYS.SYNC_QUEUE_CLEARED);
+        }
+        write(KEYS.DOWNLOAD_STATUS, buildDefaultDownloadStatus());
         write(KEYS.SEEDED,      todayString);
-        console.log('[SfaStore] Seed data v8 (1 Year with Today) loaded/refreshed for ' + todayString);
+        console.log('[SfaStore] Seed data v9 (Today route demo) loaded/refreshed for ' + todayString);
     }
 
-    // Generate 3 months of realistic historical invoice + visit data
+    const TODAY_ROUTE_IDS = ['OL-10492', 'OL-10511', 'OL-10283', 'OL-10772', 'OL-10819'];
+
+    const ROUTE_PLAN_WEEKDAY = {
+        1: ['OL-10492', 'OL-10511', 'OL-10283'],
+        2: ['OL-10772', 'OL-10819', 'OL-10902'],
+        3: ['OL-10283', 'OL-11002', 'OL-11145'],
+        4: ['OL-10492', 'OL-10819', 'OL-11239'],
+        5: ['OL-10511', 'OL-10772', 'OL-11340'],
+        6: ['OL-11673', 'OL-11784']
+    };
+
+    function getTodayRouteIds() {
+        return TODAY_ROUTE_IDS.slice();
+    }
+
+    function getPlannedRouteIdsForDate(dateStr) {
+        if (dateStr === todayStr()) return getTodayRouteIds();
+        const d = new Date(dateStr + 'T12:00:00');
+        const dow = d.getDay();
+        if (dow === 0) return [];
+        return (ROUTE_PLAN_WEEKDAY[dow] || []).slice();
+    }
+
+    function wasVisitedOnDate(customerId, dateStr) {
+        return getVisits().some(v =>
+            v.customerId === customerId &&
+            v.date === dateStr &&
+            (v.status === 'checked_out' || v.status === 'checked_in')
+        );
+    }
+
+    function getOverdueRouteCustomers() {
+        const today = new Date();
+        const bestByCustomer = {};
+
+        for (let day = 1; day < today.getDate(); day++) {
+            const dt = new Date(today.getFullYear(), today.getMonth(), day);
+            if (dt.getDay() === 0) continue;
+            const dateStr = dt.toISOString().slice(0, 10);
+            getPlannedRouteIdsForDate(dateStr).forEach(customerId => {
+                if (wasVisitedOnDate(customerId, dateStr)) return;
+                const daysOverdue = today.getDate() - day;
+                const prev = bestByCustomer[customerId];
+                if (!prev || daysOverdue > prev.daysOverdue) {
+                    bestByCustomer[customerId] = { customerId, scheduledDate: dateStr, daysOverdue };
+                }
+            });
+        }
+
+        return Object.values(bestByCustomer).sort((a, b) => b.daysOverdue - a.daysOverdue);
+    }
+
+    function isModernTradeUser() {
+        const role = String(getUser()?.role || 'canvasser').toLowerCase().replace(/[\s-]+/g, '_');
+        return role === 'md' || role === 'modern_trade' || role === 'moderntrade';
+    }
+
+    function buildSeedSyncQueue() {
+        const now = Date.now();
+        return [
+            {
+                id: 'SQ-DEMO-1', type: 'Visit',
+                payload: { customerId: 'OL-10772', customerName: 'Klinik Bunda Mulia' },
+                status: 'pending',
+                createdAt: new Date(now - 7200000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-2', type: 'Invoice',
+                payload: { invoiceNo: 'FKT-2026-0188', customerId: 'OL-10819', amount: 2100000 },
+                status: 'pending',
+                createdAt: new Date(now - 5400000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-3', type: 'Collection',
+                payload: { customerId: 'OL-10511', amount: 750000 },
+                status: 'success',
+                createdAt: new Date(now - 86400000).toISOString(),
+                updatedAt: new Date(now - 86000000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-ERR', type: 'Invoice',
+                payload: { invoiceNo: 'FKT-2026-0099', customerId: 'OL-10511', amount: 1850000 },
+                status: 'failed',
+                createdAt: new Date(now - 10800000).toISOString(),
+                updatedAt: new Date(now - 3600000).toISOString(),
+                errorMessage: 'Timeout — server tidak merespons',
+                retryCount: 2
+            }
+        ];
+    }
+
+    function ensureDemoSyncQueue() {
+        if (read(KEYS.SYNC_QUEUE_CLEARED)) {
+            const q = read(KEYS.SYNC_QUEUE);
+            return Array.isArray(q) ? q : [];
+        }
+        let q = read(KEYS.SYNC_QUEUE);
+        if (!Array.isArray(q)) q = [];
+        if (!q.some(i => i.status === 'failed')) {
+            const demoErr = q.find(i => i.id === 'SQ-DEMO-ERR');
+            if (demoErr) {
+                demoErr.status = 'failed';
+                demoErr.updatedAt = new Date().toISOString();
+                demoErr.errorMessage = demoErr.errorMessage || 'Koneksi timeout — gagal unggah ke server';
+            } else {
+                q.push({
+                    id: 'SQ-DEMO-ERR',
+                    type: 'Invoice',
+                    payload: { invoiceNo: 'FKT-2026-0099', customerId: 'OL-10511', amount: 1850000 },
+                    status: 'failed',
+                    createdAt: new Date(Date.now() - 3600000).toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    errorMessage: 'Koneksi timeout — gagal unggah ke server',
+                    retryCount: 1
+                });
+            }
+            write(KEYS.SYNC_QUEUE, q);
+        }
+        return read(KEYS.SYNC_QUEUE) || [];
+    }
+
+    function shouldDemoFailUpload(item) {
+        if (!item) return false;
+        if (item.id === 'SQ-DEMO-ERR') return true;
+        const inv = item.payload && item.payload.invoiceNo;
+        return inv === 'FKT-2026-0099' || inv === 'FKT-DEMO-ERR';
+    }
+
+    function uploadQueueItemById(id) {
+        return new Promise(resolve => {
+            const all = getSyncQueue();
+            const idx = all.findIndex(item => item.id === id);
+            if (idx < 0) { resolve(null); return; }
+
+            all[idx].status = 'uploading';
+            all[idx].updatedAt = new Date().toISOString();
+            write(KEYS.SYNC_QUEUE, all);
+
+            setTimeout(() => {
+                const fresh = getSyncQueue();
+                const fi = fresh.findIndex(item => item.id === id);
+                if (fi < 0) { resolve(null); return; }
+
+                if (shouldDemoFailUpload(fresh[fi])) {
+                    fresh[fi].status = 'failed';
+                    fresh[fi].errorMessage = 'Koneksi timeout — gagal unggah ke server';
+                } else {
+                    fresh[fi].status = 'success';
+                    fresh[fi].errorMessage = null;
+                }
+                fresh[fi].updatedAt = new Date().toISOString();
+                write(KEYS.SYNC_QUEUE, fresh);
+                resolve(fresh[fi]);
+            }, 600);
+        });
+    }
+
+    // Generate realistic historical invoice + visit data
     function buildSeedVisits() {
         const visits = [];
         const today = new Date();
+        const todayString = today.toISOString().slice(0, 10);
         const customerIds = SEED_CUSTOMERS.map(c => c.id);
         // ~5 visits per working day over 365 days
         for (let d = 365; d >= 0; d--) {
@@ -231,6 +487,32 @@
             const dow = date.getDay();
             if (dow === 0) continue; // skip Sunday
             const dateStr = date.toISOString().slice(0, 10);
+
+            if (dateStr === todayString) {
+                TODAY_ROUTE_IDS.slice(0, 2).forEach((cid, i) => {
+                    const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                    const orderAmount = Math.round((Math.random() * 1500000 + 500000) / 1000) * 1000;
+                    visits.push({
+                        id: 'VST-TODAY-' + i,
+                        customerId: cid,
+                        customerName: cust ? cust.name : cid,
+                        date: dateStr,
+                        createdAt: dateStr + 'T08:00:00.000Z',
+                        status: 'checked_out',
+                        hasOrder: true,
+                        hasCollection: false,
+                        hasNoOrderReason: false,
+                        orderAmount: orderAmount,
+                        collectionAmount: 0,
+                        stockistId: SEED_STOCKISTS[i % SEED_STOCKISTS.length].id,
+                        stockCheckDone: true,
+                        checkInTime: '08:' + String(30 + i * 15).padStart(2, '0') + ' WIB',
+                        checkOutTime: '09:' + String(15 + i * 10).padStart(2, '0') + ' WIB'
+                    });
+                });
+                continue;
+            }
+
             const count = dow === 6 ? 3 : 5;
             for (let i = 0; i < count; i++) {
                 const cid = customerIds[(d * 7 + i) % customerIds.length];
@@ -334,6 +616,19 @@
     // =========================================================
     // PRODUCTS
     // =========================================================
+    function deriveBrand(name) {
+        if (!name) return 'Lainnya';
+        const n = name.toLowerCase();
+        if (n.startsWith('morinaga')) return 'Morinaga';
+        if (n.startsWith('zee')) return 'Zee';
+        if (n.startsWith('milna')) return 'Milna';
+        if (n.startsWith('prenagen')) return 'Prenagen';
+        if (n.startsWith('entrasol')) return 'Entrasol';
+        if (n.startsWith('nutrive')) return 'Nutrive Benecol';
+        if (n.startsWith('fitbar')) return 'Fitbar';
+        return 'Lainnya';
+    }
+
     function getProducts() {
         const list = read(KEYS.PRODUCTS) || [];
         return list.map(p => {
@@ -371,6 +666,7 @@
 
             return {
                 ...p,
+                brand: p.brand || deriveBrand(p.name),
                 boxPerCtn,
                 pcsPerBox,
                 pcsPerCtn: finalPcsPerCtn,
@@ -378,8 +674,8 @@
                 priceBox,
                 pricePcs,
                 stockKarton: p.stock || 0,
-                stockBox: 0,
-                stockPcs: 0
+                stockBox: p.stockBox || 0,
+                stockPcs: p.stockPcs || 0
             };
         });
     }
@@ -388,12 +684,19 @@
         const cats = [...new Set(getProducts().map(p => p.category))];
         return cats;
     }
+    function getProductBrands() {
+        const brands = [...new Set(getProducts().map(p => p.brand))];
+        return brands.sort((a, b) => a.localeCompare(b, 'id'));
+    }
 
-    function updateProductStock(code, stockKarton) {
+    function updateProductStock(code, stockKarton, stockPcs) {
         const list = read(KEYS.PRODUCTS) || [];
         const idx = list.findIndex(p => p.code === code);
         if (idx >= 0) {
             list[idx].stock = stockKarton;
+            if (stockPcs !== undefined) {
+                list[idx].stockPcs = stockPcs;
+            }
             write(KEYS.PRODUCTS, list);
         }
     }
@@ -411,17 +714,29 @@
         return getVisits().find(v => v.customerId === customerId && v.status === 'checked_in') || null;
     }
 
+    function getActiveVisit() {
+        return getVisits().find(v => v.date === todayStr() && v.status === 'checked_in') || null;
+    }
+
     function saveVisit(obj) {
+        const existing = getActiveVisit();
+        if (existing && existing.customerId !== obj.customerId) {
+            return { error: 'ACTIVE_VISIT_EXISTS', visit: existing };
+        }
+        const stockist = getActiveStockist();
         const list = getVisits();
         const id = genId('VST');
         const entry = {
             id, date: todayStr(), createdAt: new Date().toISOString(),
             status: 'checked_in', hasOrder: false, hasCollection: false,
-            hasNoOrderReason: false, orderAmount: 0, collectionAmount: 0, ...obj
+            hasNoOrderReason: false, orderAmount: 0, collectionAmount: 0,
+            stockistId: obj.stockistId || (stockist ? stockist.id : null),
+            stockCheckDone: false,
+            ...obj
         };
         list.push(entry);
         write(KEYS.VISITS, list);
-        return id;
+        return { id };
     }
 
     function updateVisit(id, patch) {
@@ -526,32 +841,169 @@
     // =========================================================
     // SYNC QUEUE (SyncViewModel)
     // =========================================================
-    function getSyncQueue() { return read(KEYS.SYNC_QUEUE) || []; }
+    function getSyncQueue() {
+        ensureDemoSyncQueue();
+        return read(KEYS.SYNC_QUEUE) || [];
+    }
 
     function addToSyncQueue(type, payload) {
+        localStorage.removeItem(KEYS.SYNC_QUEUE_CLEARED);
         const q = getSyncQueue();
         q.push({ id: genId('SQ'), type, payload, status: 'pending', createdAt: new Date().toISOString() });
         write(KEYS.SYNC_QUEUE, q);
     }
 
-    function clearSyncQueue() { write(KEYS.SYNC_QUEUE, []); }
+    function clearSyncQueue() { return clearAllSyncQueue(); }
+
+    function clearAllSyncQueue() {
+        const raw = read(KEYS.SYNC_QUEUE);
+        const count = Array.isArray(raw) ? raw.length : 0;
+        write(KEYS.SYNC_QUEUE, []);
+        write(KEYS.SYNC_QUEUE_CLEARED, true);
+        return count;
+    }
+
+    // =========================================================
+    // DOWNLOAD FROM SERVER (master data ke perangkat)
+    // =========================================================
+    function buildDefaultDownloadStatus() {
+        const now = Date.now();
+        return {
+            lastDownload: null,
+            packages: [
+                { id: 'master', label: 'Data Master Produk', status: 'success', updatedAt: new Date(now - 86400000).toISOString() },
+                { id: 'customer', label: 'Data Pelanggan', status: 'success', updatedAt: new Date(now - 86400000).toISOString() },
+                { id: 'stokis', label: 'Data Stokis & Rute', status: 'pending', updatedAt: null },
+                { id: 'price', label: 'Harga & Promo', status: 'failed', errorMessage: 'Gagal mengunduh paket harga dari server', updatedAt: new Date(now - 1800000).toISOString() }
+            ]
+        };
+    }
+
+    function ensureDemoDownloadStatus() {
+        let data = read(KEYS.DOWNLOAD_STATUS);
+        if (!data || !Array.isArray(data.packages)) {
+            write(KEYS.DOWNLOAD_STATUS, buildDefaultDownloadStatus());
+            return read(KEYS.DOWNLOAD_STATUS);
+        }
+        if (!data.packages.some(p => p.status === 'failed')) {
+            const price = data.packages.find(p => p.id === 'price');
+            if (price) {
+                price.status = 'failed';
+                price.errorMessage = price.errorMessage || 'Gagal mengunduh paket harga dari server';
+                price.updatedAt = new Date().toISOString();
+            } else {
+                data.packages.push({
+                    id: 'price', label: 'Harga & Promo', status: 'failed',
+                    errorMessage: 'Gagal mengunduh paket harga dari server',
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            write(KEYS.DOWNLOAD_STATUS, data);
+        }
+        return data;
+    }
+
+    function getDownloadStatus() {
+        ensureDemoDownloadStatus();
+        return read(KEYS.DOWNLOAD_STATUS);
+    }
+
+    function setLastDownload(ts) {
+        const data = getDownloadStatus();
+        data.lastDownload = ts;
+        write(KEYS.DOWNLOAD_STATUS, data);
+    }
+
+    function runDownloadFromServer(onProgress) {
+        return new Promise(resolve => {
+            const data = getDownloadStatus();
+            const targets = data.packages.filter(p => p.status !== 'success' || p.id === 'price');
+            let i = 0;
+
+            function finish() {
+                ensureDemoDownloadStatus();
+                resolve(getDownloadStatus());
+            }
+
+            function step() {
+                if (i >= targets.length) {
+                    finish();
+                    return;
+                }
+                const pkg = targets[i];
+                pkg.status = 'downloading';
+                write(KEYS.DOWNLOAD_STATUS, data);
+                if (typeof onProgress === 'function') onProgress(pkg, i + 1, targets.length);
+
+                setTimeout(() => {
+                    if (pkg.id === 'price') {
+                        pkg.status = 'failed';
+                        pkg.errorMessage = 'Gagal mengunduh paket harga dari server';
+                    } else {
+                        pkg.status = 'success';
+                        pkg.errorMessage = null;
+                    }
+                    pkg.updatedAt = new Date().toISOString();
+                    write(KEYS.DOWNLOAD_STATUS, data);
+                    i++;
+                    step();
+                }, 450);
+            }
+
+            if (targets.length === 0) {
+                finish();
+            } else {
+                step();
+            }
+        });
+    }
 
     function processQueue(onProgress) {
         return new Promise(resolve => {
-            const q = getSyncQueue();
+            const pendingIds = getSyncQueue()
+                .filter(item => item.status === 'pending' || item.status === 'failed')
+                .map(item => item.id);
+            if (pendingIds.length === 0) { resolve({ success: 0, failed: 0 }); return; }
+
             let i = 0;
+            let successCount = 0;
+            let failedCount = 0;
+
             function step() {
-                if (i >= q.length) { clearSyncQueue(); resolve({ success: i, failed: 0 }); return; }
-                q[i].status = 'uploading';
-                write(KEYS.SYNC_QUEUE, q);
-                if (typeof onProgress === 'function') onProgress(i + 1, q.length, q[i]);
+                if (i >= pendingIds.length) {
+                    resolve({ success: successCount, failed: failedCount });
+                    return;
+                }
+                const id = pendingIds[i];
+                const all = getSyncQueue();
+                const idx = all.findIndex(item => item.id === id);
+                if (idx < 0) { i++; step(); return; }
+
+                all[idx].status = 'uploading';
+                all[idx].updatedAt = new Date().toISOString();
+                write(KEYS.SYNC_QUEUE, all);
+                if (typeof onProgress === 'function') onProgress(all[idx], i + 1, pendingIds.length);
+
                 setTimeout(() => {
-                    q[i].status = 'done';
-                    write(KEYS.SYNC_QUEUE, q);
-                    i++; step();
+                    const fresh = getSyncQueue();
+                    const fi = fresh.findIndex(item => item.id === id);
+                    if (fi >= 0) {
+                        if (shouldDemoFailUpload(fresh[fi])) {
+                            fresh[fi].status = 'failed';
+                            fresh[fi].errorMessage = 'Koneksi timeout — gagal unggah ke server';
+                            failedCount++;
+                        } else {
+                            fresh[fi].status = 'success';
+                            fresh[fi].errorMessage = null;
+                            successCount++;
+                        }
+                        fresh[fi].updatedAt = new Date().toISOString();
+                        write(KEYS.SYNC_QUEUE, fresh);
+                    }
+                    i++;
+                    step();
                 }, 350);
             }
-            if (q.length === 0) { resolve({ success: 0, failed: 0 }); return; }
             step();
         });
     }
@@ -716,12 +1168,30 @@
     function retryQueueItem(id) {
         const q = getSyncQueue();
         const idx = q.findIndex(item => item.id === id);
-        if (idx >= 0) { q[idx].status = 'pending'; q[idx].updatedAt = new Date().toISOString(); write(KEYS.SYNC_QUEUE, q); }
+        if (idx < 0) return Promise.resolve(null);
+
+        q[idx].retryCount = (q[idx].retryCount || 0) + 1;
+        q[idx].status = 'pending';
+        q[idx].updatedAt = new Date().toISOString();
+        write(KEYS.SYNC_QUEUE, q);
+        return uploadQueueItemById(id);
+    }
+
+    function isQueueItemDone(item) {
+        const s = String(item && item.status || '').toLowerCase();
+        return s === 'success' || s === 'done' || s === 'selesai';
     }
 
     function clearSuccessfulQueue() {
-        const q = getSyncQueue().filter(item => item.status !== 'done' && item.status !== 'success');
-        write(KEYS.SYNC_QUEUE, q);
+        const raw = read(KEYS.SYNC_QUEUE);
+        if (!Array.isArray(raw)) {
+            write(KEYS.SYNC_QUEUE, []);
+            return 0;
+        }
+        const next = raw.filter(item => !isQueueItemDone(item));
+        const removed = raw.length - next.length;
+        write(KEYS.SYNC_QUEUE, next);
+        return removed;
     }
 
     // =========================================================
@@ -765,10 +1235,15 @@
         // Customers
         getCustomers, getCustomerById, saveCustomer, updateCustomerGps,
         // Products
-        getProducts, getProductById, getProductCategories, updateProductStock,
+        getProducts, getProductById, getProductCategories, getProductBrands, updateProductStock,
         // Visits
-        getVisits, getTodayVisitByCustomerId, getActiveVisitByCustomerId,
+        getVisits, getTodayVisitByCustomerId, getActiveVisitByCustomerId, getActiveVisit,
         saveVisit, updateVisit, completeVisit,
+        getTodayRouteIds, getOverdueRouteCustomers, isModernTradeUser,
+        // Stockists & Sales Period
+        getStockists, getStockistById, getActiveStockist, setActiveStockist,
+        getNearestStockists, formatDistanceMeters, haversineMeters,
+        getActiveSalesPeriod,
         // Invoices
         getInvoices, getInvoicesByCustomerId, getTodayInvoices,
         saveInvoice, completeInvoice,
@@ -776,8 +1251,9 @@
         getCollections, getCollectionsByCustomerId,
         getOutstandingByCustomerId, saveCollection, completeCollection,
         // Sync Queue
-        getSyncQueue, addToSyncQueue, clearSyncQueue, processQueue,
-        retryQueueItem, clearSuccessfulQueue,
+        getSyncQueue, addToSyncQueue, clearSyncQueue, clearAllSyncQueue, processQueue, ensureDemoSyncQueue,
+        getDownloadStatus, runDownloadFromServer, setLastDownload, ensureDemoDownloadStatus,
+        isQueueItemDone, retryQueueItem, clearSuccessfulQueue,
         // KPI & Dashboard
         getTodayKpi, getKpiByDate, getKpiByMonth, getKpiByWeek,
         getDailyChartData, getMonthlyChartData,

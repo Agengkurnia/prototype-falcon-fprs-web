@@ -148,7 +148,7 @@
             map[c.customerId].invoices.push(c);
             map[c.customerId].totalOutstanding += (c.balance || 0);
             map[c.customerId].totalPaid += (c.paidAmount || 0);
-            map[c.customerId].totalAmount += (c.totalAmount || 0);
+            map[c.customerId].totalAmount += (c.totalAmount || c.amount || 0);
         });
 
         customerGroups = Object.values(map).filter(g => g.totalAmount > 0);
@@ -201,7 +201,7 @@
             const invoiceCount = g.invoices.length;
 
             container.append(`
-                <a href="collection_input.html?customerId=${g.customerId}" class="customer-card">
+                <a href="javascript:void(0)" onclick="goToCollectionInput('${g.customerId}')" class="customer-card">
                     <div class="customer-card-header">
                         <div>
                             <div class="customer-name">${g.customerName}</div>
@@ -222,6 +222,11 @@
                 </a>
             `);
         });
+    }
+
+    function goToCollectionInput(customerId) {
+        const currentUrl = window.location.pathname + window.location.search;
+        window.location.href = `collection_input.html?customerId=${customerId}&backUrl=${encodeURIComponent(currentUrl)}`;
     }
 </script>
 </body>

@@ -354,7 +354,7 @@
                 <div class="mobile-card">
                     <div class="mb-3">
                         <label class="form-label fw-bold fs-7 text-muted">Tanggal Pengiriman</label>
-                        <input type="date" class="form-control fs-7" id="deliveryDate" required/>
+                        <input type="text" class="form-control fs-7" id="deliveryDate" readonly style="background:#f7f9fa;"/>
                     </div>
                     <div class="mb-1">
                         <label class="form-label fw-bold fs-7 text-muted">Catatan Salesman</label>
@@ -446,10 +446,10 @@
                 }
             });
 
-            // Set default delivery date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            $('#deliveryDate').val(tomorrow.toISOString().split('T')[0]);
+            // Tanggal pengiriman = hari ini (fixed, tidak bisa diubah)
+            const today = SfaStore.todayStr();
+            const todayLabel = new Date(today + 'T12:00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            $('#deliveryDate').val(todayLabel).data('iso', today);
 
             renderCatalog();
             updateCartSummary();
@@ -972,7 +972,7 @@
                             totalGross: totalGross,
                             discount: discount,
                             totalNet: totalNet,
-                            deliveryDate: $('#deliveryDate').val(),
+                            deliveryDate: $('#deliveryDate').data('iso') || SfaStore.todayStr(),
                             notes: $('#salesNote').val(),
                             status: 'draft'
                         });

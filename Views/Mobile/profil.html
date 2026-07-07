@@ -120,12 +120,12 @@
                 </div>
             </div>
 
-            <!-- Info Kanvas -->
+            <!-- Info Penjualan -->
             <div class="info-card">
-                <div class="info-card-header">Periode Kanvas</div>
+                <div class="info-card-header">Periode Penjualan</div>
                 <div class="info-item">
                     <span class="lbl">Periode Aktif</span>
-                    <span class="val">13 Jan 2026 – 01 Jan 2027</span>
+                    <span class="val" id="infoSalesPeriod">-</span>
                 </div>
                 <div class="info-item">
                     <span class="lbl">Area</span>
@@ -243,6 +243,7 @@
         $('#infoRole').text(user.role || 'Canvasser');
         $('#infoBranch').text(user.branch || 'Jakarta');
         $('#infoLoginTime').text(user.loginTime ? SfaStore.formatDate(user.loginTime) : '-');
+        $('#infoSalesPeriod').text(SfaStore.getActiveSalesPeriod().label);
 
         // KPI
         $('#infoTargetVisit').text((kpi.pelanggan || 0) + ' outlet');

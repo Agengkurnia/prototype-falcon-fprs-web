@@ -1,0 +1,224 @@
+"""Shared build helpers for FSD Generator Engine modules."""
+import base64
+import os
+import re
+import subprocess
+import urllib.request
+import zlib
+
+from docx import Document
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Pt, Cm
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+from fsd_cover_merge import content_start_index, COVER_TABLE_COUNT
+from fsd_captions import caption_number_from_text
+from fsd_paths import REFERENCE_DOCX
+
+HEADER_BG = 'D9EAD3'
+BORDER_COLOR = '000000'
+FONT_NAME = 'Calibri'
+FONT_SIZE_BODY = 11
+FONT_SIZE_TABLE = 9
+
+
+def render_kroki(mermaid_code: str, output_path: str, label: str) -> bool:
+    return _render_kroki(mermaid_code, output_path, label, 'mermaid')
+
+
+def render_kroki_plantuml(plantuml_code: str, output_path: str, label: str) -> bool:
+    return _render_kroki(plantuml_code, output_path, label, 'plantuml')
+
+
+def _render_kroki(code: str, output_path: str, label: str, engine: str) -> bool:
+    try:
+        compressed = zlib.compress(code.strip().encode('utf-8'), 9)
+        b64 = base64.urlsafe_b64encode(compressed).decode('ascii')
+        url = f'https://kroki.io/{engine}/png/{b64}'
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = resp.read()
+        os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+        with open(output_path, 'wb') as f:
+            f.write(data)
+        print(f'   [{label}] OK {len(data):,} bytes -> {os.path.basename(output_path)}')
+        return True
+    except Exception as e:
+        print(f'   [{label}] FAIL: {e}')
+        return False
+
+
+def is_swimlane_mermaid(code: str) -> bool:
+    """True if Mermaid code uses 2+ subgraph lanes (cross-functional swimlane)."""
+    return len(re.findall(r'^\s*subgraph\s+', code, flags=re.MULTILINE)) >= 2
+
+
+def is_swimlane_plantuml(code: str) -> bool:
+    """True if PlantUML activity diagram uses swimlane separators (|Role|)."""
+    return len(re.findall(r'^\s*\|[^|]+\|\s*$', code, flags=re.MULTILINE)) >= 2
+
+
+PLANTUML_SWIMLANE_SKINPARAM = """
+skinparam SwimlaneBorderColor #000000
+skinparam SwimlaneBorderThickness 3
+skinparam SwimlaneTitleBackgroundColor #D9EAD3
+skinparam SwimlaneTitleFontStyle bold
+skinparam ActivityBackgroundColor #FFFFFF
+skinparam ActivityBorderColor #000000
+skinparam ActivityStartColor #C8E6C9
+skinparam ActivityEndColor #B2DFDB
+""".strip()
+
+
+def inject_plantuml_swimlane_style(code: str) -> str:
+    """Inject swimlane border/title skinparams after @startuml when missing."""
+    if not is_swimlane_plantuml(code):
+        return code
+    if re.search(r'SwimlaneBorderColor', code, flags=re.I):
+        return code
+    code = re.sub(r'skinparam\s+partition\s*\{[^}]*\}\s*', '', code, flags=re.I | re.DOTALL)
+    m = re.search(r'(@startuml[^\n]*\n)', code, flags=re.I)
+    if not m:
+        return code
+    insert_at = m.end()
+    return code[:insert_at] + PLANTUML_SWIMLANE_SKINPARAM + '\n' + code[insert_at:]
+
+
+def run_pandoc(md_tmp: str, docx_out: str, resource_dirs: list[str], cwd: str):
+    paths = ';'.join(resource_dirs)
+    cmd = [
+        'pandoc', md_tmp, '-o', docx_out,
+        '--from=markdown+pipe_tables',
+        f'--resource-path={paths}',
+    ]
+    if os.path.exists(REFERENCE_DOCX):
+        cmd.append(f'--reference-doc={REFERENCE_DOCX}')
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr[:800])
+
+
+def _set_cell_border(cell, **kwargs):
+    tc = cell._tc
+    tcPr = tc.get_or_add_tcPr()
+    tcBorders = tcPr.find(qn('w:tcBorders'))
+    if tcBorders is None:
+        tcBorders = OxmlElement('w:tcBorders')
+        tcPr.append(tcBorders)
+    for edge in ('start', 'top', 'end', 'bottom', 'insideH', 'insideV'):
+        if edge in kwargs:
+            tag = f'w:{edge}'
+            element = tcBorders.find(qn(tag))
+            if element is None:
+                element = OxmlElement(tag)
+                tcBorders.append(element)
+            for k, v in kwargs[edge].items():
+                element.set(qn(f'w:{k}'), str(v))
+
+
+def _set_cell_bg(cell, color: str):
+    shd = OxmlElement('w:shd')
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:color'), 'auto')
+    shd.set(qn('w:fill'), color)
+    tcPr = cell._tc.get_or_add_tcPr()
+    existing = tcPr.find(qn('w:shd'))
+    if existing is not None:
+        tcPr.remove(existing)
+    tcPr.append(shd)
+
+
+def _apply_font(run, size_pt: int, bold=None):
+    run.font.name = FONT_NAME
+    run.font.size = Pt(size_pt)
+    rPr = run._r.get_or_add_rPr()
+    el = rPr.find(qn('w:rFonts'))
+    if el is None:
+        el = OxmlElement('w:rFonts')
+        rPr.insert(0, el)
+    el.set(qn('w:ascii'), FONT_NAME)
+    el.set(qn('w:hAnsi'), FONT_NAME)
+    el.set(qn('w:cs'), FONT_NAME)
+    if bold is not None:
+        run.bold = bold
+
+
+def postprocess_captions(doc, content_start: int):
+    for i, para in enumerate(doc.paragraphs):
+        if i < content_start:
+            continue
+        raw = (para.text or '').strip()
+        if not raw or not caption_number_from_text(raw):
+            continue
+        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        for run in para.runs:
+            run.italic = True
+            _apply_font(run, FONT_SIZE_BODY)
+
+
+def postprocess_docx(
+    docx_path: str,
+    max_width_cm: float = 15.0,
+    portrait_max_width_cm: float | None = None,
+    portrait_max_height_cm: float | None = None,
+):
+    doc = Document(docx_path)
+    content_start = content_start_index(doc)
+    try:
+        doc.styles['Normal'].font.name = FONT_NAME
+        doc.styles['Normal'].font.size = Pt(FONT_SIZE_BODY)
+    except Exception:
+        pass
+    for i, para in enumerate(doc.paragraphs):
+        if i < content_start:
+            continue
+        for run in para.runs:
+            _apply_font(run, FONT_SIZE_BODY)
+    border_spec = {"sz": "8", "val": "single", "color": BORDER_COLOR}
+    bdr_all = dict(top=border_spec, bottom=border_spec, start=border_spec, end=border_spec,
+                   insideH=border_spec, insideV=border_spec)
+    for ti, table in enumerate(doc.tables):
+        if ti < COVER_TABLE_COUNT:
+            continue
+        try:
+            table.style = 'Table Grid'
+        except Exception:
+            pass
+        for row_idx, row in enumerate(table.rows):
+            is_header = row_idx == 0
+            for cell in row.cells:
+                _set_cell_border(cell, **bdr_all)
+                if is_header:
+                    _set_cell_bg(cell, HEADER_BG)
+                for para in cell.paragraphs:
+                    for run in para.runs:
+                        _apply_font(run, FONT_SIZE_TABLE, bold=True if is_header else None)
+    max_w = Cm(max_width_cm)
+    portrait_w = Cm(portrait_max_width_cm) if portrait_max_width_cm else None
+    portrait_h = Cm(portrait_max_height_cm) if portrait_max_height_cm else None
+    ns = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}'
+    for para in doc.paragraphs:
+        for run in para.runs:
+            for drawing in run._r.findall(f'.//{ns}inline'):
+                extent = drawing.find(f'{ns}extent')
+                if extent is None:
+                    continue
+                cx = int(extent.get('cx', 0))
+                cy = int(extent.get('cy', 0))
+                if cx <= 0 or cy <= 0:
+                    continue
+                is_portrait = cy > cx * 1.1
+                limit = portrait_w if (is_portrait and portrait_w) else max_w
+                if cx > limit.emu:
+                    ratio = limit.emu / cx
+                    cx = limit.emu
+                    cy = int(cy * ratio)
+                if is_portrait and portrait_h and cy > portrait_h.emu:
+                    ratio = portrait_h.emu / cy
+                    cx = int(cx * ratio)
+                    cy = portrait_h.emu
+                extent.set('cx', str(cx))
+                extent.set('cy', str(cy))
+    postprocess_captions(doc, content_start)
+    doc.save(docx_path)
