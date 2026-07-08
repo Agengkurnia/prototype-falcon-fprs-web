@@ -215,16 +215,9 @@ const MODULES = [
     { name: 'Kategori Produk', folder: 'KategoriProduk', type: 'modal', storageKey: 'md_kategori_produk', modalId: 'modalForm', saveFn: 'saveItem', deleteFn: 'del', requiredInputs: ['editId','inputNama'] },
     { name: 'Brand',        folder: 'Brand',        type: 'modal', storageKey: 'md_brand',               modalId: 'modalBrand',  saveFn: 'saveItem',     deleteFn: 'deleteItem', requiredInputs: ['editId','inputNama'] },
     { name: 'Pelanggan',    folder: 'Pelanggan',    type: 'page',  storageKey: 'md_pelanggan',           indexPage: 'index.html', addPage: 'add.html',  saveFn: 'saveDataForm', deleteFn: 'del' },
-    { name: 'Grup Pelanggan', folder: 'GrupPelanggan', type: 'modal', storageKey: 'md_grup_pelanggan',   modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama'] },
-    { name: 'Pegawai',      folder: 'Pegawai',      type: 'page',  storageKey: 'md_pegawai',             indexPage: 'index.html', addPage: 'add.html',  saveFn: 'saveDataForm', deleteFn: 'del' },
-    { name: 'Akun',         folder: 'Akun',         type: 'modal', storageKey: 'md_akun',                modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputUsername'] },
-    { name: 'Posisi',       folder: 'Posisi',       type: 'modal', storageKey: 'md_posisi',              modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama'] },
-    { name: 'Konfigurasi Akses', folder: 'KonfigurasiAkses', type: 'modal', storageKey: 'md_konfigurasi_akses', modalId: 'modalForm', saveFn: 'saveItem', deleteFn: 'del', requiredInputs: ['editId','inputNama'] },
-    { name: 'Metode Pembayaran', folder: 'MetodePembayaran', type: 'modal', storageKey: 'md_metode_pembayaran', modalId: 'modalForm', saveFn: 'saveItem', deleteFn: 'del', requiredInputs: ['editId','inputNama'] },
-    { name: 'Waktu Pembayaran', folder: 'WaktuPembayaran', type: 'modal', storageKey: 'md_waktu_pembayaran', modalId: 'modalForm', saveFn: 'saveItem', deleteFn: 'del', requiredInputs: ['editId','inputNama'] },
+    { name: 'Channel', folder: 'Channel', type: 'modal', storageKey: 'md_channel',   modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama'] },
     { name: 'Pajak',        folder: 'Pajak',        type: 'modal', storageKey: 'md_pajak',               modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama'] },
-    { name: 'Alasan',       folder: 'Alasan',       type: 'modal', storageKey: 'md_alasan',              modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama','inputTipe'] },
-    { name: 'Supplier',     folder: 'Supplier',     type: 'page',  storageKey: 'md_supplier',            indexPage: 'index.html', addPage: 'add.html',  saveFn: 'saveDataForm', deleteFn: 'del' }
+    { name: 'Alasan',       folder: 'Alasan',       type: 'modal', storageKey: 'md_alasan',              modalId: 'modalForm',   saveFn: 'saveItem',     deleteFn: 'del',        requiredInputs: ['editId','inputNama','inputTipe'] }
 ];
 
 const BASE = new URL('.', window.location.href).href;

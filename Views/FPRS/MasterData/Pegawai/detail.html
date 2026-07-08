@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Pegawai – Master Data | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+@font-face{font-family:'Kalbe Geometric';font-weight:700;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2')format('woff2')}
+    </style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1" id="formTitle">Detail Pegawai</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Data Master</li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Master Pegawai</a></li>
+                        <li class="breadcrumb-item active">Detail</li>
+                    </ol>
+                </nav>
+            </div>
+            <a href="index.html" class="btn btn-secondary"><i class="fa fa-arrow-left me-1"></i> Kembali</a>
+        </div>
+
+        <div class="alert alert-secondary border-0 shadow-sm mb-3" role="alert">
+            <i class="fa fa-eye me-2 text-secondary"></i>
+            Halaman ini hanya untuk <strong>melihat</strong> data pegawai. Input dan perubahan data pegawai
+            dilakukan melalui <strong>Upload Data</strong> di halaman daftar.
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <h5 class="border-bottom pb-2 text-success"><i class="fa fa-id-badge me-1"></i> Data Pegawai</h5>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" for="kode">NIK</label>
+                        <input type="text" class="form-control bg-light" id="kode" disabled/>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold" for="nama">Nama</label>
+                        <input type="text" class="form-control" id="nama" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="role">Role</label>
+                        <input type="text" class="form-control" id="role" disabled/>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="branch">Branch</label>
+                        <input type="text" class="form-control" id="branch" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="region">Region</label>
+                        <input type="text" class="form-control" id="region" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="telepon">Telepon</label>
+                        <input type="text" class="form-control" id="telepon" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="status">Status</label>
+                        <input type="text" class="form-control" id="status" disabled/>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold" for="keterangan">Keterangan</label>
+                        <input type="text" class="form-control" id="keterangan" disabled/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <h5 class="mb-0 text-success"><i class="fa fa-clock-rotate-left me-1"></i> Riwayat Status (Active / Inactive) — dari Upload</h5>
+                </div>
+                <div class="table-responsive">
+                    <table id="tblStatusHistory" class="table table-bordered table-sm align-middle w-100">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Waktu</th>
+                                <th>Status</th>
+                                <th>Keterangan</th>
+                                <th>File Upload</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statusHistoryBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+            const KEY = 'md_pegawai';
+            const STATUS_KEY = 'md_pegawai_status_hist';
+
+            const DT_LANG = {
+                search: '', searchPlaceholder: 'Cari...',
+                lengthMenu: '_MENU_ entri',
+                info: '_START_-_END_ dari _TOTAL_',
+                infoEmpty: '0 data', infoFiltered: '(disaring dari _MAX_)',
+                paginate: { previous: '‹', next: '›' },
+                zeroRecords: 'Tidak ada data cocok',
+                emptyTable: 'Belum ada data'
+            };
+            const DT_DOM = '<"d-flex align-items-center justify-content-between mb-2"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-2"i<"ms-auto"p>>';
+
+            function initDT(selector, opts) {
+                if ($.fn.DataTable.isDataTable(selector)) $(selector).DataTable().destroy();
+                return $(selector).DataTable(Object.assign({
+                    language: DT_LANG, dom: DT_DOM,
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'Semua']]
+                }, opts || {}));
+            }
+
+            function fmtWaktu(iso) {
+                const d = new Date(iso);
+                if (isNaN(d.getTime())) return iso || '-';
+                return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+
+            function statusBadge(s) {
+                return s === 'Active'
+                    ? '<span class="badge-status badge-active">Active</span>'
+                    : '<span class="badge-status badge-inactive">Inactive</span>';
+            }
+
+            function getLocalData() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+            function getStatusStore() { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); }
+            function setStatusStore(s) { localStorage.setItem(STATUS_KEY, JSON.stringify(s)); }
+
+            function seededInt(seed, min, max) {
+                const x = Math.sin(seed) * 10000;
+                const frac = x - Math.floor(x);
+                return min + Math.floor(frac * (max - min + 1));
+            }
+
+            function generateDemoStatusHistory(kode, currentStatus) {
+                let seedBase = 0;
+                for (let i = 0; i < kode.length; i++) seedBase += kode.charCodeAt(i) * (i + 3);
+                const today = new Date();
+                const events = [];
+                function fileFor(d) { return 'pegawai_' + d.toISOString().slice(0, 10) + '.csv'; }
+
+                let daysAgo = seededInt(seedBase, 60, 120);
+                const d0 = new Date(today); d0.setDate(today.getDate() - daysAgo);
+                events.push({ waktu: d0.toISOString(), status: 'Active', aksi: 'Ditambahkan (ada di file upload)', file: fileFor(d0) });
+                let last = 'Active';
+
+                const n = seededInt(seedBase + 1, 2, 4);
+                for (let i = 1; i < n; i++) {
+                    daysAgo -= seededInt(seedBase + i * 7, 10, 25);
+                    if (daysAgo < 3) daysAgo = 3;
+                    const di = new Date(today); di.setDate(today.getDate() - daysAgo);
+                    const toInactive = last === 'Active' && seededInt(seedBase + i * 11, 0, 1) === 1;
+                    const st = toInactive ? 'Inactive' : 'Active';
+                    const aksi = st === 'Inactive'
+                        ? 'Tidak ada di file upload → dinonaktifkan'
+                        : (last === 'Inactive' ? 'Diaktifkan kembali (ada di file upload)' : 'Diperbarui (ada di file upload)');
+                    events.push({ waktu: di.toISOString(), status: st, aksi, file: fileFor(di) });
+                    last = st;
+                }
+
+                if (last !== currentStatus) {
+                    const dz = new Date(today); dz.setDate(today.getDate() - seededInt(seedBase + 99, 0, 2));
+                    const aksi = currentStatus === 'Inactive'
+                        ? 'Tidak ada di file upload → dinonaktifkan'
+                        : 'Diaktifkan kembali (ada di file upload)';
+                    events.push({ waktu: dz.toISOString(), status: currentStatus, aksi, file: fileFor(dz) });
+                }
+                return events;
+            }
+
+            function getStatusHistory(kode, currentStatus) {
+                const store = getStatusStore();
+                if (!store[kode] || !store[kode].length) {
+                    store[kode] = generateDemoStatusHistory(kode, currentStatus);
+                    setStatusStore(store);
+                }
+                return store[kode].slice().sort((a, b) => String(b.waktu).localeCompare(String(a.waktu)));
+            }
+
+            function renderStatusHistory(kode, status) {
+                const statusHist = getStatusHistory(kode, status || 'Active');
+                document.getElementById('statusHistoryBody').innerHTML = statusHist.map(e => `<tr>
+                        <td data-order="${e.waktu}">${fmtWaktu(e.waktu)}</td>
+                        <td>${statusBadge(e.status)}</td>
+                        <td>${e.aksi}</td>
+                        <td class="text-muted small"><code>${e.file || '-'}</code></td>
+                    </tr>`).join('');
+                initDT('#tblStatusHistory', { order: [[0, 'desc']] });
+            }
+
+            function setVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+
+            function loadDetail() {
+                const id = new URLSearchParams(window.location.search).get('id');
+                const item = getLocalData().find(d => String(d.id) === String(id));
+                if (!item) {
+                    setVal('nama', '(data tidak ditemukan)');
+                    return;
+                }
+                setVal('kode', item.kode || '-');
+                setVal('nama', item.nama || '');
+                setVal('role', item.role || '-');
+                setVal('branch', item.branch || '-');
+                setVal('region', item.region || '-');
+                setVal('telepon', item.telepon || '-');
+                setVal('status', item.status || 'Active');
+                setVal('keterangan', item.keterangan || '-');
+                document.getElementById('formTitle').textContent = 'Detail Pegawai — ' + (item.nama || item.kode || '');
+                renderStatusHistory(item.kode || String(item.id), item.status || 'Active');
+            }
+
+            loadDetail();
+        });
+    </script>
+</body>
+</html>

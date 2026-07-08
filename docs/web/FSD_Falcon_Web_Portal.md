@@ -1,3 +1,9 @@
+> **⚠️ Legacy / usang (Jul 2026).** Berkas ini adalah FSD full-portal hasil auto-generate lama dan **belum** mencerminkan perubahan terbaru (mis. Produk masih menyebut `add.html`, Kategori, Divisi, dimensi, dan tombol Hapus yang kini sudah tidak ada).
+>
+> FSD terkini untuk lingkup **Data Master** ada di `Prototype/Document/{ts}__FSD_FALCON_WEB_MASTERDATA.docx`. Alur & skrip pembuatannya didokumentasikan di [pages/tools_generate_fsd.md](pages/tools_generate_fsd.md). Sumber markdown: `wwwroot/document/FSD/FalconWebPortal/source/FSD_Falcon_Web_MasterData_v1.0.md`.
+
+---
+
 **FUNCTIONAL SPECIFICATION DOCUMENT (FSD)**
 
 **Modul:** Web Portal Falcon FPRS (Field Partner Relation System)

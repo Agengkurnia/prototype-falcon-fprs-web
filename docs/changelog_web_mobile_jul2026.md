@@ -11,6 +11,7 @@ Dokumen ini merangkum perubahan prototipe **Falcon FPRS** pada sesi pengembangan
 | Area | Perubahan Utama |
 |------|-----------------|
 | **Web** | Modul Master Stokis (CRUD, validasi form, download/upload CSV, duplikat lat/lng) |
+| **FSD** | FSD WEB modul **Data Master** (7 modul) di-generate ke `Document/` — cover Kalbe + Document Approval + screenshot full-page |
 | **Mobile — Beranda** | Unduh data dari server (bukan sync dua arah); menu 3 kolom; badge error unduhan |
 | **Mobile — Kunjungan** | Rute Harian + Overdue (MD); nearest GPS (Motoris); hapus selector stokis di visit |
 | **Mobile — Stokis** | Dual mode Beli vs Cek Stok; picker stokis terdekat setelah GPS |
@@ -20,6 +21,46 @@ Dokumen ini merangkum perubahan prototipe **Falcon FPRS** pada sesi pengembangan
 ---
 
 ## Web Portal
+
+### FSD Modul Data Master (WEB) — di-generate (Jul 2026)
+
+| Item | Detail |
+|------|--------|
+| **Lingkup** | FSD hanya modul **Data Master** Web Admin (7 modul: Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan), standar `FSD Generator Engine`. |
+| **Deliverable** | `Prototype/Document/{ts}__FSD_FALCON_WEB_MASTERDATA.docx` — cover 2 halaman Kalbe + Document Approval (SHP/IT) + 15 screenshot full-page + swimlane + ERD. |
+| **Skrip baru** | `wwwroot/document/FSD/FalconWebPortal/scripts/`: `assemble_fsd_masterdata.py` (rakit markdown), `capture_masterdata_full.py` (screenshot full-page Playwright), `build_masterdata_fsd.py` (render DOCX via pipeline engine → `Document/`). |
+| **Extractor** | `extract_module_spec.py`: `MASTER_DATA_ORDER` dirapikan ke 7 modul (Channel ditambah, modul terhapus dibuang); narasi/CRUD per-modul disesuaikan (view-only Pelanggan, upload-only Pegawai/Stokis, no-delete Produk/Channel, LOV Kode Produk). |
+| **Template** | `templates/FSD_Cover_Template.docx` + `logo.png` + `reference.docx` dipulihkan dari git (sempat hilang dari disk) agar cover-merge biner berjalan. |
+| **Dokumentasi** | Lihat [web/pages/tools_generate_fsd.md](web/pages/tools_generate_fsd.md). |
+
+### Master Pegawai — data real Simplidots + Role & Region (Jul 2026)
+
+| Item | Detail |
+|------|--------|
+| **Sumber data** | `pegawai.json` di-generate dari `Master Akun Simplidots.xlsx` (disalin ke `wwwroot/data/master-akun-simplidots.xlsx`) via `wwwroot/data/_gen_pegawai.py`. 171 pegawai. |
+| **Role** | Ditambahkan field & kolom **Role**, dipisah per sheet: **Motoris** (73) dari `USER (MOTORIS)`, **SPG GT** (98) dari `USER (SPG GT)`. |
+| **Region** | Ditambahkan field & kolom **Region** + **Branch** (SPG GT). Region dipetakan dari Branch (Region 1–8, geografis, konsisten Master Stokis). Motoris tanpa branch/region. |
+| **UI** | `index.html`: kolom NO/KODE/NAMA/ROLE/BRANCH/REGION/STATUS, filter Role & Status (dropdown), kartu Total/Motoris/SPG GT/Aktif. `detail.html`: field kode/nama/role/branch/region/telepon/status/keterangan + riwayat status. |
+| **Schema** | Record: `id, kode (NIK), nama, role, telepon, branch, region, keterangan, status`. Kolom tampil **NIK**. CSV: `nik, nama, role, telepon, branch, region, status`. Baris `VACANT`/`BLORA1` di-skip → 163 pegawai (65 Motoris + 98 SPG GT). Seed ver `md_pegawai_seed_ver = real-jul2026-b`. |
+
+### Master Data dirampingkan lanjutan (Jul 2026)
+
+| Item | Detail |
+|------|--------|
+| **Dihapus** | Modul **Metode Pembayaran**, **Waktu Pembayaran**, dan **Supplier** dihapus total beserta turunannya (index/add, folder, data seed JSON, menu di 4 `layout.js`, entri `module-registry.json`, docs `docs/web/pages/`, fragment & cache FSD). |
+| **Keuangan** | Subgroup Data Master → Keuangan kini hanya berisi **Pajak**. |
+| **Lainnya** | Subgroup Lainnya kini berisi **Alasan** dan **Stokis / Grosir** (Supplier dihapus). |
+| **Catatan** | Field `supplier` (Produk/Faktur) dan `waktuPembayaran` (Pelanggan) tetap dipertahankan karena merupakan atribut data, bukan modul master. |
+
+### Subgroup Pegawai — dirampingkan (Jul 2026)
+
+| Item | Detail |
+|------|--------|
+| **Dihapus** | Modul **Akun**, **Posisi**, **Konfigurasi Akses** dihapus total (file view, data seed JSON, menu di 4 `layout.js`, entri `module-registry.json`, dokumentasi `docs/web/pages/`, fragment & cache FSD). |
+| **Disisakan** | Hanya **Master Pegawai** di subgroup Data Master → Pegawai. |
+| **Master Pegawai** | Dijadikan **view-only** mengikuti pola Master Stokis: **Download Data** & **Upload Data** CSV, tanpa Tambah/Edit/Hapus manual. Kode Pegawai jadi identitas; ada di file → Active, tidak ada → Inactive. |
+| **History** | Perubahan status akibat upload dicatat di `md_pegawai_status_hist` dan ditampilkan di `detail.html` (Riwayat Status dari Upload). |
+| **File** | `Pegawai/index.html` ditulis ulang; `Pegawai/detail.html` baru (read-only + riwayat); `Pegawai/add.html` dihapus. Seed ver `md_pegawai_seed_ver = upload-jul2026`. |
 
 ### Master Stokis / Grosir (baru)
 
@@ -53,6 +94,47 @@ Lihat detail: [web/master_stokis.md](web/master_stokis.md) · [web/pages/master_
 | Outlet ID lama tak ada di file | Otomatis **Inactive** |
 | Duplikat koordinat | Dipakai Outlet ID lain → baris dilewati |
 | Baris tidak valid | Tanpa `outlet_id`/`nama`/`lat`/`lng` → dilewati |
+
+### Master Produk
+
+| Item | Detail |
+|------|--------|
+| **Path** | `Views/FPRS/MasterData/Produk/` |
+| **Sumber data** | Data dasar (kode, nama, umbrella brand, brand, divisi, harga beli, berat & dimensi) di-sinkron dari **Master Data API** (read-only) |
+| **Diisi di aplikasi** | **Unit, Harga Jual, Pajak, Status** |
+| **Seed / storage** | `wwwroot/data/produk.json` → `md_produk` + `md_produk_seed_ver` |
+
+**Perubahan:**
+
+- Kolom `KATEGORI` di `index.html` diganti **UMBRELLA BRAND**; field `umbrella` ditambahkan ke data.
+- Kartu statistik **Rata-rata Harga** dihapus → diganti kartu **Umbrella Brand** (jumlah umbrella).
+- `unitNama` semua produk diseragamkan menjadi **`PCS`**.
+- `detail.html`: card **Informasi Logistik** (Unit & Logistik: berat, dimensi, partner link) dihapus; Unit tetap tampil di card Spesifikasi & Harga; header memakai Umbrella Brand.
+- **Form add/edit disatukan ke `detail.html`** (fleksibel Tambah & Ubah); `add.html` dihapus. `index.html` & `module-registry.json` diarahkan ke `detail.html`.
+- **Kode Produk = LOV** lookup Master Data API (disimulasikan `produk.json`) → mengisi otomatis nama/umbrella/brand/divisi/harga beli; Kode read-only saat Ubah.
+- **Harga Beli** editable; **Harga Jual** read-only, dihitung otomatis = `Harga Beli + PPN`.
+- **Skema Pajak** default **PPN 11%** (bukan NoPPN).
+- **Unit** read-only `PCS`; input **berat, panjang, lebar, tinggi dihapus** dari form.
+- `index.html`: tombol **Edit** & **Hapus** dihilangkan, aksi baris hanya **Detail / Ubah**.
+
+### Master Channel (rename dari Grup Pelanggan)
+
+- Modul **Grup Pelanggan** di-rename menjadi **Channel** — folder `GrupPelanggan/` → `Channel/`, data `grup-pelanggan.json` → `channel.json`, storage key `md_grup_pelanggan` → `md_channel`, menu & wording (judul, breadcrumb, kolom "NAMA CHANNEL", modal "Tambah/Ubah Channel"), registry (`master-channel`), dan `tests.html`.
+- Kolom **Tipe Grup** & **Estimasi Waktu** dihapus (list & modal) — modul kini hanya Nama Channel + Total Pelanggan.
+- Daftar channel diisi **21 channel** (MT/SPC/GT/GI/MED/ECOM). **Total Pelanggan** dihitung dari Master Pelanggan (relasi `md_pelanggan.channel`; 1 pelanggan → 1 channel).
+- **Modal edit** menampilkan **daftar pelanggan pada channel** dengan **pagination** (5/hal), diambil dari Master Pelanggan.
+- `pelanggan.json` field `channel` diisi nilai dari daftar channel baru (reseed `md_pelanggan_seed_ver`).
+
+### Master Pelanggan
+
+- **View-only** — data pelanggan diinput dari **aplikasi mobile SFA**; tidak ada Tambah/Edit/Hapus di web (`add.html` dihapus, `del()` dihapus, tombol & fungsi **Ubah Data** di detail dihapus).
+- **`detail.html` didesain ulang** mengikuti field input mobile: **Foto Toko**, Nama Pemilik, No. HP/WA, NPWP, Channel, Tipe Outlet, Alamat + RT/RW, Kelurahan/Kecamatan/Kota, Koordinat GPS + info Sales/Kunjungan.
+- `pelanggan.json` diperkaya field mobile (`pemilik, npwp, rtrw, kelurahan, kecamatan, kota, channel, outletType, lat, lng, photo`); reseed via `md_pelanggan_seed_ver`.
+- `module-registry.json` `formPath` Pelanggan → `detail.html`.
+
+**Menu dihapus (submenu Produk):** **Unit, Divisi, Daftar Harga, Kategori Produk, Brand** dihapus permanen (folder `Views/FPRS/MasterData/{Unit,Divisi,DaftarHarga,KategoriProduk,Brand}/`, entri menu di `layout.js`, modul di `lib/fsd/module-registry.json`, dan halaman doc terkait). Submenu Produk kini hanya berisi **Master Produk**.
+
+Lihat detail: [web/pages/master_produk.md](web/pages/master_produk.md)
 
 ---
 

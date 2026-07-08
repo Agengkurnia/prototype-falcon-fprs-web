@@ -19,11 +19,8 @@ SCREENSHOTS_DIR = os.path.join(WORKSPACE_DIR, 'screenshots')
 FRAGMENTS_DIR = os.path.join(WORKSPACE_DIR, 'source', '_fragments')
 
 MASTER_DATA_ORDER = [
-    'master-produk', 'master-unit', 'master-divisi', 'master-daftar-harga',
-    'master-kategori-produk', 'master-brand', 'master-pelanggan', 'master-grup-pelanggan',
-    'master-pegawai', 'master-akun', 'master-posisi', 'master-konfigurasi-akses',
-    'master-metode-pembayaran', 'master-waktu-pembayaran', 'master-pajak',
-    'master-alasan', 'master-supplier', 'master-stokis',
+    'master-produk', 'master-pelanggan', 'master-channel',
+    'master-pegawai', 'master-stokis', 'master-pajak', 'master-alasan',
 ]
 PENJUALAN_ORDER = ['penjualan-faktur', 'penjualan-stok-motoris', 'canvassing']
 KUNJUNGAN_ORDER = ['kunjungan-informasi', 'kunjungan-geografis', 'kunjungan-rute']
@@ -70,17 +67,36 @@ SS_BY_MODULE = {
 
 MODULE_ENRICHMENT = {
     'master-produk': (
-        'Halaman index menampilkan **4 summary cards** (`cntTotal`, `cntActive`, `cntInactive`, `cntAvgPrice`) '
-        'dan DataTable `#tbl` dengan filter per kolom. Tombol **Tambah Produk** mengarah ke `add.html`. '
-        'Mode edit mengisi form via query `?id=` dan mengunci field `kode` menjadi read-only.'
+        'Halaman index menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInactive`, `cntUmbrella`) '
+        'dan DataTable `#tbl` dengan filter per kolom, termasuk kolom **Umbrella Brand**. Tombol **Tambah Produk** '
+        'mengarah ke `detail.html`. Halaman `detail.html` bersifat fleksibel (add & edit): **Kode Produk** berupa '
+        'LOV searchable (Select2) yang mengambil data dari Master Data API, mengunci field turunan (nama, umbrella, '
+        'brand) menjadi read-only. **Harga Beli** dapat diedit, **Harga Jual** read-only dihitung otomatis '
+        '(`Harga Beli + PPN`, default skema PPN 11%). **Unit Konversi** dikunci ke `PCS`, dan **Status Produk** '
+        'berupa checkbox aktif/nonaktif.'
     ),
     'master-pelanggan': (
-        'Modul pelanggan/outlet mencakup informasi dasar, grup pelanggan, alamat, dan pengaturan keuangan '
-        '(daftar harga, waktu pembayaran, metode pembayaran). Data disimpan di `md_pelanggan`.'
+        'Data pelanggan/outlet **diinput dari aplikasi mobile** (SFA), sehingga Web Portal bersifat **view-only** — '
+        'tanpa tombol Tambah/Edit/Hapus. Halaman detail menampilkan atribut hasil capture lapangan: foto outlet, '
+        'pemilik, NPWP, alamat, RT/RW, kelurahan, kecamatan, kota, koordinat GPS, **channel**, dan tipe outlet. '
+        'Data disimpan di `md_pelanggan`.'
     ),
     'master-pegawai': (
-        'Master pegawai/sales force dengan form `add.html` untuk registrasi karyawan lapangan. '
-        'Terintegrasi rencana ke `/api/v1/Employee`.'
+        'Master pegawai/sales force bersifat **upload-only** (pola seperti Master Stokis): data disinkronkan via '
+        '**Download/Upload CSV** dan setiap perubahan status Active/Inactive dicatat pada **riwayat status**. '
+        'Setiap pegawai memiliki **role** (Motoris / SPG GT) dan penempatan **Branch** & **Region**. Identitas unik '
+        'menggunakan **NIK**. Halaman `detail.html` menampilkan data pegawai secara read-only beserta riwayat status.'
+    ),
+    'master-channel': (
+        'Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK). '
+        'Tidak terintegrasi Master Data API. Modal edit menampilkan bit **Active** dan daftar pelanggan '
+        'ter-paginasi yang tergabung pada channel tersebut (relasi 1 pelanggan → 1 channel, 1 channel → banyak '
+        'pelanggan) berdasarkan data `md_pelanggan`.'
+    ),
+    'master-stokis': (
+        'Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat stok). Menampilkan '
+        '**Branch** dan **Region** (menggantikan kolom Kota), koordinat GPS untuk validasi check-in mobile, serta '
+        'island **Riwayat Input Stok oleh Motoris** pada halaman detail.'
     ),
 }
 
@@ -95,8 +111,9 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'master-produk': {
         'purpose': (
-            'Mendaftarkan dan memelihara data SKU/produk (kode, kategori, brand, harga, pajak, dimensi) '
-            'sebagai referensi transaksi penjualan dan integrasi Master Data API.'
+            'Mendaftarkan dan memelihara data SKU/produk (kode, umbrella brand, brand, harga beli, harga jual, '
+            'pajak, status) sebagai referensi transaksi penjualan. Data produk bersumber dari Master Data API, '
+            'sedangkan harga jual, pajak, dan status dikelola di aplikasi ini.'
         ),
         'users': 'Admin Master Data, ICT Operations — pengelola katalog produk Kalbe.',
     },
@@ -124,19 +141,22 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'master-pelanggan': {
         'purpose': (
-            'Mendaftarkan outlet/pelanggan beserta alamat, grup, skema harga, dan syarat pembayaran '
-            'sebagai entitas utama kunjungan sales dan faktur.'
+            'Menampilkan data outlet/pelanggan yang diinput dari aplikasi mobile (foto, pemilik, alamat, GPS, '
+            'channel, tipe outlet) sebagai entitas utama kunjungan sales dan faktur. Bersifat view-only di web.'
         ),
         'users': 'Admin Master Data, Operations, Supervisor Sales (validasi data outlet).',
     },
-    'master-grup-pelanggan': {
-        'purpose': 'Mengelompokkan pelanggan (grosir, retail, RS, dll.) untuk kebijakan harga dan laporan segmentasi.',
+    'master-channel': {
+        'purpose': (
+            'Mengelola daftar channel pelanggan (MT/GT/SPC/MED/GI/ECOM, dll.) untuk segmentasi dan kebijakan '
+            'penjualan. Setiap pelanggan tergabung pada tepat satu channel.'
+        ),
         'users': 'Admin Master Data, Sales Operations.',
     },
     'master-pegawai': {
         'purpose': (
-            'Mendaftarkan pegawai/sales force (canvasser, motoris) beserta identitas dan penempatan '
-            'untuk assignment rute dan otorisasi aplikasi.'
+            'Memelihara data pegawai/sales force (Motoris, SPG GT) beserta NIK, Branch, dan Region melalui '
+            'mekanisme Download/Upload CSV dengan pencatatan riwayat status aktif/nonaktif.'
         ),
         'users': 'Admin HR, ICT, Supervisor Sales.',
     },
@@ -477,7 +497,35 @@ def crud_table(mod: dict) -> str:
         '| Operasi | Cara | Role | Keterangan |',
         '|---------|------|------|------------|',
     ]
-    if mid in ('penjualan-stok-motoris', 'kunjungan-geografis'):
+    if mid == 'master-pelanggan':
+        lines += [
+            '| **Create** | — | — | Data diinput dari aplikasi mobile (SFA) |',
+            '| **Read** | DataTable index + `detail.html` | Semua role | View-only |',
+            '| **Update** | — | — | Tidak tersedia di web (sumber mobile) |',
+            '| **Delete** | — | — | Tidak tersedia di web |',
+        ]
+    elif mid in ('master-pegawai', 'master-stokis'):
+        lines += [
+            '| **Create** | Upload CSV (baris baru) | Admin | Sinkronisasi dari file, bukan input manual |',
+            '| **Read** | DataTable index + `detail.html` | Semua role | Termasuk riwayat status/stok |',
+            '| **Update** | Upload CSV (status Active/Inactive) | Admin | Status disimpulkan dari keberadaan ID di file |',
+            '| **Delete** | — | — | Tidak ada hapus; nonaktif via sinkronisasi CSV |',
+        ]
+    elif mid == 'master-produk':
+        lines += [
+            '| **Create** | Klik Tambah Produk → `detail.html` (LOV Kode Produk) | Admin | Persist ke localStorage |',
+            '| **Read** | DataTable index + `detail.html` | Semua role | — |',
+            '| **Update** | Buka `detail.html?id=` → ubah harga beli/pajak/status | Admin | Kode & data API read-only |',
+            '| **Delete** | — | — | Tombol hapus dihilangkan |',
+        ]
+    elif mid == 'master-channel':
+        lines += [
+            '| **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |',
+            '| **Read** | DataTable index; modal edit menampilkan pelanggan ter-paginasi | Semua role | — |',
+            '| **Update** | Klik Edit → ubah nama/bit Active → Simpan | Admin | — |',
+            '| **Delete** | — | — | Tombol hapus dihilangkan; gunakan bit Active |',
+        ]
+    elif mid in ('penjualan-stok-motoris', 'kunjungan-geografis'):
         lines += [
             '| **Read** | Buka halaman index | Admin, Supervisor | Dashboard/monitoring read-only |',
             '| **Create** | — | — | Tidak tersedia di UI |',

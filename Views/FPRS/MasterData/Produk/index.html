@@ -14,7 +14,7 @@
 
             <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
                 <div><h2 class="title-page mb-1">Master Produk</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Master Produk</li></ol></nav></div>
-                <a href="add.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Produk</a>
+                <a href="detail.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Produk</a>
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-6 col-md-3">
@@ -24,7 +24,7 @@
                             <div class="flex-grow-1 min-w-0">
                                 <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Total Produk</div>
                                 <div class="fs-3 fw-bold text-dark mb-0" id="cntTotal">0</div>
-                                <div class="small text-muted" style="font-size:0.7rem;" id="cntCategoryNote">— kategori</div>
+                                <div class="small text-muted" style="font-size:0.7rem;" id="cntCategoryNote">— umbrella brand</div>
                             </div>
                         </div>
                     </div>
@@ -56,10 +56,10 @@
                 <div class="col-6 col-md-3">
                     <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #7b2cbf !important; background: linear-gradient(135deg, #fff 60%, #f3e8ff 100%);">
                         <div class="card-body py-3 d-flex align-items-center gap-3">
-                            <div style="width:48px;height:48px;border-radius:12px;background:#f3e8ff;color:#7b2cbf;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-coins"></i></div>
+                            <div style="width:48px;height:48px;border-radius:12px;background:#f3e8ff;color:#7b2cbf;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-umbrella"></i></div>
                             <div class="flex-grow-1 min-w-0">
-                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Rata-rata Harga</div>
-                                <div class="fs-5 fw-bold text-dark mb-0" id="cntAvgPrice">Rp 0</div>
+                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Umbrella Brand</div>
+                                <div class="fs-3 fw-bold text-dark mb-0" id="cntUmbrella">0</div>
                                 <div class="small text-muted" style="font-size:0.7rem;" id="cntBrand">0 brand</div>
                             </div>
                         </div>
@@ -76,12 +76,12 @@
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
-                        <tr><th style="width:50px;">NO</th><th>KODE</th><th>PRODUK</th><th>KATEGORI</th><th>BRAND</th><th>UNIT</th><th style="text-align:right;">HARGA JUAL</th><th>PAJAK</th><th style="width:80px;">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
+                        <tr><th style="width:50px;">NO</th><th>KODE</th><th>PRODUK</th><th>UMBRELLA BRAND</th><th>BRAND</th><th>UNIT</th><th style="text-align:right;">HARGA JUAL</th><th>PAJAK</th><th style="width:80px;">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
                         <tr class="filter-row">
                             <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Nama..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Kategori..."></th>
+                            <th><input type="text" class="form-control form-control-sm" placeholder="Umbrella Brand..."></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Brand..."></th>
                             <th></th><th></th><th></th>
                             <th><select class="form-select form-select-sm"><option value="">Semua</option><option value="active">Active</option><option value="inactive">Inactive</option></select></th>
@@ -97,29 +97,32 @@
         document.addEventListener('layoutReady', () => {
 
 const KEY='md_produk';
+const SEED_VER_KEY='md_produk_seed_ver';
+const SEED_VER='umbrella-jul2026-b';
 const fmt=v=>new Intl.NumberFormat('id-ID').format(v);
 function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
-function loadData(){if(!localStorage.getItem(KEY)){fetch('../../../../wwwroot/data/produk.json').then(r=>r.json()).then(d=>{saveData(d);render();});}else{render();}}
+function loadData(){
+    const needSeed = !localStorage.getItem(KEY) || localStorage.getItem(SEED_VER_KEY)!==SEED_VER;
+    if(needSeed){fetch('../../../../wwwroot/data/produk.json').then(r=>r.json()).then(d=>{saveData(d);localStorage.setItem(SEED_VER_KEY,SEED_VER);render();});}else{render();}
+}
 let table;
 function render(){
     if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
     const data=getData();$('#tblBody').empty();
     const brands=[...new Set(data.map(d=>d.brand).filter(Boolean))];
-    const categories=[...new Set(data.map(d=>d.kategori).filter(Boolean))];
+    const umbrellas=[...new Set(data.map(d=>d.umbrella).filter(Boolean))];
     const activeCount = data.filter(d=>d.status==='active').length;
     const inactiveCount = data.filter(d=>d.status!=='active').length;
     const activePct = data.length > 0 ? Math.round(activeCount/data.length*100) : 0;
-    const totalPrice = data.reduce((s,d)=>s+(parseFloat(d.hargaJual)||0),0);
-    const avgPrice = data.length > 0 ? totalPrice/data.length : 0;
     
     $('#cntTotal').text(data.length);
-    $('#cntCategoryNote').text(categories.length + ' kategori');
+    $('#cntCategoryNote').text(umbrellas.length + ' umbrella brand');
     $('#cntActive').text(activeCount);
     $('#cntActivePct').text(activePct + '% dari total');
     $('#cntInactive').text(inactiveCount);
     $('#cntInactivePct').text(inactiveCount > 0 ? 'Perlu review' : 'Semua aktif ✓');
-    $('#cntAvgPrice').text('Rp ' + fmt(Math.round(avgPrice)));
+    $('#cntUmbrella').text(umbrellas.length);
     $('#cntBrand').text(brands.length + ' brand');
     data.forEach((item,i)=>{
         const badge=item.status==='active'?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';
@@ -127,16 +130,14 @@ function render(){
             <td>${i+1}</td>
             <td><code>${item.kode}</code></td>
             <td><a href="detail.html?id=${item.id}" class="fw-bold text-decoration-none">${item.nama}</a>${item.divisi?'<br><small class="text-muted">'+item.divisi+'</small>':''}</td>
-            <td>${item.kategori||'-'}</td>
+            <td>${item.umbrella||'-'}</td>
             <td>${item.brand||'-'}</td>
             <td><small>${item.unitNama||'-'}</small></td>
             <td class="text-end"><strong>Rp ${fmt(item.hargaJual)}</strong></td>
             <td><small>${item.namaPajak||'-'}</small></td>
             <td>${badge}</td>
             <td><div class="row-actions">
-                <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Detail"><i class="fa fa-eye"></i></a>
-                <a href="add.html?id=${item.id}" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>
-                <button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.nama.replace(/'/g,"\\'")}')" title="Hapus"><i class="fa fa-trash"></i></button>
+                <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Detail / Ubah"><i class="fa fa-eye"></i></a>
             </div></td>
         </tr>`);
     });
@@ -145,9 +146,7 @@ function render(){
     $('.filter-row select').on('change',function(){table.column($(this).closest('th').index()).search(this.value).draw();});
     $('.filter-row input,.filter-row select').on('click',function(e){e.stopPropagation();});
 }
-function del(id,nama){Swal.fire({title:`Hapus Produk "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>String(d.id)!==String(id)));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
 $(document).ready(loadData);
-window.del = del;
         });
     </script>
 </body>

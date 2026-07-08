@@ -22,14 +22,13 @@ Jalankan dengan **Live Server** (VS Code) atau server statis lain pada port `550
 
 ```
 Views/FPRS/
-├── MasterData/          # 18 sub-modul master data
+├── MasterData/          # sub-modul master data
 │   ├── Produk/
 │   ├── Pelanggan/
-│   ├── Pegawai/
-│   ├── Supplier/
-│   ├── Stokis/          # Stokis / Grosir — CSV + validasi form
-│   ├── DaftarHarga/
-│   └── ... (Akun, Brand, Divisi, Unit, Pajak, dll.)
+│   ├── Channel/
+│   ├── Pegawai/         # view-only, upload CSV + riwayat status
+│   ├── Stokis/          # Stokis / Grosir — upload CSV + riwayat
+│   └── ... (Pajak, Alasan)
 ├── Penjualan/
 │   ├── Faktur/          # Daftar & form faktur penjualan
 │   └── StokMotoris/     # Stok motoris / canvasser
@@ -50,11 +49,11 @@ Menu dirender oleh `layout.js` ke dalam struktur bertingkat:
 
 | Grup | Submenu |
 |------|---------|
-| **Data Master → Produk** | Master Produk, Unit, Divisi, Daftar Harga, Kategori Produk, Brand |
-| **Data Master → Pelanggan** | Master Pelanggan, Grup Pelanggan |
-| **Data Master → Pegawai** | Master Pegawai, Akun, Posisi, Konfigurasi Akses |
-| **Data Master → Keuangan** | Metode Pembayaran, Waktu Pembayaran, Pajak |
-| **Data Master → Lainnya** | Alasan, Supplier, **Stokis / Grosir** |
+| **Data Master → Produk** | Master Produk |
+| **Data Master → Pelanggan** | Master Pelanggan, Channel |
+| **Data Master → Pegawai** | Master Pegawai |
+| **Data Master → Keuangan** | Pajak |
+| **Data Master → Lainnya** | Alasan, **Stokis / Grosir** |
 | **Penjualan** | Faktur, Canvassing, Stok Motoris |
 | **Kunjungan** | Informasi Kunjungan, Geografis Kunjungan, Management Rute |
 | **Tools** | Generate FSD |
@@ -120,7 +119,8 @@ Modul **Canvassing** dan **Kunjungan** menggunakan kartu interaktif, filter, Swe
 | Dokumen | Isi |
 |---------|-----|
 | [pages/README.md](pages/README.md) | **Indeks dokumentasi per halaman / modul** |
-| [FSD_Falcon_Web_Portal.md](FSD_Falcon_Web_Portal.md) | Spesifikasi fungsional lengkap per modul |
+| [pages/tools_generate_fsd.md](pages/tools_generate_fsd.md) | **FSD modul Data Master (WEB)** — skrip, capture full-page, deliverable `Document/` |
+| [FSD_Falcon_Web_Portal.md](FSD_Falcon_Web_Portal.md) | *(Legacy)* FSD full-portal auto-generate lama — sebagian usang |
 | [pages/master_stokis.md](pages/master_stokis.md) | Master Stokis — CRUD, validasi form, CSV, integrasi mobile |
 | [master_stokis.md](master_stokis.md) | Ringkasan Master Stokis |
 | [master_data_integration.md](master_data_integration.md) | Analisis integrasi portal Master Data Kalbe |

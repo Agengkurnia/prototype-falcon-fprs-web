@@ -12,99 +12,92 @@
 <body>
     <div id="app-content">
 
-                <div class="d-flex align-items-center justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-                    <div>
-                        <h2 class="title-page mb-1">Detail Produk</h2>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
-                                <li class="breadcrumb-item">Data Master</li>
-                                <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Master Produk</a></li>
-                                <li class="breadcrumb-item active" id="prodNameBreadcrumb">Info</li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a href="index.html" class="btn btn-secondary"><i class="fa fa-arrow-left me-1"></i> Kembali</a>
-                        <a href="#" id="editLinkBtn" class="btn btn-success"><i class="fa fa-pen me-1"></i> Ubah Data</a>
-                    </div>
+                <div class="mb-3">
+                    <h2 class="title-page mb-1" id="formTitle">Detail Produk</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                            <li class="breadcrumb-item">Data Master</li>
+                            <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Master Produk</a></li>
+                            <li class="breadcrumb-item active" id="breadcrumbActive">Detail</li>
+                        </ol>
+                    </nav>
                 </div>
-                
-                <!-- Product Header Info Card -->
-                <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #005d41 0%, #007d57 100%); color: white;">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-white text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 70px; height: 70px; font-size: 2.2rem;">
-                                <i class="fa fa-box"></i>
-                            </div>
-                            <div>
-                                <h3 class="mb-1 fw-bold" id="detailNama">ZEE RTD STRAWBERRY 185 ML</h3>
-                                <div class="d-flex align-items-center gap-2" style="flex-wrap:wrap;">
-                                    <span class="badge bg-light text-success fw-bold" id="detailKode">ZSRTD</span>
-                                    <span class="badge bg-success" id="detailStatus">Active</span>
-                                    <span class="text-white-50">| Brand:</span> <strong id="detailBrand">ZEE</strong>
-                                    <span class="text-white-50">| Kategori:</span> <strong id="detailKategori">Minuman Kesehatan</strong>
+
+                <div class="alert alert-info border-0 shadow-sm mb-3" role="alert">
+                    <i class="fa fa-link me-2 text-info"></i>
+                    <strong>Sumber data:</strong> Pilih <strong>Kode Produk</strong> untuk lookup ke <strong>Master Data API</strong> — nama, umbrella brand, brand &amp; divisi terisi otomatis (read-only).
+                    <strong>Harga Beli</strong>, <strong>Skema Pajak</strong>, dan <strong>Status</strong> diisi di aplikasi ini. <strong>Harga Jual</strong> dihitung otomatis (Harga Beli + PPN). Unit selalu <strong>PCS</strong>.
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form id="formProduk" onsubmit="saveDataForm(event)">
+                            <input type="hidden" id="editId" />
+
+                            <div class="row g-3">
+                                <h5 class="border-bottom pb-2 text-success"><i class="fa fa-box me-1"></i> Informasi Produk</h5>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Kode Produk <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="kode" required>
+                                        <option value="">-- Pilih Kode Produk (Master Data API) --</option>
+                                    </select>
+                                    <small class="text-muted">Data produk terisi otomatis dari Master Data API.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Nama Produk</label>
+                                    <input type="text" class="form-control bg-light" id="nama" placeholder="Terisi otomatis dari API..." readonly />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Umbrella Brand</label>
+                                    <input type="text" class="form-control bg-light" id="umbrella" placeholder="—" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Brand</label>
+                                    <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly />
+                                </div>
+
+                                <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-tags me-1"></i> Harga & Pajak</h5>
+
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Harga Beli <span class="required-mark">*</span></label>
+                                    <input type="number" class="form-control" id="hargaBeli" placeholder="Rp..." required min="0" oninput="recalcHargaJual()" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Skema Pajak <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="namaPajak" required onchange="recalcHargaJual()">
+                                        <option value="PPN 11%">PPN (11%)</option>
+                                        <option value="NoPPN">No PPN (0%)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Harga Jual <span class="text-muted fw-normal">(otomatis)</span></label>
+                                    <input type="number" class="form-control bg-light" id="hargaJual" readonly />
+                                    <small class="text-muted">= Harga Beli + PPN</small>
+                                </div>
+
+                                <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-cube me-1"></i> Unit & Status</h5>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Unit Konversi</label>
+                                    <input type="text" class="form-control bg-light" id="unitNama" value="PCS" readonly />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold d-block">Status Produk</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="status" checked onchange="updateStatusLabel()" style="cursor:pointer;" />
+                                        <label class="form-check-label" for="status" id="statusLabel">Active</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-info-circle me-1"></i> Spesifikasi & Harga</h5>
-                                <table class="table table-borderless m-0">
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-muted" style="width:160px;">Harga Beli</td>
-                                            <td>: <span class="fw-bold text-danger" id="detailHargaBeli">Rp 4.500</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Harga Jual</td>
-                                            <td>: <span class="fw-bold text-success" id="detailHargaJual">Rp 6.000</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Divisi internal</td>
-                                            <td>: <span id="detailDivisi">Nutritionals</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Skema Pajak</td>
-                                            <td>: <span class="badge bg-light text-dark" id="detailPajak">NoPPN</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                                <a href="index.html" class="btn btn-secondary"><i class="fa fa-times me-1"></i> Batal</a>
+                                <button type="submit" class="btn btn-success"><i class="fa fa-save me-1"></i> Simpan Produk</button>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="card shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-shipping-fast me-1"></i> Informasi Logistik</h5>
-                                <table class="table table-borderless m-0">
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-muted" style="width:160px;">Unit Konversi</td>
-                                            <td>: <span class="badge bg-light text-dark" id="detailUnit">KARTON, PCS</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Berat Bersih</td>
-                                            <td>: <span id="detailBerat">0.185</span> kg</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Dimensi (P x L x T)</td>
-                                            <td>: <span id="detailDimensi">6 x 4 x 14</span> cm</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Partner Link ID</td>
-                                            <td>: <span class="text-muted">-</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
     </div>
@@ -112,55 +105,207 @@
     <script>
         document.addEventListener('layoutReady', () => {
 
-const KEY='md_produk';
+const KEY = 'md_produk';
+const PPN_RATE = 0.11;
+let catalog = [];
+let currentDivisi = '';
 
 function getLocalData() {
     return JSON.parse(localStorage.getItem(KEY) || '[]');
 }
+function setLocalData(data) {
+    localStorage.setItem(KEY, JSON.stringify(data));
+}
 
-function loadProfile() {
+function updateStatusLabel() {
+    const on = document.getElementById('status').checked;
+    document.getElementById('statusLabel').textContent = on ? 'Active' : 'Inactive';
+}
+
+function recalcHargaJual() {
+    const hargaBeli = parseFloat(document.getElementById('hargaBeli').value) || 0;
+    const pajak = document.getElementById('namaPajak').value;
+    const rate = pajak === 'PPN 11%' ? PPN_RATE : 0;
+    document.getElementById('hargaJual').value = Math.round(hargaBeli * (1 + rate));
+}
+
+function fillFromMaster(item) {
+    document.getElementById('nama').value = item.nama || '';
+    document.getElementById('umbrella').value = item.umbrella || '';
+    document.getElementById('brand').value = item.brand || '';
+    currentDivisi = item.divisi || '';
+    document.getElementById('hargaBeli').value = item.hargaBeli || 0;
+    document.getElementById('unitNama').value = 'PCS';
+    recalcHargaJual();
+}
+
+// LOV: lookup Master Data API (disimulasikan dari produk.json)
+function loadCatalog() {
+    return fetch('../../../../wwwroot/data/produk.json')
+        .then(r => r.json())
+        .then(list => {
+            catalog = list;
+            const sel = document.getElementById('kode');
+            list.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.kode;
+                opt.textContent = `${p.kode} — ${p.nama}`;
+                sel.appendChild(opt);
+            });
+        })
+        .catch(() => { catalog = []; });
+}
+
+function onKodeChange() {
+    const kode = document.getElementById('kode').value;
+    const master = catalog.find(p => p.kode === kode);
+    if (master) fillFromMaster(master);
+}
+
+function checkEditMode() {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    if (id) {
-        document.getElementById('editLinkBtn').setAttribute('href', `add.html?id=${id}`);
-        const dataList = getLocalData();
-        const item = dataList.find(d => String(d.id)===String(id));
+    const editId = params.get('id');
+    if (editId) {
+        // Mode Ubah
+        document.getElementById('formTitle').textContent = 'Ubah Produk';
+        document.getElementById('breadcrumbActive').textContent = 'Ubah';
+        document.getElementById('editId').value = editId;
+
+        const item = getLocalData().find(d => String(d.id) === String(editId));
         if (item) {
-            document.getElementById('prodNameBreadcrumb').textContent = item.nama;
-            document.getElementById('detailNama').textContent = item.nama;
-            document.getElementById('detailKode').textContent = item.kode;
-            document.getElementById('detailStatus').textContent = item.status === 'active' ? 'Active' : 'Inactive';
-            document.getElementById('detailBrand').textContent = item.brand || '-';
-            document.getElementById('detailKategori').textContent = item.kategori || '-';
-            
-            document.getElementById('detailHargaBeli').textContent = 'Rp ' + Number(item.hargaBeli || 0).toLocaleString('id-ID');
-            document.getElementById('detailHargaJual').textContent = 'Rp ' + Number(item.hargaJual || 0).toLocaleString('id-ID');
-            document.getElementById('detailDivisi').textContent = item.divisi || '-';
-            document.getElementById('detailPajak').textContent = item.namaPajak || 'NoPPN';
-            
-            document.getElementById('detailUnit').textContent = item.unitNama || 'KARTON, PCS';
-            document.getElementById('detailBerat').textContent = item.berat || '0';
-            
-            const p = item.panjang || 0;
-            const l = item.lebar || 0;
-            const t = item.tinggi || 0;
-            document.getElementById('detailDimensi').textContent = `${p} x ${l} x ${t}`;
-            
-            // Adjust status badge color
-            const badge = document.getElementById('detailStatus');
-            badge.className = 'badge';
-            if (item.status === 'active') {
-                badge.classList.add('bg-success');
-            } else {
-                badge.classList.add('bg-danger');
+            const sel = document.getElementById('kode');
+            if (!Array.from(sel.options).some(o => o.value === item.kode)) {
+                const opt = document.createElement('option');
+                opt.value = item.kode;
+                opt.textContent = `${item.kode} — ${item.nama}`;
+                sel.appendChild(opt);
             }
+            sel.value = item.kode;
+            sel.disabled = true; // Kode tidak dapat diubah saat edit
+            sel.classList.add('bg-light');
+
+            document.getElementById('nama').value = item.nama || '';
+            document.getElementById('umbrella').value = item.umbrella || '';
+            document.getElementById('brand').value = item.brand || '';
+            currentDivisi = item.divisi || '';
+            document.getElementById('hargaBeli').value = item.hargaBeli || 0;
+            document.getElementById('namaPajak').value = item.namaPajak || 'PPN 11%';
+            document.getElementById('unitNama').value = 'PCS';
+            document.getElementById('status').checked = (item.status || 'active') === 'active';
+            updateStatusLabel();
+            recalcHargaJual();
         }
+    } else {
+        // Mode Tambah
+        document.getElementById('formTitle').textContent = 'Tambah Produk';
+        document.getElementById('breadcrumbActive').textContent = 'Tambah';
+        document.getElementById('namaPajak').value = 'PPN 11%';
+        document.getElementById('status').checked = true;
+        updateStatusLabel();
+        document.getElementById('unitNama').value = 'PCS';
     }
 }
 
+function initKodeSelect2() {
+    const $k = $('#kode');
+    $k.select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Cari / pilih kode produk...' });
+    $k.on('change', onKodeChange);
+}
+
+function saveDataForm(event) {
+    event.preventDefault();
+
+    const kode = document.getElementById('kode').value.trim().toUpperCase();
+    const nama = document.getElementById('nama').value.trim();
+    const hargaBeli = parseFloat(document.getElementById('hargaBeli').value);
+
+    const dataList = getLocalData();
+    const editId = document.getElementById('editId').value;
+
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+    function showFieldError(id, message) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.add('is-invalid');
+        const feedback = document.createElement('div');
+        feedback.className = 'invalid-feedback';
+        feedback.style.display = 'block';
+        feedback.textContent = message;
+        el.parentNode.appendChild(feedback);
+    }
+
+    let firstError = null;
+
+    if (!kode) {
+        showFieldError('kode', 'Kode produk wajib dipilih dari Master Data API.');
+        firstError = firstError || 'kode';
+    } else {
+        const duplicate = dataList.find(d => d.kode === kode && (!editId || String(d.id) !== String(editId)));
+        if (duplicate) {
+            showFieldError('kode', `Kode "${kode}" sudah terdaftar pada Master Produk.`);
+            firstError = firstError || 'kode';
+        }
+    }
+
+    if (!nama) {
+        showFieldError('kode', 'Data produk belum termuat. Pilih ulang Kode Produk.');
+        firstError = firstError || 'kode';
+    }
+
+    if (isNaN(hargaBeli) || hargaBeli <= 0) {
+        showFieldError('hargaBeli', 'Harga beli harus lebih dari 0.');
+        firstError = firstError || 'hargaBeli';
+    }
+
+    if (firstError) {
+        const el = document.getElementById(firstError);
+        if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        Swal.fire({ icon: 'warning', title: 'Validasi Gagal', text: 'Mohon perbaiki kesalahan pada form sebelum menyimpan.', timer: 2000, showConfirmButton: false });
+        return;
+    }
+
+    recalcHargaJual();
+    const hargaJual = parseFloat(document.getElementById('hargaJual').value) || 0;
+
+    const newObj = {
+        id: editId ? (isNaN(editId) ? editId : parseInt(editId)) : Date.now(),
+        kode: kode,
+        nama: nama,
+        umbrella: document.getElementById('umbrella').value.trim(),
+        brand: document.getElementById('brand').value.trim(),
+        divisi: currentDivisi,
+        hargaBeli: hargaBeli,
+        hargaJual: hargaJual,
+        namaPajak: document.getElementById('namaPajak').value,
+        unitNama: 'PCS',
+        status: document.getElementById('status').checked ? 'active' : 'inactive',
+        partnerId: ''
+    };
+
+    if (editId) {
+        const idx = dataList.findIndex(d => String(d.id) === String(editId));
+        if (idx > -1) dataList[idx] = { ...dataList[idx], ...newObj };
+    } else {
+        dataList.push(newObj);
+    }
+
+    setLocalData(dataList);
+
+    Swal.fire({ icon: 'success', title: 'Berhasil!', text: `Produk "${nama}" telah disimpan.`, timer: 1500, showConfirmButton: false })
+        .then(() => { window.location.href = 'index.html'; });
+}
+
 $(document).ready(function() {
-    loadProfile();
+    loadCatalog().then(function() {
+        checkEditMode();
+        initKodeSelect2();
+    });
 });
+window.saveDataForm = saveDataForm;
+window.recalcHargaJual = recalcHargaJual;
+window.updateStatusLabel = updateStatusLabel;
 
         });
     </script>

@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
     <style>
 @font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}@font-face{font-family:'Kalbe Geometric';font-weight:700;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2')format('woff2')}
+.photo-frame{width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#f1f3f5;display:flex;align-items:center;justify-content:center;border:1px solid #e9ecef;}
+.photo-frame img{width:100%;height:100%;object-fit:cover;}
+.photo-frame .placeholder{color:#adb5bd;text-align:center;font-size:.85rem;padding:16px;}
+.photo-frame .placeholder i{font-size:2.4rem;display:block;margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -26,10 +30,14 @@
                     </div>
                     <div class="d-flex gap-2">
                         <a href="index.html" class="btn btn-secondary"><i class="fa fa-arrow-left me-1"></i> Kembali</a>
-                        <a href="#" id="editLinkBtn" class="btn btn-success"><i class="fa fa-pen me-1"></i> Ubah Data</a>
                     </div>
                 </div>
-                
+
+                <div class="alert alert-info border-0 shadow-sm mb-3" role="alert">
+                    <i class="fa fa-mobile-screen me-2 text-info"></i>
+                    Data pelanggan ini diinput dari <strong>aplikasi mobile SFA</strong> (read-only).
+                </div>
+
                 <!-- Customer Header Profile -->
                 <div class="card mb-4 border-0 shadow-sm" style="background: linear-gradient(135deg, #005d41 0%, #007d57 100%); color: white;">
                     <div class="card-body p-4">
@@ -38,68 +46,80 @@
                                 <i class="fa fa-store"></i>
                             </div>
                             <div>
-                                <h3 class="mb-1 fw-bold" id="detailNama" style="color: #fff;">Apotek Sehat Sejahtera</h3>
+                                <h3 class="mb-1 fw-bold" id="detailNama" style="color: #fff;">Pelanggan</h3>
                                 <div class="d-flex align-items-center gap-2" style="flex-wrap:wrap;">
-                                    <span class="badge bg-light text-success fw-bold" id="detailKode">CS-001</span>
+                                    <span class="badge bg-light text-success fw-bold" id="detailKode">-</span>
                                     <span class="badge bg-success" id="detailStatus">Active</span>
-                                    <span class="text-white-50">| Group:</span> <strong id="detailGrup">Apotek</strong>
+                                    <span class="text-white-50">| Channel:</span> <strong id="detailChannel">-</strong>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row g-4">
-                    <div class="col-md-7">
+                    <!-- Foto Toko -->
+                    <div class="col-md-4">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
-                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-id-card me-1"></i> Detail Profil</h5>
+                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-camera me-1"></i> Foto Toko</h5>
+                                <div class="photo-frame" id="photoFrame">
+                                    <div class="placeholder" id="photoPlaceholder"><i class="fa fa-store"></i>Foto toko dari aplikasi mobile belum tersinkron</div>
+                                    <img src="" id="photoImg" class="d-none" alt="Foto Toko"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Toko & Kontak -->
+                    <div class="col-md-8">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-id-card me-1"></i> Data Toko & Kontak</h5>
                                 <table class="table table-borderless m-0">
                                     <tbody>
-                                        <tr>
-                                            <td class="text-muted" style="width:150px;">Telepon</td>
-                                            <td>: <span id="detailTelepon">02112345678</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Alamat</td>
-                                            <td>: <span id="detailAlamat">Jl. Sudirman No.10, Jakarta Pusat</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Kunjungan Terakhir</td>
-                                            <td>: <span id="detailKunjungan">2026-06-04</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Transaksi Terakhir</td>
-                                            <td>: <span id="detailTransaksi">2026-06-03</span></td>
-                                        </tr>
+                                        <tr><td class="text-muted" style="width:170px;">Nama Pemilik</td><td>: <span id="detailPemilik">-</span></td></tr>
+                                        <tr><td class="text-muted">No. HP / WhatsApp</td><td>: <span id="detailTelepon">-</span></td></tr>
+                                        <tr><td class="text-muted">NPWP</td><td>: <span id="detailNpwp">-</span></td></tr>
+                                        <tr><td class="text-muted">Channel Distribusi</td><td>: <span class="badge bg-light text-dark" id="detailChannel2">-</span></td></tr>
+                                        <tr><td class="text-muted">Tipe Outlet</td><td>: <span class="badge bg-light text-dark" id="detailTipe">-</span></td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="col-md-5">
+
+                    <!-- Alamat & Wilayah -->
+                    <div class="col-md-6">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
-                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-file-invoice-dollar me-1"></i> Informasi Keuangan & Sales</h5>
+                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-map-location-dot me-1"></i> Alamat & Wilayah</h5>
                                 <table class="table table-borderless m-0">
                                     <tbody>
-                                        <tr>
-                                            <td class="text-muted" style="width:180px;">Daftar Harga</td>
-                                            <td>: <span class="badge bg-light text-dark" id="detailDaftarHarga">Inc Pajak</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Waktu Pembayaran</td>
-                                            <td>: <span class="badge bg-light text-dark" id="detailWaktuPembayaran">Net 30</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Salesman / PIC</td>
-                                            <td>: <strong class="text-primary" id="detailSalesman">JAKARTA1</strong></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Partner Link ID</td>
-                                            <td>: <span class="text-muted">-</span></td>
-                                        </tr>
+                                        <tr><td class="text-muted" style="width:150px;">Alamat</td><td>: <span id="detailAlamat">-</span></td></tr>
+                                        <tr><td class="text-muted">RT / RW</td><td>: <span id="detailRtrw">-</span></td></tr>
+                                        <tr><td class="text-muted">Kelurahan</td><td>: <span id="detailKelurahan">-</span></td></tr>
+                                        <tr><td class="text-muted">Kecamatan</td><td>: <span id="detailKecamatan">-</span></td></tr>
+                                        <tr><td class="text-muted">Kota</td><td>: <span id="detailKota">-</span></td></tr>
+                                        <tr><td class="text-muted">Koordinat GPS</td><td>: <span id="detailGps">-</span></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales & Kunjungan -->
+                    <div class="col-md-6">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-user-tie me-1"></i> Sales & Kunjungan</h5>
+                                <table class="table table-borderless m-0">
+                                    <tbody>
+                                        <tr><td class="text-muted" style="width:170px;">Salesman / PIC</td><td>: <strong class="text-primary" id="detailSalesman">-</strong></td></tr>
+                                        <tr><td class="text-muted">Daftar Harga</td><td>: <span class="badge bg-light text-dark" id="detailDaftarHarga">-</span></td></tr>
+                                        <tr><td class="text-muted">Waktu Pembayaran</td><td>: <span class="badge bg-light text-dark" id="detailWaktuPembayaran">-</span></td></tr>
+                                        <tr><td class="text-muted">Kunjungan Terakhir</td><td>: <span id="detailKunjungan">-</span></td></tr>
+                                        <tr><td class="text-muted">Transaksi Terakhir</td><td>: <span id="detailTransaksi">-</span></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -111,52 +131,64 @@
     <script>
         document.addEventListener('layoutReady', () => {
 
-const KEY='md_pelanggan';
+const KEY = 'md_pelanggan';
 
 function getLocalData() {
     return JSON.parse(localStorage.getItem(KEY) || '[]');
 }
 
+function setText(id, val) {
+    document.getElementById(id).textContent = (val === undefined || val === null || val === '') ? '-' : val;
+}
+
 function loadProfile() {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    if (id) {
-        document.getElementById('editLinkBtn').setAttribute('href', `add.html?id=${id}`);
-        const dataList = getLocalData();
-        const item = dataList.find(d => String(d.id)===String(id));
-        if (item) {
-            document.getElementById('custNameBreadcrumb').textContent = item.nama;
-            document.getElementById('detailNama').textContent = item.nama;
-            document.getElementById('detailKode').textContent = item.kode;
-            document.getElementById('detailStatus').textContent = item.status;
-            document.getElementById('detailGrup').textContent = item.grupPelanggan || '-';
-            
-            document.getElementById('detailTelepon').textContent = item.telepon || '-';
-            document.getElementById('detailAlamat').textContent = item.alamat || '-';
-            document.getElementById('detailKunjungan').textContent = item.kunjunganTerakhir || '-';
-            document.getElementById('detailTransaksi').textContent = item.transaksiTerakhir || '-';
-            
-            document.getElementById('detailDaftarHarga').textContent = item.daftarHarga || 'Inc Pajak';
-            document.getElementById('detailWaktuPembayaran').textContent = item.waktuPembayaran || 'Cash';
-            document.getElementById('detailSalesman').textContent = item.employee || item.salesman || '-';
-            
-            // Adjust status badge color
-            const badge = document.getElementById('detailStatus');
-            badge.className = 'badge';
-            if (item.status === 'Active') {
-                badge.classList.add('bg-success');
-            } else if (item.status === 'Unverified') {
-                badge.classList.add('bg-warning', 'text-dark');
-            } else {
-                badge.classList.add('bg-danger');
-            }
-        }
+    if (!id) return;
+    const item = getLocalData().find(d => String(d.id) === String(id));
+    if (!item) return;
+
+    setText('custNameBreadcrumb', item.nama);
+    setText('detailNama', item.nama);
+    setText('detailKode', item.kode);
+    setText('detailStatus', item.status);
+    setText('detailChannel', item.channel);
+    setText('detailChannel2', item.channel);
+
+    setText('detailPemilik', item.pemilik);
+    setText('detailTelepon', item.telepon);
+    setText('detailNpwp', item.npwp);
+    setText('detailTipe', item.outletType);
+
+    setText('detailAlamat', item.alamat);
+    setText('detailRtrw', item.rtrw);
+    setText('detailKelurahan', item.kelurahan);
+    setText('detailKecamatan', item.kecamatan);
+    setText('detailKota', item.kota);
+    setText('detailGps', (item.lat && item.lng) ? `${item.lat}, ${item.lng}` : '-');
+
+    setText('detailSalesman', item.employee || item.salesman);
+    setText('detailDaftarHarga', item.daftarHarga);
+    setText('detailWaktuPembayaran', item.waktuPembayaran);
+    setText('detailKunjungan', item.kunjunganTerakhir);
+    setText('detailTransaksi', item.transaksiTerakhir);
+
+    // Foto toko dari aplikasi mobile (jika sudah tersinkron)
+    if (item.photo) {
+        document.getElementById('photoImg').src = item.photo;
+        document.getElementById('photoImg').classList.remove('d-none');
+        document.getElementById('photoPlaceholder').classList.add('d-none');
     }
+
+    // Warna badge status
+    const badge = document.getElementById('detailStatus');
+    badge.className = 'badge';
+    if (item.status === 'Active') badge.classList.add('bg-success');
+    else if (item.status === 'Unverified') badge.classList.add('bg-warning', 'text-dark');
+    else badge.classList.add('bg-danger');
 }
 
-$(document).ready(function() {
-    loadProfile();
-});
+$(document).ready(loadProfile);
 
         });
     </script>

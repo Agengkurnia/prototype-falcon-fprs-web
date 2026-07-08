@@ -30,15 +30,15 @@ Berikut adalah status replikasi modul dari SimpliDOTS Condensed per tanggal **11
 | | - Master Pelanggan | `/condensed/customer` | **Selesai** | `Views/FPRS/MasterData/Pelanggan/` |
 | | - Grup Pelanggan | `/condensed/customergroup` | **Selesai** | `Views/FPRS/MasterData/GrupPelanggan/` (Terintegrasi API) |
 | | - Stok Pelanggan | `/condensed/customerstock` | Belum | Rencana fase berikutnya |
-| | **Supplier** | `/condensed/supplier` | **Selesai** | `Views/FPRS/MasterData/Supplier/` (Terintegrasi API) |
+| | **Supplier** | `/condensed/supplier` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
 | | **Pegawai** | | | |
-| | - Master Pegawai | `/condensed/employee` | **Selesai** | `Views/FPRS/MasterData/Pegawai/` (Terintegrasi API) |
-| | - Akun | `/condensed/account` | **Selesai** | `Views/FPRS/MasterData/Akun/` (Terintegrasi API) |
-| | - Posisi | `/condensed/position` | **Selesai** | `Views/FPRS/MasterData/Posisi/` (Terintegrasi API) |
-| | - Konfigurasi Akses | `/condensed/rolegroup` | **Selesai** | `Views/FPRS/MasterData/KonfigurasiAkses/` (Terintegrasi API) |
+| | - Master Pegawai | `/condensed/employee` | **Selesai** | `Views/FPRS/MasterData/Pegawai/` (view-only, upload CSV + riwayat) |
+| | - Akun | `/condensed/account` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
+| | - Posisi | `/condensed/position` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
+| | - Konfigurasi Akses | `/condensed/rolegroup` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
 | | **Keuangan** | | | |
-| | - Metode Pembayaran | `/condensed/paymentmethod` | **Selesai** | `Views/FPRS/MasterData/MetodePembayaran/` |
-| | - Waktu Pembayaran | `/condensed/paymentterm` | **Selesai** | `Views/FPRS/MasterData/WaktuPembayaran/` |
+| | - Metode Pembayaran | `/condensed/paymentmethod` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
+| | - Waktu Pembayaran | `/condensed/paymentterm` | **Dihapus** | Modul dihapus dari prototipe (Jul 2026) |
 | | - Pajak | `/condensed/tax` | **Selesai** | `Views/FPRS/MasterData/Pajak/` |
 | | **Skema Promo** | `/condensed/promo` | Belum | Mockup statis terintegrasi di form Tambah Faktur |
 | | **Alasan** | `/condensed/reason` | **Selesai** | `Views/FPRS/MasterData/Alasan/` (Terintegrasi API) |

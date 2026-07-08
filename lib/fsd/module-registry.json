@@ -17,7 +17,7 @@
       "enabled": true,
       "type": "page",
       "htmlPath": "Views/FPRS/MasterData/Produk/index.html",
-      "formPath": "Views/FPRS/MasterData/Produk/add.html",
+      "formPath": "Views/FPRS/MasterData/Produk/detail.html",
       "apiEndpoint": "/api/v1/Sku",
       "storageKey": "md_produk",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
@@ -51,46 +51,6 @@
         },
         "erd": {
           "default": true
-        }
-      }
-    },
-    {
-      "id": "master-akun",
-      "label": "Master Data — Akun",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/Akun/index.html",
-      "apiEndpoint": "/api/v1/Account",
-      "storageKey": "md_akun",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_21_master_akun_index.png",
-        "ss_22_master_akun_modal_tambah.png",
-        "ss_23_master_akun_modal_edit.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "screenshots": {
-          "default": true
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
         }
       }
     },
@@ -131,234 +91,18 @@
       }
     },
     {
-      "id": "master-brand",
-      "label": "Master Data — Brand",
+      "id": "master-channel",
+      "label": "Master Data — Channel",
       "group": "masterData",
       "enabled": true,
       "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/Brand/index.html",
-      "apiEndpoint": "/api/v1/Brand",
-      "storageKey": "md_brand",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_13_master_brand_index.png",
-        "ss_14_master_brand_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-daftar-harga",
-      "label": "Master Data — Daftar Harga",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/DaftarHarga/index.html",
-      "apiEndpoint": "/api/v1/PriceList",
-      "storageKey": "md_daftar_harga",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_09_master_daftar_harga_index.png",
-        "ss_10_master_daftar_harga_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-divisi",
-      "label": "Master Data — Divisi",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/Divisi/index.html",
-      "apiEndpoint": "/api/v1/Division",
-      "storageKey": "md_divisi",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_07_master_divisi_index.png",
-        "ss_08_master_divisi_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-grup-pelanggan",
-      "label": "Master Data — Grup Pelanggan",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/GrupPelanggan/index.html",
-      "apiEndpoint": "/api/v1/CustomerGroup",
-      "storageKey": "md_grup_pelanggan",
+      "htmlPath": "Views/FPRS/MasterData/Channel/index.html",
+      "apiEndpoint": null,
+      "storageKey": "md_channel",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
         "ss_17_master_grup_pelanggan_index.png",
         "ss_18_master_grup_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-kategori-produk",
-      "label": "Master Data — Kategori Produk",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/KategoriProduk/index.html",
-      "apiEndpoint": "/api/v1/ProductCategory",
-      "storageKey": "md_kategori_produk",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_11_master_kategori_index.png",
-        "ss_12_master_kategori_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-konfigurasi-akses",
-      "label": "Master Data — Konfigurasi Akses",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/KonfigurasiAkses/index.html",
-      "apiEndpoint": "/api/v1/AccessConfig",
-      "storageKey": "md_konfigurasi_akses",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_26_master_konfig_akses_index.png",
-        "ss_27_master_konfig_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-metode-pembayaran",
-      "label": "Master Data — Metode Pembayaran",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/MetodePembayaran/index.html",
-      "apiEndpoint": "/api/v1/PaymentMethod",
-      "storageKey": "md_metode_pembayaran",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_28_master_metode_index.png",
-        "ss_29_master_metode_modal.png"
       ],
       "sections": {
         "overview": {
@@ -425,8 +169,8 @@
       "enabled": true,
       "type": "page",
       "htmlPath": "Views/FPRS/MasterData/Pegawai/index.html",
-      "formPath": "Views/FPRS/MasterData/Pegawai/add.html",
-      "apiEndpoint": "/api/v1/Employee",
+      "formPath": "Views/FPRS/MasterData/Pegawai/detail.html",
+      "apiEndpoint": null,
       "storageKey": "md_pegawai",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
@@ -462,86 +206,13 @@
       "enabled": true,
       "type": "page",
       "htmlPath": "Views/FPRS/MasterData/Pelanggan/index.html",
-      "formPath": "Views/FPRS/MasterData/Pelanggan/add.html",
+      "formPath": "Views/FPRS/MasterData/Pelanggan/detail.html",
       "apiEndpoint": "/api/v1/Customer",
       "storageKey": "md_pelanggan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
         "ss_15_master_pelanggan_index.png",
         "ss_16_master_pelanggan_add.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-posisi",
-      "label": "Master Data — Posisi",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/Posisi/index.html",
-      "apiEndpoint": "/api/v1/Position",
-      "storageKey": "md_posisi",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_24_master_posisi_index.png",
-        "ss_25_master_posisi_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-supplier",
-      "label": "Master Data — Supplier",
-      "group": "masterData",
-      "enabled": true,
-      "type": "page",
-      "htmlPath": "Views/FPRS/MasterData/Supplier/index.html",
-      "formPath": "Views/FPRS/MasterData/Supplier/add.html",
-      "apiEndpoint": "/api/v1/Supplier",
-      "storageKey": "md_supplier",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_36_master_supplier_index.png",
-        "ss_37_master_supplier_add.png"
       ],
       "sections": {
         "overview": {
@@ -578,64 +249,6 @@
       "screenshots": [
         "ss_45_master_stokis_index.png",
         "ss_46_master_stokis_add.png"
-      ],
-      "sections": {
-        "overview": { "default": true },
-        "columns": { "default": true, "source": "html" },
-        "fields": { "default": true, "source": "html" },
-        "validation": { "default": true, "source": "html" },
-        "businessRules": { "default": true, "source": "ai" }
-      }
-    },
-    {
-      "id": "master-unit",
-      "label": "Master Data — Unit",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/Unit/index.html",
-      "apiEndpoint": "/api/v1/Unit",
-      "storageKey": "md_unit",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_05_master_unit_index.png",
-        "ss_06_master_unit_modal.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
-          "default": true,
-          "source": "html"
-        },
-        "validation": {
-          "default": true,
-          "source": "html"
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "master-waktu-pembayaran",
-      "label": "Master Data — Waktu Pembayaran",
-      "group": "masterData",
-      "enabled": true,
-      "type": "modal",
-      "htmlPath": "Views/FPRS/MasterData/WaktuPembayaran/index.html",
-      "apiEndpoint": "/api/v1/PaymentTerm",
-      "storageKey": "md_waktu_pembayaran",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_30_master_waktu_index.png",
-        "ss_31_master_waktu_modal.png"
       ],
       "sections": {
         "overview": {
