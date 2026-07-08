@@ -16,7 +16,7 @@ Dalam perjalanannya, prototipe ini telah melewati beberapa fase penyempurnaan:
 5. **Fase Mobile SFA & Pembayaran**: Pembuatan prototipe antarmuka mobile khusus untuk sales lapangan (`Views/Mobile/`) yang mencakup pemesanan barang, tagihan piutang, pelacakan GPS, dan dasbor target.
 6. **Fase Feedback Stakeholder Mobile**: Penyelarasan UI/UX beranda (Periode Penjualan), alur Visit (single active, cek stok wajib), form outlet (NPWP mask, wilayah JSON), dan seed data demo.
 7. **Fase Kemasan Flutter APK**: Pengintegrasian modul mobile ke dalam pembungkus (wrapper) Flutter untuk menghasilkan aplikasi Android mandiri (`app-release.apk`).
-8. **Fase Juli 2026 (Web & Mobile)**: Master Stokis web (CSV), unduh data server di beranda mobile, role MD/Motoris di rute kunjungan, dual mode beli/cek stok, antrean upload. Lihat [changelog_web_mobile_jul2026.md](changelog_web_mobile_jul2026.md).
+8. **Fase Juli 2026 (Web & Mobile)**: Master Stokis web (CRUD + validasi form + CSV), unduh data server di beranda mobile, role MD/Motoris di rute kunjungan, dual mode beli/cek stok, antrean upload. Lihat [changelog_web_mobile_jul2026.md](changelog_web_mobile_jul2026.md).
 
 ---
 

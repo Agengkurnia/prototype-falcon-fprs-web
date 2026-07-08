@@ -10,11 +10,13 @@ Pusat dokumentasi prototipe **Falcon FPRS (PT Kalbe Nutritionals)** — panel we
 | **Changelog** | [changelog_web_mobile_jul2026.md](changelog_web_mobile_jul2026.md) | **Perubahan Juli 2026** — web Stokis, mobile unduh/upload, role MD |
 | **Web** | [web/README.md](web/README.md) | Portal admin desktop (`Views/FPRS/`) |
 | **Web** | [web/FSD_Falcon_Web_Portal.md](web/FSD_Falcon_Web_Portal.md) | Functional Specification Document portal web |
-| **Web** | [web/master_stokis.md](web/master_stokis.md) | Modul Master Stokis / Grosir |
+| **Web** | [web/master_stokis.md](web/master_stokis.md) | Modul Master Stokis / Grosir (CRUD, validasi form, CSV) |
+| **Web** | [web/pages/README.md](web/pages/README.md) | **Dokumentasi per halaman / modul web** |
 | **Web** | [web/master_data_integration.md](web/master_data_integration.md) | Integrasi Master Data Kalbe |
 | **Web** | [web/geografis_kunjungan_plan.md](web/geografis_kunjungan_plan.md) | Rencana modul geografis kunjungan |
 | **Mobile** | [mobile/README.md](mobile/README.md) | Indeks dokumentasi SFA mobile |
 | **Mobile** | [mobile/sfa_mobile_prototype.md](mobile/sfa_mobile_prototype.md) | Modul, alur bisnis, panduan uji |
+| **Mobile** | [mobile/pages/README.md](mobile/pages/README.md) | **Dokumentasi per halaman mobile** |
 | **Mobile** | [mobile/feedback_implementation.md](mobile/feedback_implementation.md) | Rekaman implementasi feedback PDF |
 | **Mobile** | [mobile/generate_apk.md](mobile/generate_apk.md) | Build & distribusi APK Android |
 | **Mobile** | [mobile/simplidots_sfa_mobile_flow.md](mobile/simplidots_sfa_mobile_flow.md) | Referensi alur SimpliDOTS (dekompilasi) |

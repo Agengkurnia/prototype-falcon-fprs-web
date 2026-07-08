@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Sinkronisasi Data - Falcon SFA Mobile</title>
+    <title>Antrean Upload - Falcon SFA Mobile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         .sync-summary-bar {
             background: linear-gradient(135deg, #004d35, #005D41);
@@ -79,12 +80,12 @@
         /* .empty-state styling now lives in shared mobile.css */
     </style>
 </head>
-<body style="background:#f7f9fa;">
+<body style="background:#f7f9fa;" data-prototype-doc="sync_detail">
 <div class="mobile-wrapper">
     <div class="mobile-header">
         <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
-        <span class="header-title">Sinkronisasi Data</span>
-        <div style="width:36px;"></div>
+        <span class="header-title">Antrean Upload</span>
+        <div data-prototype-doc-spacer style="width:36px;"></div>
     </div>
 
     <!-- Summary -->
@@ -147,6 +148,7 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
+<script src="../../wwwroot/js/prototype-page-doc.js"></script>
 <script>
     $(document).ready(function() {
         renderQueue();

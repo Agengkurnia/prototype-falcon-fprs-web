@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Stokis – Master Data | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+@font-face{font-family:'Kalbe Geometric';font-weight:700;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2')format('woff2')}
+    </style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1" id="formTitle">Detail Stokis</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Data Master</li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Stokis</a></li>
+                        <li class="breadcrumb-item active">Detail</li>
+                    </ol>
+                </nav>
+            </div>
+            <a href="index.html" class="btn btn-secondary"><i class="fa fa-arrow-left me-1"></i> Kembali</a>
+        </div>
+
+        <div class="alert alert-secondary border-0 shadow-sm mb-3" role="alert">
+            <i class="fa fa-eye me-2 text-secondary"></i>
+            Halaman ini hanya untuk <strong>melihat</strong> data stokis. Input dan perubahan data stokis
+            dilakukan melalui <strong>Upload Data</strong> di halaman daftar.
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <h5 class="border-bottom pb-2 text-success"><i class="fa fa-store me-1"></i> Data Stokis / Grosir</h5>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold" for="kode">Outlet ID</label>
+                        <input type="text" class="form-control bg-light" id="kode" disabled/>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold" for="nama">Nama Stokis</label>
+                        <input type="text" class="form-control" id="nama" disabled/>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="branch">Branch</label>
+                        <input type="text" class="form-control" id="branch" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="region">Region</label>
+                        <input type="text" class="form-control" id="region" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="telepon">Telepon</label>
+                        <input type="text" class="form-control" id="telepon" disabled/>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold" for="status">Status</label>
+                        <input type="text" class="form-control" id="status" disabled/>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold" for="alamat">Alamat Lengkap</label>
+                        <textarea class="form-control" id="alamat" rows="2" disabled></textarea>
+                    </div>
+
+                    <h5 class="border-bottom pb-2 text-success mt-2"><i class="fa fa-map-marker-alt me-1"></i> Koordinat GPS (Check-in Mobile)</h5>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="lat">Latitude</label>
+                        <input type="text" class="form-control" id="lat" disabled/>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold" for="lng">Longitude</label>
+                        <input type="text" class="form-control" id="lng" disabled/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3" id="stokCard">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                    <h5 class="mb-0 text-success"><i class="fa fa-boxes-stacked me-1"></i> Informasi Stok Saat Ini</h5>
+                    <small class="text-muted" id="stokUpdatedInfo"></small>
+                </div>
+
+                <div id="stokEmptyState" class="alert alert-secondary border-0 mb-0 d-none">
+                    <i class="fa fa-circle-info me-1"></i>
+                    Data stok belum tersedia untuk stokis ini.
+                </div>
+
+                <div id="stokContent" class="d-none">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="text-muted small">Total SKU</div>
+                                <div class="fs-4 fw-bold" id="statTotalSku">0</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="text-muted small">Total Kuantitas (Karton)</div>
+                                <div class="fs-4 fw-bold" id="statTotalQty">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion" id="stokAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="hdProduk">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collProduk" aria-expanded="true" aria-controls="collProduk">
+                                    <i class="fa fa-box me-2 text-muted"></i> Stok per Produk
+                                </button>
+                            </h2>
+                            <div id="collProduk" class="accordion-collapse collapse show">
+                                <div class="accordion-body py-3">
+                                    <div class="mb-3"></div>
+                                    <table id="tblStokProduk" class="table table-bordered table-sm align-middle w-100">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Kode</th>
+                                                <th>Produk</th>
+                                                <th class="text-end">Stok (Karton)</th>
+                                                <th class="text-end">Stok (Pcs)</th>
+                                                <th>Update Terakhir</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stokProdukBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="hdHistory">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collHistory" aria-expanded="false" aria-controls="collHistory">
+                                    <i class="fa fa-clock-rotate-left me-2 text-muted"></i> Riwayat Input Stok oleh Motoris
+                                </button>
+                            </h2>
+                            <div id="collHistory" class="accordion-collapse collapse">
+                                <div class="accordion-body py-3">
+                                    <div class="mb-3"></div>
+                                    <table id="tblStokHistory" class="table table-bordered table-sm align-middle w-100">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Tanggal</th>
+                                                <th>Motoris</th>
+                                                <th>Produk</th>
+                                                <th class="text-end">Qty</th>
+                                                <th>Catatan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stokHistoryBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="hdStatus">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collStatus" aria-expanded="false" aria-controls="collStatus">
+                                    <i class="fa fa-toggle-on me-2 text-muted"></i> Riwayat Status (Active / Inactive) — dari Upload
+                                </button>
+                            </h2>
+                            <div id="collStatus" class="accordion-collapse collapse">
+                                <div class="accordion-body py-3">
+                                    <div class="mb-3"></div>
+                                    <table id="tblStatusHistory" class="table table-bordered table-sm align-middle w-100">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Waktu</th>
+                                                <th>Status</th>
+                                                <th>Keterangan</th>
+                                                <th>File Upload</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="statusHistoryBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+            const KEY = 'md_stokis';
+            const STOCK_KEY = 'md_stokis_stock_hist';
+            const STATUS_KEY = 'md_stokis_status_hist';
+
+            const DT_LANG = {
+                search: '', searchPlaceholder: 'Cari...',
+                lengthMenu: '_MENU_ entri',
+                info: '_START_-_END_ dari _TOTAL_',
+                infoEmpty: '0 data', infoFiltered: '(disaring dari _MAX_)',
+                paginate: { previous: '‹', next: '›' },
+                zeroRecords: 'Tidak ada data cocok',
+                emptyTable: 'Belum ada data'
+            };
+            const DT_DOM = '<"d-flex align-items-center justify-content-between mb-2"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-2"i<"ms-auto"p>>';
+
+            function initDT(selector, opts) {
+                if ($.fn.DataTable.isDataTable(selector)) $(selector).DataTable().destroy();
+                return $(selector).DataTable(Object.assign({
+                    language: DT_LANG, dom: DT_DOM,
+                    pageLength: 5,
+                    lengthMenu: [[5, 10, 25, -1], [5, 10, 25, 'Semua']]
+                }, opts || {}));
+            }
+
+            function fmtWaktu(iso) {
+                const d = new Date(iso);
+                if (isNaN(d.getTime())) return iso || '-';
+                return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            }
+
+            function statusBadge(s) {
+                return s === 'Active'
+                    ? '<span class="badge-status badge-active">Active</span>'
+                    : '<span class="badge-status badge-inactive">Inactive</span>';
+            }
+            const DEMO_PRODUCTS = [
+                { kode: 'SKU-001', nama: 'Morinaga Chil Kid 800g', price: 265000, pcsPerCtn: 12 },
+                { kode: 'SKU-004', nama: 'Chil School Gum 800g', price: 235000, pcsPerCtn: 12 },
+                { kode: 'SKU-012', nama: 'Prenagen Mommy 400g', price: 65000, pcsPerCtn: 24 },
+                { kode: 'SKU-018', nama: 'Entrasol Gold 600g', price: 89000, pcsPerCtn: 12 },
+                { kode: 'SKU-021', nama: 'Diabetasol Vanilla 600g', price: 72000, pcsPerCtn: 12 }
+            ];
+            const DEMO_MOTORIS = ['Budi Santoso', 'Rudi Hartono', 'Agus Salim', 'Dedi Kurniawan'];
+
+            function getLocalData() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+            function getStockStore() { return JSON.parse(localStorage.getItem(STOCK_KEY) || '{}'); }
+            function setStockStore(s) { localStorage.setItem(STOCK_KEY, JSON.stringify(s)); }
+            function getStatusStore() { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); }
+            function setStatusStore(s) { localStorage.setItem(STATUS_KEY, JSON.stringify(s)); }
+
+            function seededInt(seed, min, max) {
+                const x = Math.sin(seed) * 10000;
+                const frac = x - Math.floor(x);
+                return min + Math.floor(frac * (max - min + 1));
+            }
+
+            function generateDemoStock(kode) {
+                let seedBase = 0;
+                for (let i = 0; i < kode.length; i++) seedBase += kode.charCodeAt(i) * (i + 1);
+                const history = [];
+                const today = new Date();
+                const jenisList = ['Cek Stok', 'Tambah Stok (Beli)'];
+                for (let i = 0; i < 8; i++) {
+                    const seed = seedBase + i * 17;
+                    const prod = DEMO_PRODUCTS[seededInt(seed, 0, DEMO_PRODUCTS.length - 1)];
+                    const motoris = DEMO_MOTORIS[seededInt(seed + 3, 0, DEMO_MOTORIS.length - 1)];
+                    const jenis = jenisList[seededInt(seed + 5, 0, jenisList.length - 1)];
+                    const qty = seededInt(seed + 7, 2, 40);
+                    const d = new Date(today);
+                    d.setDate(today.getDate() - seededInt(seed + 9, 0, 45));
+                    history.push({
+                        tanggal: d.toISOString().slice(0, 10),
+                        motoris,
+                        produkKode: prod.kode,
+                        produkNama: prod.nama,
+                        jenis,
+                        qty,
+                        catatan: jenis === 'Cek Stok' ? 'Stok opname di lokasi' : 'Restock/kulakan'
+                    });
+                }
+                history.sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+                return history;
+            }
+
+            function getStockHistory(kode) {
+                const store = getStockStore();
+                if (!store[kode]) {
+                    store[kode] = generateDemoStock(kode);
+                    setStockStore(store);
+                }
+                return store[kode];
+            }
+
+            function generateDemoStatusHistory(kode, currentStatus) {
+                let seedBase = 0;
+                for (let i = 0; i < kode.length; i++) seedBase += kode.charCodeAt(i) * (i + 3);
+                const today = new Date();
+                const events = [];
+                function fileFor(d) { return 'stokis_' + d.toISOString().slice(0, 10) + '.csv'; }
+
+                let daysAgo = seededInt(seedBase, 60, 120);
+                const d0 = new Date(today); d0.setDate(today.getDate() - daysAgo);
+                events.push({ waktu: d0.toISOString(), status: 'Active', aksi: 'Ditambahkan (ada di file upload)', file: fileFor(d0) });
+                let last = 'Active';
+
+                const n = seededInt(seedBase + 1, 2, 4);
+                for (let i = 1; i < n; i++) {
+                    daysAgo -= seededInt(seedBase + i * 7, 10, 25);
+                    if (daysAgo < 3) daysAgo = 3;
+                    const di = new Date(today); di.setDate(today.getDate() - daysAgo);
+                    const toInactive = last === 'Active' && seededInt(seedBase + i * 11, 0, 1) === 1;
+                    const st = toInactive ? 'Inactive' : 'Active';
+                    const aksi = st === 'Inactive'
+                        ? 'Tidak ada di file upload → dinonaktifkan'
+                        : (last === 'Inactive' ? 'Diaktifkan kembali (ada di file upload)' : 'Diperbarui (ada di file upload)');
+                    events.push({ waktu: di.toISOString(), status: st, aksi, file: fileFor(di) });
+                    last = st;
+                }
+
+                if (last !== currentStatus) {
+                    const dz = new Date(today); dz.setDate(today.getDate() - seededInt(seedBase + 99, 0, 2));
+                    const aksi = currentStatus === 'Inactive'
+                        ? 'Tidak ada di file upload → dinonaktifkan'
+                        : 'Diaktifkan kembali (ada di file upload)';
+                    events.push({ waktu: dz.toISOString(), status: currentStatus, aksi, file: fileFor(dz) });
+                }
+                return events;
+            }
+
+            function getStatusHistory(kode, currentStatus) {
+                const store = getStatusStore();
+                if (!store[kode] || !store[kode].length) {
+                    store[kode] = generateDemoStatusHistory(kode, currentStatus);
+                    setStatusStore(store);
+                }
+                return store[kode].slice().sort((a, b) => String(b.waktu).localeCompare(String(a.waktu)));
+            }
+
+            function computeCurrentStock(history) {
+                const map = {};
+                history.forEach(h => {
+                    if (!map[h.produkKode]) {
+                        const prod = DEMO_PRODUCTS.find(p => p.kode === h.produkKode) || { nama: h.produkNama, pcsPerCtn: 12 };
+                        map[h.produkKode] = { kode: h.produkKode, nama: h.produkNama, pcsPerCtn: prod.pcsPerCtn, price: prod.price || 0, karton: 0, lastDate: '' };
+                    }
+                    const rec = map[h.produkKode];
+                    if (h.jenis === 'Cek Stok') {
+                        rec.karton = h.qty;
+                    } else {
+                        rec.karton += h.qty;
+                    }
+                    if (h.tanggal > rec.lastDate) rec.lastDate = h.tanggal;
+                });
+                return Object.values(map).sort((a, b) => a.kode.localeCompare(b.kode));
+            }
+
+            function renderStockSection(kode, status) {
+                const empty = document.getElementById('stokEmptyState');
+                const content = document.getElementById('stokContent');
+                if (!kode) {
+                    empty.classList.remove('d-none');
+                    content.classList.add('d-none');
+                    return;
+                }
+                const history = getStockHistory(kode);
+                const current = computeCurrentStock(history);
+                const statusHist = getStatusHistory(kode, status || 'Active');
+
+                empty.classList.add('d-none');
+                content.classList.remove('d-none');
+
+                const totalQty = current.reduce((s, c) => s + c.karton, 0);
+                document.getElementById('statTotalSku').textContent = current.length;
+                document.getElementById('statTotalQty').textContent = totalQty.toLocaleString('id-ID');
+                document.getElementById('stokUpdatedInfo').textContent = history.length ? 'Update terakhir: ' + history[0].tanggal : '';
+
+                document.getElementById('stokProdukBody').innerHTML = current.map(c => `<tr>
+                    <td><code>${c.kode}</code></td>
+                    <td>${c.nama}</td>
+                    <td class="text-end">${c.karton.toLocaleString('id-ID')}</td>
+                    <td class="text-end">${(c.karton * c.pcsPerCtn).toLocaleString('id-ID')}</td>
+                    <td>${c.lastDate || '-'}</td>
+                </tr>`).join('');
+
+                document.getElementById('stokHistoryBody').innerHTML = history.map(h => `<tr>
+                        <td>${h.tanggal}</td>
+                        <td>${h.motoris}</td>
+                        <td><code>${h.produkKode}</code> ${h.produkNama}</td>
+                        <td class="text-end">${h.qty.toLocaleString('id-ID')}</td>
+                        <td class="text-muted small">${h.catatan}</td>
+                    </tr>`).join('');
+
+                document.getElementById('statusHistoryBody').innerHTML = statusHist.map(e => `<tr>
+                        <td data-order="${e.waktu}">${fmtWaktu(e.waktu)}</td>
+                        <td>${statusBadge(e.status)}</td>
+                        <td>${e.aksi}</td>
+                        <td class="text-muted small"><code>${e.file || '-'}</code></td>
+                    </tr>`).join('');
+
+                initDT('#tblStokProduk', { order: [[0, 'asc']] });
+                initDT('#tblStokHistory', { order: [[0, 'desc']] });
+                initDT('#tblStatusHistory', { order: [[0, 'desc']] });
+
+                document.querySelectorAll('#stokAccordion .accordion-collapse').forEach(el => {
+                    el.addEventListener('shown.bs.collapse', () => {
+                        ['#tblStokProduk', '#tblStokHistory', '#tblStatusHistory'].forEach(sel => {
+                            if ($.fn.DataTable.isDataTable(sel)) $(sel).DataTable().columns.adjust();
+                        });
+                    });
+                });
+            }
+
+            function loadDetail() {
+                const id = new URLSearchParams(window.location.search).get('id');
+                const item = getLocalData().find(d => String(d.id) === String(id));
+                if (!item) {
+                    document.getElementById('nama').value = '(data tidak ditemukan)';
+                    renderStockSection(null);
+                    return;
+                }
+                document.getElementById('kode').value = item.kode || '';
+                document.getElementById('nama').value = item.nama || '';
+                document.getElementById('telepon').value = item.telepon || '-';
+                document.getElementById('branch').value = item.branch || '-';
+                document.getElementById('region').value = item.region || '-';
+                document.getElementById('alamat').value = item.alamat || '-';
+                document.getElementById('lat').value = item.lat ?? '-';
+                document.getElementById('lng').value = item.lng ?? '-';
+                document.getElementById('status').value = item.status || 'Active';
+                document.getElementById('formTitle').textContent = 'Detail Stokis — ' + (item.nama || item.kode || '');
+                renderStockSection(item.kode, item.status || 'Active');
+            }
+
+            loadDetail();
+        });
+    </script>
+</body>
+</html>

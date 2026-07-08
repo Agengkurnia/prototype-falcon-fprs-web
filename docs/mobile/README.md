@@ -8,6 +8,7 @@ Prototipe aplikasi **Sales Force Automation (SFA)** untuk canvasser lapangan. Be
 
 | Dokumen | Fokus |
 |---------|-------|
+| [pages/README.md](pages/README.md) | **Indeks dokumentasi per halaman (20 halaman)** |
 | [sfa_mobile_prototype.md](sfa_mobile_prototype.md) | Arsitektur, modul, alur bisnis, panduan uji |
 | [feedback_implementation.md](feedback_implementation.md) | Implementasi feedback stakeholder (PDF) |
 | [generate_apk.md](generate_apk.md) | Build APK release |

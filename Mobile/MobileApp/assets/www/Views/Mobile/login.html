@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         /* Specific Styles for Login Screen */
         .login-wrapper {
@@ -188,7 +189,7 @@
         }
     </style>
 </head>
-<body>
+<body data-prototype-doc="login">
 
     <div class="mobile-wrapper">
         <div class="login-wrapper">
@@ -245,6 +246,7 @@
     <!-- JS Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/prototype-page-doc.js"></script>
     <script>
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('passwordInput');

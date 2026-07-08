@@ -572,7 +572,7 @@
       "enabled": true,
       "type": "page",
       "htmlPath": "Views/FPRS/MasterData/Stokis/index.html",
-      "formPath": "Views/FPRS/MasterData/Stokis/add.html",
+      "formPath": "Views/FPRS/MasterData/Stokis/detail.html",
       "storageKey": "md_stokis",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [

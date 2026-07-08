@@ -27,7 +27,7 @@ Views/FPRS/
 │   ├── Pelanggan/
 │   ├── Pegawai/
 │   ├── Supplier/
-│   ├── Stokis/          # Stokis / Grosir (baru — CSV download/upload)
+│   ├── Stokis/          # Stokis / Grosir — CSV + validasi form
 │   ├── DaftarHarga/
 │   └── ... (Akun, Brand, Divisi, Unit, Pajak, dll.)
 ├── Penjualan/
@@ -119,8 +119,10 @@ Modul **Canvassing** dan **Kunjungan** menggunakan kartu interaktif, filter, Swe
 
 | Dokumen | Isi |
 |---------|-----|
+| [pages/README.md](pages/README.md) | **Indeks dokumentasi per halaman / modul** |
 | [FSD_Falcon_Web_Portal.md](FSD_Falcon_Web_Portal.md) | Spesifikasi fungsional lengkap per modul |
-| [master_stokis.md](master_stokis.md) | **Master Stokis** — CRUD, CSV download/upload, integrasi mobile |
+| [pages/master_stokis.md](pages/master_stokis.md) | Master Stokis — CRUD, validasi form, CSV, integrasi mobile |
+| [master_stokis.md](master_stokis.md) | Ringkasan Master Stokis |
 | [master_data_integration.md](master_data_integration.md) | Analisis integrasi portal Master Data Kalbe |
 | [master_data_integration_shp.md](master_data_integration_shp.md) | Variasi integrasi SHP |
 | [geografis_kunjungan_plan.md](geografis_kunjungan_plan.md) | Rencana fitur peta kunjungan |

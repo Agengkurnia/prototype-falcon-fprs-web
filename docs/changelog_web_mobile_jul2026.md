@@ -10,7 +10,7 @@ Dokumen ini merangkum perubahan prototipe **Falcon FPRS** pada sesi pengembangan
 
 | Area | Perubahan Utama |
 |------|-----------------|
-| **Web** | Modul Master Stokis (CRUD, download/upload CSV, validasi duplikat lat/lng) |
+| **Web** | Modul Master Stokis (CRUD, validasi form, download/upload CSV, duplikat lat/lng) |
 | **Mobile — Beranda** | Unduh data dari server (bukan sync dua arah); menu 3 kolom; badge error unduhan |
 | **Mobile — Kunjungan** | Rute Harian + Overdue (MD); nearest GPS (Motoris); hapus selector stokis di visit |
 | **Mobile — Stokis** | Dual mode Beli vs Cek Stok; picker stokis terdekat setelah GPS |
@@ -27,20 +27,32 @@ Dokumen ini merangkum perubahan prototipe **Falcon FPRS** pada sesi pengembangan
 |------|--------|
 | **Path** | `Views/FPRS/MasterData/Stokis/` |
 | **Menu** | Data Master → Stokis / Grosir (`layout.js`) |
-| **Halaman** | `index.html` (daftar), `add.html` (tambah) |
-| **Seed data** | `wwwroot/data/stokis.json` |
-| **Storage key** | `md_stokis` (localStorage) |
+| **Halaman** | `index.html` (daftar), `detail.html` (view-only) |
+| **Seed data** | `wwwroot/data/stokis.json` (84 outlet dari *MAPPING MPP JULI 2026*) |
+| **Storage key** | `md_stokis`, `md_stokis_seed_ver`, `md_stokis_stock_hist` (localStorage) |
 
 **Fitur:**
 
-- CRUD stokis/grosir dengan kode, nama, tipe, kota, telepon, alamat, lat/lng, status
-- **Download Data** — ekspor seluruh data ke CSV
-- **Upload Data** — impor massal dari CSV (edit di Excel)
-- Validasi duplikat berdasarkan **latitude & longitude** saja (koordinat sama = dilewati)
-- Auto-generate kode jika kosong atau bentrok
+- Data stokis: **Outlet ID**, nama, kota, telepon, alamat, lat/lng, status
+- **View-only** — input & edit **hanya via Upload CSV**; tidak ada tambah/edit/hapus manual
+- Aksi tabel hanya **View** (ikon mata) → `detail.html`
+- **Download Data** — ekspor ke CSV (dengan kolom `outlet_id`)
+- **Upload Data** — sinkronisasi: Outlet ID di file → **Active**; Outlet ID lama tak ada di file → **Inactive**
+- Duplikat koordinat: koordinat yang sudah dipakai Outlet ID lain → baris dilewati
+- Halaman detail memuat island **Informasi Stok Saat Ini** + **Riwayat Input Stok Motoris**
 - Data dibaca mobile via `SfaStore.getStockists()` dari key `md_stokis`
 
-Lihat detail: [web/master_stokis.md](web/master_stokis.md)
+Lihat detail: [web/master_stokis.md](web/master_stokis.md) · [web/pages/master_stokis.md](web/pages/master_stokis.md)
+
+#### Aturan upload (identitas Outlet ID)
+
+| Aturan | Detail |
+|--------|--------|
+| Identitas | Kolom `outlet_id` wajib ada di file |
+| Outlet ID ada di file | Ditambah/diperbarui, status **Active** |
+| Outlet ID lama tak ada di file | Otomatis **Inactive** |
+| Duplikat koordinat | Dipakai Outlet ID lain → baris dilewati |
+| Baris tidak valid | Tanpa `outlet_id`/`nama`/`lat`/`lng` → dilewati |
 
 ---
 
@@ -194,7 +206,7 @@ Demo queue seed: 2 pending, 1 success (Collection), 1 failed (Invoice `SQ-DEMO-E
 
 ```
 Views/FPRS/MasterData/Stokis/index.html
-Views/FPRS/MasterData/Stokis/add.html
+Views/FPRS/MasterData/Stokis/detail.html   (view-only, dulu add.html)
 wwwroot/js/layout.js                    (menu Stokis)
 wwwroot/data/stokis.json
 ```
@@ -220,6 +232,16 @@ node scripts/create-flutter-wrapper.js
 build-apk.bat
 ```
 
+### Bantuan In-Page (Prototipe)
+
+| File | Keterangan |
+|------|------------|
+| `wwwroot/js/prototype-page-doc.js` | Modal ringkasan dokumentasi per halaman |
+| `wwwroot/css/prototype-page-doc.css` | Style tombol info |
+| `data-prototype-doc` | Atribut pada `<body>` halaman terkait |
+
+Halaman dengan bantuan in-app: `login`, `home`, `visit_list`, `visit_detail`, `product_catalog`, `outlet_list`, `sync_detail`, web `Stokis/index`.
+
 ---
 
 ## Panduan Uji Cepat
@@ -227,8 +249,10 @@ build-apk.bat
 ### Web — Master Stokis
 
 1. Buka `http://127.0.0.1:5501/Views/FPRS/MasterData/Stokis/index.html`
-2. Tambah stokis manual atau upload CSV
-3. Download CSV → edit → upload; verifikasi duplikat lat/lng dilewati
+2. **Tambah stokis** → verifikasi kode auto-generate (readonly)
+3. Isi lat/lng yang sudah dipakai stokis lain → simpan harus ditolak
+4. Telepon invalid (`08123`) ditolak; format valid (`0812-3456-7890`) lolos
+5. Download CSV → edit → upload; verifikasi duplikat lat/lng dilewati
 
 ### Mobile — Unduh Data
 
@@ -262,7 +286,8 @@ build-apk.bat
 
 | Dokumen | Isi |
 |---------|-----|
+| [pages/README.md](pages/README.md) | Dokumentasi per halaman mobile |
 | [mobile/sfa_mobile_prototype.md](mobile/sfa_mobile_prototype.md) | Spesifikasi modul mobile (diperbarui) |
-| [web/master_stokis.md](web/master_stokis.md) | Modul Master Stokis web |
+| [web/pages/master_stokis.md](web/pages/master_stokis.md) | Modul Master Stokis web (detail) |
 | [mobile/generate_apk.md](mobile/generate_apk.md) | Build APK |
 | [project_overview.md](project_overview.md) | Arsitektur umum |

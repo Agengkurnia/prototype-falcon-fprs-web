@@ -9,7 +9,7 @@ Modul administrasi untuk mengelola data **Stokis** dan **Grosir** yang digunakan
 | Item | Path |
 |------|------|
 | Daftar | `Views/FPRS/MasterData/Stokis/index.html` |
-| Tambah | `Views/FPRS/MasterData/Stokis/add.html` |
+| Detail (view-only) | `Views/FPRS/MasterData/Stokis/detail.html` |
 | Menu sidebar | Data Master → **Stokis / Grosir** |
 | Seed JSON | `wwwroot/data/stokis.json` |
 | Storage | `localStorage` key `md_stokis` |
@@ -18,28 +18,32 @@ Modul administrasi untuk mengelola data **Stokis** dan **Grosir** yang digunakan
 
 ## Fitur
 
-### CRUD Manual
+### View-Only (tanpa CRUD manual)
 
-- Tambah stokis via form `add.html`
-- Edit / hapus dari tabel `index.html`
-- Kolom: Kode, Nama, Tipe, Kota, Telepon, Status, Koordinat (lat/lng)
+- Data **hanya diinput/diubah via Upload CSV**
+- Aksi tabel hanya **View** (ikon mata) → `detail.html`
+- `detail.html`: semua field **disabled**; hanya untuk melihat data + island stok
+- Kolom tabel: **Outlet ID**, Nama, Kota, Telepon, Status, Aksi
 
 ### Download Data (CSV)
 
-Tombol **Download Data** mengekspor seluruh record ke file CSV untuk diedit di Excel.
+Tombol **Download Data** mengekspor record ke CSV untuk diedit di Excel.
 
-### Upload Data (CSV)
+**Kolom ekspor:** `outlet_id`, `nama`, `alamat`, `kota`, `telepon`, `lat`, `lng`, `status` — `outlet_id` adalah identitas record.
 
-Tombol **Upload Data** mengimpor file CSV hasil edit.
+### Upload Data (CSV) — satu-satunya cara input & edit
+
+Tombol **Upload Data** menyinkronkan data dari file CSV.
 
 **Aturan impor:**
 
 | Aturan | Detail |
 |--------|--------|
-| Duplikat | Dicek dari **latitude & longitude** saja |
-| Koordinat sama | Baris dilewati (tidak di-insert ulang) |
-| Kode kosong / bentrok | Auto-generate kode baru |
-| Format | CSV dengan header kolom standar modul |
+| Identitas | Kolom `outlet_id` **wajib** ada di file |
+| Outlet ID ada di file | Record ditambah/diperbarui, status **Active** |
+| Outlet ID lama tidak ada di file | Otomatis di-set **Inactive** |
+| Duplikat koordinat | Koordinat yang sudah dipakai Outlet ID lain → baris dilewati |
+| Baris tidak valid | Tanpa `outlet_id` / `nama` / `lat` / `lng` → dilewati |
 
 ### Integrasi Mobile
 
@@ -64,7 +68,7 @@ flowchart LR
     WEB[Web Master Stokis]
     LS[(localStorage md_stokis)]
     MOB[Mobile SFA]
-    WEB -->|CRUD / CSV| LS
+    WEB -->|Upload CSV| LS
     LS -->|getStockists| MOB
 ```
 
@@ -73,11 +77,11 @@ flowchart LR
 ## Pengujian
 
 1. Jalankan Live Server port `5501`
-2. Buka halaman Stokis index
-3. Tambah 1 record manual dengan koordinat unik
-4. Download CSV → ubah nama → upload ulang
-5. Upload baris dengan lat/lng sama → harus dilewati (notifikasi skip)
-6. Buka mobile `product_catalog.html` → GPS check-in → stokis baru muncul di picker
+2. Buka halaman Stokis index → klik ikon **mata** → `detail.html` (field disabled + island stok)
+3. **Download CSV** → hapus satu baris Outlet ID → **Upload**
+4. Outlet ID di file → **Active**; Outlet ID yang dihapus → **Inactive**
+5. Tambah baris Outlet ID baru → upload → muncul record baru (Active)
+6. Buka mobile `product_catalog.html` → GPS check-in → stokis Active muncul di picker
 
 ---
 

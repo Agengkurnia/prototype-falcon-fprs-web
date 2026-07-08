@@ -19,14 +19,16 @@ Dokumen FSD untuk **Mobile SFA** Falcon FPRS (`Views/Mobile/`), mengikuti standa
 ```powershell
 cd "D:\Work\Source\Comsup\falcon\Prototype"
 
-# Terminal 1
+# Terminal 1 (opsional, untuk capture screenshot)
 py -m http.server 5502
 
-# Terminal 2
-py Document/build_fsd_deliverables.py --mobile-only
+# Terminal 2 — Mobile saja, skip capture jika screenshot sudah ada
+py Document/build_fsd_deliverables.py --mobile-only --skip-capture
 ```
 
 Deliverable: `Document/{YYYYMMDDHHmmss}__FSD_FALCON_MOBILE.docx`
+
+Terakhir di-build: **8 Juli 2026** — `20260708101352__FSD_FALCON_MOBILE.docx`
 
 ## Build lokal (hanya folder ini)
 

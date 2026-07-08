@@ -35,6 +35,10 @@ PAGES = [
     ('ss_21_sync_detail.png', 'sync_detail.html', 'auth'),
 ]
 
+VIEWPORT_WIDTH = 390
+VIEWPORT_HEIGHT = 844
+DEVICE_SCALE = 2
+
 AUTH_JS = """
 () => {
   localStorage.setItem('sfa_user', JSON.stringify({
@@ -51,6 +55,56 @@ AUTH_JS = """
     localStorage.removeItem('sfa_customers');
     localStorage.removeItem('sfa_products');
     localStorage.removeItem('sfa_sync_queue');
+  }
+}
+"""
+
+PREPARE_CAPTURE_JS = """
+() => {
+  const id = 'fsd-capture-style';
+  if (!document.getElementById(id)) {
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        min-height: 100% !important;
+        display: block !important;
+        background: #fff !important;
+        overflow: hidden !important;
+      }
+      .mobile-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100% !important;
+        max-height: 100% !important;
+        min-height: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .proto-doc-btn, .proto-doc-btn--float, .skip-link {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  window.scrollTo(0, 0);
+  const content = document.querySelector('.mobile-content');
+  if (content) content.scrollTop = 0;
+}
+"""
+
+SCROLL_CONTENT_BOTTOM_JS = """
+() => {
+  const content = document.querySelector('.mobile-content');
+  if (content) {
+    content.scrollTop = content.scrollHeight;
+  } else {
+    window.scrollTo(0, document.body.scrollHeight);
   }
 }
 """
@@ -90,8 +144,16 @@ def wait_ready(page, filename: str, rel_path: str):
 
 
 def take_shot(page, filename: str) -> None:
-    """Viewport capture — satu layar ponsel, proporsi sesuai UI mobile."""
-    page.screenshot(path=os.path.join(OUT_DIR, filename), full_page=False)
+    """Capture `.mobile-wrapper` edge-to-edge — tanpa margin abu-abu desktop preview."""
+    out = os.path.join(OUT_DIR, filename)
+    wrapper = page.locator('.mobile-wrapper').first
+    try:
+        wrapper.wait_for(state='visible', timeout=5000)
+        wrapper.screenshot(path=out)
+        return
+    except Exception:
+        pass
+    page.screenshot(path=out, full_page=False)
 
 
 def capture_all(base_url: str):
@@ -108,10 +170,14 @@ def capture_all(base_url: str):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         context = browser.new_context(
-            viewport={'width': 360, 'height': 780},
-            device_scale_factor=1,
+            viewport={'width': VIEWPORT_WIDTH, 'height': VIEWPORT_HEIGHT},
+            device_scale_factor=DEVICE_SCALE,
             is_mobile=True,
             has_touch=True,
+            user_agent=(
+                'Mozilla/5.0 (Linux; Android 13; Pixel 7) '
+                'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36'
+            ),
         )
         page = context.new_page()
 
@@ -124,13 +190,10 @@ def capture_all(base_url: str):
                     page.evaluate(AUTH_JS)
                 page.goto(url, wait_until='domcontentloaded', timeout=30000)
                 wait_ready(page, filename, rel_path)
+                page.evaluate(PREPARE_CAPTURE_JS)
                 if setup == 'auth_bottom':
-                    try:
-                        page.locator('.mobile-nav').scroll_into_view_if_needed(timeout=3000)
-                        time.sleep(0.4)
-                    except Exception:
-                        page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
-                        time.sleep(0.4)
+                    page.evaluate(SCROLL_CONTENT_BOTTOM_JS)
+                    time.sleep(0.4)
                 take_shot(page, filename)
                 captured += 1
             except Exception as e:

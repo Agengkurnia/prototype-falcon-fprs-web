@@ -31,6 +31,17 @@ LOGO_HEIGHT = Cm(3.93)
 FRONT_MATTER_KEEP = 21
 COVER_TABLE_COUNT = 2
 
+DEFAULT_DOCUMENT_APPROVAL = [
+    {'name': 'Muhammad Rafi', 'title': 'SHP Channel & Customer Development'},
+    {'name': 'Silvester Mario Nian Destrada', 'title': 'SHP Channel & Customer Development'},
+    {'name': 'Ageng Kurniawan Sugianto', 'title': 'IT Product'},
+    {'name': 'Albet', 'title': 'IT Product'},
+]
+
+APPROVAL_TABLE_INDEX = 1
+APPROVAL_HEADER_ROW = 7
+APPROVAL_DATA_START_ROW = 8
+
 DEFAULT_META = {
     'version': '1.0.0',
     'project': 'IDC System',
@@ -258,6 +269,35 @@ def set_cover_logo(doc: Document, logo_path: str = LOGO_PATH):
     run.add_picture(logo_path, width=LOGO_WIDTH, height=LOGO_HEIGHT)
 
 
+def _set_merged_row_text(row, start_col: int, end_col: int, text: str):
+    for ci in range(start_col, min(end_col + 1, len(row.cells))):
+        row.cells[ci].text = text
+
+
+def update_document_approval(doc: Document, rows: list[dict] | None = None):
+    if len(doc.tables) <= APPROVAL_TABLE_INDEX:
+        return
+    approval = rows or DEFAULT_DOCUMENT_APPROVAL
+    table = doc.tables[APPROVAL_TABLE_INDEX]
+    for i, person in enumerate(approval):
+        ri = APPROVAL_DATA_START_ROW + i
+        if ri >= len(table.rows):
+            break
+        row = table.rows[ri]
+        name = person.get('name', '')
+        title = person.get('title', '')
+        _set_merged_row_text(row, 0, 1, name)
+        _set_merged_row_text(row, 2, 5, title)
+        if len(row.cells) > 6:
+            row.cells[6].text = person.get('signature', '')
+        if len(row.cells) > 7:
+            row.cells[7].text = person.get('signature_date', '')
+    for ri in range(APPROVAL_DATA_START_ROW + len(approval), len(table.rows)):
+        row = table.rows[ri]
+        for ci in range(len(row.cells)):
+            row.cells[ci].text = ''
+
+
 def update_cover_pages(doc: Document, meta: dict):
     """Update teks cover (paragraf & tabel) sesuai metadata proyek."""
     if len(doc.paragraphs) > 2:
@@ -318,6 +358,9 @@ def update_cover_pages(doc: Document, meta: dict):
             for ci, cell in enumerate(r.cells):
                 if ci < len(vals):
                     cell.text = vals[ci]
+
+    approval_rows = meta.get('document_approval')
+    update_document_approval(doc, approval_rows)
 
 
 def trim_template_body(doc: Document, keep: int = FRONT_MATTER_KEEP):

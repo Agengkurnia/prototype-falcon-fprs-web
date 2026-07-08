@@ -20,7 +20,22 @@ cd "D:\Work\Source\Comsup\falcon\Prototype\wwwroot\document\FSD\FalconMobile"
 py build.py
 ```
 
-Output DOCX di masing-masing folder `output/`. Buka Word → tekan **F9** untuk update Table of Contents.
+Output DOCX di masing-masing folder `output/`. Deliverable final (timestamp) disalin ke `Prototype/Document/` via `Document/build_fsd_deliverables.py`.
+
+Buka Word → tekan **F9** untuk update Table of Contents.
+
+## Document Approval (cover halaman 2)
+
+Standar **Falcon FPRS / SHP** — diisi otomatis saat build (`lib/fsd_cover_merge.py`):
+
+| Full name | Job Title |
+|-----------|-----------|
+| Muhammad Rafi | SHP Channel & Customer Development |
+| Silvester Mario Nian Destrada | SHP Channel & Customer Development |
+| Ageng Kurniawan Sugianto | IT Product |
+| Albet | IT Product |
+
+Berlaku sama untuk FSD **Web** dan **Mobile**.
 
 ## Ruang lingkup
 

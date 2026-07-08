@@ -238,8 +238,10 @@
                     .map(s => ({
                         id: s.kode || String(s.id),
                         name: s.nama,
-                        address: s.alamat || '',
-                        kota: s.kota || '',
+                        address: s.alamat || [s.branch, s.region].filter(Boolean).join(', '),
+                        kota: s.branch || s.kota || '',
+                        branch: s.branch || '',
+                        region: s.region || '',
                         telepon: s.telepon || '',
                         tipe: s.tipe || 'Grosir',
                         lat: s.lat,
