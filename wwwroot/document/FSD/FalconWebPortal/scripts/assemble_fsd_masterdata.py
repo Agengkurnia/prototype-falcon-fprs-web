@@ -24,8 +24,13 @@ from extract_module_spec import (  # noqa: E402
     load_registry,
     module_section,
 )
+from maven_spec import (  # noqa: E402
+    MAVEN_MAPPING,
+    appendix_maven_extra,
+    chapter_erd,
+)
 
-TANGGAL = '8 Juli 2026'
+TANGGAL = '9 Juli 2026'
 
 # Document Approval — standar Falcon FPRS / SHP (lihat fsd_cover_merge.DEFAULT_DOCUMENT_APPROVAL)
 DOCUMENT_APPROVAL = [
@@ -43,18 +48,18 @@ def preamble() -> str:
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Falcon FPRS — Data Master (Web Admin)
 ### Sistem: Falcon FPRS
-### Versi Dokumen: 1.0
+### Versi Dokumen: 1.1
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Falcon FPRS |
-| **Versi** | 1.0 |
+| **Versi** | 1.1 |
 | **Tanggal** | {TANGGAL} |
-| **Divisi** | ICT / Business – Falcon FPRS |
+| **Divisi** | IT / Business – Falcon FPRS |
 | **Status** | Draft |
-| **Dibuat oleh** | Tim ICT – Falcon FPRS |
+| **Dibuat oleh** | Tim IT – Falcon FPRS |
 
 ---
 
@@ -62,7 +67,8 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.0** | **{TANGGAL}** | **Tim ICT** | Initial draft – modul Data Master Web Admin FPRS |
+| **1.1** | **{TANGGAL}** | **Tim IT** | Tambah arsitektur produksi MAVEN, mapping UI→database, ERD lengkap, DDL PostgreSQL, tooltip prototipe |
+| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin FPRS |
 
 ---
 
@@ -102,15 +108,17 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe.
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
 | Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) |
-| Persistensi prototipe (localStorage + JSON seed) | Implementasi produksi backend final |
+| Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
+| Desain database produksi MAVEN (PostgreSQL + EF Core) | — |
+| Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
 
 ### 1.4 Stakeholder
 
 | Peran | Tim/Divisi | Keterlibatan |
 |-------|------------|--------------|
-| Admin Master Data | ICT / Operations | CRUD & sinkronisasi data referensi |
+| Admin Master Data | IT / Operations | CRUD & sinkronisasi data referensi |
 | Supervisor Sales | Sales | Validasi data outlet & pegawai |
-| Developer | ICT | Implementasi API & UI produksi |
+| Developer | IT | Implementasi API & UI produksi |
 | Business Analyst | PDV / Sales | Validasi alur bisnis |
 
 ---
@@ -158,7 +166,7 @@ flowchart LR
   end
   subgraph L2[Sistem Falcon Web]
     B1[Load seed JSON ke localStorage]
-    B2[Tampilkan DataTable index]
+    B2[Tampilkan dashboard list DataTable]
     B3[Validasi client-side Swal]
     B4[Simpan ke localStorage]
   end
@@ -173,15 +181,6 @@ flowchart LR
   B4 -.-> C3
 ```
 
-### 2.4 Konvensi Penamaan File
-
-| Pola | Contoh |
-|------|--------|
-| Index modul | `Views/FPRS/MasterData/Produk/index.html` |
-| Form/Detail page | `Views/FPRS/MasterData/Produk/detail.html` |
-| Modal CRUD | Form di dalam `index.html` (`#modalForm`) |
-
----
 '''
 
 
@@ -191,8 +190,8 @@ def chapter_master_data(reg: dict, all_rules: list) -> str:
     lines = [
         '## 3. Modul Data Master',
         '',
-        'Bab ini mendeskripsikan setiap modul Data Master: kolom DataTable index, '
-        'field form/modal, tombol aksi, business rules (hasil ekstraksi validasi UI), '
+        'Bab ini mendeskripsikan setiap modul Data Master: kolom dashboard list (DataTable), '
+        'field form/modal/detail, tombol aksi, business rules (hasil ekstraksi validasi UI), '
         'dan pola CRUD. Konten field/kolom/validasi diambil langsung dari file HTML sumber.',
         '',
     ]
@@ -203,6 +202,9 @@ def chapter_master_data(reg: dict, all_rules: list) -> str:
             continue
         sub += 1
         lines.append(module_section('3', sub, mod, br_counters, all_rules))
+        mapping = MAVEN_MAPPING.get(mid)
+        if mapping:
+            lines.append(mapping)
     return '\n'.join(lines)
 
 
@@ -281,34 +283,6 @@ bersumber dari aplikasi mobile.
 '''
 
 
-def chapter_erd() -> str:
-    return '''## 7. Struktur Data & ERD
-
-Relasi entity master (prototipe):
-
-```mermaid
-erDiagram
-    M_Channel ||--o{ M_Pelanggan : mengelompokkan
-    M_Pajak ||--o{ M_Produk : "skema pajak"
-    M_Stokis ||--o{ M_Pelanggan : "wilayah layan"
-    M_Pegawai ||--o{ M_Pelanggan : "menangani"
-    M_Produk }o--|| M_Pajak : "harga jual + PPN"
-```
-
-| Entity | localStorage Key | Deskripsi |
-|--------|------------------|-----------|
-| `M_Produk` | `md_produk` | Master produk/SKU (kode, umbrella brand, harga, pajak, status) |
-| `M_Pelanggan` | `md_pelanggan` | Master pelanggan/outlet (sumber mobile) |
-| `M_Channel` | `md_channel` | Klasifikasi channel pelanggan |
-| `M_Pegawai` | `md_pegawai` | Master pegawai (Motoris/SPG GT, NIK, Branch/Region) |
-| `M_Stokis` | `md_stokis` | Master stokis/grosir (Branch/Region, GPS) |
-| `M_Pajak` | `md_pajak` | Skema pajak (PPN/DPP) |
-| `M_Alasan` | `md_alasan` | Kode alasan operasional |
-
----
-'''
-
-
 def chapter_appendix(reg: dict) -> str:
     by_id = {m['id']: m for m in reg['modules'] if m.get('enabled', True)}
     lines = [
@@ -324,30 +298,14 @@ def chapter_appendix(reg: dict) -> str:
     ):
         m = by_id[mid]
         lines.append(f'| {i} | {m["label"]} | `{m["htmlPath"]}` | {m.get("type", "page")} |')
-    lines += [
-        '',
-        '### 8.2 Status Prototipe vs Produksi',
-        '',
-        '| Aspek | Prototipe Saat Ini | Produksi Target |',
-        '|-------|-------------------|-----------------|',
-        '| Persistensi | localStorage + JSON seed | REST API + database |',
-        '| Autentikasi | Tidak ada login web admin | SSO / JWT |',
-        '| RBAC | Simulasi | Server-side enforcement |',
-        '',
-        '### 8.3 Build Dokumen',
-        '',
-        '```powershell',
-        'cd wwwroot/document/FSD/FalconWebPortal',
-        'py scripts/assemble_fsd_masterdata.py   # regenerate markdown',
-        'py scripts/build_masterdata_fsd.py       # render DOCX ke Document/',
-        '```',
-        '',
-    ]
+    lines.append(appendix_maven_extra())
     return '\n'.join(lines)
 
 
 def assemble() -> str:
     os.makedirs(SOURCE_DIR, exist_ok=True)
+    import extract_module_spec as ems  # noqa: E402
+    ems._BTN_MANIFEST = None
     reg = load_registry()
     all_rules: list[tuple[str, str]] = []
 

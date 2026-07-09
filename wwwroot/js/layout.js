@@ -265,15 +265,8 @@ class Layout {
                             <div data-i18n="Data Master">Data Master</div>
                         </a>
                         <ul class="menu-sub">
-                            <!-- Produk Subgroup -->
-                            <li class="menu-item">
-                                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <div data-i18n="Produk">Produk</div>
-                                </a>
-                                <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
-                                </ul>
-                            </li>
+                            <!-- Master Produk (child tunggal, dinaikkan) -->
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                             <!-- Pelanggan Subgroup -->
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -284,24 +277,10 @@ class Layout {
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div></a></li>
                                 </ul>
                             </li>
-                            <!-- Pegawai Subgroup -->
-                            <li class="menu-item">
-                                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <div data-i18n="Pegawai">Pegawai</div>
-                                </a>
-                                <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div></a></li>
-                                </ul>
-                            </li>
-                            <!-- Keuangan Subgroup -->
-                            <li class="menu-item">
-                                <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <div data-i18n="Keuangan">Keuangan</div>
-                                </a>
-                                <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pajak/index.html" class="menu-link"><div data-i18n="Pajak">Pajak</div></a></li>
-                                </ul>
-                            </li>
+                            <!-- Master Pegawai (child tunggal, dinaikkan) -->
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div></a></li>
+                            <!-- Pajak (child tunggal, dinaikkan) -->
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pajak/index.html" class="menu-link"><div data-i18n="Pajak">Pajak</div></a></li>
                             <!-- Lainnya Subgroup -->
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -487,6 +466,9 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/js/extensions/i18nextBrowserLanguageDetector.min.js',
             'wwwroot/lib/vuexy/vendor/js/extensions/jquery-i18next.min.js',
             'wwwroot/lib/vuexy/vendor/js/unison-js/unison-js.min.js',
+            'wwwroot/js/vendor/crypto-js.js',
+            'wwwroot/js/cls-rijndael.browser.js',
+            'wwwroot/js/master-data-param.js',
             'wwwroot/js/role-manager.js',
             'wwwroot/js/prototype-chat.js'
         ];

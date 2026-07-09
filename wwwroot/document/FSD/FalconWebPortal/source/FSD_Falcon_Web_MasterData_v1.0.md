@@ -1,18 +1,18 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Falcon FPRS — Data Master (Web Admin)
 ### Sistem: Falcon FPRS
-### Versi Dokumen: 1.0
+### Versi Dokumen: 1.1
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Falcon FPRS |
-| **Versi** | 1.0 |
-| **Tanggal** | 8 Juli 2026 |
-| **Divisi** | ICT / Business – Falcon FPRS |
+| **Versi** | 1.1 |
+| **Tanggal** | 9 Juli 2026 |
+| **Divisi** | IT / Business – Falcon FPRS |
 | **Status** | Draft |
-| **Dibuat oleh** | Tim ICT – Falcon FPRS |
+| **Dibuat oleh** | Tim IT – Falcon FPRS |
 
 ---
 
@@ -20,7 +20,8 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.0** | **8 Juli 2026** | **Tim ICT** | Initial draft – modul Data Master Web Admin FPRS |
+| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur produksi MAVEN, mapping UI→database, ERD lengkap, DDL PostgreSQL, tooltip prototipe |
+| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin FPRS |
 
 ---
 
@@ -63,15 +64,17 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe.
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
 | Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) |
-| Persistensi prototipe (localStorage + JSON seed) | Implementasi produksi backend final |
+| Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
+| Desain database produksi MAVEN (PostgreSQL + EF Core) | — |
+| Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
 
 ### 1.4 Stakeholder
 
 | Peran | Tim/Divisi | Keterlibatan |
 |-------|------------|--------------|
-| Admin Master Data | ICT / Operations | CRUD & sinkronisasi data referensi |
+| Admin Master Data | IT / Operations | CRUD & sinkronisasi data referensi |
 | Supervisor Sales | Sales | Validasi data outlet & pegawai |
-| Developer | ICT | Implementasi API & UI produksi |
+| Developer | IT | Implementasi API & UI produksi |
 | Business Analyst | PDV / Sales | Validasi alur bisnis |
 
 ---
@@ -119,7 +122,7 @@ flowchart LR
   end
   subgraph L2[Sistem Falcon Web]
     B1[Load seed JSON ke localStorage]
-    B2[Tampilkan DataTable index]
+    B2[Tampilkan dashboard list DataTable]
     B3[Validasi client-side Swal]
     B4[Simpan ke localStorage]
   end
@@ -134,59 +137,54 @@ flowchart LR
   B4 -.-> C3
 ```
 
-### 2.4 Konvensi Penamaan File
-
-| Pola | Contoh |
-|------|--------|
-| Index modul | `Views/FPRS/MasterData/Produk/index.html` |
-| Form/Detail page | `Views/FPRS/MasterData/Produk/detail.html` |
-| Modal CRUD | Form di dalam `index.html` (`#modalForm`) |
-
----
 
 ## 3. Modul Data Master
 
-Bab ini mendeskripsikan setiap modul Data Master: kolom DataTable index, field form/modal, tombol aksi, business rules (hasil ekstraksi validasi UI), dan pola CRUD. Konten field/kolom/validasi diambil langsung dari file HTML sumber.
+Bab ini mendeskripsikan setiap modul Data Master: kolom dashboard list (DataTable), field form/modal/detail, tombol aksi, business rules (hasil ekstraksi validasi UI), dan pola CRUD. Konten field/kolom/validasi diambil langsung dari file HTML sumber.
 
 ### 3.1 Produk
 
 Modul **Produk** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**. Sumber: `Views/FPRS/MasterData/Produk/index.html`.
 
-Halaman index menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInactive`, `cntUmbrella`) dan DataTable `#tbl` dengan filter per kolom, termasuk kolom **Umbrella Brand**. Tombol **Tambah Produk** mengarah ke `detail.html`. Halaman `detail.html` bersifat fleksibel (add & edit): **Kode Produk** berupa LOV searchable (Select2) yang mengambil data dari Master Data API, mengunci field turunan (nama, umbrella, brand) menjadi read-only. **Harga Beli** dapat diedit, **Harga Jual** read-only dihitung otomatis (`Harga Beli + PPN`, default skema PPN 11%). **Unit Konversi** dikunci ke `PCS`, dan **Status Produk** berupa checkbox aktif/nonaktif.
+Halaman dashboard list menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInactive`, `cntUmbrella`) dan DataTable `#tbl` dengan filter per kolom, termasuk kolom **Umbrella Brand**. Tombol **Tambah Produk** mengarah ke `detail.html`. Halaman `detail.html` bersifat fleksibel (add & edit): **Kode Produk** berupa LOV searchable (Select2) yang mengambil data dari Master Data API, mengunci field turunan (nama, umbrella, brand) menjadi read-only. **Harga Beli** dapat diedit, **Harga Jual** read-only dihitung otomatis (`Harga Beli + PPN`, default skema PPN 11%). **Unit Konversi** dikunci ke `PCS`, dan **Status Produk** berupa checkbox aktif/nonaktif.
 
 | Aspek | Keterangan |
 |-------|------------|
 | **Tujuan Form** | Mendaftarkan dan memelihara data SKU/produk (kode, umbrella brand, brand, harga beli, harga jual, pajak, status) sebagai referensi transaksi penjualan. Data produk bersumber dari Master Data API, sedangkan harga jual, pajak, dan status dikelola di aplikasi ini. |
-| **Pengguna** | Admin Master Data, ICT Operations — pengelola katalog produk Kalbe. |
+| **Pengguna** | Admin Master Data, IT Operations — pengelola katalog produk Kalbe. |
 
 
 > **Integrasi API (rencana):** `/api/v1/Sku`
 
 > **localStorage key:** `md_produk`
 
-**Tampilan Master Data — Produk:**
+![Master Data — Produk — Dashboard List](screenshots/ss_02_master_produk_index.png)
 
-![Master Data — Produk](screenshots/ss_02_master_produk_index.png)
 
-![Tampilan tambahan Master Data — Produk](screenshots/ss_03_master_produk_add.png)
-
-![Tampilan tambahan Master Data — Produk](screenshots/ss_04_master_produk_edit.png)
-
-#### 3.1.1 Kolom DataTable Index
+#### 3.1.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| KODE | `Kode` | Text | Ya | Kolom grid index |
-| PRODUK | `Produk` | Text | Ya | Kolom grid index |
-| UMBRELLA BRAND | `UmbrellaBrand` | Text | Ya | Kolom grid index |
-| BRAND | `Brand` | Text | Ya | Kolom grid index |
-| UNIT | `Unit` | Text | Ya | Kolom grid index |
-| HARGA JUAL | `HargaJual` | Text | Ya | Kolom grid index |
-| PAJAK | `Pajak` | Text | Ya | Kolom grid index |
-| STATUS | `Status` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| KODE | `Kode` | Text | Ya | Kolom grid dashboard list |
+| PRODUK | `Produk` | Text | Ya | Kolom grid dashboard list |
+| UMBRELLA BRAND | `UmbrellaBrand` | Text | Ya | Kolom grid dashboard list |
+| BRAND | `Brand` | Text | Ya | Kolom grid dashboard list |
+| UNIT | `Unit` | Text | Ya | Kolom grid dashboard list |
+| HARGA JUAL | `HargaJual` | Text | Ya | Kolom grid dashboard list |
+| PAJAK | `Pajak` | Text | Ya | Kolom grid dashboard list |
+| STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.1.2 Form Tambah/Ubah
+#### 3.1.2 Tombol Aksi — Dashboard List
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_produk_tambah-produk.png) | Tambah Produk | `—` | btn-success | Membuka modal form untuk menambah data baru. |
+| — | Detail / Ubah | `—` | btn-outline-secondary | Menampilkan halaman detail record terpilih (parameter URL terenkripsi). |
+
+Halaman **detail** (`detail.html`) diakses melalui aksi baris pada dashboard list (parameter URL terenkripsi `?param=`).
+
+#### 3.1.3 Form Detail (read-only)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
@@ -200,13 +198,13 @@ Halaman index menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInacti
 | Unit Konversi | `unitNama` | Text (readonly) | Tidak | PCS | — | — |
 | Status Produk | `status` | Text | Tidak | (kosong) | — | — |
 
-#### 3.1.3 Tombol Aksi
+#### 3.1.4 Tombol Aksi — Halaman Detail
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Simpan Produk | `—` | btn-success | — | — |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_produk_simpan-produk.png) | Simpan Produk | `—` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
 
-#### 3.1.4 Business Rules
+#### 3.1.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
@@ -215,14 +213,29 @@ Halaman index menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInacti
 | BR-MD03 | Harga beli harus lebih dari 0. |
 | BR-MD04 | Kode "${kode}" sudah terdaftar pada Master Produk. |
 
-#### 3.1.5 CRUD
+#### 3.1.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Klik Tambah Produk → `detail.html` (LOV Kode Produk) | Admin | Persist ke localStorage |
-| **Read** | DataTable index + `detail.html` | Semua role | — |
-| **Update** | Buka `detail.html?id=` → ubah harga beli/pajak/status | Admin | Kode & data API read-only |
-| **Delete** | — | — | Tombol hapus dihilangkan |
+| **Read** | dashboard list (DataTable) + `detail.html` | Semua role | — |
+| **Update** | Buka `detail.html?param=` → ubah harga beli/pajak/status | Admin | Kode & data API read-only |
+
+#### 3.1.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Kode Produk | `mProduk` | `txtKode` | UQ | LOV dari Master Data API |
+| Nama Produk | `mProduk` | `txtNama` | | Read-only dari API |
+| Umbrella Brand | `mProduk` | `txtUmbrella` | | Read-only dari API |
+| Brand | `mProduk` | `intBrandID` | FK → `mBrand` | Reuse tabel MAVEN existing |
+| Harga Beli | `mProduk` | `decHargaBeli` | | ≥ 0 |
+| Harga Jual | `mProduk` | `decHargaJual` | | Dihitung otomatis |
+| Skema Pajak | `mProduk` | `intPajakID` | FK → `mPajak` | |
+| Unit | `mProduk` | `intUnitID` | FK → `mUnit` | Selalu PCS di prototipe |
+| Status | `mProduk` | `bitActive` | | active → true |
+| Kategori (API) | `mProduk` | `intKategoriID` | FK → `mKategoriProduk` | |
+| Divisi (API) | `mProduk` | `intDivisiID` | FK → `mDivisi` | |
 
 ### 3.2 Pelanggan
 
@@ -240,33 +253,65 @@ Data pelanggan/outlet **diinput dari aplikasi mobile** (SFA), sehingga Web Porta
 
 > **localStorage key:** `md_pelanggan`
 
-**Tampilan Master Data — Pelanggan:**
+![Master Data — Pelanggan — Dashboard List](screenshots/ss_15_master_pelanggan_index.png)
 
-![Master Data — Pelanggan](screenshots/ss_15_master_pelanggan_index.png)
 
-![Tampilan tambahan Master Data — Pelanggan](screenshots/ss_16_master_pelanggan_add.png)
-
-#### 3.2.1 Kolom DataTable Index
+#### 3.2.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| KODE | `Kode` | Text | Ya | Kolom grid index |
-| PELANGGAN | `Pelanggan` | Text | Ya | Kolom grid index |
-| ALAMAT | `Alamat` | Text | Ya | Kolom grid index |
-| TELEPON | `Telepon` | Text | Ya | Kolom grid index |
-| SALESMAN | `Salesman` | Text | Ya | Kolom grid index |
-| KUNJUNGAN TERAKHIR | `KunjunganTerakhir` | Text | Ya | Kolom grid index |
-| STATUS | `Status` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| KODE | `Kode` | Text | Ya | Kolom grid dashboard list |
+| PELANGGAN | `Pelanggan` | Text | Ya | Kolom grid dashboard list |
+| ALAMAT | `Alamat` | Text | Ya | Kolom grid dashboard list |
+| TELEPON | `Telepon` | Text | Ya | Kolom grid dashboard list |
+| SALESMAN | `Salesman` | Text | Ya | Kolom grid dashboard list |
+| KUNJUNGAN TERAKHIR | `KunjunganTerakhir` | Text | Ya | Kolom grid dashboard list |
+| STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.2.5 CRUD
+#### 3.2.2 Tombol Aksi — Dashboard List
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_common_detail.png) | Detail | `—` | btn-outline-secondary | Menampilkan halaman detail record terpilih (parameter URL terenkripsi). |
+
+Halaman **detail** (`detail.html`) diakses melalui aksi baris pada dashboard list (parameter URL terenkripsi `?param=`).
+
+#### 3.2.3 Tombol Aksi — Halaman Detail
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_common_kembali.png) | Kembali | `—` | btn-secondary | Kembali ke dashboard list modul. |
+
+#### 3.2.4 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | — | — | Data diinput dari aplikasi mobile (SFA) |
-| **Read** | DataTable index + `detail.html` | Semua role | View-only |
-| **Update** | — | — | Tidak tersedia di web (sumber mobile) |
-| **Delete** | — | — | Tidak tersedia di web |
+| **Read** | dashboard list (DataTable) + `detail.html` | Semua role | View-only |
+
+#### 3.2.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Kode | `mPelanggan` | `txtKode` | UQ | |
+| Nama / PELANGGAN | `mPelanggan` | `txtNama` | | |
+| Alamat | `mPelanggan` | `txtAlamat` | | |
+| Telepon | `mPelanggan` | `txtTelepon` | | |
+| Salesman | `mPelanggan` | `intSalesmanID` | FK → `mPegawai` | |
+| Kunjungan Terakhir | `mPelanggan` | `dtKunjunganTerakhir` | | |
+| Status | `mPelanggan` | `bitActive` | | Active → true |
+| Pemilik | `mPelanggan` | `txtPemilik` | | Dari mobile |
+| NPWP | `mPelanggan` | `txtNpwp` | | |
+| Channel | `mPelanggan` | `intChannelID` | FK → `mChannel` | |
+| Daftar Harga | `mPelanggan` | `intDaftarHargaID` | FK → `mDaftarHarga` | |
+| Tipe Outlet | `mPelanggan` | `txtOutletType` | | |
+| Grup Pelanggan | `mPelanggan` | `txtGrupPelanggan` | | |
+| RT/RW, Kelurahan, Kecamatan, Kota | `mPelanggan` | `txtRtRw`, `txtKelurahan`, `txtKecamatan`, `txtKota` | | |
+| Koordinat GPS | `mPelanggan` | `decLat`, `decLng`, `bitHasGps` | | |
+| Foto Toko | `mPelanggan` | `txtPhoto` | | Path/URL dari mobile |
+| Waktu Pembayaran | `mPelanggan` | `txtWaktuPembayaran` | | |
+| Transaksi Terakhir | `mPelanggan` | `dtTransaksiTerakhir` | | |
 
 ### 3.3 Channel
 
@@ -282,42 +327,66 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 
 > **localStorage key:** `md_channel`
 
-**Tampilan Master Data — Channel:**
+![Master Data — Channel — Dashboard List](screenshots/ss_47_master_channel_index.png)
 
-![Master Data — Channel](screenshots/ss_17_master_grup_pelanggan_index.png)
 
-![Tampilan tambahan Master Data — Channel](screenshots/ss_18_master_grup_modal.png)
-
-#### 3.3.1 Kolom DataTable Index
+#### 3.3.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| NAMA CHANNEL | `NamaChannel` | Text | Ya | Kolom grid index |
-| TOTAL PELANGGAN | `TotalPelanggan` | Text | Ya | Kolom grid index |
-| STATUS | `Status` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| NAMA CHANNEL | `NamaChannel` | Text | Ya | Kolom grid dashboard list |
+| TOTAL PELANGGAN | `TotalPelanggan` | Text | Ya | Kolom grid dashboard list |
+| STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.3.3 Tombol Aksi
+#### 3.3.2 Tombol Aksi — Dashboard List
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Tambah Channel | `openModal()` | btn-success | — | openModal() |
-| Simpan | `saveItem()` | btn-success | — | saveItem() |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_channel_tambah-channel.png) | Tambah Channel | `openModal()` | btn-success | Membuka modal form untuk menambah data baru. |
+| ![](screenshots/ss_btn_channel_edit.png) | Edit | `editItem('1')` | btn-outline-secondary | Membuka modal form dalam mode ubah untuk baris yang dipilih. |
 
-#### 3.3.4 Business Rules
+![Master Data — Channel — Form Modal (full page)](screenshots/ss_48_master_channel_modal.png)
+
+
+**Dashboard list** menampilkan DataTable channel. **Form modal** muncul di atas halaman yang sama (bukan halaman terpisah). Mode **Tambah**: pengguna mengisi Nama Channel dan Status Active/Inactive. Mode **Ubah**: field yang sama ditampilkan terisi, ditambah panel **Pelanggan pada Channel Ini** (read-only, paginasi) yang menampilkan outlet dengan `channel` yang cocok.
+
+
+#### 3.3.3 Form Modal (Tambah / Ubah)
+
+| Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
+|------------|-----------|------|-----------|---------|----------|------------|
+| Nama Channel | `inputNama` | Text | Ya | (kosong) | — | — |
+| Status | `inputActive` | Text | Tidak | (kosong) | — | — |
+| Pelanggan pada Channel Ini | `custSection` | Sub-tabel (read-only) | — | — | — | Hanya mode Ubah; data dari `md_pelanggan`, paginasi 5 baris |
+
+#### 3.3.4 Tombol Aksi — Form Modal
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| — | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
+
+#### 3.3.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
 | BR-MD05 | Nama channel wajib diisi. |
 
-#### 3.3.5 CRUD
+#### 3.3.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |
-| **Read** | DataTable index; modal edit menampilkan pelanggan ter-paginasi | Semua role | — |
+| **Read** | dashboard list (DataTable); modal edit menampilkan pelanggan ter-paginasi | Semua role | — |
 | **Update** | Klik Edit → ubah nama/bit Active → Simpan | Admin | — |
-| **Delete** | — | — | Tombol hapus dihilangkan; gunakan bit Active |
+
+#### 3.3.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Nama Channel | `mChannel` | `txtNama` | UQ | |
+| Total Pelanggan | — | — | | Kolom turunan COUNT(`mPelanggan`) |
+| Status | `mChannel` | `bitActive` | | |
 
 ### 3.4 Pegawai
 
@@ -328,30 +397,37 @@ Master pegawai/sales force bersifat **upload-only** (pola seperti Master Stokis)
 | Aspek | Keterangan |
 |-------|------------|
 | **Tujuan Form** | Memelihara data pegawai/sales force (Motoris, SPG GT) beserta NIK, Branch, dan Region melalui mekanisme Download/Upload CSV dengan pencatatan riwayat status aktif/nonaktif. |
-| **Pengguna** | Admin HR, ICT, Supervisor Sales. |
+| **Pengguna** | Admin HR, IT, Supervisor Sales. |
 
 
 > **localStorage key:** `md_pegawai`
 
-**Tampilan Master Data — Pegawai:**
+![Master Data — Pegawai — Dashboard List](screenshots/ss_19_master_pegawai_index.png)
 
-![Master Data — Pegawai](screenshots/ss_19_master_pegawai_index.png)
 
-![Tampilan tambahan Master Data — Pegawai](screenshots/ss_20_master_pegawai_add.png)
-
-#### 3.4.1 Kolom DataTable Index
+#### 3.4.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| NIK | `Nik` | Text | Ya | Kolom grid index |
-| NAMA | `Nama` | Text | Ya | Kolom grid index |
-| ROLE | `Role` | Text | Ya | Kolom grid index |
-| BRANCH | `Branch` | Text | Ya | Kolom grid index |
-| REGION | `Region` | Text | Ya | Kolom grid index |
-| STATUS | `Status` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| NIK | `Nik` | Text | Ya | Kolom grid dashboard list |
+| NAMA | `Nama` | Text | Ya | Kolom grid dashboard list |
+| ROLE | `Role` | Text | Ya | Kolom grid dashboard list |
+| BRANCH | `Branch` | Text | Ya | Kolom grid dashboard list |
+| REGION | `Region` | Text | Ya | Kolom grid dashboard list |
+| STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.4.2 Form Tambah/Ubah
+#### 3.4.2 Tombol Aksi — Dashboard List
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_pegawai_download-data.png) | Download Data | `downloadPegawai()` | btn-outline-secondary | Mengunduh data modul sebagai file CSV. |
+| ![](screenshots/ss_btn_pegawai_upload-data.png) | Upload Data | `triggerUploadPegawai()` | btn-outline-secondary | Mengunggah file CSV untuk sinkronisasi data. |
+| ![](screenshots/ss_btn_common_lihat-detail.png) | Lihat Detail | `—` | btn-outline-secondary | Menampilkan halaman detail record terpilih (parameter URL terenkripsi). |
+
+Halaman **detail** (`detail.html`) diakses melalui aksi baris pada dashboard list (parameter URL terenkripsi `?param=`).
+
+#### 3.4.3 Form Detail (read-only)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
@@ -364,28 +440,39 @@ Master pegawai/sales force bersifat **upload-only** (pola seperti Master Stokis)
 | Status | `status` | Text | Tidak | (kosong) | — | — |
 | Keterangan | `keterangan` | Text | Tidak | (kosong) | — | — |
 
-#### 3.4.3 Tombol Aksi
+#### 3.4.4 Tombol Aksi — Halaman Detail
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Download Data | `downloadPegawai()` | btn-secondary | — | downloadPegawai() |
-| Upload Data | `triggerUploadPegawai()` | btn-secondary | — | triggerUploadPegawai() |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_common_kembali.png) | Kembali | `—` | btn-secondary | Kembali ke dashboard list modul. |
 
-#### 3.4.4 Business Rules
+#### 3.4.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
 | BR-MD06 | File kosong atau format header tidak dikenali. |
 | BR-MD07 | Tidak ada baris data yang dapat diproses. |
 
-#### 3.4.5 CRUD
+#### 3.4.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Upload CSV (baris baru) | Admin | Sinkronisasi dari file, bukan input manual |
-| **Read** | DataTable index + `detail.html` | Semua role | Termasuk riwayat status/stok |
+| **Read** | dashboard list (DataTable) + `detail.html` | Semua role | Termasuk riwayat status/stok |
 | **Update** | Upload CSV (status Active/Inactive) | Admin | Status disimpulkan dari keberadaan ID di file |
-| **Delete** | — | — | Tidak ada hapus; nonaktif via sinkronisasi CSV |
+
+#### 3.4.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| NIK | `mPegawai` | `txtKode` | UQ | Identitas CSV upload |
+| Nama | `mPegawai` | `txtNama` | | |
+| Role | `mPegawai` | `txtRole` | | Motoris / SPG GT |
+| Branch | `mPegawai` | `txtBranch` | | |
+| Region | `mPegawai` | `txtRegion` | | Diturunkan dari Branch |
+| Telepon | `mPegawai` | `txtTelepon` | | |
+| Keterangan | `mPegawai` | `txtKeterangan` | | |
+| Status | `mPegawai` | `bitActive` | | Active/Inactive via CSV |
 
 ### 3.5 Stokis
 
@@ -401,24 +488,31 @@ Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat
 
 > **localStorage key:** `md_stokis`
 
-**Tampilan Master Data — Stokis:**
+![Master Data — Stokis — Dashboard List](screenshots/ss_45_master_stokis_index.png)
 
-![Master Data — Stokis](screenshots/ss_45_master_stokis_index.png)
 
-![Tampilan tambahan Master Data — Stokis](screenshots/ss_46_master_stokis_add.png)
-
-#### 3.5.1 Kolom DataTable Index
+#### 3.5.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| OUTLET ID | `OutletId` | Text | Ya | Kolom grid index |
-| NAMA STOKIS | `NamaStokis` | Text | Ya | Kolom grid index |
-| BRANCH | `Branch` | Text | Ya | Kolom grid index |
-| REGION | `Region` | Text | Ya | Kolom grid index |
-| STATUS | `Status` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| OUTLET ID | `OutletId` | Text | Ya | Kolom grid dashboard list |
+| NAMA STOKIS | `NamaStokis` | Text | Ya | Kolom grid dashboard list |
+| BRANCH | `Branch` | Text | Ya | Kolom grid dashboard list |
+| REGION | `Region` | Text | Ya | Kolom grid dashboard list |
+| STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.5.2 Form Tambah/Ubah
+#### 3.5.2 Tombol Aksi — Dashboard List
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_stokis_download-data.png) | Download Data | `downloadStokis()` | btn-outline-secondary | Mengunduh data modul sebagai file CSV. |
+| ![](screenshots/ss_btn_stokis_upload-data.png) | Upload Data | `triggerUploadStokis()` | btn-outline-secondary | Mengunggah file CSV untuk sinkronisasi data. |
+| ![](screenshots/ss_btn_common_lihat-detail.png) | Lihat Detail | `—` | btn-outline-secondary | Menampilkan halaman detail record terpilih (parameter URL terenkripsi). |
+
+Halaman **detail** (`detail.html`) diakses melalui aksi baris pada dashboard list (parameter URL terenkripsi `?param=`).
+
+#### 3.5.3 Form Detail (read-only)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
@@ -432,31 +526,42 @@ Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat
 | Latitude | `lat` | Text | Tidak | (kosong) | — | — |
 | Longitude | `lng` | Text | Tidak | (kosong) | — | — |
 
-#### 3.5.3 Tombol Aksi
+#### 3.5.4 Tombol Aksi — Halaman Detail
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Download Data | `downloadStokis()` | btn-secondary | — | downloadStokis() |
-| Upload Data | `triggerUploadStokis()` | btn-secondary | — | triggerUploadStokis() |
-| Stok per Produk | `—` | btn-secondary | — | — |
-| Riwayat Input Stok oleh Motoris | `—` | btn-secondary | — | — |
-| Riwayat Status (Active / Inactive) — dari Upload | `—` | btn-secondary | — | — |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_common_kembali.png) | Kembali | `—` | btn-secondary | Kembali ke dashboard list modul. |
+| ![](screenshots/ss_btn_stokis_stok-per-produk.png) | Stok per Produk | `—` | btn-secondary | Membuka panel Stok per Produk menampilkan data terkait pada halaman detail. |
+| — | Riwayat Input Stok oleh Motoris | `—` | btn-secondary | Membuka panel Riwayat Input Stok oleh Motoris menampilkan data terkait pada halaman detail. |
+| — | Riwayat Status (Active / Inactive) — dari Upload | `—` | btn-secondary | Membuka panel Riwayat Status (Active / Inactive) — dari Upload menampilkan data terkait pada halaman detail. |
 
-#### 3.5.4 Business Rules
+#### 3.5.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
 | BR-MD08 | File kosong atau format header tidak dikenali. |
 | BR-MD09 | Tidak ada baris data yang dapat diproses. |
 
-#### 3.5.5 CRUD
+#### 3.5.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Upload CSV (baris baru) | Admin | Sinkronisasi dari file, bukan input manual |
-| **Read** | DataTable index + `detail.html` | Semua role | Termasuk riwayat status/stok |
+| **Read** | dashboard list (DataTable) + `detail.html` | Semua role | Termasuk riwayat status/stok |
 | **Update** | Upload CSV (status Active/Inactive) | Admin | Status disimpulkan dari keberadaan ID di file |
-| **Delete** | — | — | Tidak ada hapus; nonaktif via sinkronisasi CSV |
+
+#### 3.5.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Outlet ID | `mStokis` | `txtOutletId` | UQ | Identitas CSV upload |
+| Nama Stokis | `mStokis` | `txtNama` | | |
+| Branch | `mStokis` | `txtBranch` | | |
+| Region | `mStokis` | `txtRegion` | | |
+| Telepon | `mStokis` | `txtTelepon` | | |
+| Alamat | `mStokis` | `txtAlamat` | | |
+| Latitude / Longitude | `mStokis` | `decLat`, `decLng` | | Unik per outlet |
+| Status | `mStokis` | `bitActive` | | Active/Inactive via CSV |
 
 ### 3.6 Pajak
 
@@ -472,43 +577,71 @@ Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**
 
 > **localStorage key:** `md_pajak`
 
-**Tampilan Master Data — Pajak:**
+![Master Data — Pajak — Dashboard List](screenshots/ss_32_master_pajak_index.png)
 
-![Master Data — Pajak](screenshots/ss_32_master_pajak_index.png)
 
-![Tampilan tambahan Master Data — Pajak](screenshots/ss_33_master_pajak_modal.png)
-
-#### 3.6.1 Kolom DataTable Index
+#### 3.6.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| KODE PAJAK | `KodePajak` | Text | Ya | Kolom grid index |
-| NAMA PAJAK | `NamaPajak` | Text | Ya | Kolom grid index |
-| PERSENTASE (%) | `Persentase` | Text | Ya | Kolom grid index |
-| NILAI DPP | `NilaiDpp` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| KODE PAJAK | `KodePajak` | Text | Ya | Kolom grid dashboard list |
+| NAMA PAJAK | `NamaPajak` | Text | Ya | Kolom grid dashboard list |
+| PERSENTASE (%) | `Persentase` | Text | Ya | Kolom grid dashboard list |
+| NILAI DPP | `NilaiDpp` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.6.3 Tombol Aksi
+#### 3.6.2 Tombol Aksi — Dashboard List
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Tambah Pajak | `openModal()` | btn-success | — | openModal() |
-| Simpan | `saveItem()` | btn-success | — | saveItem() |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_pajak_tambah-pajak.png) | Tambah Pajak | `openModal()` | btn-success | Membuka modal form untuk menambah data baru. |
+| ![](screenshots/ss_btn_pajak_edit.png) | Edit | `editItem('1')` | btn-outline-secondary | Membuka modal form dalam mode ubah untuk baris yang dipilih. |
+| ![](screenshots/ss_btn_pajak_hapus.png) | Hapus | `del('1','PPN')` | btn-outline-secondary | Menghapus data terpilih setelah konfirmasi pengguna. |
 
-#### 3.6.4 Business Rules
+![Master Data — Pajak — Form Modal (full page)](screenshots/ss_33_master_pajak_modal.png)
+
+
+**Dashboard list** menampilkan daftar skema pajak. **Form modal** untuk Tambah/Ubah berisi Kode Pajak, Nama Pajak, Persentase (%), dan Nilai DPP. Data disimpan ke `localStorage` setelah validasi.
+
+
+#### 3.6.3 Form Modal (Tambah / Ubah)
+
+| Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
+|------------|-----------|------|-----------|---------|----------|------------|
+| Kode Pajak | `inputKode` | Text | Ya | (kosong) | — | — |
+| Nama Pajak | `inputNama` | Text | Ya | (kosong) | — | — |
+| Persentase (%) | `inputPersen` | Number | Ya | (kosong) | — | — |
+| Nilai DPP | `inputDpp` | Text | Tidak | (kosong) | — | — |
+
+#### 3.6.4 Tombol Aksi — Form Modal
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_pajak_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
+
+#### 3.6.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
 | BR-MD10 | Kode dan Nama pajak wajib diisi. |
 
-#### 3.6.5 CRUD
+#### 3.6.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |
-| **Read** | DataTable index | Semua role | — |
+| **Read** | dashboard list (DataTable) | Semua role | — |
 | **Update** | Klik Edit → ubah modal → Simpan | Admin | — |
 | **Delete** | Klik Hapus → konfirmasi Swal | Admin | Hapus dari localStorage |
+
+#### 3.6.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Kode Pajak | `mPajak` | `txtKodePajak` | UQ | mis. PPN, NoPPN |
+| Nama Pajak | `mPajak` | `txtNamaPajak` | | |
+| Persentase (%) | `mPajak` | `decPersentase` | | |
+| Nilai DPP | `mPajak` | `txtNilaiDpp` | | |
 
 ### 3.7 Alasan
 
@@ -524,42 +657,68 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 
 > **localStorage key:** `md_alasan`
 
-**Tampilan Master Data — Alasan:**
+![Master Data — Alasan — Dashboard List](screenshots/ss_34_master_alasan_index.png)
 
-![Master Data — Alasan](screenshots/ss_34_master_alasan_index.png)
 
-![Tampilan tambahan Master Data — Alasan](screenshots/ss_35_master_alasan_modal.png)
-
-#### 3.7.1 Kolom DataTable Index
+#### 3.7.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| NO | `No` | Text | Ya | Kolom grid index |
-| NAMA ALASAN | `NamaAlasan` | Text | Ya | Kolom grid index |
-| DESKRIPSI | `Deskripsi` | Text | Ya | Kolom grid index |
-| TIPE | `Tipe` | Text | Ya | Kolom grid index |
+| NO | `No` | Text | Ya | Kolom grid dashboard list |
+| NAMA ALASAN | `NamaAlasan` | Text | Ya | Kolom grid dashboard list |
+| DESKRIPSI | `Deskripsi` | Text | Ya | Kolom grid dashboard list |
+| TIPE | `Tipe` | Text | Ya | Kolom grid dashboard list |
 
-#### 3.7.3 Tombol Aksi
+#### 3.7.2 Tombol Aksi — Dashboard List
 
-| Tombol | ID / Handler | Warna/Style | Kondisi Aktif | Fungsi |
-|--------|--------------|-------------|---------------|--------|
-| Tambah Alasan | `openModal()` | btn-success | — | openModal() |
-| Simpan | `saveItem()` | btn-success | — | saveItem() |
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_alasan_tambah-alasan.png) | Tambah Alasan | `openModal()` | btn-success | Membuka modal form untuk menambah data baru. |
+| ![](screenshots/ss_btn_alasan_edit.png) | Edit | `editItem('1')` | btn-outline-secondary | Membuka modal form dalam mode ubah untuk baris yang dipilih. |
+| ![](screenshots/ss_btn_alasan_hapus.png) | Hapus | `del('1','Salah Pengiriman')` | btn-outline-secondary | Menghapus data terpilih setelah konfirmasi pengguna. |
 
-#### 3.7.4 Business Rules
+![Master Data — Alasan — Form Modal (full page)](screenshots/ss_35_master_alasan_modal.png)
+
+
+**Dashboard list** menampilkan master alasan operasional. **Form modal** Tambah/Ubah berisi Nama Alasan, Deskripsi, dan Tipe (Return/Kunjungan/Order/Lainnya). Terintegrasi rencana API `/api/v1/Param`.
+
+
+#### 3.7.3 Form Modal (Tambah / Ubah)
+
+| Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
+|------------|-----------|------|-----------|---------|----------|------------|
+| Nama Alasan | `inputNama` | Text | Ya | (kosong) | — | — |
+| Deskripsi | `inputDeskripsi` | Text | Ya | (kosong) | — | — |
+| Tipe | `inputTipe` | Dropdown | Ya | (kosong) | — | — |
+
+#### 3.7.4 Tombol Aksi — Form Modal
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_alasan_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
+
+#### 3.7.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
 | BR-MD11 | Nama dan Tipe wajib diisi. |
 
-#### 3.7.5 CRUD
+#### 3.7.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |
-| **Read** | DataTable index | Semua role | — |
+| **Read** | dashboard list (DataTable) | Semua role | — |
 | **Update** | Klik Edit → ubah modal → Simpan | Admin | — |
 | **Delete** | Klik Hapus → konfirmasi Swal | Admin | Hapus dari localStorage |
+
+#### 3.7.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Nama Alasan | `mAlasan` | `txtNama` | | |
+| Deskripsi | `mAlasan` | `txtDeskripsi` | | |
+| Tipe | `mAlasan` | `txtTipe` | | Return / Kunjungan / Order |
 
 ## 4. Aturan Bisnis (Rekap)
 
@@ -631,16 +790,7 @@ bersumber dari aplikasi mobile.
 
 ## 7. Struktur Data & ERD
 
-Relasi entity master (prototipe):
-
-```mermaid
-erDiagram
-    M_Channel ||--o{ M_Pelanggan : mengelompokkan
-    M_Pajak ||--o{ M_Produk : "skema pajak"
-    M_Stokis ||--o{ M_Pelanggan : "wilayah layan"
-    M_Pegawai ||--o{ M_Pelanggan : "menangani"
-    M_Produk }o--|| M_Pajak : "harga jual + PPN"
-```
+### 7.1 Prototipe (localStorage)
 
 | Entity | localStorage Key | Deskripsi |
 |--------|------------------|-----------|
@@ -651,6 +801,370 @@ erDiagram
 | `M_Stokis` | `md_stokis` | Master stokis/grosir (Branch/Region, GPS) |
 | `M_Pajak` | `md_pajak` | Skema pajak (PPN/DPP) |
 | `M_Alasan` | `md_alasan` | Kode alasan operasional |
+
+Relasi prototipe disimpan sebagai **string nama** (bukan FK). Di produksi MAVEN diganti kolom `intXxxID`.
+
+### 7.2 ERD Produksi MAVEN (PostgreSQL)
+
+Diagram berikut menggambarkan target database produksi. Detail kolom per tabel ada di subsection mapping modul (3.1.6–3.7.6) dan dokumen referensi `docs/web/erd_master_data_maven.md`.
+
+```mermaid
+erDiagram
+    mProduk }o--|| mKategoriProduk : "intKategoriID"
+    mProduk }o--|| mBrand : "intBrandID"
+    mProduk }o--|| mDivisi : "intDivisiID"
+    mProduk }o--|| mUnit : "intUnitID"
+    mProduk }o--|| mPajak : "intPajakID"
+    mKategoriProduk }o--o| mKategoriProduk : "intParentKategoriID"
+
+    mPelanggan }o--|| mChannel : "intChannelID"
+    mPelanggan }o--|| mDaftarHarga : "intDaftarHargaID"
+    mPelanggan }o--|| mPegawai : "intSalesmanID"
+
+    mProduk {
+        int intProdukID PK
+        uuid txtGuid UK
+        varchar txtKode UK
+        varchar txtNama
+        numeric decHargaBeli
+        numeric decHargaJual
+        int intKategoriID FK
+        int intBrandID FK
+        int intDivisiID FK
+        int intUnitID FK
+        int intPajakID FK
+        boolean bitActive
+    }
+    mPelanggan {
+        int intPelangganID PK
+        uuid txtGuid UK
+        varchar txtKode UK
+        varchar txtNama
+        int intChannelID FK
+        int intDaftarHargaID FK
+        int intSalesmanID FK
+        numeric decLat
+        numeric decLng
+        boolean bitActive
+    }
+    mPegawai {
+        int intPegawaiID PK
+        varchar txtKode UK
+        varchar txtNama
+        varchar txtRole
+        boolean bitActive
+    }
+    mStokis {
+        int intStokisID PK
+        varchar txtOutletId UK
+        varchar txtNama
+        numeric decLat
+        numeric decLng
+        boolean bitActive
+    }
+    mChannel {
+        int intChannelID PK
+        varchar txtNama UK
+    }
+    mPajak {
+        int intPajakID PK
+        varchar txtKodePajak UK
+        numeric decPersentase
+    }
+    mAlasan {
+        int intAlasanID PK
+        varchar txtNama
+        varchar txtTipe
+    }
+    mKategoriProduk {
+        int intKategoriID PK
+        varchar txtNama UK
+        int intParentKategoriID FK
+    }
+    mDivisi {
+        int intDivisiID PK
+        varchar txtNama UK
+    }
+    mUnit {
+        int intUnitID PK
+        varchar txtNama UK
+    }
+    mDaftarHarga {
+        int intDaftarHargaID PK
+        varchar txtNama UK
+        boolean bitIsDefault
+    }
+    mBrand {
+        int IntId PK
+        varchar BrandName
+        varchar BrandDesc
+    }
+```
+
+### 7.3 Daftar Relasi (FK)
+
+| Tabel Anak | Kolom FK | Tabel Induk | Kardinalitas |
+|------------|----------|-------------|--------------|
+| `mProduk` | `intKategoriID` | `mKategoriProduk` | many-to-one |
+| `mProduk` | `intBrandID` | `mBrand` | many-to-one (reuse existing) |
+| `mProduk` | `intDivisiID` | `mDivisi` | many-to-one |
+| `mProduk` | `intUnitID` | `mUnit` | many-to-one |
+| `mProduk` | `intPajakID` | `mPajak` | many-to-one |
+| `mKategoriProduk` | `intParentKategoriID` | `mKategoriProduk` | self, many-to-one (nullable) |
+| `mPelanggan` | `intChannelID` | `mChannel` | many-to-one |
+| `mPelanggan` | `intDaftarHargaID` | `mDaftarHarga` | many-to-one |
+| `mPelanggan` | `intSalesmanID` | `mPegawai` | many-to-one |
+
+> `mStokis` dan `mAlasan` berdiri sendiri (tanpa FK di level master). `totalPelanggan` (channel) dan `totalProduk` (brand) adalah agregasi COUNT, bukan kolom fisik.
+
+### 7.4 Catatan Desain Database
+
+- **Status → boolean:** field `status` string prototipe dipetakan ke `bitActive`.
+- **ID prototype → PK + GUID:** `id` integer menjadi `intXxxID` serial + `txtGuid` uuid.
+- **Relasi by ID:** string nama di prototipe diganti FK `intXxxID` di MAVEN.
+- **Reuse `mBrand`:** tabel brand sudah ada di MAVEN — jangan buat duplikat.
+- **Blok audit wajib:** `bitActive`, `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive`.
+
+### 7.5 Query Pembuatan Tabel (DDL PostgreSQL)
+
+Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.5.1) dulu, lalu master inti (7.5.2). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
+
+#### 7.5.1 Tabel Lookup
+
+```sql
+-- Kategori Produk (self-reference)
+CREATE TABLE "mKategoriProduk" (
+    "intKategoriID"       serial PRIMARY KEY,
+    "txtGuid"             uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"             varchar(100) NOT NULL,
+    "intParentKategoriID" int NULL,
+    "bitActive"           boolean NOT NULL DEFAULT true,
+    "dtInserted"          timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"       varchar(100) NULL,
+    "dtUpdated"           timestamp without time zone NULL,
+    "txtUpdatedBy"        varchar(100) NULL,
+    "dtNonActive"         timestamp without time zone NULL,
+    CONSTRAINT "mKategoriProduk_txtNama_uq" UNIQUE ("txtNama"),
+    CONSTRAINT "mKategoriProduk_parent_fk" FOREIGN KEY ("intParentKategoriID")
+        REFERENCES "mKategoriProduk" ("intKategoriID")
+);
+
+-- Divisi
+CREATE TABLE "mDivisi" (
+    "intDivisiID"   serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"       varchar(100) NOT NULL,
+    "txtDeskripsi"  varchar(500) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mDivisi_txtNama_uq" UNIQUE ("txtNama")
+);
+
+-- Unit / UOM
+CREATE TABLE "mUnit" (
+    "intUnitID"     serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"       varchar(50) NOT NULL,
+    "txtDeskripsi"  varchar(100) NULL,
+    "txtUomPajak"   varchar(50) NULL,
+    "txtPartnerId"  varchar(100) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mUnit_txtNama_uq" UNIQUE ("txtNama")
+);
+
+-- Daftar Harga / Price List
+CREATE TABLE "mDaftarHarga" (
+    "intDaftarHargaID"  serial PRIMARY KEY,
+    "txtGuid"           uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"           varchar(100) NOT NULL,
+    "bitIsDefault"      boolean NOT NULL DEFAULT false,
+    "bitIsInclusiveTax" boolean NOT NULL DEFAULT false,
+    "bitActive"         boolean NOT NULL DEFAULT true,
+    "dtInserted"        timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"     varchar(100) NULL,
+    "dtUpdated"         timestamp without time zone NULL,
+    "txtUpdatedBy"      varchar(100) NULL,
+    "dtNonActive"       timestamp without time zone NULL,
+    CONSTRAINT "mDaftarHarga_txtNama_uq" UNIQUE ("txtNama")
+);
+
+-- Channel
+CREATE TABLE "mChannel" (
+    "intChannelID"  serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"       varchar(100) NOT NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mChannel_txtNama_uq" UNIQUE ("txtNama")
+);
+
+-- Pajak
+CREATE TABLE "mPajak" (
+    "intPajakID"    serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtKodePajak"  varchar(50) NOT NULL,
+    "txtNamaPajak"  varchar(100) NULL,
+    "txtPartnerId"  varchar(100) NULL,
+    "decPersentase" numeric(5,2) NULL,
+    "txtNilaiDpp"   varchar(50) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mPajak_txtKodePajak_uq" UNIQUE ("txtKodePajak")
+);
+
+-- Alasan
+CREATE TABLE "mAlasan" (
+    "intAlasanID"   serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"       varchar(255) NOT NULL,
+    "txtDeskripsi"  varchar(500) NULL,
+    "txtTipe"       varchar(50) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL
+);
+
+-- Pegawai (target FK dari mPelanggan.intSalesmanID)
+CREATE TABLE "mPegawai" (
+    "intPegawaiID"  serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtKode"       varchar(50) NOT NULL,
+    "txtNama"       varchar(255) NOT NULL,
+    "txtRole"       varchar(100) NULL,
+    "txtTelepon"    varchar(30) NULL,
+    "txtBranch"     varchar(100) NULL,
+    "txtRegion"     varchar(100) NULL,
+    "txtKeterangan" varchar(500) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mPegawai_txtKode_uq" UNIQUE ("txtKode")
+);
+```
+
+#### 7.5.2 Tabel Master Inti
+
+```sql
+-- Produk (FK: kategori, brand, divisi, unit, pajak)
+CREATE TABLE "mProduk" (
+    "intProdukID"   serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtKode"       varchar(50) NOT NULL,
+    "txtNama"       varchar(255) NOT NULL,
+    "txtPartnerId"  varchar(100) NULL,
+    "decHargaBeli"  numeric(18,2) NULL,
+    "decHargaJual"  numeric(18,2) NULL,
+    "intKategoriID" int NULL,
+    "intBrandID"    int NULL,
+    "intDivisiID"   int NULL,
+    "intUnitID"     int NULL,
+    "intPajakID"    int NULL,
+    "txtUmbrella"   varchar(100) NULL,
+    "txtSupplier"   varchar(255) NULL,
+    "decBerat"      numeric(10,3) NULL,
+    "decPanjang"    numeric(10,2) NULL,
+    "decLebar"      numeric(10,2) NULL,
+    "decTinggi"     numeric(10,2) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mProduk_txtKode_uq"    UNIQUE ("txtKode"),
+    CONSTRAINT "mProduk_kategori_fk"   FOREIGN KEY ("intKategoriID") REFERENCES "mKategoriProduk" ("intKategoriID"),
+    CONSTRAINT "mProduk_brand_fk"      FOREIGN KEY ("intBrandID")    REFERENCES "mBrand" ("IntId"),
+    CONSTRAINT "mProduk_divisi_fk"     FOREIGN KEY ("intDivisiID")   REFERENCES "mDivisi" ("intDivisiID"),
+    CONSTRAINT "mProduk_unit_fk"       FOREIGN KEY ("intUnitID")     REFERENCES "mUnit" ("intUnitID"),
+    CONSTRAINT "mProduk_pajak_fk"      FOREIGN KEY ("intPajakID")    REFERENCES "mPajak" ("intPajakID")
+);
+
+-- Pelanggan / Outlet (FK: channel, daftarHarga, salesman)
+CREATE TABLE "mPelanggan" (
+    "intPelangganID"      serial PRIMARY KEY,
+    "txtGuid"             uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtKode"             varchar(50) NOT NULL,
+    "txtNama"             varchar(255) NOT NULL,
+    "txtPartnerId"        varchar(100) NULL,
+    "txtAlamat"           varchar(500) NULL,
+    "txtTelepon"          varchar(30) NULL,
+    "txtPemilik"          varchar(255) NULL,
+    "txtNpwp"             varchar(30) NULL,
+    "txtRtRw"             varchar(20) NULL,
+    "txtKelurahan"        varchar(100) NULL,
+    "txtKecamatan"        varchar(100) NULL,
+    "txtKota"             varchar(100) NULL,
+    "intChannelID"        int NULL,
+    "intDaftarHargaID"    int NULL,
+    "intSalesmanID"       int NULL,
+    "txtGrupPelanggan"    varchar(100) NULL,
+    "txtOutletType"       varchar(100) NULL,
+    "txtWaktuPembayaran"  varchar(50) NULL,
+    "dtKunjunganTerakhir" timestamp without time zone NULL,
+    "dtTransaksiTerakhir" timestamp without time zone NULL,
+    "decLat"              numeric(10,7) NULL,
+    "decLng"              numeric(10,7) NULL,
+    "bitHasGps"           boolean NOT NULL DEFAULT false,
+    "txtPhoto"            varchar(500) NULL,
+    "bitActive"           boolean NOT NULL DEFAULT true,
+    "dtInserted"          timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"       varchar(100) NULL,
+    "dtUpdated"           timestamp without time zone NULL,
+    "txtUpdatedBy"        varchar(100) NULL,
+    "dtNonActive"         timestamp without time zone NULL,
+    CONSTRAINT "mPelanggan_txtKode_uq"     UNIQUE ("txtKode"),
+    CONSTRAINT "mPelanggan_channel_fk"     FOREIGN KEY ("intChannelID")     REFERENCES "mChannel" ("intChannelID"),
+    CONSTRAINT "mPelanggan_daftarharga_fk" FOREIGN KEY ("intDaftarHargaID") REFERENCES "mDaftarHarga" ("intDaftarHargaID"),
+    CONSTRAINT "mPelanggan_salesman_fk"    FOREIGN KEY ("intSalesmanID")    REFERENCES "mPegawai" ("intPegawaiID")
+);
+
+-- Stokis / Grosir (view-only, sinkron via Upload CSV)
+CREATE TABLE "mStokis" (
+    "intStokisID"   serial PRIMARY KEY,
+    "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtOutletId"   varchar(50) NOT NULL,
+    "txtNama"       varchar(255) NOT NULL,
+    "txtAlamat"     varchar(500) NULL,
+    "txtKota"       varchar(100) NULL,
+    "txtBranch"     varchar(100) NULL,
+    "txtRegion"     varchar(100) NULL,
+    "txtTelepon"    varchar(30) NULL,
+    "decLat"        numeric(10,7) NULL,
+    "decLng"        numeric(10,7) NULL,
+    "bitActive"     boolean NOT NULL DEFAULT true,
+    "dtInserted"    timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy" varchar(100) NULL,
+    "dtUpdated"     timestamp without time zone NULL,
+    "txtUpdatedBy"  varchar(100) NULL,
+    "dtNonActive"   timestamp without time zone NULL,
+    CONSTRAINT "mStokis_txtOutletId_uq" UNIQUE ("txtOutletId")
+);
+```
+
+> `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join.
 
 ---
 
@@ -670,16 +1184,51 @@ erDiagram
 
 ### 8.2 Status Prototipe vs Produksi
 
-| Aspek | Prototipe Saat Ini | Produksi Target |
-|-------|-------------------|-----------------|
-| Persistensi | localStorage + JSON seed | REST API + database |
+| Aspek | Prototipe Saat Ini | Produksi Target (MAVEN) |
+|-------|-------------------|-------------------------|
+| Persistensi | localStorage + JSON seed (`wwwroot/data/`) | PostgreSQL via `CentralContext` |
+| Arsitektur | HTML statis + inline JS | ASP.NET Core 8 MVC (4 layer) |
 | Autentikasi | Tidak ada login web admin | SSO / JWT |
-| RBAC | Simulasi | Server-side enforcement |
+| RBAC | Simulasi client-side | Server-side enforcement |
+| Relasi data | String nama (channel, brand, dll.) | FK `intXxxID` + integritas referensial |
+| Status | String `"active"` / `"Active"` | Boolean `bitActive` |
+| Brand | Seed `brand.json` | Reuse tabel `mBrand` MAVEN existing |
+| Audit trail | Tidak ada | `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive` |
+| Tooltip UI | `title="Tabel: mXxx | Kolom: txtYyy"` | Acuan validasi mapping saat UAT |
 
 ### 8.3 Build Dokumen
 
 ```powershell
 cd wwwroot/document/FSD/FalconWebPortal
-py scripts/assemble_fsd_masterdata.py   # regenerate markdown
+py scripts/capture_masterdata_full.py    # screenshot halaman (opsional)
+py scripts/assemble_fsd_masterdata.py    # regenerate markdown
 py scripts/build_masterdata_fsd.py       # render DOCX ke Document/
 ```
+
+### 8.4 Tooltip UI → Database Mapping
+
+Setiap label form dan header kolom tabel di halaman Master Data prototipe memiliki atribut HTML `title` native (bukan Bootstrap tooltip) dengan format:
+
+```
+Tabel: mXxx | Kolom: txtYyy
+```
+
+| Modul | File | Contoh Tooltip |
+|-------|------|----------------|
+| Produk | `Produk/index.html`, `detail.html` | `Tabel: mProduk | Kolom: txtKode` |
+| Pelanggan | `Pelanggan/index.html`, `detail.html` | `Tabel: mPelanggan | Kolom: txtNama` |
+| Pegawai | `Pegawai/index.html`, `detail.html` | `Tabel: mPegawai | Kolom: txtKode` |
+| Stokis | `Stokis/index.html`, `detail.html` | `Tabel: mStokis | Kolom: txtOutletId` |
+| Channel | `Channel/index.html` | `Tabel: mChannel | Kolom: txtNama` |
+| Pajak | `Pajak/index.html` | `Tabel: mPajak | Kolom: txtKodePajak` |
+| Alasan | `Alasan/index.html` | `Tabel: mAlasan | Kolom: txtNama` |
+
+Tooltip ini memudahkan tim bisnis dan developer memverifikasi kesesuaian UI prototipe dengan skema database MAVEN saat walkthrough UAT.
+
+### 8.5 Dokumen Terkait
+
+| Dokumen | Lokasi | Keterangan |
+|---------|--------|------------|
+| ERD MAVEN detail | `docs/web/erd_master_data_maven.md` | Spesifikasi kolom lengkap + DDL |
+| Modul Stokis | `docs/web/master_stokis.md` | Aturan CSV upload |
+| Build FSD | `docs/web/pages/tools_generate_fsd.md` | Instruksi pipeline DOCX |

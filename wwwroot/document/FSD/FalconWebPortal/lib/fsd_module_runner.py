@@ -37,6 +37,7 @@ from fsd_build import (
     postprocess_docx,
 )
 from fsd_captions import preprocess_captions
+from fsd_deliver import DeliverableConfig, deliver_fsd_outputs
 
 
 @dataclass
@@ -61,6 +62,7 @@ class ModuleBuildConfig:
     cover_defaults: dict | None = None
     swimlane_image_width_cm: float = 17.0
     default_image_width_cm: float = 15.0
+    deliverable: DeliverableConfig | None = None
 
 
 def _rel(script_dir: str, path: str) -> str:
@@ -183,4 +185,13 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
             os.remove(tmp)
 
     print(f'SELESAI: {docx_out}')
+
+    if config.deliverable:
+        md_src = os.path.join(source_dir, config.md_filename)
+        deliver_fsd_outputs(
+            docx_out,
+            config.deliverable,
+            md_path=md_src if config.deliverable.include_md else None,
+        )
+
     return docx_out

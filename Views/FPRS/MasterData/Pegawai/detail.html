@@ -39,38 +39,38 @@
                     <h5 class="border-bottom pb-2 text-success"><i class="fa fa-id-badge me-1"></i> Data Pegawai</h5>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold" for="kode">NIK</label>
-                        <input type="text" class="form-control bg-light" id="kode" disabled/>
+                        <label class="form-label fw-bold" for="kode" title="Tabel: mPegawai | Kolom: txtKode (NIK)">NIK</label>
+                        <input type="text" class="form-control bg-light" id="kode" disabled title="Tabel: mPegawai | Kolom: txtKode (NIK)"/>
                     </div>
                     <div class="col-md-5">
-                        <label class="form-label fw-bold" for="nama">Nama</label>
-                        <input type="text" class="form-control" id="nama" disabled/>
+                        <label class="form-label fw-bold" for="nama" title="Tabel: mPegawai | Kolom: txtNama">Nama</label>
+                        <input type="text" class="form-control" id="nama" disabled title="Tabel: mPegawai | Kolom: txtNama"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="role">Role</label>
-                        <input type="text" class="form-control" id="role" disabled/>
+                        <label class="form-label fw-bold" for="role" title="Tabel: mPegawai | Kolom: txtRole">Role</label>
+                        <input type="text" class="form-control" id="role" disabled title="Tabel: mPegawai | Kolom: txtRole"/>
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="branch">Branch</label>
-                        <input type="text" class="form-control" id="branch" disabled/>
+                        <label class="form-label fw-bold" for="branch" title="Tabel: mPegawai | Kolom: txtBranch">Branch</label>
+                        <input type="text" class="form-control" id="branch" disabled title="Tabel: mPegawai | Kolom: txtBranch"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="region">Region</label>
-                        <input type="text" class="form-control" id="region" disabled/>
+                        <label class="form-label fw-bold" for="region" title="Tabel: mPegawai | Kolom: txtRegion">Region</label>
+                        <input type="text" class="form-control" id="region" disabled title="Tabel: mPegawai | Kolom: txtRegion"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="telepon">Telepon</label>
-                        <input type="text" class="form-control" id="telepon" disabled/>
+                        <label class="form-label fw-bold" for="telepon" title="Tabel: mPegawai | Kolom: txtTelepon">Telepon</label>
+                        <input type="text" class="form-control" id="telepon" disabled title="Tabel: mPegawai | Kolom: txtTelepon"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="status">Status</label>
-                        <input type="text" class="form-control" id="status" disabled/>
+                        <label class="form-label fw-bold" for="status" title="Tabel: mPegawai | Kolom: bitActive">Status</label>
+                        <input type="text" class="form-control" id="status" disabled title="Tabel: mPegawai | Kolom: bitActive"/>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label fw-bold" for="keterangan">Keterangan</label>
-                        <input type="text" class="form-control" id="keterangan" disabled/>
+                        <label class="form-label fw-bold" for="keterangan" title="Tabel: mPegawai | Kolom: txtKeterangan">Keterangan</label>
+                        <input type="text" class="form-control" id="keterangan" disabled title="Tabel: mPegawai | Kolom: txtKeterangan"/>
                     </div>
                 </div>
             </div>
@@ -204,7 +204,7 @@
             function setVal(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
 
             function loadDetail() {
-                const id = new URLSearchParams(window.location.search).get('id');
+                const id = MasterDataParam.parseRecordId();
                 const item = getLocalData().find(d => String(d.id) === String(id));
                 if (!item) {
                     setVal('nama', '(data tidak ditemukan)');

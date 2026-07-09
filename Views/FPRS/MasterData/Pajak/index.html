@@ -18,7 +18,7 @@
             </div>
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
-                    <thead><tr><th style="width:50px;">NO</th><th>KODE PAJAK</th><th>NAMA PAJAK</th><th>PERSENTASE (%)</th><th>NILAI DPP</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
+                    <thead><tr><th style="width:50px;">NO</th><th title="Tabel: mPajak | Kolom: txtKodePajak">KODE PAJAK</th><th title="Tabel: mPajak | Kolom: txtNamaPajak">NAMA PAJAK</th><th title="Tabel: mPajak | Kolom: decPersentase">PERSENTASE (%)</th><th title="Tabel: mPajak | Kolom: txtNilaiDpp">NILAI DPP</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
                     <tbody id="tblBody"></tbody>
                 </table>
             </div></div></div>
@@ -27,10 +27,10 @@
         <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Pajak</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <div class="modal-body">
             <input type="hidden" id="editId" />
-            <div class="mb-3"><label class="form-label">Kode Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputKode" placeholder="Contoh: PPN" maxlength="20" /></div>
-            <div class="mb-3"><label class="form-label">Nama Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama pajak..." maxlength="95" /></div>
-            <div class="mb-3"><label class="form-label">Persentase (%) <span class="required-mark">*</span></label><input type="number" class="form-control" id="inputPersen" placeholder="0" min="0" max="100" step="0.01" /></div>
-            <div class="mb-3"><label class="form-label">Nilai DPP</label><input type="text" class="form-control" id="inputDpp" placeholder="Nilai DPP (opsional)" /></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mPajak | Kolom: txtKodePajak">Kode Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputKode" placeholder="Contoh: PPN" maxlength="20" title="Tabel: mPajak | Kolom: txtKodePajak" /></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mPajak | Kolom: txtNamaPajak">Nama Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama pajak..." maxlength="95" title="Tabel: mPajak | Kolom: txtNamaPajak" /></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mPajak | Kolom: decPersentase">Persentase (%) <span class="required-mark">*</span></label><input type="number" class="form-control" id="inputPersen" placeholder="0" min="0" max="100" step="0.01" title="Tabel: mPajak | Kolom: decPersentase" /></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mPajak | Kolom: txtNilaiDpp">Nilai DPP</label><input type="text" class="form-control" id="inputDpp" placeholder="Nilai DPP (opsional)" title="Tabel: mPajak | Kolom: txtNilaiDpp" /></div>
         </div>
         <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
     </div></div>

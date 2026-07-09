@@ -25,7 +25,7 @@
 
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
-                    <thead><tr><th style="width:50px;">NO</th><th>NAMA ALASAN</th><th>DESKRIPSI</th><th style="width:120px;">TIPE</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
+                    <thead><tr><th style="width:50px;">NO</th><th title="Tabel: mAlasan | Kolom: txtNama">NAMA ALASAN</th><th title="Tabel: mAlasan | Kolom: txtDeskripsi">DESKRIPSI</th><th style="width:120px;" title="Tabel: mAlasan | Kolom: txtTipe">TIPE</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
                     <tbody id="tblBody"></tbody>
                 </table>
             </div></div></div>
@@ -34,10 +34,10 @@
         <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Alasan</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <div class="modal-body">
             <input type="hidden" id="editId" />
-            <div class="mb-3"><label class="form-label">Nama Alasan <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama alasan..." /></div>
-            <div class="mb-3"><label class="form-label">Deskripsi</label><textarea class="form-control" id="inputDeskripsi" rows="2" placeholder="Deskripsi alasan..."></textarea></div>
-            <div class="mb-3"><label class="form-label">Tipe <span class="required-mark">*</span></label>
-                <select class="form-select" id="inputTipe">
+            <div class="mb-3"><label class="form-label" title="Tabel: mAlasan | Kolom: txtNama">Nama Alasan <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama alasan..." title="Tabel: mAlasan | Kolom: txtNama" /></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mAlasan | Kolom: txtDeskripsi">Deskripsi</label><textarea class="form-control" id="inputDeskripsi" rows="2" placeholder="Deskripsi alasan..." title="Tabel: mAlasan | Kolom: txtDeskripsi"></textarea></div>
+            <div class="mb-3"><label class="form-label" title="Tabel: mAlasan | Kolom: txtTipe">Tipe <span class="required-mark">*</span></label>
+                <select class="form-select" id="inputTipe" title="Tabel: mAlasan | Kolom: txtTipe">
                     <option value="">-- Pilih Tipe --</option>
                     <option value="Return">Return</option>
                     <option value="Kunjungan">Kunjungan</option>

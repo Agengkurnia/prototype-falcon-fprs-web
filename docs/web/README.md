@@ -49,12 +49,12 @@ Menu dirender oleh `layout.js` ke dalam struktur bertingkat:
 
 | Grup | Submenu |
 |------|---------|
-| **Data Master → Produk** | Master Produk |
+| **Data Master** *(item langsung)* | Master Produk, Master Pegawai, Pajak |
 | **Data Master → Pelanggan** | Master Pelanggan, Channel |
-| **Data Master → Pegawai** | Master Pegawai |
-| **Data Master → Keuangan** | Pajak |
 | **Data Master → Lainnya** | Alasan, **Stokis / Grosir** |
 | **Penjualan** | Faktur, Canvassing, Stok Motoris |
+
+> Subgroup ber-child tunggal (Produk, Pegawai, Keuangan) dinaikkan menjadi item langsung di bawah **Data Master**; hanya subgroup ber-child ≥ 2 (Pelanggan, Lainnya) yang tetap bertingkat.
 | **Kunjungan** | Informasi Kunjungan, Geografis Kunjungan, Management Rute |
 | **Tools** | Generate FSD |
 

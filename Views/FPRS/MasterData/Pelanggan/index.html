@@ -26,7 +26,7 @@
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
-                        <tr><th style="width:50px;">NO</th><th>KODE</th><th>PELANGGAN</th><th>ALAMAT</th><th>TELEPON</th><th>SALESMAN</th><th>KUNJUNGAN TERAKHIR</th><th style="width:110px;">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
+                        <tr><th style="width:50px;">NO</th><th title="Tabel: mPelanggan | Kolom: txtKode">KODE</th><th title="Tabel: mPelanggan | Kolom: txtNama">PELANGGAN</th><th title="Tabel: mPelanggan | Kolom: txtAlamat">ALAMAT</th><th title="Tabel: mPelanggan | Kolom: txtTelepon">TELEPON</th><th title="Tabel: mPelanggan | Kolom: intSalesmanID (FK mPegawai)">SALESMAN</th><th title="Tabel: mPelanggan | Kolom: dtKunjunganTerakhir">KUNJUNGAN TERAKHIR</th><th style="width:110px;" title="Tabel: mPelanggan | Kolom: bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
                         <tr class="filter-row">
                             <th></th><th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Nama..."></th>
@@ -65,14 +65,14 @@ function render(){
         $('#tblBody').append(`<tr>
             <td>${i+1}</td>
             <td><small class="text-muted">${item.kode}</small></td>
-            <td><a href="detail.html?id=${item.id}" class="fw-bold text-decoration-none">${item.nama}</a>${item.grupPelanggan?'<br><small class="text-muted">'+item.grupPelanggan+'</small>':''}</td>
+            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a>${item.grupPelanggan?'<br><small class="text-muted">'+item.grupPelanggan+'</small>':''}</td>
             <td><small>${item.alamat||'-'}</small></td>
             <td>${item.telepon||'-'}</td>
             <td>${item.employee||'-'}</td>
             <td><small>${item.kunjunganTerakhir||'-'}</small></td>
             <td>${badgeStatus(item.status)}</td>
             <td><div class="row-actions">
-                <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Detail"><i class="fa fa-eye"></i></a>
+                <a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="btn-action btn-action-view" title="Detail"><i class="fa fa-eye"></i></a>
             </div></td>
         </tr>`);
     });

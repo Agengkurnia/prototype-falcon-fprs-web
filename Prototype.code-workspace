@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../../../FSD Generator Engine"
+		},
+		{
+			"path": "../../MAVEN"
 		}
 	],
 	"settings": {

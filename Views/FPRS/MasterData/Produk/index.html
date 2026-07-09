@@ -76,7 +76,7 @@
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
-                        <tr><th style="width:50px;">NO</th><th>KODE</th><th>PRODUK</th><th>UMBRELLA BRAND</th><th>BRAND</th><th>UNIT</th><th style="text-align:right;">HARGA JUAL</th><th>PAJAK</th><th style="width:80px;">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
+                        <tr><th style="width:50px;">NO</th><th title="Tabel: mProduk | Kolom: txtKode">KODE</th><th title="Tabel: mProduk | Kolom: txtNama">PRODUK</th><th title="Tabel: mProduk | Kolom: txtUmbrella">UMBRELLA BRAND</th><th title="Tabel: mProduk | Kolom: intBrandID (FK mBrand.BrandName)">BRAND</th><th title="Tabel: mProduk | Kolom: intUnitID (FK mUnit.txtNama)">UNIT</th><th style="text-align:right;" title="Tabel: mProduk | Kolom: decHargaJual">HARGA JUAL</th><th title="Tabel: mProduk | Kolom: intPajakID (FK mPajak.txtNamaPajak)">PAJAK</th><th style="width:80px;" title="Tabel: mProduk | Kolom: bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
                         <tr class="filter-row">
                             <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
@@ -129,7 +129,7 @@ function render(){
         $('#tblBody').append(`<tr>
             <td>${i+1}</td>
             <td><code>${item.kode}</code></td>
-            <td><a href="detail.html?id=${item.id}" class="fw-bold text-decoration-none">${item.nama}</a>${item.divisi?'<br><small class="text-muted">'+item.divisi+'</small>':''}</td>
+            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a>${item.divisi?'<br><small class="text-muted">'+item.divisi+'</small>':''}</td>
             <td>${item.umbrella||'-'}</td>
             <td>${item.brand||'-'}</td>
             <td><small>${item.unitNama||'-'}</small></td>
@@ -137,7 +137,7 @@ function render(){
             <td><small>${item.namaPajak||'-'}</small></td>
             <td>${badge}</td>
             <td><div class="row-actions">
-                <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Detail / Ubah"><i class="fa fa-eye"></i></a>
+                <a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="btn-action btn-action-view" title="Detail / Ubah"><i class="fa fa-eye"></i></a>
             </div></td>
         </tr>`);
     });

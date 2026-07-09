@@ -18,7 +18,11 @@ Generator dokumen Functional Specification Document (FSD) otomatis dari prototip
 `docs/web/generate_fsd.bat`
 
 ## Output
-Dokumen FSD di `wwwroot/document/FSD/` (web & mobile). Deliverable timestamp: `Prototype/Document/{ts}__FSD_FALCON_{WEB|MOBILE}.docx`
+Dokumen FSD di `wwwroot/document/FSD/` (web & mobile).
+
+**Deliverable (standar §K.3):**
+- **Repo (git):** `output/FSD_*.docx` — terbaru, tanpa timestamp
+- **Project Log (luar git):** `D:\Work\Documentation\SHP\Project Log\{tahun}\{NNN}. {proyek}\` — arsip ber-timestamp
 
 ## Document Approval
 Cover halaman 2 — standar SHP (Web & Mobile): Muhammad Rafi, Silvester Mario Nian Destrada (SHP Channel & Customer Development); Ageng Kurniawan Sugianto, Albet (IT Product). Lihat `wwwroot/document/FSD/README.md`.
@@ -27,7 +31,7 @@ Cover halaman 2 — standar SHP (Web & Mobile): Muhammad Rafi, Silvester Mario N
 
 ## FSD Modul Data Master (WEB) — Jul 2026
 
-FSD khusus lingkup **Data Master** Web Admin dibuat mengikuti standar `D:\Work\Source\FSD Generator Engine` dan disimpan sebagai deliverable di `Prototype/Document/`.
+FSD khusus lingkup **Data Master** Web Admin dibuat mengikuti standar `D:\Work\Source\FSD Generator Engine`.
 
 ### Lingkup (7 modul)
 Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan — diambil dari `lib/fsd/module-registry.json` (`group == "masterData"`). Modul lama yang sudah dihapus (Unit, Divisi, Daftar Harga, Kategori, Brand, Grup Pelanggan, Akun, Posisi, Konfigurasi Akses, Metode/Waktu Pembayaran, Supplier) tidak lagi muncul.
@@ -37,8 +41,8 @@ Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan — diambil dari `lib
 | Skrip | Fungsi |
 |-------|--------|
 | `assemble_fsd_masterdata.py` | Merangkai markdown `source/FSD_Falcon_Web_MasterData_v1.0.md` — cover metadata + Document Approval + bab 1–8. Kolom/field/validasi/tombol tiap modul di-*extract* langsung dari HTML sumber via `extract_module_spec.module_section`. |
-| `capture_masterdata_full.py` | Capture **full-page** screenshot 7 modul (Playwright/Chromium) → `screenshots/ss_*.png`, memakai nama file yang dirujuk fragmen. Modal (Channel/Pajak/Alasan) dibuka via `openModal()`/`editItem()`. Opsi `--only id1,id2` & `--base-url`. |
-| `build_masterdata_fsd.py` | Render markdown → DOCX memakai pipeline resmi engine (`build_fsd_module`): cover 2 halaman Kalbe + Document Approval + render diagram Kroki + Pandoc + post-process, lalu salin ke `Prototype/Document/{ts}__FSD_FALCON_WEB_MASTERDATA.docx`. |
+| `capture_masterdata_full.py` | Capture **full-page** screenshot 7 modul (Playwright/Chromium) → `screenshots/ss_*.png`, memakai nama file yang dirujuk fragmen. Modal (Channel/Pajak/Alasan) dibuka via `openModal()`. Juga capture **tombol aksi** per-elemen → `ss_btn_{mod}_{slug}.png` + manifest `_btn_manifest.json`. Opsi `--only id1,id2` & `--base-url`. |
+| `build_masterdata_fsd.py` | Render markdown → DOCX (`build_fsd_module`) + arsip Project Log + salinan terbaru ke `output/` dan `FSD Generator Engine/docs/deliverables/`. |
 
 ### Urutan menjalankan
 Prasyarat: server statis prototipe berjalan (default `http://127.0.0.1:5502`), Pandoc di PATH, koneksi internet (Kroki), paket `python-docx` + `docxcompose`.
@@ -47,7 +51,7 @@ Prasyarat: server statis prototipe berjalan (default `http://127.0.0.1:5502`), P
 cd wwwroot/document/FSD/FalconWebPortal
 py scripts/capture_masterdata_full.py     # screenshot full-page (server harus jalan)
 py scripts/assemble_fsd_masterdata.py     # rakit markdown
-py scripts/build_masterdata_fsd.py        # render DOCX -> Document/
+py scripts/build_masterdata_fsd.py        # render DOCX + Project Log
 ```
 
 Buka DOCX lalu tekan **F9** untuk refresh daftar isi/nomor field bila perlu.

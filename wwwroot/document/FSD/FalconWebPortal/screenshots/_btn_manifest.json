@@ -1,0 +1,232 @@
+{
+  "master-channel": [
+    {
+      "file": "ss_btn_channel_tambah-channel.png",
+      "label": "Tambah Channel",
+      "id": "openModal()",
+      "style": "btn-success",
+      "function": "openModal()",
+      "narrative": "Membuka modal form untuk menambah data baru."
+    },
+    {
+      "file": "ss_btn_channel_edit.png",
+      "label": "Edit",
+      "id": "editItem('1')",
+      "style": "btn-outline-secondary",
+      "function": "editItem('1')",
+      "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
+    },
+    {
+      "file": "",
+      "label": "Simpan",
+      "id": "saveItem()",
+      "style": "btn-success",
+      "function": "saveItem()",
+      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
+    }
+  ],
+  "master-pajak": [
+    {
+      "file": "ss_btn_pajak_tambah-pajak.png",
+      "label": "Tambah Pajak",
+      "id": "openModal()",
+      "style": "btn-success",
+      "function": "openModal()",
+      "narrative": "Membuka modal form untuk menambah data baru."
+    },
+    {
+      "file": "ss_btn_pajak_edit.png",
+      "label": "Edit",
+      "id": "editItem('1')",
+      "style": "btn-outline-secondary",
+      "function": "editItem('1')",
+      "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
+    },
+    {
+      "file": "ss_btn_pajak_hapus.png",
+      "label": "Hapus",
+      "id": "del('1','PPN')",
+      "style": "btn-outline-secondary",
+      "function": "del('1','PPN')",
+      "narrative": "Menghapus data terpilih setelah konfirmasi pengguna."
+    },
+    {
+      "file": "ss_btn_pajak_simpan.png",
+      "label": "Simpan",
+      "id": "saveItem()",
+      "style": "btn-success",
+      "function": "saveItem()",
+      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
+    }
+  ],
+  "master-alasan": [
+    {
+      "file": "ss_btn_alasan_tambah-alasan.png",
+      "label": "Tambah Alasan",
+      "id": "openModal()",
+      "style": "btn-success",
+      "function": "openModal()",
+      "narrative": "Membuka modal form untuk menambah data baru."
+    },
+    {
+      "file": "ss_btn_alasan_edit.png",
+      "label": "Edit",
+      "id": "editItem('1')",
+      "style": "btn-outline-secondary",
+      "function": "editItem('1')",
+      "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
+    },
+    {
+      "file": "ss_btn_alasan_hapus.png",
+      "label": "Hapus",
+      "id": "del('1','Salah Pengiriman')",
+      "style": "btn-outline-secondary",
+      "function": "del('1','Salah Pengiriman')",
+      "narrative": "Menghapus data terpilih setelah konfirmasi pengguna."
+    },
+    {
+      "file": "ss_btn_alasan_simpan.png",
+      "label": "Simpan",
+      "id": "saveItem()",
+      "style": "btn-success",
+      "function": "saveItem()",
+      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
+    }
+  ],
+  "master-produk": [
+    {
+      "file": "ss_btn_produk_tambah-produk.png",
+      "label": "Tambah Produk",
+      "id": "—",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Membuka modal form untuk menambah data baru."
+    },
+    {
+      "file": "",
+      "label": "Detail / Ubah",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_produk_simpan-produk.png",
+      "label": "Simpan Produk",
+      "id": "—",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
+    }
+  ],
+  "master-pelanggan": [
+    {
+      "file": "ss_btn_pelanggan_detail.png",
+      "label": "Detail",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_pelanggan_kembali.png",
+      "label": "Kembali",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Kembali ke dashboard list modul."
+    }
+  ],
+  "master-pegawai": [
+    {
+      "file": "ss_btn_pegawai_download-data.png",
+      "label": "Download Data",
+      "id": "downloadPegawai()",
+      "style": "btn-outline-secondary",
+      "function": "downloadPegawai()",
+      "narrative": "Mengunduh data modul sebagai file CSV."
+    },
+    {
+      "file": "ss_btn_pegawai_upload-data.png",
+      "label": "Upload Data",
+      "id": "triggerUploadPegawai()",
+      "style": "btn-outline-secondary",
+      "function": "triggerUploadPegawai()",
+      "narrative": "Mengunggah file CSV untuk sinkronisasi data."
+    },
+    {
+      "file": "ss_btn_pegawai_lihat-detail.png",
+      "label": "Lihat Detail",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_pegawai_kembali.png",
+      "label": "Kembali",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Kembali ke dashboard list modul."
+    }
+  ],
+  "master-stokis": [
+    {
+      "file": "ss_btn_stokis_download-data.png",
+      "label": "Download Data",
+      "id": "downloadStokis()",
+      "style": "btn-outline-secondary",
+      "function": "downloadStokis()",
+      "narrative": "Mengunduh data modul sebagai file CSV."
+    },
+    {
+      "file": "ss_btn_stokis_upload-data.png",
+      "label": "Upload Data",
+      "id": "triggerUploadStokis()",
+      "style": "btn-outline-secondary",
+      "function": "triggerUploadStokis()",
+      "narrative": "Mengunggah file CSV untuk sinkronisasi data."
+    },
+    {
+      "file": "ss_btn_stokis_lihat-detail.png",
+      "label": "Lihat Detail",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_stokis_kembali.png",
+      "label": "Kembali",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Kembali ke dashboard list modul."
+    },
+    {
+      "file": "ss_btn_stokis_stok-per-produk.png",
+      "label": "Stok per Produk",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel Stok per Produk menampilkan data terkait pada halaman detail."
+    },
+    {
+      "file": "",
+      "label": "Riwayat Input Stok oleh Motoris",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel Riwayat Input Stok oleh Motoris menampilkan data terkait pada halaman detail."
+    },
+    {
+      "file": "",
+      "label": "Riwayat Status (Active / Inactive) — dari Upload",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel Riwayat Status (Active / Inactive) — dari Upload menampilkan data terkait pada halaman detail."
+    }
+  ]
+}

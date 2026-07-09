@@ -47,14 +47,14 @@ DEFAULT_META = {
     'project': 'IDC System',
     'module': '',
     'module_cover': '',
-    'prepared_by': 'Tim ICT',
+    'prepared_by': 'Tim IT',
     'company': 'PT. Sanghiang Perkasa',
     'date': '01/01/2026',
     'brd_no': '2026.SHP-FSD.0040',
     'pid_no': '2026.SHP-PID.0040',
     'revision_version': '1.0.0',
     'revision_date': '1 January 2026',
-    'revision_author': 'Tim ICT',
+    'revision_author': 'Tim IT',
     'revision_desc': 'Initial Document',
 }
 

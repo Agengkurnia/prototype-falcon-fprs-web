@@ -7,6 +7,7 @@ FIG_CAPTION_RE = re.compile(r'^\*?Gambar\s+(\d+(?:\.\d+)*)\s*[—–-]\s*(.+?)\*
 TBL_CAPTION_RE = re.compile(r'^\*?Tabel\s+(\d+(?:\.\d+)*)\s*[—–-]\s*(.+?)\*?$')
 CHAPTER_RE = re.compile(r'^##\s+(\d+)\.\s+')
 SUBSECTION_RE = re.compile(r'^###\s+(\d+)\.(\d+)\s+')
+SUBSUBSECTION_RE = re.compile(r'^####\s+\d+(?:\.\d+)+\s+(.+)$')
 IMAGE_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)\s*$')
 TABLE_ROW_RE = re.compile(r'^\|.+\|$')
 TABLE_SEP_RE = re.compile(r'^\|[\s|:\-]+\|$')
@@ -39,6 +40,9 @@ def _table_title(lines: list[str], table_start: int) -> str:
             continue
         if TBL_CAPTION_RE.match(line):
             return ''
+        hm = SUBSUBSECTION_RE.match(line)
+        if hm:
+            return hm.group(1).strip()
         m = BOLD_LINE_RE.match(line)
         if m:
             return m.group(1).strip()

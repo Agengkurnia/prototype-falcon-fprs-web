@@ -22,6 +22,15 @@ Dokumen ini merangkum perubahan prototipe **Falcon FPRS** pada sesi pengembangan
 
 ## Web Portal
 
+### Sidebar Data Master dirampingkan (Jul 2026)
+
+| Item | Detail |
+|------|--------|
+| **Aturan** | Subgroup Data Master dengan **child tunggal dinaikkan** menjadi item langsung di bawah "Data Master". |
+| **Dinaikkan** | **Produk** → `Master Produk` (badge Master Data API dipertahankan), **Pegawai** → `Master Pegawai`, **Keuangan** → `Pajak`. |
+| **Tetap bertingkat** | **Pelanggan** (Master Pelanggan, Channel) dan **Lainnya** (Alasan, Stokis / Grosir) — child ≥ 2. |
+| **File** | Diterapkan ke 4 salinan `wwwroot/js/layout.js` (utama + 3 bundle mobile: `Mobile/MobileApp`, `Mobile/MobileApp_capacitor`, `falcon_sfa_mobile/android`). |
+
 ### FSD Modul Data Master (WEB) — di-generate (Jul 2026)
 
 | Item | Detail |

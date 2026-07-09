@@ -39,45 +39,45 @@
                     <h5 class="border-bottom pb-2 text-success"><i class="fa fa-store me-1"></i> Data Stokis / Grosir</h5>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-bold" for="kode">Outlet ID</label>
-                        <input type="text" class="form-control bg-light" id="kode" disabled/>
+                        <label class="form-label fw-bold" for="kode" title="Tabel: mStokis | Kolom: txtOutletId">Outlet ID</label>
+                        <input type="text" class="form-control bg-light" id="kode" disabled title="Tabel: mStokis | Kolom: txtOutletId"/>
                     </div>
                     <div class="col-md-8">
-                        <label class="form-label fw-bold" for="nama">Nama Stokis</label>
-                        <input type="text" class="form-control" id="nama" disabled/>
+                        <label class="form-label fw-bold" for="nama" title="Tabel: mStokis | Kolom: txtNama">Nama Stokis</label>
+                        <input type="text" class="form-control" id="nama" disabled title="Tabel: mStokis | Kolom: txtNama"/>
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="branch">Branch</label>
-                        <input type="text" class="form-control" id="branch" disabled/>
+                        <label class="form-label fw-bold" for="branch" title="Tabel: mStokis | Kolom: txtBranch">Branch</label>
+                        <input type="text" class="form-control" id="branch" disabled title="Tabel: mStokis | Kolom: txtBranch"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="region">Region</label>
-                        <input type="text" class="form-control" id="region" disabled/>
+                        <label class="form-label fw-bold" for="region" title="Tabel: mStokis | Kolom: txtRegion">Region</label>
+                        <input type="text" class="form-control" id="region" disabled title="Tabel: mStokis | Kolom: txtRegion"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="telepon">Telepon</label>
-                        <input type="text" class="form-control" id="telepon" disabled/>
+                        <label class="form-label fw-bold" for="telepon" title="Tabel: mStokis | Kolom: txtTelepon">Telepon</label>
+                        <input type="text" class="form-control" id="telepon" disabled title="Tabel: mStokis | Kolom: txtTelepon"/>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label fw-bold" for="status">Status</label>
-                        <input type="text" class="form-control" id="status" disabled/>
+                        <label class="form-label fw-bold" for="status" title="Tabel: mStokis | Kolom: bitActive">Status</label>
+                        <input type="text" class="form-control" id="status" disabled title="Tabel: mStokis | Kolom: bitActive"/>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label fw-bold" for="alamat">Alamat Lengkap</label>
-                        <textarea class="form-control" id="alamat" rows="2" disabled></textarea>
+                        <label class="form-label fw-bold" for="alamat" title="Tabel: mStokis | Kolom: txtAlamat">Alamat Lengkap</label>
+                        <textarea class="form-control" id="alamat" rows="2" disabled title="Tabel: mStokis | Kolom: txtAlamat"></textarea>
                     </div>
 
                     <h5 class="border-bottom pb-2 text-success mt-2"><i class="fa fa-map-marker-alt me-1"></i> Koordinat GPS (Check-in Mobile)</h5>
 
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="lat">Latitude</label>
-                        <input type="text" class="form-control" id="lat" disabled/>
+                        <label class="form-label fw-bold" for="lat" title="Tabel: mStokis | Kolom: decLat">Latitude</label>
+                        <input type="text" class="form-control" id="lat" disabled title="Tabel: mStokis | Kolom: decLat"/>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-bold" for="lng">Longitude</label>
-                        <input type="text" class="form-control" id="lng" disabled/>
+                        <label class="form-label fw-bold" for="lng" title="Tabel: mStokis | Kolom: decLng">Longitude</label>
+                        <input type="text" class="form-control" id="lng" disabled title="Tabel: mStokis | Kolom: decLng"/>
                     </div>
                 </div>
             </div>
@@ -406,7 +406,7 @@
             }
 
             function loadDetail() {
-                const id = new URLSearchParams(window.location.search).get('id');
+                const id = MasterDataParam.parseRecordId();
                 const item = getLocalData().find(d => String(d.id) === String(id));
                 if (!item) {
                     document.getElementById('nama').value = '(data tidak ditemukan)';

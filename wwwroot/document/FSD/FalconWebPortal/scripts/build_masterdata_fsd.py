@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
 Render FSD Data Master (markdown -> DOCX) memakai pipeline resmi FSD Generator
-Engine (cover 2 halaman Kalbe + Document Approval + Kroki + Pandoc + post-process),
-lalu salin deliverable ke Document/ (standar §K.2).
+Engine (cover 2 halaman Kalbe + Document Approval + Kroki + Pandoc + post-process).
+
+Deliverable (standar §K.3):
+- Project Log (luar git): D:\\Work\\Documentation\\SHP\\Project Log\\{tahun}\\{NNN}. {proyek}\\
+  dengan nama ber-timestamp.
+- Repo (dalam git): output/ + FSD Generator Engine/docs/deliverables/ — tanpa timestamp.
 
 Usage (dari mana saja):
   py scripts/build_masterdata_fsd.py
@@ -10,23 +14,24 @@ Usage (dari mana saja):
 from __future__ import annotations
 
 import os
-import shutil
 import sys
-from datetime import datetime
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 WORKSPACE_DIR = os.path.dirname(SCRIPT_DIR)
 OUTPUT_DIR = os.path.join(WORKSPACE_DIR, 'output')
 SCREENSHOTS_DIR = os.path.join(WORKSPACE_DIR, 'screenshots')
 PROTOTYPE_ROOT = os.path.abspath(os.path.join(WORKSPACE_DIR, '..', '..', '..', '..'))
-DOCUMENT_DIR = os.path.join(PROTOTYPE_ROOT, 'Document')
+FSD_ENGINE_ROOT = os.path.abspath(os.path.join(PROTOTYPE_ROOT, '..', '..', 'FSD Generator Engine'))
+ENGINE_DELIVERABLES_DIR = os.path.join(FSD_ENGINE_ROOT, 'docs', 'deliverables')
 
 MD_NAME = 'FSD_Falcon_Web_MasterData_v1.0.md'
 DOCX_NAME = 'FSD_Falcon_Web_MasterData_v1.0.docx'
 DELIVERABLE_CODE = 'FALCON_WEB_MASTERDATA'
+PROJECT_LOG_NAME = 'Falcon FPRS'
 
 sys.path.insert(0, os.path.join(WORKSPACE_DIR, 'lib'))
 
+from fsd_deliver import DeliverableConfig  # noqa: E402
 from fsd_module_runner import build_fsd_module, ModuleBuildConfig, MermaidHandler  # noqa: E402
 
 
@@ -42,7 +47,7 @@ def build() -> str:
                 'module_cover': 'Data Master (Web Admin)',
                 'brd_no': '2026.SHP-FSD.0101',
                 'pid_no': '2026.SHP-PID.0101',
-                'prepared_by': 'Tim ICT – Falcon FPRS',
+                'prepared_by': 'Tim IT – Falcon FPRS',
                 'date': '08/07/2026',
                 'revision_date': '8 Juli 2026',
                 'revision_desc': 'Initial draft – modul Data Master Web Admin FPRS',
@@ -54,17 +59,18 @@ def build() -> str:
                     'ERD', 'ERD – Modul Data Master',
                 ),
             ],
+            deliverable=DeliverableConfig(
+                project_log_name=PROJECT_LOG_NAME,
+                deliverable_code=DELIVERABLE_CODE,
+                include_md=True,
+                repo_copy_path=os.path.join(ENGINE_DELIVERABLES_DIR, DOCX_NAME),
+            ),
         ),
-        # script_file pura-pura di root workspace agar source/ output/ screenshots/ resolve benar
         os.path.join(WORKSPACE_DIR, 'build.py'),
     )
 
-    os.makedirs(DOCUMENT_DIR, exist_ok=True)
-    ts = datetime.now().strftime('%Y%m%d%H%M%S')
-    deliverable = os.path.join(DOCUMENT_DIR, f'{ts}__FSD_{DELIVERABLE_CODE}.docx')
-    shutil.copy2(docx_out, deliverable)
-    print(f'\nDeliverable -> {deliverable} ({os.path.getsize(deliverable):,} bytes)')
-    return deliverable
+    print(f'\nBuild output (repo, tanpa timestamp): {docx_out}')
+    return docx_out
 
 
 if __name__ == '__main__':

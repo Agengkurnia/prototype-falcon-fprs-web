@@ -22,9 +22,7 @@
       "storageKey": "md_produk",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_02_master_produk_index.png",
-        "ss_03_master_produk_add.png",
-        "ss_04_master_produk_edit.png"
+        "ss_02_master_produk_index.png"
       ],
       "sections": {
         "overview": {
@@ -101,8 +99,8 @@
       "storageKey": "md_channel",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_17_master_grup_pelanggan_index.png",
-        "ss_18_master_grup_modal.png"
+        "ss_47_master_channel_index.png",
+        "ss_48_master_channel_modal.png"
       ],
       "sections": {
         "overview": {
@@ -174,8 +172,7 @@
       "storageKey": "md_pegawai",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_19_master_pegawai_index.png",
-        "ss_20_master_pegawai_add.png"
+        "ss_19_master_pegawai_index.png"
       ],
       "sections": {
         "overview": {
@@ -211,8 +208,7 @@
       "storageKey": "md_pelanggan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_15_master_pelanggan_index.png",
-        "ss_16_master_pelanggan_add.png"
+        "ss_15_master_pelanggan_index.png"
       ],
       "sections": {
         "overview": {
@@ -247,8 +243,7 @@
       "storageKey": "md_stokis",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_45_master_stokis_index.png",
-        "ss_46_master_stokis_add.png"
+        "ss_45_master_stokis_index.png"
       ],
       "sections": {
         "overview": {
