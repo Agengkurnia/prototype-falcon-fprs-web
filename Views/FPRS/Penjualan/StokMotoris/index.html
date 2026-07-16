@@ -150,11 +150,6 @@
         .step-item.active .step-label { color: #005d41; }
         .step-item.warning .step-label { color: #E65100; }
 
-        /* Qty / Rupiah Toggle */
-        .unit-toggle { display: inline-flex; background: #f1f3f5; border-radius: 8px; padding: 3px; gap: 2px; }
-        .unit-toggle button { border: none; background: transparent; font-size: 0.78rem; font-weight: 700; color: #64748b; padding: 4px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-        .unit-toggle button.active { background: #005d41; color: #fff; box-shadow: 0 2px 4px rgba(0,93,65,0.2); }
-
         /* Card secondary metric */
         .dc-extra { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 0.74rem; font-weight: 700; }
         .dc-extra .pill { padding: 1px 7px; border-radius: 20px; font-size: 0.7rem; }
@@ -325,6 +320,27 @@
         }
         .mini-bar-wrapper:hover .mini-bar-tooltip { opacity: 1; }
 
+        /* Brand contribution doughnut */
+        .brand-chart-wrap { position: relative; height: 240px; width: 100%; }
+        .brand-chart-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -58%);
+            text-align: center; pointer-events: none; width: 46%; line-height: 1.2;
+        }
+        .brand-chart-center .bc-pct { font-size: 1.35rem; font-weight: 800; color: #1b253b; font-family: 'Kalbe Geometric', sans-serif; }
+        .brand-chart-center .bc-label { font-size: 0.68rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 2px; }
+        .brand-chart-center .bc-sub { font-size: 0.62rem; color: #94a3b8; font-weight: 600; margin-top: 2px; }
+        .brand-chart-legend {
+            display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center;
+            margin-top: 0.65rem; font-size: 0.72rem; font-weight: 600;
+        }
+        .brand-chart-legend-item {
+            display: inline-flex; align-items: center; gap: 5px; color: #334155;
+        }
+        .brand-chart-legend-item.inactive {
+            text-decoration: line-through; color: #94a3b8; opacity: 0.72;
+        }
+        .brand-chart-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
         /* Mock Map UI */
         .mock-map { height: 90px; background: #e2e8f0; border-radius: 8px; position: relative; overflow: hidden; border: 1px solid #cbd5e1; margin-top: 8px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06); }
         .mock-map-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: 15px 15px; background-image: linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px); }
@@ -381,10 +397,6 @@
                     <span class="pulse-dot"></span>
                     <span id="lastUpdatedTime">Terakhir diperbarui: hari ini, --:-- WIB</span>
                 </div>
-                <div class="unit-toggle" id="unitToggle">
-                    <button class="active" data-unit="qty" onclick="setUnitMode('qty')">Qty</button>
-                    <button data-unit="rp" onclick="setUnitMode('rp')">Rupiah</button>
-                </div>
                 <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()"><i class="fa fa-download me-1"></i> Export Excel</button>
                 <button class="btn btn-success btn-sm" onclick="refreshDashboard()"><i class="fa fa-sync-alt me-1"></i> Refresh</button>
             </div>
@@ -394,17 +406,15 @@
         <div class="filter-bar">
             <select id="filterRegion" onchange="onRegionChange()">
                 <option value="">Seluruh Indonesia (Nasional)</option>
-                <option value="jabodetabek">Jabodetabek</option>
-                <option value="jawa_barat">Jawa Barat</option>
-                <option value="jawa_tengah">Jawa Tengah</option>
-                <option value="jawa_timur">Jawa Timur</option>
-                <option value="sumatera">Sumatera</option>
             </select>
             <select id="filterArea" onchange="onAreaChange()">
                 <option value="">Semua Area</option>
             </select>
             <select id="filterSales" onchange="applyAllFilters()">
                 <option value="">Semua Motoris</option>
+            </select>
+            <select id="filterBrand" onchange="applyAllFilters()">
+                <option value="">Semua Umbrand</option>
             </select>
             <div class="d-flex align-items-center" style="gap: 0.4rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.1rem 0.5rem; height: 34px;">
                 <span style="font-size:0.75rem; font-weight:700; color:#64748b;"><i class="fas fa-calendar-alt me-1"></i> Dari:</span>
@@ -428,63 +438,58 @@
                 <div class="dc-label">Armada Motoris Aktif</div>
                 <div class="dc-value" id="cardActiveMotoris">342</div>
                 <div class="dc-sub">tersebar di seluruh Indonesia</div>
-                <div class="dc-extra"><span class="pill pill-up"><i class="fas fa-circle" style="font-size:0.5rem;"></i> 318 Online</span> <span style="color:#94a3b8;">24 Offline</span></div>
             </div>
             <div class="dash-card" style="--stripe-color:#1565C0;">
-                <div class="dc-icon" style="background:rgba(21,101,192,0.08); color:#1565C0;"><i class="fas fa-warehouse"></i></div>
-                <div class="dc-label">Total Kulakan (Inbound)</div>
-                <div class="dc-value" id="cardInbound">3,810 Krt</div>
-                <div class="dc-sub">dari 48 stokis / grosir resmi</div>
-                <div class="dc-extra"><span class="pill pill-rp" id="cardInboundRp">≈ Rp 1,91 M</span></div>
+                <div class="dc-icon" style="background:rgba(21,101,192,0.08); color:#1565C0;"><i class="fas fa-users"></i></div>
+                <div class="dc-label">Pelanggan</div>
+                <div class="dc-value" id="cardPelanggan">0</div>
+                <div class="dc-sub" id="cardPelangganSub">terdaftar oleh motoris terfilter</div>
             </div>
             <div class="dash-card" style="--stripe-color:#2E7D32;">
-                <div class="dc-icon" style="background:rgba(46,125,50,0.08); color:#2E7D32;"><i class="fas fa-store"></i></div>
-                <div class="dc-label">Penjualan Warung (Outbound)</div>
-                <div class="dc-value" id="cardOutbound">14,820 Pcs</div>
-                <div class="dc-sub">ke 1,580 outlet kelontong</div>
-                <div class="dc-extra"><span class="pill pill-up" id="cardSellThrough">Sell-Through 73%</span></div>
+                <div class="dc-icon" style="background:rgba(46,125,50,0.08); color:#2E7D32;"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="dc-label">Faktur Penjualan</div>
+                <div class="dc-value" id="cardFaktur">0</div>
+                <div class="dc-sub" id="cardFakturSub">dalam periode terpilih</div>
             </div>
             <div class="dash-card" style="--stripe-color:#8E24AA;">
-                <div class="dc-icon" style="background:rgba(142,36,170,0.08); color:#8E24AA;"><i class="fas fa-boxes-stacked"></i></div>
-                <div class="dc-label">Saldo Stok di Motor</div>
-                <div class="dc-value" id="cardSaldoMotor">708 Krt</div>
-                <div class="dc-sub" id="cardSaldoPcs">≈ 50,976 Pcs total</div>
-                <div class="dc-extra"><span class="pill pill-rp" id="cardSaldoRp">≈ Rp 354 Jt</span></div>
+                <div class="dc-icon" style="background:rgba(142,36,170,0.08); color:#8E24AA;"><i class="fas fa-route"></i></div>
+                <div class="dc-label">Kunjungan</div>
+                <div class="dc-value" id="cardKunjungan">0</div>
+                <div class="dc-sub" id="cardKunjunganSub">dilakukan pada periode terpilih</div>
             </div>
-            <div class="dash-card" style="--stripe-color:#E65100;">
-                <div class="dc-icon" style="background:rgba(230,81,0,0.08); color:#E65100;"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="dc-label">Deviasi & Selisih</div>
-                <div class="dc-value" id="cardDeviations">5 Kasus</div>
-                <div class="dc-sub">GPS / Selisih stok fisik</div>
-                <div class="dc-extra"><span class="pill pill-down"><i class="fas fa-clock" style="font-size:0.6rem;"></i> 2 Stok Aging > 14 hari</span></div>
+            <div class="dash-card" style="--stripe-color:#00897B;">
+                <div class="dc-icon" style="background:rgba(0,137,123,0.08); color:#00897B;"><i class="fas fa-handshake"></i></div>
+                <div class="dc-label">Kunjungan Efektif <span style="font-weight:500; font-size:0.68rem; color:#8a92a6;">(Effective Call)</span></div>
+                <div class="dc-value" id="cardEffectiveCall">0%</div>
+                <div class="dc-sub" id="cardEffectiveCallSub">0 dari 0 kunjungan bertransaksi</div>
             </div>
         </div>
 
         <!-- Supply Chain Flow -->
         <div class="flow-container">
-            <h3 style="font-size:0.95rem; font-weight:700; color:#343a40; margin:0 0 0.5rem 0; font-family:'Kalbe Geometric',sans-serif;">
+                <h3 style="font-size:0.95rem; font-weight:700; color:#343a40; margin:0 0 0.5rem 0; font-family:'Kalbe Geometric',sans-serif;">
                 <i class="fas fa-exchange-alt" style="color:#005d41; margin-right:6px;"></i> Visualisasi Alur Pergerakan Stok
             </h3>
             <div class="flow-visual">
                 <div class="flow-node" style="background:#E8F5E9;">
                     <div class="fn-icon" style="background:#C8E6C9; color:#2E7D32;"><i class="fas fa-warehouse"></i></div>
-                    <div class="fn-label">Stokis / Grosir</div>
-                    <div class="fn-value" id="flowStokis">48 Outlet</div>
-                    <div style="font-size:0.72rem; color:#6c757d;">Penyedia Stok Utama</div>
+                    <div class="fn-label">Stokis / Grosir Resmi</div>
+                    <div class="fn-value" id="flowStokis">Rp 0</div>
+                    <div style="font-size:0.72rem; color:#6c757d;" id="flowStokisSub">Nilai Pembelian Masuk</div>
                 </div>
                 <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
                 <div class="flow-node" style="background:#E3F2FD;">
                     <div class="fn-icon" style="background:#BBDEFB; color:#1565C0;"><i class="fas fa-motorcycle"></i></div>
-                    <div class="fn-label">Motoris (Sales)</div>
-                    <div class="fn-value" id="flowMotoris">342 Sales</div>
-                    <div style="font-size:0.72rem; color:#6c757d;">Gudang Berjalan</div>
+                    <div class="fn-label">Motoris (Penjualan)</div>
+                    <div class="fn-value" id="flowMotoris">Rp 0</div>
+                    <div style="font-size:0.72rem; color:#6c757d;" id="flowMotorisSub">Nilai Stok di Motoris</div>
                 </div>
                 <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
                 <div class="flow-node" style="background:#FFF8E1;">
                     <div class="fn-icon" style="background:#FFE082; color:#F57F17;"><i class="fas fa-home"></i></div>
-                    <div class="fn-label">Warung Kelontong</div>
-                    <div class="fn-value" id="flowWarung">1,480 Outlet</div>
-                    <div style="font-size:0.72rem; color:#6c757d;">Destinasi Akhir Konsumen</div>
+                    <div class="fn-label">Outlet Kelontong</div>
+                    <div class="fn-value" id="flowWarung">Rp 0</div>
+                    <div style="font-size:0.72rem; color:#6c757d;" id="flowWarungSub">Nilai Penjualan Keluar</div>
                 </div>
             </div>
         </div>
@@ -518,16 +523,18 @@
             </div>
             <div class="charts-row">
                 <div class="chart-card">
-                    <h3><i class="fas fa-chart-line" style="color:#1565C0; margin-right:6px;"></i> Tren Penjualan Harian (Pcs)</h3>
+                    <h3><i class="fas fa-chart-line" style="color:#1565C0; margin-right:6px;"></i> Tren Penjualan Harian</h3>
                     <div style="position: relative; height: 220px; width: 100%;">
                         <canvas id="chartDailyTrend"></canvas>
                     </div>
                 </div>
                 <div class="chart-card">
-                    <h3><i class="fas fa-map-marker-alt" style="color:#C62828; margin-right:6px;"></i> Akurasi GPS Transaksi</h3>
-                    <div style="position: relative; height: 220px; width: 100%;">
-                        <canvas id="chartGPS"></canvas>
+                    <h3><i class="fas fa-chart-pie" style="color:#8E24AA; margin-right:6px;"></i> Kontribusi Umbrand</h3>
+                    <div class="brand-chart-wrap">
+                        <canvas id="chartBrandContrib"></canvas>
+                        <div id="brandChartCenter" class="brand-chart-center"></div>
                     </div>
+                    <div id="brandChartLegend" class="brand-chart-legend"></div>
                 </div>
             </div>
         </div>
@@ -547,13 +554,9 @@
                             <tr>
                                 <th>Motoris</th>
                                 <th>Wilayah</th>
-                                <th>Stok (Krt)</th>
-                                <th>Stok (Dus)</th>
-                                <th>Stok (Pcs)</th>
-                                <th>Total Pcs</th>
-                                <th>Sell-Through</th>
-                                <th>Umur Stok</th>
-                                <th>Nilai Saldo</th>
+                                <th style="text-align:right;">Nilai Kulakan</th>
+                                <th style="text-align:right;">Nilai Penjualan</th>
+                                <th style="text-align:right;">Nilai Saldo</th>
                             </tr>
                         </thead>
                         <tbody id="balanceTableBody"></tbody>
@@ -579,10 +582,8 @@
                                 <th>Motoris</th>
                                 <th>Tipe</th>
                                 <th>Produk</th>
-                                <th>Qty</th>
+                                <th>Nilai (Rp)</th>
                                 <th>Outlet / Stokis</th>
-                                <th>GPS</th>
-                                <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -593,118 +594,260 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
-    // ===================== MOCK DATA =====================
-    const PRODUCTS = [
-        { name: 'Prenagen Mommy Vanilla 400g', pricePerPcs: 52000 },
-        { name: 'Morinaga Chil-Go Strawberry 140ml', pricePerPcs: 8500 },
-        { name: 'Entrasol Gold Plain 580g', pricePerPcs: 98000 },
-        { name: 'Diabetasol Vanilla 600g', pricePerPcs: 112000 },
-        { name: 'Prenagen Esensis Coklat 360g', pricePerPcs: 68000 },
-        { name: 'Morinaga BMT Platinum 800g', pricePerPcs: 185000 },
-        { name: 'Milna Biskuit Bayi Original 130g', pricePerPcs: 15000 },
-        { name: 'Entrasol Active Coklat 350g', pricePerPcs: 45000 },
-        { name: 'Zee Platinum Vanilla 350g', pricePerPcs: 42000 },
-        { name: 'Prenagen Lactamom Mocca 200g', pricePerPcs: 38000 }
+    // ===================== MASTER DATA =====================
+    const MASTER_STORES = [
+        { key: 'md_pegawai', verKey: 'md_pegawai_seed_ver', ver: 'real-jul2026-b', json: '../../../../wwwroot/data/pegawai.json' },
+        { key: 'md_produk', verKey: 'md_produk_seed_ver', ver: 'umbrella7-jul2026', json: '../../../../wwwroot/data/produk.json' },
+        { key: 'md_stokis', verKey: 'md_stokis_seed_ver', ver: 'mpp-jul2026-b', json: '../../../../wwwroot/data/stokis.json' },
+        { key: 'md_pelanggan', verKey: 'md_pelanggan_seed_ver', ver: 'mobile-jul2026-c', json: '../../../../wwwroot/data/pelanggan.json' }
     ];
+    const STOR_KEY = 'md_stok_motoris';
+    const FAKTUR_STORAGE_KEY = 'fprs_faktur';
 
-    const OUTLETS = ['Toko Maju Jaya', 'Warung Barokah', 'Kios Sejahtera', 'Toko Sinar Baru', 'Warung Bu Eni', 'Kios Makmur', 'Toko Harapan', 'Warung Pak De', 'Kios Mentari', 'Toko Berkah', 'Warung Subur', 'Kios Purnama', 'Toko Dua Putri', 'Warung Keluarga', 'Kios Bintang'];
+    let masterData = { pegawai: [], produk: [], stokis: [], pelanggan: [] };
+    let masterFaktur = [];
+    let produkByKode = {};
+    let masterRegions = [];
+    let masterUmbrellas = [];
+    let motorisData = [];
+    let auditData = [];
+    let chartInstances = {};
+    let dtBalance = null;
+    let dtAudit = null;
 
-    const STOKIS_LIST = ['PT Sumber Makmur', 'CV Berkah Jaya', 'PT Indo Distribusi', 'CV Mitra Sejahtera', 'PT Kalbe Farma Dist.', 'CV Karya Mandiri'];
+    function isActiveStatus(status) {
+        return String(status || 'Active').toLowerCase() === 'active';
+    }
+
+    async function loadMasterStore({ key, verKey, ver, json }) {
+        const needSeed = !localStorage.getItem(key) || localStorage.getItem(verKey) !== ver;
+        if (!needSeed) return JSON.parse(localStorage.getItem(key) || '[]');
+        const resp = await fetch(json);
+        if (!resp.ok) throw new Error('Gagal memuat ' + key);
+        const data = await resp.json();
+        localStorage.setItem(key, JSON.stringify(data));
+        localStorage.setItem(verKey, ver);
+        return data;
+    }
+
+    async function loadFakturData() {
+        const stored = localStorage.getItem(FAKTUR_STORAGE_KEY);
+        if (stored) return JSON.parse(stored);
+        const resp = await fetch('../../../../wwwroot/data/faktur.json');
+        if (!resp.ok) return [];
+        return resp.json();
+    }
+
+    async function loadAllMasterData() {
+        const [pegawai, produk, stokis, pelanggan] = await Promise.all(MASTER_STORES.map(loadMasterStore));
+        masterData = {
+            pegawai: pegawai.filter(p => isActiveStatus(p.status)),
+            produk: produk.filter(p => isActiveStatus(p.status)),
+            stokis: stokis.filter(s => isActiveStatus(s.status)),
+            pelanggan: pelanggan.filter(p => isActiveStatus(p.status))
+        };
+        masterFaktur = await loadFakturData();
+        produkByKode = Object.fromEntries(masterData.produk.map(p => [p.kode, p]));
+        masterUmbrellas = [...new Set(masterData.produk.map(p => p.umbrella).filter(Boolean))].sort();
+        masterRegions = [...new Set(
+            masterData.stokis.map(s => s.region).filter(Boolean)
+                .concat(masterData.pegawai.map(p => p.region).filter(Boolean))
+        )].sort();
+    }
+
+    function hashSeed(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) h = ((h << 5) - h) + str.charCodeAt(i) | 0;
+        return Math.abs(h) || 1;
+    }
+
+    function seededRandom(seed) {
+        let s = seed;
+        return function(min, max) {
+            s = (s * 1103515245 + 12345) & 0x7fffffff;
+            return min + (s % (max - min + 1));
+        };
+    }
 
     function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
     function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
     function formatRp(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
     function formatNum(n) { return n.toLocaleString('id-ID'); }
 
-    function generateMotorisData() {
-        const names = [
-            { name: 'Andi Prasetyo', code: 'MTR-001', region: 'jabodetabek', area: 'Jakarta Selatan' },
-            { name: 'Budi Santoso', code: 'MTR-002', region: 'jabodetabek', area: 'Jakarta Timur' },
-            { name: 'Cahyo Wibowo', code: 'MTR-003', region: 'jabodetabek', area: 'Tangerang' },
-            { name: 'Dedi Kurniawan', code: 'MTR-004', region: 'jawa_barat', area: 'Bandung' },
-            { name: 'Eko Firmansyah', code: 'MTR-005', region: 'jawa_barat', area: 'Bogor' },
-            { name: 'Fajar Hidayat', code: 'MTR-006', region: 'jawa_barat', area: 'Bekasi' },
-            { name: 'Gunawan Setiadi', code: 'MTR-007', region: 'jawa_tengah', area: 'Semarang' },
-            { name: 'Hendra Wijaya', code: 'MTR-008', region: 'jawa_tengah', area: 'Solo' },
-            { name: 'Irfan Maulana', code: 'MTR-009', region: 'jawa_tengah', area: 'Purwokerto' },
-            { name: 'Joko Purnomo', code: 'MTR-010', region: 'jawa_timur', area: 'Surabaya' },
-            { name: 'Krisna Adi', code: 'MTR-011', region: 'jawa_timur', area: 'Malang' },
-            { name: 'Lukman Hakim', code: 'MTR-012', region: 'jawa_timur', area: 'Sidoarjo' },
-            { name: 'Muhammad Rizki', code: 'MTR-013', region: 'sumatera', area: 'Medan' },
-            { name: 'Naufal Akbar', code: 'MTR-014', region: 'sumatera', area: 'Palembang' },
-            { name: 'Oscar Ramadhan', code: 'MTR-015', region: 'sumatera', area: 'Lampung' },
-            { name: 'Putra Aditya', code: 'MTR-016', region: 'jabodetabek', area: 'Depok' },
-            { name: 'Rendi Saputra', code: 'MTR-017', region: 'jawa_timur', area: 'Gresik' }
-        ];
+    function pickStokisForMotoris(rnd, region) {
+        const pool = region
+            ? masterData.stokis.filter(s => s.region === region)
+            : masterData.stokis;
+        const list = pool.length ? pool : masterData.stokis;
+        return list[rnd(0, list.length - 1)];
+    }
 
-        return names.map(m => {
-            // Generate products held by this motoris (3-6 products)
-            const numProds = randomInt(3, 6);
+    function pickPelangganForMotoris(rnd) {
+        if (!masterData.pelanggan.length) return null;
+        return masterData.pelanggan[rnd(0, masterData.pelanggan.length - 1)];
+    }
+
+    function generateMotorisData() {
+        const motorisList = masterData.pegawai.filter(p =>
+            String(p.role || '').toLowerCase() === 'motoris'
+        );
+        if (!motorisList.length || !masterData.produk.length) return [];
+
+        const products = masterData.produk.map(p => ({
+            kode: p.kode,
+            name: p.nama,
+            umbrella: p.umbrella || '',
+            brand: p.brand || '',
+            pricePerPcs: Number(p.hargaJual) || 0
+        }));
+
+        return motorisList.map((peg, idx) => {
+            const rnd = seededRandom(hashSeed(peg.kode || String(peg.id) || String(idx)));
+            const stokisRef = pickStokisForMotoris(rnd, peg.region || '');
+            const region = peg.region || stokisRef?.region || masterRegions[idx % Math.max(masterRegions.length, 1)] || 'Nasional';
+            const area = peg.branch || stokisRef?.branch || '—';
+
+            const numProds = rnd(3, Math.min(6, products.length));
             const selectedProds = [];
             const usedIdx = new Set();
             for (let i = 0; i < numProds; i++) {
-                let idx;
-                do { idx = randomInt(0, PRODUCTS.length - 1); } while (usedIdx.has(idx));
-                usedIdx.add(idx);
+                let pIdx;
+                do { pIdx = rnd(0, products.length - 1); } while (usedIdx.has(pIdx));
+                usedIdx.add(pIdx);
+                const prod = products[pIdx];
+                const karton = rnd(1, 8);
+                const inboundKrt = karton + rnd(2, 5);
                 selectedProds.push({
-                    name: PRODUCTS[idx].name,
-                    karton: randomInt(1, 8),
-                    dus: randomInt(0, 11),
-                    pcs: randomInt(0, 5),
-                    pricePerPcs: PRODUCTS[idx].pricePerPcs
+                    kode: prod.kode,
+                    name: prod.name,
+                    umbrella: prod.umbrella,
+                    brand: prod.brand,
+                    umbrella: prod.umbrella,
+                    karton,
+                    dus: rnd(0, 11),
+                    pcs: rnd(0, 5),
+                    pricePerPcs: prod.pricePerPcs,
+                    inboundKrt
                 });
             }
 
-            // Calculate totals
-            let totalKrt = 0, totalDus = 0, totalPcs = 0;
-            selectedProds.forEach(p => { totalKrt += p.karton; totalDus += p.dus; totalPcs += p.pcs; });
+            let totalKrt = 0, totalDus = 0, totalPcs = 0, totalInboundKrt = 0;
+            selectedProds.forEach(p => {
+                totalKrt += p.karton;
+                totalDus += p.dus;
+                totalPcs += p.pcs;
+                totalInboundKrt += p.inboundKrt;
+            });
             const totalPcsAll = (totalKrt * 72) + (totalDus * 6) + totalPcs;
-            const inboundKrt = totalKrt + randomInt(5, 20); // They got more than current stock
-            const soldPcs = (inboundKrt * 72) - totalPcsAll; // difference is what was sold
-            const aging = randomInt(1, 18);
-            const sellThrough = Math.round((soldPcs / (inboundKrt * 72)) * 100);
+            const inboundKrt = totalInboundKrt;
+            const soldPcs = Math.max(0, (inboundKrt * 72) - totalPcsAll);
+            const aging = rnd(1, 18);
+            const sellThrough = inboundKrt > 0 ? Math.round((soldPcs / (inboundKrt * 72)) * 100) : 0;
 
-            // Generate sales history (last 10 transactions)
             const salesHistory = [];
             for (let i = 0; i < 10; i++) {
-                const day = randomInt(1, 28);
-                const prod = randomChoice(selectedProds);
-                const qtyPcs = randomInt(2, 24);
-                // Generate coordinates based on region
-                const baseCoords = { jabodetabek: [-6.2, 106.85], jawa_barat: [-6.9, 107.6], jawa_tengah: [-7.0, 110.4], jawa_timur: [-7.3, 112.7], sumatera: [3.6, 98.7] };
-                const base = baseCoords[m.region] || [-6.2, 106.85];
-                const lat = base[0] + (Math.random() - 0.5) * 0.06;
-                const lng = base[1] + (Math.random() - 0.5) * 0.08;
+                const day = rnd(1, 28);
+                const prod = selectedProds[rnd(0, selectedProds.length - 1)];
+                const qtyPcs = rnd(2, 24);
+                const outlet = pickPelangganForMotoris(rnd);
+                const lat = outlet?.lat ?? (-6.2 + (rnd(-30, 30) / 100));
+                const lng = outlet?.lng ?? (106.85 + (rnd(-40, 40) / 100));
                 salesHistory.push({
                     date: `2026-06-${String(day).padStart(2, '0')}`,
-                    outlet: randomChoice(OUTLETS),
+                    outlet: outlet?.nama || 'Outlet',
+                    outletKode: outlet?.kode || '',
                     product: prod.name,
-                    qtyPcs: qtyPcs,
+                    umbrella: prod.umbrella,
+                    brand: prod.brand,
+                    umbrella: prod.umbrella,
+                    qtyPcs,
                     amount: qtyPcs * prod.pricePerPcs,
-                    lat: parseFloat(lat.toFixed(6)),
-                    lng: parseFloat(lng.toFixed(6))
+                    lat: parseFloat(Number(lat).toFixed(6)),
+                    lng: parseFloat(Number(lng).toFixed(6))
                 });
             }
             salesHistory.sort((a, b) => b.date.localeCompare(a.date));
 
-            // Daily sales for mini chart (last 7 days)
-            const dailySales = [];
-            for (let d = 7; d >= 1; d--) {
-                dailySales.push(randomInt(10, 80));
+            const visitHistory = [];
+            const numVisits = rnd(20, 38);
+            for (let i = 0; i < numVisits; i++) {
+                const day = rnd(1, 28);
+                const outlet = pickPelangganForMotoris(rnd);
+                const hasTransaction = rnd(0, 100) < 68;
+                const visit = {
+                    date: `2026-06-${String(day).padStart(2, '0')}`,
+                    outlet: outlet?.nama || 'Outlet',
+                    outletKode: outlet?.kode || '',
+                    hasTransaction
+                };
+                const baseLat = outlet?.lat ?? (-6.2 + rnd(-30, 30) / 100);
+                const baseLng = outlet?.lng ?? (106.85 + rnd(-40, 40) / 100);
+                const checkInHour = rnd(8, 16);
+                const checkInMin = rnd(0, 59);
+                const checkInSec = rnd(0, 59);
+                visit.durationMin = hasTransaction ? rnd(15, 50) : rnd(8, 25);
+                visit.checkInTime = `${visit.date}T${String(checkInHour).padStart(2, '0')}:${String(checkInMin).padStart(2, '0')}:${String(checkInSec).padStart(2, '0')}`;
+                const totalOutMin = checkInHour * 60 + checkInMin + visit.durationMin;
+                const outHour = Math.floor(totalOutMin / 60) % 24;
+                const outMin = totalOutMin % 60;
+                visit.checkOutTime = `${visit.date}T${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}:${String(rnd(0, 59)).padStart(2, '0')}`;
+                visit.checkInLat = parseFloat((baseLat + rnd(-25, 25) / 100000).toFixed(6));
+                visit.checkInLng = parseFloat((baseLng + rnd(-25, 25) / 100000).toFixed(6));
+                visit.checkOutLat = parseFloat((baseLat + rnd(-30, 30) / 100000).toFixed(6));
+                visit.checkOutLng = parseFloat((baseLng + rnd(-30, 30) / 100000).toFixed(6));
+                visit.lat = baseLat;
+                visit.lng = baseLng;
+                visit.distanceCheckInMeter = distanceMeters(baseLat, baseLng, visit.checkInLat, visit.checkInLng);
+                visit.distanceCheckOutMeter = distanceMeters(baseLat, baseLng, visit.checkOutLat, visit.checkOutLng);
+                if (hasTransaction) {
+                    const prod = selectedProds[rnd(0, selectedProds.length - 1)];
+                    visit.product = prod.name;
+                    visit.umbrella = prod.umbrella;
+                    visit.amount = rnd(2, 24) * prod.pricePerPcs;
+                }
+                visitHistory.push(visit);
             }
+            visitHistory.sort((a, b) => b.date.localeCompare(a.date));
 
-            // Last kulakan info
+            const registeredPelanggan = [];
+            const regUsed = new Set();
+            const regCount = rnd(4, Math.min(12, masterData.pelanggan.length));
+            for (let i = 0; i < regCount; i++) {
+                const pel = pickPelangganForMotoris(rnd);
+                if (!pel || regUsed.has(pel.kode)) continue;
+                regUsed.add(pel.kode);
+                registeredPelanggan.push({
+                    id: pel.id,
+                    kode: pel.kode,
+                    nama: pel.nama,
+                    tanggalDaftar: `2026-06-${String(rnd(1, 28)).padStart(2, '0')}`
+                });
+            }
+            registeredPelanggan.sort((a, b) => b.tanggalDaftar.localeCompare(a.tanggalDaftar));
+
+            const dailySales = [];
+            for (let d = 7; d >= 1; d--) dailySales.push(rnd(50000, 450000));
+
+            const kulakanStokis = pickStokisForMotoris(rnd, region);
             const lastKulakan = {
-                date: `2026-06-${String(randomInt(10, 25)).padStart(2, '0')}`,
-                stokis: randomChoice(STOKIS_LIST),
-                qty: randomInt(3, 15),
-                gps: Math.random() > 0.15
+                date: `2026-06-${String(rnd(10, 25)).padStart(2, '0')}`,
+                stokis: kulakanStokis?.nama || 'Stokis',
+                stokisKode: kulakanStokis?.kode || '',
+                qty: rnd(3, 15),
+                gps: rnd(0, 100) > 15,
+                lat: kulakanStokis?.lat,
+                lng: kulakanStokis?.lng
             };
 
             return {
-                ...m,
+                id: peg.id,
+                name: peg.nama,
+                code: peg.kode,
+                region,
+                area,
                 products: selectedProds,
                 totalKrt, totalDus, totalPcs,
                 totalPcsAll,
@@ -713,6 +856,8 @@
                 aging,
                 sellThrough,
                 salesHistory,
+                visitHistory,
+                registeredPelanggan,
                 dailySales,
                 lastKulakan,
                 nilai: selectedProds.reduce((sum, p) => sum + ((p.karton * 72 + p.dus * 6 + p.pcs) * p.pricePerPcs), 0)
@@ -720,11 +865,27 @@
         });
     }
 
-    let motorisData = generateMotorisData();
-    let currentUnit = 'qty';
-    let chartInstances = {};
-    let dtBalance = null;
-    let dtAudit = null;
+    function persistMotorisSnapshot() {
+        localStorage.setItem(STOR_KEY, JSON.stringify({
+            generatedAt: new Date().toISOString(),
+            source: 'master',
+            motoris: motorisData
+        }));
+    }
+
+    function populateMasterFilters() {
+        const regionSelect = document.getElementById('filterRegion');
+        regionSelect.innerHTML = '<option value="">Seluruh Indonesia (Nasional)</option>';
+        masterRegions.forEach(r => {
+            regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
+        });
+
+        const brandSelect = document.getElementById('filterBrand');
+        brandSelect.innerHTML = '<option value="">Semua Umbrand</option>';
+        masterUmbrellas.forEach(u => {
+            brandSelect.innerHTML += `<option value="${u}">${u}</option>`;
+        });
+    }
 
     // ===================== AUDIT TRAIL DATA =====================
     function generateAuditData() {
@@ -735,8 +896,9 @@
             const inProd = randomChoice(m.products);
             const inQty = m.lastKulakan.qty;
             const afterKrt = inProd.karton + inQty;
-            const lat = (-6.1 - Math.random() * 1.5).toFixed(6);
-            const lng = (106.7 + Math.random() * 1.2).toFixed(6);
+            const lat = Number(m.lastKulakan.lat ?? (-6.1 - Math.random() * 1.5)).toFixed(6);
+            const lng = Number(m.lastKulakan.lng ?? (106.7 + Math.random() * 1.2)).toFixed(6);
+            const inAmount = inQty * 72 * inProd.pricePerPcs;
             audits.push({
                 id: `TX-IN-2606${String(randomInt(10,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
                 date: m.lastKulakan.date,
@@ -747,8 +909,11 @@
                 area: m.area,
                 type: 'inbound',
                 product: inProd.name,
+                brand: inProd.brand,
+                umbrella: inProd.umbrella,
                 qty: inQty,
                 qtyUnit: 'Krt',
+                amount: inAmount,
                 outlet: m.lastKulakan.stokis,
                 gps: m.lastKulakan.gps,
                 gpsCoords: `${lat},${lng}`,
@@ -764,9 +929,11 @@
                 const qtyPcs = randomInt(6, 48);
                 const beforePcs = (prod.karton * 72) + (prod.dus * 6) + prod.pcs;
                 const afterPcs = beforePcs - qtyPcs;
-                const olat = (-6.1 - Math.random() * 1.5).toFixed(6);
-                const olng = (106.7 + Math.random() * 1.2).toFixed(6);
+                const outlet = randomChoice(m.salesHistory);
+                const olat = outlet?.lat ?? (-6.1 - Math.random() * 1.5);
+                const olng = outlet?.lng ?? (106.7 + Math.random() * 1.2);
                 const gpsValid = Math.random() > 0.1;
+                const outAmount = qtyPcs * prod.pricePerPcs;
                 audits.push({
                     id: `TX-OUT-2606${String(randomInt(12,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
                     date: `2026-06-${String(randomInt(12, 28)).padStart(2, '0')}`,
@@ -777,11 +944,14 @@
                     area: m.area,
                     type: 'outbound',
                     product: prod.name,
+                    brand: prod.brand,
+                    umbrella: prod.umbrella,
                     qty: qtyPcs,
                     qtyUnit: 'Pcs',
-                    outlet: randomChoice(OUTLETS),
+                    amount: outAmount,
+                    outlet: outlet?.outlet || 'Outlet',
                     gps: gpsValid,
-                    gpsCoords: `${olat},${olng}`,
+                    gpsCoords: `${Number(olat).toFixed(6)},${Number(olng).toFixed(6)}`,
                     gpsDetails: gpsValid ? `Jarak ${randomInt(3,20)}m.` : `PERINGATAN: Jarak ${(Math.random()*1.2+0.2).toFixed(1)} km dari outlet.`,
                     nota: false,
                     status: Math.random() > 0.2 ? 'verified' : 'pending',
@@ -793,16 +963,32 @@
         return audits;
     }
 
-    let auditData = generateAuditData();
+    function rebuildDashboardData() {
+        motorisData = generateMotorisData();
+        auditData = generateAuditData();
+        persistMotorisSnapshot();
+    }
 
     // ===================== INITIALIZATION =====================
-    document.addEventListener('layoutReady', function() {
-        updateTimestamp();
-        renderBalanceTable();
-        renderAuditTable();
-        initCharts();
-        updateSummaryCards();
-        updateCharts();
+    document.addEventListener('layoutReady', async function() {
+        try {
+            await loadAllMasterData();
+            populateMasterFilters();
+            rebuildDashboardData();
+            updateTimestamp();
+            renderBalanceTable();
+            renderAuditTable();
+            initCharts();
+            updateSummaryCards();
+            updateCharts();
+        } catch (err) {
+            console.error('[StokMotoris]', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Memuat Data Master',
+                text: 'Pastikan master Pegawai, Produk, Stokis, dan Pelanggan sudah tersedia.'
+            });
+        }
     });
 
     function updateTimestamp() {
@@ -811,58 +997,114 @@
         document.getElementById('lastUpdatedTime').textContent = `Terakhir diperbarui: hari ini, ${time} WIB`;
     }
 
-    // ===================== UNIT TOGGLE =====================
-    function setUnitMode(mode) {
-        currentUnit = mode;
-        document.querySelectorAll('#unitToggle button').forEach(b => b.classList.remove('active'));
-        document.querySelector(`#unitToggle button[data-unit="${mode}"]`).classList.add('active');
-        updateSummaryCards();
-        renderBalanceTable();
-        updateCharts();
+    function calcInboundRp(products) {
+        return products.reduce((sum, p) => sum + (p.inboundKrt || 0) * 72 * p.pricePerPcs, 0);
+    }
+
+    function calcOutboundRp(salesHistory) {
+        return salesHistory.reduce((sum, h) => sum + h.amount, 0);
+    }
+
+    function calcEffectiveCallStats(motorisList) {
+        let totalVisits = 0;
+        let effectiveVisits = 0;
+        motorisList.forEach(m => {
+            const visits = m.visitHistory || [];
+            totalVisits += visits.length;
+            effectiveVisits += visits.filter(v => v.hasTransaction).length;
+        });
+        const rate = totalVisits > 0 ? Math.round((effectiveVisits / totalVisits) * 100) : 0;
+        const nonEffective = totalVisits - effectiveVisits;
+        return { totalVisits, effectiveVisits, nonEffective, rate };
+    }
+
+    function getMotorisOutletCodes(motorisList) {
+        const codes = new Set();
+        motorisList.forEach(m => {
+            (m.registeredPelanggan || []).forEach(p => { if (p.kode) codes.add(p.kode); });
+            (m.salesHistory || []).forEach(h => { if (h.outletKode) codes.add(h.outletKode); });
+            (m.visitHistory || []).forEach(v => { if (v.outletKode) codes.add(v.outletKode); });
+        });
+        return codes;
+    }
+
+    function fakturMatchesUmbrella(faktur, umbrella) {
+        if (!umbrella || !faktur.items?.length) return true;
+        return faktur.items.some(item => produkByKode[item.kode]?.umbrella === umbrella);
+    }
+
+    function countFilteredPelanggan(motorisList, dateStart, dateEnd, umbrella) {
+        const seen = new Set();
+        motorisList.forEach(m => {
+            (m.registeredPelanggan || []).forEach(p => {
+                if (dateStart && p.tanggalDaftar < dateStart) return;
+                if (dateEnd && p.tanggalDaftar > dateEnd) return;
+                if (umbrella) {
+                    const hasUmbrellaActivity = (m.visitHistory || []).some(v =>
+                        v.outletKode === p.kode && v.hasTransaction && v.umbrella === umbrella
+                    );
+                    if (!hasUmbrellaActivity) return;
+                }
+                if (p.kode) seen.add(p.kode);
+            });
+        });
+        return seen.size;
+    }
+
+    function countFilteredFaktur(motorisList, dateStart, dateEnd, umbrella) {
+        const outletCodes = getMotorisOutletCodes(motorisList);
+        if (!outletCodes.size || !masterFaktur.length) return 0;
+        return masterFaktur.filter(f => {
+            const fDate = (f.tanggalFaktur || '').slice(0, 10);
+            if (dateStart && fDate < dateStart) return false;
+            if (dateEnd && fDate > dateEnd) return false;
+            if (!outletCodes.has(f.pelangganKode)) return false;
+            return fakturMatchesUmbrella(f, umbrella);
+        }).length;
+    }
+
+    function countFilteredKunjungan(motorisList) {
+        return motorisList.reduce((sum, m) => sum + (m.visitHistory || []).length, 0);
     }
 
     // ===================== SUMMARY CARDS =====================
     function updateSummaryCards() {
         const filtered = getFilteredMotoris();
-        const totalInboundKrt = filtered.reduce((s, m) => s + m.inboundKrt, 0);
-        const totalInboundRp = totalInboundKrt * 72 * 55000;
-        const totalSoldPcs = filtered.reduce((s, m) => s + m.soldPcs, 0);
-        const totalSoldRp = filtered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
-        const totalSaldoKrt = filtered.reduce((s, m) => s + m.totalKrt, 0);
-        const totalSaldoPcsAll = filtered.reduce((s, m) => s + m.totalPcsAll, 0);
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+        const umbrella = document.getElementById('filterBrand').value;
+        const totalInboundRp = filtered.reduce((sum, m) => sum + calcInboundRp(m.products), 0);
+        const totalSoldRp = filtered.reduce((sum, m) => sum + calcOutboundRp(m.salesHistory), 0);
         const totalNilai = filtered.reduce((s, m) => s + m.nilai, 0);
-        const avgSellThrough = filtered.length > 0 ? Math.round(filtered.reduce((s, m) => s + m.sellThrough, 0) / filtered.length) : 0;
+        const effectiveCall = calcEffectiveCallStats(filtered);
+        const pelangganCount = countFilteredPelanggan(filtered, dateStart, dateEnd, umbrella);
+        const fakturCount = countFilteredFaktur(filtered, dateStart, dateEnd, umbrella);
+        const kunjunganCount = countFilteredKunjungan(filtered);
 
         document.getElementById('cardActiveMotoris').textContent = formatNum(filtered.length);
-
-        if (currentUnit === 'qty') {
-            document.getElementById('cardInbound').textContent = formatNum(totalInboundKrt) + ' Krt';
-            document.getElementById('cardInboundRp').textContent = '≈ ' + formatRp(totalInboundRp);
-
-            document.getElementById('cardOutbound').textContent = formatNum(totalSoldPcs) + ' Pcs';
-            document.getElementById('cardSellThrough').textContent = 'Sell-Through ' + avgSellThrough + '%';
-
-            document.getElementById('cardSaldoMotor').textContent = formatNum(totalSaldoKrt) + ' Krt';
-            document.getElementById('cardSaldoPcs').textContent = '≈ ' + formatNum(totalSaldoPcsAll) + ' Pcs total';
-            document.getElementById('cardSaldoRp').textContent = '≈ ' + formatRp(totalNilai);
-        } else {
-            document.getElementById('cardInbound').textContent = formatRp(totalInboundRp);
-            document.getElementById('cardInboundRp').textContent = `≈ ${formatNum(totalInboundKrt)} Krt`;
-
-            document.getElementById('cardOutbound').textContent = formatRp(totalSoldRp);
-            document.getElementById('cardSellThrough').textContent = `Sell-Through ${avgSellThrough}% (≈ ${formatNum(totalSoldPcs)} Pcs)`;
-
-            document.getElementById('cardSaldoMotor').textContent = formatRp(totalNilai);
-            document.getElementById('cardSaldoPcs').textContent = `≈ ${formatNum(totalSaldoKrt)} Krt`;
-            document.getElementById('cardSaldoRp').textContent = `≈ ${formatNum(totalSaldoPcsAll)} Pcs total`;
-        }
+        document.getElementById('cardPelanggan').textContent = formatNum(pelangganCount);
+        document.getElementById('cardPelangganSub').textContent =
+            `terdaftar oleh ${formatNum(filtered.length)} motoris terfilter`;
+        document.getElementById('cardFaktur').textContent = formatNum(fakturCount);
+        document.getElementById('cardFakturSub').textContent = 'faktur penjualan dalam periode terpilih';
+        document.getElementById('cardKunjungan').textContent = formatNum(kunjunganCount);
+        document.getElementById('cardKunjunganSub').textContent = 'kunjungan pada periode terpilih';
+        document.getElementById('flowStokis').textContent = formatRp(totalInboundRp);
+        document.getElementById('flowMotoris').textContent = formatRp(totalNilai);
+        document.getElementById('flowWarung').textContent = formatRp(totalSoldRp);
+        document.getElementById('cardEffectiveCall').textContent = effectiveCall.rate + '%';
+        document.getElementById('cardEffectiveCallSub').textContent =
+            `${formatNum(effectiveCall.effectiveVisits)} dari ${formatNum(effectiveCall.totalVisits)} kunjungan bertransaksi` +
+            (effectiveCall.nonEffective > 0 ? ` · ${formatNum(effectiveCall.nonEffective)} tanpa transaksi` : '');
     }
 
     // ===================== FILTER LOGIC =====================
-    function getFilteredMotoris() {
+    function getFilteredMotoris(options = {}) {
+        const applyBrandFilter = options.applyBrandFilter !== false;
         const region = document.getElementById('filterRegion').value;
         const area = document.getElementById('filterArea').value;
         const sales = document.getElementById('filterSales').value;
+        const umbrella = document.getElementById('filterBrand').value;
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
 
@@ -870,14 +1112,33 @@
         if (region) data = data.filter(m => m.region === region);
         if (area) data = data.filter(m => m.area === area);
         if (sales) data = data.filter(m => m.code === sales);
+        if (umbrella && applyBrandFilter) {
+            data = data.filter(m => m.products.some(p => p.umbrella === umbrella));
+        }
 
         return data.map(m => {
+            let products = m.products;
+            if (umbrella && applyBrandFilter) {
+                products = products.filter(p => p.umbrella === umbrella);
+            }
+
             let salesHistory = m.salesHistory;
+            if (umbrella && applyBrandFilter) {
+                salesHistory = salesHistory.filter(h => h.umbrella === umbrella);
+            }
             if (dateStart) salesHistory = salesHistory.filter(h => h.date >= dateStart);
             if (dateEnd) salesHistory = salesHistory.filter(h => h.date <= dateEnd);
 
+            let visitHistory = m.visitHistory || [];
+            if (dateStart) visitHistory = visitHistory.filter(v => v.date >= dateStart);
+            if (dateEnd) visitHistory = visitHistory.filter(v => v.date <= dateEnd);
+            if (umbrella && applyBrandFilter) {
+                visitHistory = visitHistory.filter(v => !v.hasTransaction || v.umbrella === umbrella);
+            }
+
             const soldPcs = salesHistory.reduce((sum, h) => sum + h.qtyPcs, 0);
-            const inboundPcs = m.inboundKrt * 72;
+            const inboundKrt = products.reduce((sum, p) => sum + (p.inboundKrt || (p.karton + 3)), 0);
+            const inboundPcs = inboundKrt * 72;
             const remainingPcs = Math.max(0, inboundPcs - soldPcs);
 
             const totalKrt = Math.floor(remainingPcs / 72);
@@ -886,19 +1147,29 @@
             const totalPcsAll = remainingPcs;
 
             const sellThrough = inboundPcs > 0 ? Math.round((soldPcs / inboundPcs) * 100) : 0;
-            const avgPrice = m.products.reduce((sum, p) => sum + p.pricePerPcs, 0) / m.products.length;
+            const avgPrice = products.length > 0
+                ? products.reduce((sum, p) => sum + p.pricePerPcs, 0) / products.length
+                : 0;
             const nilai = remainingPcs * avgPrice;
+
+            const inboundRp = calcInboundRp(products);
+            const outboundRp = calcOutboundRp(salesHistory);
 
             return {
                 ...m,
+                products,
                 salesHistory,
+                visitHistory,
                 soldPcs,
                 totalKrt,
                 totalDus,
                 totalPcs,
                 totalPcsAll,
                 sellThrough,
-                nilai
+                nilai,
+                inboundKrt,
+                inboundRp,
+                outboundRp
             };
         });
     }
@@ -942,6 +1213,7 @@
         const region = document.getElementById('filterRegion');
         const area = document.getElementById('filterArea');
         const sales = document.getElementById('filterSales');
+        const brand = document.getElementById('filterBrand');
         const bar = document.getElementById('filterChipsBar');
         const list = document.getElementById('filterChipsList');
         let chips = [];
@@ -949,6 +1221,7 @@
         if (region.value) chips.push({ label: region.options[region.selectedIndex].text, icon: 'fa-globe', field: 'filterRegion' });
         if (area.value) chips.push({ label: area.options[area.selectedIndex].text, icon: 'fa-map-marker-alt', field: 'filterArea' });
         if (sales.value) chips.push({ label: sales.options[sales.selectedIndex].text, icon: 'fa-user', field: 'filterSales' });
+        if (brand.value) chips.push({ label: 'Umbrand: ' + brand.options[brand.selectedIndex].text, icon: 'fa-tag', field: 'filterBrand' });
 
         if (chips.length === 0) { bar.classList.add('hidden'); return; }
         bar.classList.remove('hidden');
@@ -966,6 +1239,7 @@
         document.getElementById('filterRegion').value = '';
         document.getElementById('filterArea').value = '';
         document.getElementById('filterSales').value = '';
+        document.getElementById('filterBrand').value = '';
         document.getElementById('filterArea').innerHTML = '<option value="">Semua Area</option>';
         document.getElementById('filterSales').innerHTML = '<option value="">Semua Motoris</option>';
         applyAllFilters();
@@ -980,24 +1254,17 @@
         const tbody = document.getElementById('balanceTableBody');
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><div class="empty-state-title">Tidak ada data</div><div class="empty-state-desc">Tidak ditemukan data motoris sesuai filter yang dipilih.</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><div class="empty-state-title">Tidak ada data</div><div class="empty-state-desc">Tidak ditemukan data motoris sesuai filter yang dipilih.</div></div></td></tr>`;
             return;
         }
 
         tbody.innerHTML = filtered.map(m => {
-            const stClass = m.sellThrough >= 70 ? 'st-good' : m.sellThrough >= 40 ? 'st-mid' : 'st-low';
-            const agingClass = m.aging <= 7 ? 'aging-fresh' : m.aging <= 14 ? 'aging-warn' : 'aging-old';
-            const nilaiDisplay = formatRp(m.nilai);
             return `<tr>
                 <td><a class="motoris-link" onclick="showMotorisDetail('${m.code}')">${m.name}</a><br><span style="font-size:0.7rem;color:#94a3b8;">${m.code}</span></td>
                 <td>${m.area}<br><span style="font-size:0.7rem;color:#94a3b8;">${regionLabel(m.region)}</span></td>
-                <td style="font-weight:700;">${m.totalKrt}</td>
-                <td>${m.totalDus}</td>
-                <td>${m.totalPcs}</td>
-                <td style="font-weight:700; color:#005d41;" data-order="${m.totalPcsAll}">${formatNum(m.totalPcsAll)}</td>
-                <td data-order="${m.sellThrough}"><div class="mini-bar-wrapper"><span class="mini-bar-tooltip">${m.sellThrough}% Sell-Through</span><div class="mini-bar"><span class="${stClass}" style="width:${m.sellThrough}%;"></span></div></div><span style="font-size:0.7rem;color:#64748b;margin-top:2px;display:block;">${m.sellThrough}%</span></td>
-                <td data-order="${m.aging}"><span class="aging-badge ${agingClass}">${m.aging} hari</span></td>
-                <td style="font-size:0.78rem; font-weight:600;" data-order="${m.nilai}">${nilaiDisplay}</td>
+                <td style="font-weight:600; text-align:right;" data-order="${m.inboundRp}">${formatRp(m.inboundRp)}</td>
+                <td style="font-weight:600; text-align:right; color:#2E7D32;" data-order="${m.outboundRp}">${formatRp(m.outboundRp)}</td>
+                <td style="font-size:0.82rem; font-weight:700; text-align:right; color:#005d41;" data-order="${m.nilai}">${formatRp(m.nilai)}</td>
             </tr>`;
         }).join('');
 
@@ -1005,7 +1272,7 @@
         dtBalance = $('#balanceTable').DataTable({
             pageLength: 10,
             lengthMenu: [5, 10, 25, 50],
-            order: [[5, 'desc']],
+            order: [[4, 'desc']],
             language: {
                 search: 'Cari:',
                 lengthMenu: 'Tampilkan _MENU_ data',
@@ -1020,8 +1287,11 @@
     }
 
     function regionLabel(key) {
-        const map = { jabodetabek: 'Jabodetabek', jawa_barat: 'Jawa Barat', jawa_tengah: 'Jawa Tengah', jawa_timur: 'Jawa Timur', sumatera: 'Sumatera' };
-        return map[key] || key;
+        return key || 'Nasional';
+    }
+
+    function getRegionChartKeys() {
+        return masterRegions.length ? masterRegions : [...new Set(motorisData.map(m => m.region).filter(Boolean))];
     }
 
     // ===================== MOTORIS DETAIL POPUP =====================
@@ -1030,15 +1300,16 @@
         if (!m) return;
 
         const stokRows = m.products.map(p => {
-            const totalPcsProd = (p.karton * 72) + (p.dus * 6) + p.pcs;
-            return `<tr><td>${p.name}</td><td style="text-align:center;">${p.karton}</td><td style="text-align:center;">${p.dus}</td><td style="text-align:center;">${p.pcs}</td><td style="text-align:right;">${formatRp(totalPcsProd * p.pricePerPcs)}</td></tr>`;
+            const nilaiProd = ((p.karton * 72) + (p.dus * 6) + p.pcs) * p.pricePerPcs;
+            return `<tr><td>${p.name}</td><td style="text-align:right; font-weight:600;">${formatRp(nilaiProd)}</td></tr>`;
         }).join('');
 
         const historyRows = m.salesHistory.map((h, idx) => {
-            return `<tr><td style="text-align:center; font-weight:700; color:#005d41;">${idx + 1}</td><td>${h.date}</td><td><a href="#" class="motoris-link" onclick="event.preventDefault(); focusMapMarker(${idx})">${h.outlet}</a></td><td style="font-size:0.72rem;">${h.product}</td><td style="text-align:center;">${h.qtyPcs}</td><td style="text-align:right;">${formatRp(h.amount)}</td></tr>`;
+            return `<tr><td style="text-align:center; font-weight:700; color:#005d41;">${idx + 1}</td><td>${h.date}</td><td><a href="#" class="motoris-link" onclick="event.preventDefault(); focusMapMarker(${idx})">${h.outlet}</a></td><td style="font-size:0.72rem;">${h.product}</td><td style="text-align:right; font-weight:600;">${formatRp(h.amount)}</td></tr>`;
         }).join('');
 
         const gpsIcon = m.lastKulakan.gps ? '<span class="gps-dot gps-valid"></span> Valid' : '<span class="gps-dot gps-invalid"></span> Invalid';
+        const kulakanRp = m.lastKulakan.qty * 72 * (m.products[0]?.pricePerPcs || 0);
 
         const html = `
         <div class="motoris-pop">
@@ -1050,14 +1321,14 @@
                 <div class="motoris-pop-sect">
                     <h4><i class="fas fa-boxes-stacked"></i> Stok per SKU</h4>
                     <table>
-                        <thead><tr><th>Produk</th><th style="text-align:center;">Krt</th><th style="text-align:center;">Dus</th><th style="text-align:center;">Pcs</th><th style="text-align:right;">Nilai (Rp)</th></tr></thead>
+                        <thead><tr><th>Produk</th><th style="text-align:right;">Nilai (Rp)</th></tr></thead>
                         <tbody>${stokRows}</tbody>
-                        <tfoot><tr style="font-weight:700;border-top:2px solid #005d41;"><td>TOTAL</td><td style="text-align:center;">${m.totalKrt}</td><td style="text-align:center;">${m.totalDus}</td><td style="text-align:center;">${m.totalPcs}</td><td style="text-align:right;">${formatRp(m.nilai)}</td></tr></tfoot>
+                        <tfoot><tr style="font-weight:700;border-top:2px solid #005d41;"><td>TOTAL</td><td style="text-align:right;">${formatRp(m.nilai)}</td></tr></tfoot>
                     </table>
                 </div>
                 <div>
                     <div class="motoris-pop-sect" style="margin-bottom:1rem;">
-                        <h4><i class="fas fa-chart-line"></i> Penjualan 7 Hari Terakhir (Pcs)</h4>
+                        <h4><i class="fas fa-chart-line"></i> Penjualan 7 Hari Terakhir (Rp)</h4>
                         <div style="position:relative; height:140px; width:100%;">
                             <canvas id="miniChartCanvas"></canvas>
                         </div>
@@ -1067,7 +1338,7 @@
                         <div style="font-size:0.78rem; line-height:1.8;">
                             <div><strong>Tanggal:</strong> ${m.lastKulakan.date}</div>
                             <div><strong>Stokis:</strong> ${m.lastKulakan.stokis}</div>
-                            <div><strong>Qty:</strong> ${m.lastKulakan.qty} Krt</div>
+                            <div><strong>Nilai:</strong> ${formatRp(kulakanRp)}</div>
                             <div><strong>GPS:</strong> ${gpsIcon}</div>
                         </div>
                     </div>
@@ -1082,7 +1353,7 @@
                 <h4><i class="fas fa-history"></i> History Penjualan Terakhir (10 transaksi)</h4>
                 <div style="overflow-x:auto; max-height:220px; overflow-y:auto;">
                     <table>
-                        <thead><tr><th style="text-align:center; width:30px;">#</th><th>Tanggal</th><th>Outlet</th><th>Produk</th><th style="text-align:center;">Qty (Pcs)</th><th style="text-align:right;">Harga</th></tr></thead>
+                        <thead><tr><th style="text-align:center; width:30px;">#</th><th>Tanggal</th><th>Outlet</th><th>Produk</th><th style="text-align:right;">Nilai (Rp)</th></tr></thead>
                         <tbody>${historyRows}</tbody>
                     </table>
                 </div>
@@ -1103,7 +1374,7 @@
                         data: {
                             labels: ['H-7','H-6','H-5','H-4','H-3','H-2','H-1'],
                             datasets: [{
-                                label: 'Pcs Terjual',
+                                label: 'Penjualan (Rp)',
                                 data: m.dailySales,
                                 borderColor: '#005d41',
                                 backgroundColor: 'rgba(0,93,65,0.08)',
@@ -1181,14 +1452,16 @@
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
 
+        const umbrella = document.getElementById('filterBrand').value;
         let filteredAudit = auditData.filter(a => names.has(a.motoris));
+        if (umbrella) filteredAudit = filteredAudit.filter(a => a.umbrella === umbrella);
         if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
         if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
 
         const tbody = document.getElementById('auditTableBody');
 
         if (filteredAudit.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clipboard"></i></div><div class="empty-state-title">Belum ada transaksi</div><div class="empty-state-desc">Audit trail kosong untuk filter yang dipilih.</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clipboard"></i></div><div class="empty-state-title">Belum ada transaksi</div><div class="empty-state-desc">Audit trail kosong untuk filter yang dipilih.</div></div></td></tr>`;
             return;
         }
 
@@ -1196,26 +1469,15 @@
             const typeBadge = a.type === 'inbound'
                 ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-down"></i> Inbound</span>'
                 : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-up"></i> Outbound</span>';
-            const qtyDisplay = a.type === 'inbound'
-                ? `+${a.qty} Krt`
-                : `-${a.qty} Pcs`;
-            const qtyColor = a.type === 'inbound' ? 'color:#2E7D32;' : 'color:#C62828;';
-            const statusBadge = a.status === 'verified'
-                ? '<span class="badge-sm badge-verified"><i class="fas fa-check-circle"></i> Verified</span>'
-                : '<span class="badge-sm badge-pending"><i class="fas fa-clock"></i> Pending</span>';
-            const gpsHtml = a.gps
-                ? '<span class="gps-dot gps-valid"></span> Valid'
-                : '<span class="gps-dot gps-invalid"></span> Invalid';
-
+            const amountDisplay = formatRp(a.amount || 0);
+            const amountColor = a.type === 'inbound' ? 'color:#2E7D32;' : 'color:#C62828;';
             return `<tr>
                 <td>${a.date}</td>
                 <td>${a.motoris}</td>
                 <td>${typeBadge}</td>
                 <td style="font-size:0.78rem;">${a.product}</td>
-                <td style="font-weight:700; ${qtyColor}">${qtyDisplay}</td>
+                <td style="font-weight:700; ${amountColor}">${amountDisplay}</td>
                 <td>${a.outlet}</td>
-                <td>${gpsHtml}</td>
-                <td>${statusBadge}</td>
                 <td><button class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:2px 8px;" onclick="showAuditDetail(this)" data-id="${a.id}" data-motoris="${a.motoris}" data-salescode="${a.salesCode}" data-date="${a.date}" data-type="${a.type}" data-product="${a.product}" data-qty="${a.qty}" data-unit="${a.qtyUnit}" data-outlet="${a.outlet}" data-gps="${a.gps}" data-status="${a.status}"><i class="fas fa-eye"></i></button></td>
             </tr>`;
         }).join('');
@@ -1329,7 +1591,7 @@
                         <div class="audit-pop-sect">
                             <h4><i class="fas fa-user-tie"></i> Profil Sales & Informasi Lokasi</h4>
                             <table style="width:100%; font-size:0.78rem; border-collapse:collapse;">
-                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b; width:110px;">Motoris (Sales)</td><td style="padding:5px 0; color:#1e293b;">: <strong>${r.motoris || d.motoris}</strong> <span style="color:#64748b; font-size:0.72rem;">(${r.salesCode || d.salescode || ''})</span></td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b; width:110px;">Motoris (Penjualan)</td><td style="padding:5px 0; color:#1e293b;">: <strong>${r.motoris || d.motoris}</strong> <span style="color:#64748b; font-size:0.72rem;">(${r.salesCode || d.salescode || ''})</span></td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Wilayah Kerja</td><td style="padding:5px 0; color:#1e293b;">: ${r.region || ''} &mdash; <strong>${r.area || ''}</strong></td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Jenis Transaksi</td><td style="padding:5px 0;">: ${typeBadgeHtml}</td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Partner Tujuan</td><td style="padding:5px 0; color:#1e293b;">: ${r.outlet || d.outlet}</td></tr>
@@ -1420,36 +1682,31 @@
         initBarChart();
         initTop10Chart();
         initDailyTrendChart();
-        initGPSChart();
+        initBrandContribChart();
     }
 
     function initBarChart() {
         const ctx = document.getElementById('chartBarSales');
         if (!ctx) return;
-        const regions = ['Jabodetabek', 'Jawa Barat', 'Jawa Tengah', 'Jawa Timur', 'Sumatera'];
-        const regionKeys = ['jabodetabek', 'jawa_barat', 'jawa_tengah', 'jawa_timur', 'sumatera'];
-        
-        const isRp = currentUnit === 'rp';
-        const inboundData = regionKeys.map(r => {
-            const krt = motorisData.filter(m => m.region === r).reduce((s, m) => s + m.inboundKrt, 0);
-            return isRp ? krt * 72 * 55000 : krt;
-        });
-        const outboundData = regionKeys.map(r => {
-            const rFiltered = motorisData.filter(m => m.region === r);
-            if (isRp) {
-                return rFiltered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
-            } else {
-                return rFiltered.reduce((s, m) => s + m.soldPcs, 0) / 72; // normalize to Krt equiv
-            }
-        });
+        const regionKeys = getRegionChartKeys();
+        const regions = regionKeys.map(regionLabel);
+
+        const inboundData = regionKeys.map(r =>
+            motorisData.filter(m => m.region === r).reduce((sum, m) =>
+                sum + m.products.reduce((ps, p) => ps + (p.inboundKrt || 0) * 72 * p.pricePerPcs, 0), 0)
+        );
+        const outboundData = regionKeys.map(r =>
+            motorisData.filter(m => m.region === r).reduce((sum, m) =>
+                sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0)
+        );
 
         chartInstances.bar = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: regions,
                 datasets: [
-                    { label: isRp ? 'Inbound (Rp)' : 'Inbound (Krt)', data: inboundData, backgroundColor: 'rgba(21,101,192,0.7)', borderRadius: 4 },
-                    { label: isRp ? 'Outbound (Rp)' : 'Outbound (Krt equiv)', data: outboundData, backgroundColor: 'rgba(46,125,50,0.7)', borderRadius: 4 }
+                    { label: 'Inbound (Rp)', data: inboundData, backgroundColor: 'rgba(21,101,192,0.7)', borderRadius: 4 },
+                    { label: 'Outbound (Rp)', data: outboundData, backgroundColor: 'rgba(46,125,50,0.7)', borderRadius: 4 }
                 ]
             },
             options: {
@@ -1463,122 +1720,14 @@
                     if (elements.length > 0) {
                         const idx = elements[0].index;
                         const isDrilledDown = document.getElementById('btnBackDrill').style.display === 'inline-flex';
-                        if (!isDrilledDown) {
+                        if (!isDrilledDown && regionKeys[idx]) {
                             drilldownToRegion(regionKeys[idx], regions[idx]);
                         }
                     }
                 }
             }
         });
-    }
-
-    function drilldownToRegion(regionKey, regionName) {
-        const filtered = motorisData.filter(m => m.region === regionKey);
-        const labels = filtered.map(m => m.name);
-        const isRp = currentUnit === 'rp';
-        const data = filtered.map(m => {
-            if (isRp) {
-                return m.salesHistory.reduce((s, h) => s + h.amount, 0);
-            } else {
-                return m.soldPcs;
-            }
-        });
-        chartInstances.bar.data.labels = labels;
-        chartInstances.bar.data.datasets = [{
-            label: isRp ? `Penjualan (Rp) - ${regionName}` : `Penjualan (Pcs) - ${regionName}`,
-            data: data,
-            backgroundColor: 'rgba(0,93,65,0.7)',
-            borderRadius: 4
-        }];
-        chartInstances.bar.update();
-        document.getElementById('btnBackDrill').style.display = 'inline-flex';
-    }
-
-    function resetDrilldown() {
-        document.getElementById('btnBackDrill').style.display = 'none';
-        chartInstances.bar.destroy();
-        initBarChart();
-    }
-
-    function updateCharts() {
-        const filtered = getFilteredMotoris();
-        const names = new Set(filtered.map(m => m.name));
-        const dateStart = document.getElementById('filterDateStart').value;
-        const dateEnd = document.getElementById('filterDateEnd').value;
-        
-        let filteredAudit = auditData.filter(a => names.has(a.motoris));
-        if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
-        if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
-
-        const isRp = currentUnit === 'rp';
-
-        // 1. Update Bar Chart
-        if (chartInstances.bar) {
-            const isDrilledDown = document.getElementById('btnBackDrill').style.display === 'inline-flex';
-            if (!isDrilledDown) {
-                const regionKeys = ['jabodetabek', 'jawa_barat', 'jawa_tengah', 'jawa_timur', 'sumatera'];
-                const inboundData = regionKeys.map(r => {
-                    const rFiltered = filtered.filter(m => m.region === r);
-                    const krt = rFiltered.reduce((s, m) => s + m.inboundKrt, 0);
-                    return isRp ? krt * 72 * 55000 : krt;
-                });
-                const outboundData = regionKeys.map(r => {
-                    const rFiltered = filtered.filter(m => m.region === r);
-                    if (isRp) {
-                        return rFiltered.reduce((sum, m) => sum + m.salesHistory.reduce((s, h) => s + h.amount, 0), 0);
-                    } else {
-                        return rFiltered.reduce((s, m) => s + m.soldPcs, 0) / 72;
-                    }
-                });
-                chartInstances.bar.data.datasets[0].label = isRp ? 'Inbound (Rp)' : 'Inbound (Krt)';
-                chartInstances.bar.data.datasets[0].data = inboundData;
-                chartInstances.bar.data.datasets[1].label = isRp ? 'Outbound (Rp)' : 'Outbound (Krt equiv)';
-                chartInstances.bar.data.datasets[1].data = outboundData;
-                chartInstances.bar.update();
-            } else {
-                resetDrilldown();
-            }
-        }
-
-        // 2. Update Top 10 Chart
-        if (chartInstances.top10) {
-            const sorted = [...filtered].sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
-            chartInstances.top10.data.labels = sorted.map(m => m.name);
-            chartInstances.top10.data.datasets[0].data = sorted.map(m => m.sellThrough);
-            chartInstances.top10.data.datasets[0].backgroundColor = sorted.map(m => m.sellThrough >= 70 ? 'rgba(46,125,50,0.7)' : m.sellThrough >= 40 ? 'rgba(245,127,23,0.7)' : 'rgba(198,40,40,0.7)');
-            chartInstances.top10.update();
-        }
-
-        // 3. Update Daily Trend Chart
-        if (chartInstances.daily) {
-            const dayMap = {};
-            const startDay = dateStart ? parseInt(dateStart.split('-')[2]) : 1;
-            const endDay = dateEnd ? parseInt(dateEnd.split('-')[2]) : 30;
-            for (let d = startDay; d <= endDay; d++) {
-                dayMap[`${d} Jun`] = 0;
-            }
-            filtered.forEach(m => {
-                m.salesHistory.forEach(h => {
-                    const dayNum = parseInt(h.date.split('-')[2]);
-                    const key = `${dayNum} Jun`;
-                    if (key in dayMap) {
-                        dayMap[key] += isRp ? h.amount : h.qtyPcs;
-                    }
-                });
-            });
-            chartInstances.daily.data.labels = Object.keys(dayMap);
-            chartInstances.daily.data.datasets[0].label = isRp ? 'Penjualan (Rp)' : 'Penjualan (Pcs)';
-            chartInstances.daily.data.datasets[0].data = Object.values(dayMap);
-            chartInstances.daily.update();
-        }
-
-        // 4. Update GPS Chart
-        if (chartInstances.gps) {
-            const validCount = filteredAudit.filter(a => a.gps).length;
-            const invalidCount = filteredAudit.filter(a => !a.gps).length;
-            chartInstances.gps.data.datasets[0].data = [validCount, invalidCount];
-            chartInstances.gps.update();
-        }
+        chartInstances.bar._regionKeys = regionKeys;
     }
 
     function initTop10Chart() {
@@ -1598,7 +1747,8 @@
             },
             options: {
                 indexAxis: 'y',
-                responsive: true, maintainAspectRatio: false,
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { beginAtZero: true, max: 100, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, callback: v => v + '%' } },
@@ -1608,6 +1758,288 @@
         });
     }
 
+    function drilldownToRegion(regionKey, regionName) {
+        const filtered = getFilteredMotoris().filter(m => m.region === regionKey);
+        const labels = filtered.map(m => m.name);
+        const data = filtered.map(m => m.salesHistory.reduce((s, h) => s + h.amount, 0));
+        chartInstances.bar.data.labels = labels;
+        chartInstances.bar.data.datasets = [{
+            label: `Penjualan (Rp) - ${regionName}`,
+            data: data,
+            backgroundColor: 'rgba(0,93,65,0.7)',
+            borderRadius: 4
+        }];
+        chartInstances.bar.update();
+        document.getElementById('btnBackDrill').style.display = 'inline-flex';
+    }
+
+    function resetDrilldown() {
+        document.getElementById('btnBackDrill').style.display = 'none';
+        chartInstances.bar.destroy();
+        initBarChart();
+    }
+
+    function updateCharts() {
+        const filtered = getFilteredMotoris();
+        const names = new Set(filtered.map(m => m.name));
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+        const umbrella = document.getElementById('filterBrand').value;
+        
+        let filteredAudit = auditData.filter(a => names.has(a.motoris));
+        if (umbrella) filteredAudit = filteredAudit.filter(a => a.umbrella === umbrella);
+        if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
+        if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
+
+        // 1. Update Bar Chart
+        if (chartInstances.bar) {
+            const isDrilledDown = document.getElementById('btnBackDrill').style.display === 'inline-flex';
+            if (!isDrilledDown) {
+                const regionKeys = getRegionChartKeys();
+                const inboundData = regionKeys.map(r =>
+                    filtered.filter(m => m.region === r).reduce((sum, m) => sum + calcInboundRp(m.products), 0)
+                );
+                const outboundData = regionKeys.map(r =>
+                    filtered.filter(m => m.region === r).reduce((sum, m) => sum + calcOutboundRp(m.salesHistory), 0)
+                );
+                chartInstances.bar.data.labels = regionKeys.map(regionLabel);
+                chartInstances.bar.data.datasets[0].label = 'Inbound (Rp)';
+                chartInstances.bar.data.datasets[0].data = inboundData;
+                chartInstances.bar.data.datasets[1].label = 'Outbound (Rp)';
+                chartInstances.bar.data.datasets[1].data = outboundData;
+                chartInstances.bar._regionKeys = regionKeys;
+                chartInstances.bar.update();
+            } else {
+                resetDrilldown();
+            }
+        }
+
+        // 2. Update Top 10 Chart
+        if (chartInstances.top10) {
+            const sorted = [...filtered].sort((a, b) => b.sellThrough - a.sellThrough).slice(0, 10);
+            chartInstances.top10.data.labels = sorted.map(m => m.name);
+            chartInstances.top10.data.datasets[0].data = sorted.map(m => m.sellThrough);
+            chartInstances.top10.data.datasets[0].backgroundColor = sorted.map(m =>
+                m.sellThrough >= 70 ? 'rgba(46,125,50,0.7)' : m.sellThrough >= 40 ? 'rgba(245,127,23,0.7)' : 'rgba(198,40,40,0.7)'
+            );
+            chartInstances.top10.update();
+        }
+
+        // 3. Update Daily Trend Chart
+        if (chartInstances.daily) {
+            const dayMap = {};
+            const startDay = dateStart ? parseInt(dateStart.split('-')[2]) : 1;
+            const endDay = dateEnd ? parseInt(dateEnd.split('-')[2]) : 30;
+            for (let d = startDay; d <= endDay; d++) {
+                dayMap[`${d} Jun`] = 0;
+            }
+            filtered.forEach(m => {
+                m.salesHistory.forEach(h => {
+                    const dayNum = parseInt(h.date.split('-')[2]);
+                    const key = `${dayNum} Jun`;
+                    if (key in dayMap) {
+                        dayMap[key] += h.amount;
+                    }
+                });
+            });
+            chartInstances.daily.data.labels = Object.keys(dayMap);
+            chartInstances.daily.data.datasets[0].label = 'Penjualan (Rp)';
+            chartInstances.daily.data.datasets[0].data = Object.values(dayMap);
+            chartInstances.daily.update();
+        }
+
+        // 4. Update Brand Contribution Chart
+        updateBrandContribChart();
+    }
+
+
+
+    const BRAND_CHART_PALETTE = ['#8E24AA', '#005d41', '#1565C0', '#F57F17', '#C62828', '#3730A3', '#00838F', '#6D4C41'];
+
+    const brandSlicePercentPlugin = {
+        id: 'brandSlicePercent',
+        afterDatasetDraw(chart) {
+            if (chart.config.type !== 'doughnut') return;
+            const { ctx, data } = chart;
+            const selected = chart.options.plugins?.brandFilter?.selected || '';
+            const meta = chart.getDatasetMeta(0);
+            const dataset = data.datasets[0];
+            const total = dataset.data.reduce((a, b) => a + b, 0);
+            if (!total || selected) return;
+
+            meta.data.forEach((arc, i) => {
+                const label = data.labels[i];
+                const value = dataset.data[i];
+                if (!value) return;
+                if (selected && label !== selected) return;
+                const pct = (value / total) * 100;
+                if (pct < 4.5) return;
+
+                const { x, y } = arc.tooltipPosition();
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 11px Kalbe Geometric, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.35)';
+                ctx.shadowBlur = 3;
+                ctx.fillText(pct.toFixed(1) + '%', x, y);
+                ctx.restore();
+            });
+        }
+    };
+
+    if (typeof Chart !== 'undefined') {
+        Chart.register(brandSlicePercentPlugin);
+    }
+
+    function getBrandColorMap() {
+        const map = {};
+        masterUmbrellas.forEach((u, i) => { map[u] = BRAND_CHART_PALETTE[i % BRAND_CHART_PALETTE.length]; });
+        return map;
+    }
+
+    function computeUmbrellaTotals(filteredData) {
+        const umbrellaMap = {};
+        masterUmbrellas.forEach(u => { umbrellaMap[u] = 0; });
+        filteredData.forEach(m => {
+            m.salesHistory.forEach(h => {
+                if (h.umbrella && h.umbrella in umbrellaMap) {
+                    umbrellaMap[h.umbrella] += h.amount;
+                }
+            });
+        });
+        return umbrellaMap;
+    }
+
+    function buildBrandChartView() {
+        const selectedUmbrella = document.getElementById('filterBrand').value;
+        const baseData = getFilteredMotoris({ applyBrandFilter: false });
+        const umbrellaMap = computeUmbrellaTotals(baseData);
+        const labels = masterUmbrellas.slice();
+        const rawValues = labels.map(u => umbrellaMap[u] || 0);
+        const total = rawValues.reduce((a, b) => a + b, 0);
+        const percentages = rawValues.map(v => total > 0 ? (v / total) * 100 : 0);
+        const palette = getBrandColorMap();
+
+        const chartValues = selectedUmbrella
+            ? labels.map(u => (u === selectedUmbrella ? umbrellaMap[u] : 0))
+            : rawValues;
+
+        return { labels, chartValues, rawValues, percentages, total, selectedUmbrella, palette };
+    }
+
+    function renderBrandChartCenter(view) {
+        const el = document.getElementById('brandChartCenter');
+        if (!el) return;
+        if (!view.total) {
+            el.innerHTML = '<div class="bc-label">Tidak ada data</div>';
+            return;
+        }
+        if (view.selectedUmbrella) {
+            const idx = view.labels.indexOf(view.selectedUmbrella);
+            const pct = view.percentages[idx].toFixed(1);
+            const val = view.rawValues[idx];
+            const valText = formatRp(val);
+            el.innerHTML = `<div class="bc-pct">${pct}%</div><div class="bc-label">${view.selectedUmbrella}</div><div class="bc-sub">${valText}</div>`;
+            return;
+        }
+        let maxI = 0;
+        view.rawValues.forEach((v, i) => { if (v > view.rawValues[maxI]) maxI = i; });
+        el.innerHTML = `<div class="bc-pct">${view.percentages[maxI].toFixed(1)}%</div><div class="bc-label">Top: ${view.labels[maxI]}</div><div class="bc-sub">${view.labels.length} umbrand</div>`;
+    }
+
+    function renderBrandChartLegend(view) {
+        const el = document.getElementById('brandChartLegend');
+        if (!el) return;
+        el.innerHTML = view.labels.map((u, i) => {
+            const inactive = view.selectedUmbrella && u !== view.selectedUmbrella;
+            const pct = view.percentages[i].toFixed(1);
+            const val = view.rawValues[i];
+            const valText = formatRp(val);
+            return `<span class="brand-chart-legend-item${inactive ? ' inactive' : ''}">
+                <span class="brand-chart-legend-dot" style="background:${inactive ? '#e2e8f0' : view.palette[u]}"></span>
+                ${u} <strong>${pct}%</strong> <span style="font-weight:500;">(${valText})</span>
+            </span>`;
+        }).join('');
+    }
+
+    function getBrandChartOptions(selectedUmbrella) {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '62%',
+            plugins: {
+                legend: { display: false },
+                brandFilter: { selected: selectedUmbrella || '' },
+                tooltip: {
+                    callbacks: {
+                        label(context) {
+                            const view = context.chart.$brandView;
+                            const idx = context.dataIndex;
+                            const pct = view ? view.percentages[idx].toFixed(1) : '0.0';
+                            const val = context.raw;
+                            const valText = formatRp(val);
+                            const inactive = view?.selectedUmbrella && context.label !== view.selectedUmbrella;
+                            const prefix = inactive ? '(difilter) ' : '';
+                            return ` ${prefix}${context.label}: ${pct}% — ${valText}`;
+                        },
+                        filter(item) {
+                            const view = item.chart.$brandView;
+                            if (!view?.selectedUmbrella) return item.raw > 0;
+                            return item.label === view.selectedUmbrella;
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    function updateBrandContribChart() {
+        const view = buildBrandChartView();
+        renderBrandChartCenter(view);
+        renderBrandChartLegend(view);
+
+        const ctx = document.getElementById('chartBrandContrib');
+        if (!ctx) return;
+
+        if (!chartInstances.brandContrib) {
+            chartInstances.brandContrib = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: view.labels,
+                    datasets: [{
+                        data: view.chartValues,
+                        backgroundColor: view.labels.map(u =>
+                            view.selectedUmbrella && u !== view.selectedUmbrella ? '#eef2f5' : view.palette[u]
+                        ),
+                        borderWidth: 2,
+                        borderColor: '#fff',
+                        spacing: view.selectedUmbrella ? 0 : 2
+                    }]
+                },
+                options: getBrandChartOptions(view.selectedUmbrella)
+            });
+            chartInstances.brandContrib.$brandView = view;
+            return;
+        }
+
+        const chart = chartInstances.brandContrib;
+        chart.$brandView = view;
+        chart.data.labels = view.labels;
+        chart.data.datasets[0].data = view.chartValues;
+        chart.data.datasets[0].backgroundColor = view.labels.map(u =>
+            view.selectedUmbrella && u !== view.selectedUmbrella ? '#eef2f5' : view.palette[u]
+        );
+        chart.data.datasets[0].spacing = view.selectedUmbrella ? 0 : 2;
+        chart.options.plugins.brandFilter = { selected: view.selectedUmbrella || '' };
+        chart.update();
+    }
+
+    function initBrandContribChart() {
+        updateBrandContribChart();
+    }
+
     function initDailyTrendChart() {
         const ctx = document.getElementById('chartDailyTrend');
         if (!ctx) return;
@@ -1615,14 +2047,14 @@
         const values = [];
         for (let d = 1; d <= 28; d++) {
             days.push(`${d} Jun`);
-            values.push(randomInt(300, 900));
+            values.push(randomInt(500000, 2500000));
         }
         chartInstances.daily = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: days,
                 datasets: [{
-                    label: 'Penjualan (Pcs)',
+                    label: 'Penjualan (Rp)',
                     data: values,
                     borderColor: '#1565C0',
                     backgroundColor: 'rgba(21,101,192,0.06)',
@@ -1644,32 +2076,6 @@
         });
     }
 
-    function initGPSChart() {
-        const ctx = document.getElementById('chartGPS');
-        if (!ctx) return;
-        const validCount = auditData.filter(a => a.gps).length;
-        const invalidCount = auditData.filter(a => !a.gps).length;
-        chartInstances.gps = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['GPS Valid', 'GPS Invalid'],
-                datasets: [{
-                    data: [validCount, invalidCount],
-                    backgroundColor: ['#2E7D32', '#C62828'],
-                    borderWidth: 0,
-                    spacing: 2
-                }]
-            },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                cutout: '65%',
-                plugins: {
-                    legend: { position: 'bottom', labels: { font: { size: 11, weight: '600' }, padding: 16 } }
-                }
-            }
-        });
-    }
-
     // ===================== COLLAPSIBLE SECTIONS =====================
     function toggleSection(id) {
         const el = document.getElementById(id);
@@ -1685,41 +2091,293 @@
     }
 
     // ===================== EXPORT & REFRESH =====================
-    function exportToExcel() {
-        const filtered = getFilteredMotoris();
-        let csv = 'sep=,\nMotoris,Kode,Wilayah,Area,Stok Krt,Stok Dus,Stok Pcs,Total Pcs,Sell-Through %,Umur Stok (Hari),Nilai Saldo\n';
-        filtered.forEach(m => {
-            csv += `"${m.name}","${m.code}","${regionLabel(m.region)}","${m.area}",${m.totalKrt},${m.totalDus},${m.totalPcs},${m.totalPcsAll},${m.sellThrough},${m.aging},${Math.round(m.nilai)}\n`;
-        });
-        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'stok_motoris_' + new Date().toISOString().slice(0, 10) + '.csv';
-        a.click();
-        URL.revokeObjectURL(url);
+    const SALES_INVOICE_HEADERS = [
+        'Date', 'SalesInvoiceNo', 'InvoiceStatus', 'InvoiceDocType', 'InvoiceGenerateFrom', 'IsInvoiceReturn',
+        'EmployeeCode', 'EmployeeName', 'CustomerCode', 'CustomerName', 'CustomerAddress',
+        'OrderLatitude', 'OrderLongitude', 'WarehouseCode', 'WarehouseName', 'PaymentTermName',
+        'ProductCode', 'ProductName', 'QuantityL', 'UnitL', 'QuantityM', 'UnitM', 'QuantityS', 'UnitS',
+        'TotalQuantity', 'SellPrice', 'TaxCode', 'LineTotal', 'InvoiceNotes'
+    ];
 
-        Swal.fire({ icon: 'success', title: 'Export Berhasil', text: `${filtered.length} data motoris berhasil di-export.`, timer: 2000, showConfirmButton: false });
+    const DAILY_VISIT_HEADERS = [
+        'EmployeeCode', 'EmployeeName', 'Role', 'Date', 'Planned', 'UnPlaned', 'Visited',
+        'CustomerCode', 'CustomerName', 'CustomerAddress', 'CustomerLatitude', 'CustomerLongitude',
+        'CheckInTime', 'CheckOutTime', 'Duration', 'Distance in Meter Check in', 'CheckInLatitude', 'CheckInLongitude',
+        'CheckOutLatitude', 'CheckOutLongitude', 'Distance in Meter Check out', 'Pseq', 'Aseq',
+        'TotalSales', 'Description', 'Unvisited', 'TargetCall', 'EffCall'
+    ];
+
+    function formatVisitDuration(minutes) {
+        const total = Math.max(0, Math.round(Number(minutes) || 0));
+        const h = Math.floor(total / 60);
+        const m = total % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+    }
+
+    function calcDurationMinutes(checkInTime, checkOutTime) {
+        const start = new Date(checkInTime);
+        const end = new Date(checkOutTime);
+        if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return 0;
+        return Math.max(0, Math.round((end - start) / 60000));
+    }
+
+    function distanceMeters(lat1, lng1, lat2, lng2) {
+        const a1 = Number(lat1);
+        const o1 = Number(lng1);
+        const a2 = Number(lat2);
+        const o2 = Number(lng2);
+        if ([a1, o1, a2, o2].some(v => Number.isNaN(v))) return '';
+        const R = 6371000;
+        const toRad = deg => deg * Math.PI / 180;
+        const dLat = toRad(a2 - a1);
+        const dLng = toRad(o2 - o1);
+        const sinLat = Math.sin(dLat / 2);
+        const sinLng = Math.sin(dLng / 2);
+        const h = sinLat * sinLat + Math.cos(toRad(a1)) * Math.cos(toRad(a2)) * sinLng * sinLng;
+        return Math.round(R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h)));
+    }
+
+    function resolveVisitTiming(v, pel, seedKey) {
+        if (v.checkInTime && v.checkOutTime) {
+            const durationMin = v.durationMin ?? calcDurationMinutes(v.checkInTime, v.checkOutTime);
+            const custLat = pel.lat ?? v.lat ?? '';
+            const custLng = pel.lng ?? v.lng ?? '';
+            const checkInLat = v.checkInLat ?? custLat;
+            const checkInLng = v.checkInLng ?? custLng;
+            const checkOutLat = v.checkOutLat ?? checkInLat;
+            const checkOutLng = v.checkOutLng ?? checkInLng;
+            return {
+                checkInTime: v.checkInTime,
+                checkOutTime: v.checkOutTime,
+                durationMin,
+                checkInLat,
+                checkInLng,
+                checkOutLat,
+                checkOutLng,
+                distanceCheckInMeter: v.distanceCheckInMeter ?? distanceMeters(custLat, custLng, checkInLat, checkInLng),
+                distanceCheckOutMeter: v.distanceCheckOutMeter ?? distanceMeters(custLat, custLng, checkOutLat, checkOutLng)
+            };
+        }
+
+        const rnd = seededRandom(hashSeed(seedKey));
+        const baseLat = Number(pel.lat ?? v.lat ?? -6.2);
+        const baseLng = Number(pel.lng ?? v.lng ?? 106.85);
+        const checkInHour = rnd(8, 16);
+        const checkInMin = rnd(0, 59);
+        const checkInSec = rnd(0, 59);
+        const durationMin = v.hasTransaction ? rnd(15, 50) : rnd(8, 25);
+        const checkInTime = `${v.date}T${String(checkInHour).padStart(2, '0')}:${String(checkInMin).padStart(2, '0')}:${String(checkInSec).padStart(2, '0')}`;
+        const totalOutMin = checkInHour * 60 + checkInMin + durationMin;
+        const outHour = Math.floor(totalOutMin / 60) % 24;
+        const outMin = totalOutMin % 60;
+        const checkOutTime = `${v.date}T${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}:${String(rnd(0, 59)).padStart(2, '0')}`;
+        const checkInLat = parseFloat((baseLat + rnd(-25, 25) / 100000).toFixed(6));
+        const checkInLng = parseFloat((baseLng + rnd(-25, 25) / 100000).toFixed(6));
+        const checkOutLat = parseFloat((baseLat + rnd(-30, 30) / 100000).toFixed(6));
+        const checkOutLng = parseFloat((baseLng + rnd(-30, 30) / 100000).toFixed(6));
+
+        return {
+            checkInTime,
+            checkOutTime,
+            durationMin,
+            checkInLat,
+            checkInLng,
+            checkOutLat,
+            checkOutLng,
+            distanceCheckInMeter: distanceMeters(baseLat, baseLng, checkInLat, checkInLng),
+            distanceCheckOutMeter: distanceMeters(baseLat, baseLng, checkOutLat, checkOutLng)
+        };
+    }
+
+    function getPelangganMap() {
+        return Object.fromEntries((masterData.pelanggan || []).map(p => [p.kode, p]));
+    }
+
+    function findMotorisForOutlet(motorisList, outletKode) {
+        if (!outletKode) return null;
+        return motorisList.find(m =>
+            (m.salesHistory || []).some(h => h.outletKode === outletKode) ||
+            (m.visitHistory || []).some(v => v.outletKode === outletKode) ||
+            (m.registeredPelanggan || []).some(p => p.kode === outletKode)
+        ) || null;
+    }
+
+    function warehouseCodeFromName(gudang) {
+        if (!gudang) return '';
+        const name = String(gudang).replace(/^Gudang\s+/i, '').trim().toUpperCase();
+        return name.slice(0, 3) + '01';
+    }
+
+    function buildSalesInvoiceExportRows(filtered) {
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+        const umbrella = document.getElementById('filterBrand').value;
+        const outletCodes = getMotorisOutletCodes(filtered);
+        const pelMap = getPelangganMap();
+        const rows = [];
+
+        masterFaktur.forEach(f => {
+            const fDate = (f.tanggalFaktur || '').slice(0, 10);
+            if (dateStart && fDate < dateStart) return;
+            if (dateEnd && fDate > dateEnd) return;
+            if (!outletCodes.has(f.pelangganKode)) return;
+            if (!fakturMatchesUmbrella(f, umbrella)) return;
+
+            const pel = pelMap[f.pelangganKode] || {};
+            const motoris = findMotorisForOutlet(filtered, f.pelangganKode);
+            const items = (f.items || []).filter(item =>
+                !umbrella || produkByKode[item.kode]?.umbrella === umbrella
+            );
+            if (!items.length) return;
+
+            items.forEach(item => {
+                const qty = Number(item.qty) || 0;
+                const sellPrice = Number(item.hargaUnit) || 0;
+                const itemDiscount = Number(item.diskon) || 0;
+                const lineTotal = Math.round(qty * sellPrice - itemDiscount);
+
+                rows.push({
+                    Date: fDate,
+                    SalesInvoiceNo: f.id || '',
+                    InvoiceStatus: f.status || '',
+                    InvoiceDocType: 'MobileCanvass',
+                    InvoiceGenerateFrom: f.tipe === 'Canvass' ? 'Canvassing' : (f.tipe || ''),
+                    IsInvoiceReturn: false,
+                    EmployeeCode: motoris?.code || '',
+                    EmployeeName: motoris?.name || f.salesNama || '',
+                    CustomerCode: f.pelangganKode || '',
+                    CustomerName: f.pelangganNama || pel.nama || '',
+                    CustomerAddress: f.pelangganAlamat || pel.alamat || '',
+                    OrderLatitude: pel.lat ?? '',
+                    OrderLongitude: pel.lng ?? '',
+                    WarehouseCode: warehouseCodeFromName(f.gudang),
+                    WarehouseName: f.gudang || '',
+                    PaymentTermName: f.jangkaWaktuPembayaran || '',
+                    ProductCode: item.kode || '',
+                    ProductName: item.nama || '',
+                    QuantityL: '',
+                    UnitL: 'KARTON',
+                    QuantityM: '',
+                    UnitM: 'RENCENG',
+                    QuantityS: qty,
+                    UnitS: item.satuan || 'PCS',
+                    TotalQuantity: qty,
+                    SellPrice: sellPrice,
+                    TaxCode: item.pajak || 'NoPPN',
+                    LineTotal: lineTotal,
+                    InvoiceNotes: f.catatan || ''
+                });
+            });
+        });
+
+        return rows;
+    }
+
+    function buildDailyVisitExportRows(filtered) {
+        const pelMap = getPelangganMap();
+        const rows = [];
+
+        filtered.forEach(m => {
+            (m.visitHistory || []).forEach((v, idx) => {
+                const pel = pelMap[v.outletKode] || {};
+                const salesAmount = v.hasTransaction ? Math.round(Number(v.amount) || 0) : 0;
+                const custLat = pel.lat ?? v.lat ?? '';
+                const custLng = pel.lng ?? v.lng ?? '';
+                const timing = resolveVisitTiming(v, pel, `${m.code}|${v.date}|${v.outletKode}|${idx}`);
+
+                rows.push({
+                    EmployeeCode: m.code,
+                    EmployeeName: m.name,
+                    Role: 'Canvasser',
+                    Date: v.date,
+                    Planned: '',
+                    UnPlaned: 1,
+                    Visited: 1,
+                    CustomerCode: v.outletKode || '',
+                    CustomerName: v.outlet || pel.nama || '',
+                    CustomerAddress: pel.alamat || '',
+                    CustomerLatitude: custLat,
+                    CustomerLongitude: custLng,
+                    CheckInTime: timing.checkInTime,
+                    CheckOutTime: timing.checkOutTime,
+                    Duration: formatVisitDuration(timing.durationMin),
+                    'Distance in Meter Check in': timing.distanceCheckInMeter,
+                    CheckInLatitude: timing.checkInLat,
+                    CheckInLongitude: timing.checkInLng,
+                    CheckOutLatitude: timing.checkOutLat,
+                    CheckOutLongitude: timing.checkOutLng,
+                    'Distance in Meter Check out': timing.distanceCheckOutMeter,
+                    Pseq: '',
+                    Aseq: idx + 1,
+                    TotalSales: salesAmount,
+                    Description: v.hasTransaction
+                        ? (v.product || 'Transaksi canvass')
+                        : 'Kunjungan tanpa transaksi',
+                    Unvisited: 0,
+                    TargetCall: 1,
+                    EffCall: v.hasTransaction ? 1 : 0
+                });
+            });
+        });
+
+        return rows;
+    }
+
+    function sheetFromObjects(rows, headers) {
+        const data = [headers];
+        rows.forEach(row => data.push(headers.map(h => row[h] ?? '')));
+        return XLSX.utils.aoa_to_sheet(data);
+    }
+
+    function exportToExcel() {
+        if (typeof XLSX === 'undefined') {
+            Swal.fire({ icon: 'error', title: 'Export Gagal', text: 'Library Excel belum dimuat. Muat ulang halaman lalu coba lagi.' });
+            return;
+        }
+
+        const filtered = getFilteredMotoris();
+        const salesRows = buildSalesInvoiceExportRows(filtered);
+        const visitRows = buildDailyVisitExportRows(filtered);
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, sheetFromObjects(salesRows, SALES_INVOICE_HEADERS), 'SalesInvoices');
+        XLSX.utils.book_append_sheet(wb, sheetFromObjects(visitRows, DAILY_VISIT_HEADERS), 'DailyVisits');
+
+        const stamp = new Date().toISOString().slice(0, 10);
+        XLSX.writeFile(wb, `StokMotoris_Export_${stamp}.xlsx`);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Export Berhasil',
+            html: `${salesRows.length} baris faktur · ${visitRows.length} baris kunjungan<br><small>${filtered.length} motoris terfilter</small>`,
+            timer: 2500,
+            showConfirmButton: false
+        });
     }
 
     function refreshDashboard() {
         const btn = document.querySelector('.btn-success .fa-sync-alt') || document.querySelector('.fa-sync-alt');
         if (btn) btn.classList.add('fa-spin');
 
-        setTimeout(() => {
-            motorisData = generateMotorisData();
-            auditData = generateAuditData();
-            updateTimestamp();
+        setTimeout(async () => {
+            try {
+                await loadAllMasterData();
+                populateMasterFilters();
+                rebuildDashboardData();
+                updateTimestamp();
 
-            // Rebuild charts
-            Object.values(chartInstances).forEach(c => { if (c && c.destroy) c.destroy(); });
-            chartInstances = {};
-            initCharts();
+                Object.values(chartInstances).forEach(c => { if (c && c.destroy) c.destroy(); });
+                chartInstances = {};
+                initCharts();
 
-            applyAllFilters();
+                applyAllFilters();
 
-            if (btn) btn.classList.remove('fa-spin');
-            Swal.fire({ icon: 'success', title: 'Data Diperbarui', text: 'Dashboard telah di-refresh dengan data terbaru.', timer: 1500, showConfirmButton: false });
+                if (btn) btn.classList.remove('fa-spin');
+                Swal.fire({ icon: 'success', title: 'Data Diperbarui', text: 'Dashboard telah di-refresh dari data master terbaru.', timer: 1500, showConfirmButton: false });
+            } catch (err) {
+                if (btn) btn.classList.remove('fa-spin');
+                Swal.fire({ icon: 'error', title: 'Refresh Gagal', text: 'Tidak dapat memuat ulang data master.' });
+            }
         }, 800);
     }
 

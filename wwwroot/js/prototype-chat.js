@@ -338,7 +338,7 @@ const PrototypeChat = {
             return best.answer;
         }
 
-        return 'Saya tidak menemukan jawaban spesifik di FAQ. Coba tanyakan tentang: Falcon FPRS, data mock, modul Master Data, desktop vs mobile, atau canvassing/kunjungan.';
+        return 'Saya tidak menemukan jawaban spesifik di FAQ. Coba tanyakan tentang: Falcon FPRS, data mock, modul Master Data, desktop vs mobile, atau kunjungan.';
     },
 
     escapeHtml(str) {

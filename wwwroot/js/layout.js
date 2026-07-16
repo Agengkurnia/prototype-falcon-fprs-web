@@ -307,11 +307,6 @@ class Layout {
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="${this.basePath}Views/FPRS/Canvassing/index.html" class="menu-link">
-                                    <div data-i18n="Canvassing">Canvassing</div>
-                                </a>
-                            </li>
-                            <li class="menu-item">
                                 <a href="${this.basePath}Views/FPRS/Penjualan/StokMotoris/index.html" class="menu-link">
                                     <div data-i18n="Stok Motoris">Stok Motoris</div>
                                 </a>
@@ -469,6 +464,7 @@ class Layout {
             'wwwroot/js/vendor/crypto-js.js',
             'wwwroot/js/cls-rijndael.browser.js',
             'wwwroot/js/master-data-param.js',
+            'wwwroot/js/master-source-tooltip.js',
             'wwwroot/js/role-manager.js',
             'wwwroot/js/prototype-chat.js'
         ];

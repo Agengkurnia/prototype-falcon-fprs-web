@@ -39,55 +39,55 @@
                                 <h5 class="border-bottom pb-2 text-success"><i class="fa fa-box me-1"></i> Informasi Produk</h5>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: txtKode">Kode Produk <span class="required-mark">*</span></label>
-                                    <select class="form-select" id="kode" required title="Tabel: mProduk | Kolom: txtKode">
+                                    <label class="form-label fw-bold" title="Source : mProduk | txtKode">Kode Produk <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="kode" required title="Source : mProduk | txtKode">
                                         <option value="">-- Pilih Kode Produk (Master Data API) --</option>
                                     </select>
                                     <small class="text-muted">Data produk terisi otomatis dari Master Data API.</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: txtNama">Nama Produk</label>
-                                    <input type="text" class="form-control bg-light" id="nama" placeholder="Terisi otomatis dari API..." readonly title="Tabel: mProduk | Kolom: txtNama" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | txtNama">Nama Produk</label>
+                                    <input type="text" class="form-control bg-light" id="nama" placeholder="Terisi otomatis dari API..." readonly title="Source : mProduk | txtNama" />
                                 </div>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: txtUmbrella">Umbrella Brand</label>
-                                    <input type="text" class="form-control bg-light" id="umbrella" placeholder="—" readonly title="Tabel: mProduk | Kolom: txtUmbrella" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | txtUmbrella">Umbrella Brand</label>
+                                    <input type="text" class="form-control bg-light" id="umbrella" placeholder="—" readonly title="Source : mProduk | txtUmbrella" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: intBrandID (FK mBrand)">Brand</label>
-                                    <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly title="Tabel: mProduk | Kolom: intBrandID (FK mBrand)" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | intBrandID (FK mBrand)">Brand</label>
+                                    <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly title="Source : mProduk | intBrandID (FK mBrand)" />
                                 </div>
 
                                 <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-tags me-1"></i> Harga & Pajak</h5>
 
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: decHargaBeli">Harga Beli <span class="required-mark">*</span></label>
-                                    <input type="number" class="form-control" id="hargaBeli" placeholder="Rp..." required min="0" oninput="recalcHargaJual()" title="Tabel: mProduk | Kolom: decHargaBeli" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | decHargaBeli">Harga Beli <span class="required-mark">*</span></label>
+                                    <input type="number" class="form-control" id="hargaBeli" placeholder="Rp..." required min="0" oninput="recalcHargaJual()" title="Source : mProduk | decHargaBeli" />
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: intPajakID (FK mPajak)">Skema Pajak <span class="required-mark">*</span></label>
-                                    <select class="form-select" id="namaPajak" required onchange="recalcHargaJual()" title="Tabel: mProduk | Kolom: intPajakID (FK mPajak)">
+                                    <label class="form-label fw-bold" title="Source : mProduk | intPajakID (FK mPajak)">Skema Pajak <span class="required-mark">*</span></label>
+                                    <select class="form-select" id="namaPajak" required onchange="recalcHargaJual()" title="Source : mProduk | intPajakID (FK mPajak)">
                                         <option value="PPN 11%">PPN (11%)</option>
                                         <option value="NoPPN">No PPN (0%)</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: decHargaJual">Harga Jual <span class="text-muted fw-normal">(otomatis)</span></label>
-                                    <input type="number" class="form-control bg-light" id="hargaJual" readonly title="Tabel: mProduk | Kolom: decHargaJual" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | decHargaJual">Harga Jual <span class="text-muted fw-normal">(otomatis)</span></label>
+                                    <input type="number" class="form-control bg-light" id="hargaJual" readonly title="Source : mProduk | decHargaJual" />
                                     <small class="text-muted">= Harga Beli + PPN</small>
                                 </div>
 
                                 <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-cube me-1"></i> Unit & Status</h5>
 
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Tabel: mProduk | Kolom: intUnitID (FK mUnit)">Unit Konversi</label>
-                                    <input type="text" class="form-control bg-light" id="unitNama" value="PCS" readonly title="Tabel: mProduk | Kolom: intUnitID (FK mUnit)" />
+                                    <label class="form-label fw-bold" title="Source : mProduk | intUnitID (FK mUnit)">Unit Konversi</label>
+                                    <input type="text" class="form-control bg-light" id="unitNama" value="PCS" readonly title="Source : mProduk | intUnitID (FK mUnit)" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold d-block" title="Tabel: mProduk | Kolom: bitActive">Status Produk</label>
+                                    <label class="form-label fw-bold d-block" title="Source : mProduk | bitActive">Status Produk</label>
                                     <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="status" checked onchange="updateStatusLabel()" style="cursor:pointer;" title="Tabel: mProduk | Kolom: bitActive" />
+                                        <input class="form-check-input" type="checkbox" role="switch" id="status" checked onchange="updateStatusLabel()" style="cursor:pointer;" title="Source : mProduk | bitActive" />
                                         <label class="form-check-label" for="status" id="statusLabel">Active</label>
                                     </div>
                                 </div>
@@ -209,6 +209,7 @@ function initKodeSelect2() {
     const $k = $('#kode');
     $k.select2({ theme: 'bootstrap-5', width: '100%', placeholder: 'Cari / pilih kode produk...' });
     $k.on('change', onKodeChange);
+    if (typeof initMasterSourceTooltips === 'function') initMasterSourceTooltips();
 }
 
 function saveDataForm(event) {

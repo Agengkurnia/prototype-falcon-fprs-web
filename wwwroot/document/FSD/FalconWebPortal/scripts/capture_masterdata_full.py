@@ -37,9 +37,12 @@ MASTER_ORDER = [
     'master-pegawai', 'master-stokis', 'master-pajak', 'master-alasan',
 ]
 
-# 'edit' = klik Edit baris pertama (lebih kaya konten, mis. Channel + sub-tabel pelanggan)
-MODAL_SHOT_MODE = {
-    'master-channel': 'edit',
+# Screenshot halaman detail (page + formPath) — indeks 1 di SS_BY_MODULE
+DETAIL_SHOT_BY_MODULE = {
+    'master-produk': 'ss_03_master_produk_detail.png',
+    'master-pelanggan': 'ss_16_master_pelanggan_detail.png',
+    'master-pegawai': 'ss_20_master_pegawai_detail.png',
+    'master-stokis': 'ss_46_master_stokis_detail.png',
 }
 
 
@@ -100,13 +103,31 @@ def append_unique_buttons(target: list, extras: list) -> None:
         target.append(e)
 
 
-def capture_detail_page_buttons(page, mod: dict, base_url: str) -> list:
-    """Buka halaman detail dari dashboard list lalu capture tombol aksi."""
+MODAL_SHOT_MODE = {
+    'master-channel': 'edit',
+}
+
+
+def module_page_shots(mod: dict) -> list[str]:
+    """Daftar screenshot halaman: index + detail (bila modul page punya formPath)."""
+    shots = list(mod.get('screenshots') or [])
+    mid = mod['id']
+    if mod.get('type') == 'page' and mod.get('formPath'):
+        detail = DETAIL_SHOT_BY_MODULE.get(mid)
+        if detail and detail not in shots:
+            shots.append(detail)
+    return shots
+
+
+def navigate_to_detail_page(page, mod: dict, base_url: str) -> None:
+    """Buka halaman detail dari dashboard list (klik baris) atau direct URL."""
     form_path = mod.get('formPath') or ''
     if not form_path:
-        return []
+        return
     view = page.locator(
-        '#tblBody tr a.btn-action-view, #tblBody tr .btn-action-view, #tblBody tr a[href*="detail"]'
+        '#tblBody tr a.btn-action-view, #tblBody tr .btn-action-view, '
+        '#tbl tbody tr a.btn-action-view, #tbl tbody tr .btn-action-view, '
+        '#tblBody tr a[href*="detail"], #tbl tbody tr a[href*="detail"]'
     ).first
     if view.count() and view.is_visible():
         try:
@@ -119,7 +140,42 @@ def capture_detail_page_buttons(page, mod: dict, base_url: str) -> list:
         detail_url = base_url.rstrip('/') + '/' + form_path.replace('\\', '/')
         page.goto(detail_url, wait_until='domcontentloaded', timeout=30000)
     wait_ready(page)
-    if mod.get('id') == 'master-stokis':
+
+
+def wait_detail_ready(page, mod_id: str) -> None:
+    """Tunggu konten detail siap sebelum full-page screenshot."""
+    if mod_id == 'master-produk':
+        try:
+            page.wait_for_selector('#formProduk, #kode', timeout=15000)
+            page.wait_for_function(
+                "() => { const n = document.querySelector('#nama'); "
+                "return n && n.value && n.value.length > 0; }",
+                timeout=20000,
+            )
+        except Exception:
+            pass
+    elif mod_id == 'master-pelanggan':
+        try:
+            page.wait_for_selector('#detailNama', timeout=15000)
+            page.wait_for_function(
+                "() => { const n = document.querySelector('#detailNama'); "
+                "return n && n.textContent && n.textContent.trim() !== '-' "
+                "&& n.textContent.trim() !== 'Pelanggan'; }",
+                timeout=20000,
+            )
+        except Exception:
+            pass
+    elif mod_id == 'master-pegawai':
+        try:
+            page.wait_for_selector('#nama, #kode', timeout=15000)
+            page.wait_for_function(
+                "() => { const n = document.querySelector('#nama'); "
+                "return n && n.value && n.value.length > 0; }",
+                timeout=20000,
+            )
+        except Exception:
+            pass
+    elif mod_id == 'master-stokis':
         try:
             page.wait_for_function(
                 '() => document.querySelectorAll("#stokAccordion .accordion-button").length >= 3',
@@ -129,11 +185,21 @@ def capture_detail_page_buttons(page, mod: dict, base_url: str) -> list:
             pass
     else:
         try:
-            page.wait_for_selector('#stokAccordion, #app-content', timeout=10000)
+            page.wait_for_selector('#app-content', timeout=10000)
         except Exception:
             pass
+    page.evaluate('() => window.scrollTo(0, 0)')
+    time.sleep(1.0)
+
+
+def capture_detail_page_buttons(page, mod: dict, base_url: str) -> list:
+    """Buka halaman detail lalu capture tombol aksi."""
+    if not mod.get('formPath'):
+        return []
+    navigate_to_detail_page(page, mod, base_url)
+    wait_detail_ready(page, mod['id'])
     page.evaluate('() => window.scrollTo(0, document.body.scrollHeight)')
-    time.sleep(1.2)
+    time.sleep(0.8)
     return capture_module_buttons(page, mod['id'], SCREENSHOTS_DIR)
 
 
@@ -227,7 +293,7 @@ def capture(base_url, only=None):
         browser = p.chromium.launch(headless=True)
         for mod in modules:
             mid = mod['id']
-            shots = mod.get('screenshots') or []
+            shots = module_page_shots(mod)
             if not shots:
                 continue
             print(f'[{mid}] {mod["label"]}')
@@ -254,7 +320,20 @@ def capture(base_url, only=None):
                     extra = capture_module_buttons(page, mid, SCREENSHOTS_DIR)
                     append_unique_buttons(btn_manifest[mid], extra)
 
-                if mod.get('formPath'):
+                elif mod.get('formPath') and mod.get('type') == 'page' and len(shots) > 1:
+                    navigate_to_detail_page(page, mod, base_url)
+                    wait_detail_ready(page, mid)
+                    detail_path = full_shot(page, shots[1])
+                    done += 1
+                    if _shots_identical(
+                        os.path.join(SCREENSHOTS_DIR, shots[0]),
+                        detail_path,
+                    ):
+                        print(f'   WARN {mid}: screenshot detail identik dengan index')
+                    detail_btns = capture_module_buttons(page, mid, SCREENSHOTS_DIR)
+                    append_unique_buttons(btn_manifest[mid], detail_btns)
+
+                elif mod.get('formPath'):
                     detail_btns = capture_detail_page_buttons(page, mod, base_url)
                     append_unique_buttons(btn_manifest[mid], detail_btns)
             except Exception as e:

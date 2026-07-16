@@ -62,6 +62,17 @@ def _format_caption(kind: str, number: str, title: str) -> str:
     return f'*{label} {number} — {title}*'
 
 
+_DIAGRAM_N_RE = re.compile(r'^Diagram\s+\d+$', re.I)
+
+
+def sanitize_figure_title(alt: str, fallback: str = '') -> str:
+    """Strip redundant 'Diagram N' alt text — penomoran sudah di prefix Gambar."""
+    title = (alt or '').strip()
+    if not title or _DIAGRAM_N_RE.match(title):
+        return fallback or 'Alur'
+    return title
+
+
 def preprocess_captions(md_text: str) -> str:
     """Number images/tables and add center+italic caption lines in processed MD only."""
     lines = md_text.splitlines()
@@ -116,7 +127,7 @@ def preprocess_captions(md_text: str) -> str:
             if not FIG_CAPTION_RE.match(next_stripped):
                 fig_counter += 1
                 number = f'{chapter}.{fig_counter}'
-                title = alt or f'Gambar {number}'
+                title = sanitize_figure_title(alt, fallback=f'Gambar {number}')
                 out.append(line)
                 out.append('')
                 out.append(_format_caption('fig', number, title))

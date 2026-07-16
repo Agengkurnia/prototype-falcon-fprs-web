@@ -304,11 +304,6 @@ class Layout {
                                     <div data-i18n="Faktur">Faktur</div>
                                 </a>
                             </li>
-                            <li class="menu-item">
-                                <a href="${this.basePath}Views/FPRS/Canvassing/index.html" class="menu-link">
-                                    <div data-i18n="Canvassing">Canvassing</div>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 

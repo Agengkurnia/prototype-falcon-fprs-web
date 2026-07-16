@@ -22,7 +22,7 @@
 
 <div class="card"><div class="card-body"><div class="table-responsive">
 <table class="table table-bordered table-hover" id="tbl">
-<thead><tr><th style="width:50px;">NO</th><th title="Tabel: mChannel | Kolom: txtNama">NAMA CHANNEL</th><th style="text-align:center;" title="Kolom turunan (COUNT mPelanggan) - tidak disimpan">TOTAL PELANGGAN</th><th style="width:100px;" title="Tabel: mChannel | Kolom: bitActive">STATUS</th><th style="width:80px;text-align:center;">AKSI</th></tr></thead>
+<thead><tr><th style="width:50px;">NO</th><th title="Source : mChannel | txtNama">NAMA CHANNEL</th><th style="text-align:center;" title="Source : mPelanggan | COUNT(*) (derived)">TOTAL PELANGGAN</th><th style="width:100px;" title="Source : mChannel | bitActive">STATUS</th><th style="width:80px;text-align:center;">AKSI</th></tr></thead>
 <tbody id="tblBody"></tbody>
 </table></div></div></div>
 
@@ -30,11 +30,11 @@
 <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Channel</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
 <div class="modal-body">
 <input type="hidden" id="editId"/>
-<div class="mb-3"><label class="form-label" title="Tabel: mChannel | Kolom: txtNama">Nama Channel <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama channel..." title="Tabel: mChannel | Kolom: txtNama"/></div>
+<div class="mb-3"><label class="form-label" title="Source : mChannel | txtNama">Nama Channel <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama channel..." title="Source : mChannel | txtNama"/></div>
 <div class="mb-3">
-    <label class="form-label d-block" title="Tabel: mChannel | Kolom: bitActive">Status</label>
+    <label class="form-label d-block" title="Source : mChannel | bitActive">Status</label>
     <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="inputActive" checked onchange="updateActiveLabel()" style="cursor:pointer;" title="Tabel: mChannel | Kolom: bitActive"/>
+        <input class="form-check-input" type="checkbox" role="switch" id="inputActive" checked onchange="updateActiveLabel()" style="cursor:pointer;" title="Source : mChannel | bitActive"/>
         <label class="form-check-label" for="inputActive" id="activeLabel">Active</label>
     </div>
 </div>
@@ -47,7 +47,7 @@
     </div>
     <div class="table-responsive">
         <table class="table table-sm table-bordered mb-2">
-            <thead><tr><th style="width:40px;">#</th><th title="Tabel: mPelanggan | Kolom: txtKode">KODE</th><th title="Tabel: mPelanggan | Kolom: txtNama">NAMA PELANGGAN</th><th title="Tabel: mPelanggan | Kolom: txtKota">KOTA</th></tr></thead>
+            <thead><tr><th style="width:40px;">#</th><th title="Source : mPelanggan | txtKode">KODE</th><th title="Source : mPelanggan | txtNama">NAMA PELANGGAN</th><th title="Source : mPelanggan | txtKota">KOTA</th></tr></thead>
             <tbody id="custBody"></tbody>
         </table>
     </div>

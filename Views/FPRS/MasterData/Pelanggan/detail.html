@@ -46,11 +46,11 @@
                                 <i class="fa fa-store"></i>
                             </div>
                             <div>
-                                <h3 class="mb-1 fw-bold" id="detailNama" style="color: #fff;" title="Tabel: mPelanggan | Kolom: txtNama">Pelanggan</h3>
+                                <h3 class="mb-1 fw-bold" id="detailNama" style="color: #fff;" title="Source : mPelanggan | txtNama">Pelanggan</h3>
                                 <div class="d-flex align-items-center gap-2" style="flex-wrap:wrap;">
-                                    <span class="badge bg-light text-success fw-bold" id="detailKode" title="Tabel: mPelanggan | Kolom: txtKode">-</span>
-                                    <span class="badge bg-success" id="detailStatus" title="Tabel: mPelanggan | Kolom: bitActive">Active</span>
-                                    <span class="text-white-50">| Channel:</span> <strong id="detailChannel" title="Tabel: mPelanggan | Kolom: intChannelID (FK mChannel)">-</strong>
+                                    <span class="badge bg-light text-success fw-bold" id="detailKode" title="Source : mPelanggan | txtKode">-</span>
+                                    <span class="badge bg-success" id="detailStatus" title="Source : mPelanggan | bitActive">Active</span>
+                                    <span class="text-white-50">| Channel:</span> <strong id="detailChannel" title="Source : mPelanggan | intChannelID (FK mChannel)">-</strong>
                                 </div>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
                     <div class="col-md-4">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
-                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3" title="Tabel: mPelanggan | Kolom: txtPhoto"><i class="fa fa-camera me-1"></i> Foto Toko</h5>
+                                <h5 class="border-bottom pb-2 text-success fw-bold mb-3" title="Source : mPelanggan | txtPhoto"><i class="fa fa-camera me-1"></i> Foto Toko</h5>
                                 <div class="photo-frame" id="photoFrame">
                                     <div class="placeholder" id="photoPlaceholder"><i class="fa fa-store"></i>Foto toko dari aplikasi mobile belum tersinkron</div>
                                     <img src="" id="photoImg" class="d-none" alt="Foto Toko"/>
@@ -78,11 +78,11 @@
                                 <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-id-card me-1"></i> Data Toko & Kontak</h5>
                                 <table class="table table-borderless m-0">
                                     <tbody>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtPemilik"><td class="text-muted" style="width:170px;">Nama Pemilik</td><td>: <span id="detailPemilik">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtTelepon"><td class="text-muted">No. HP / WhatsApp</td><td>: <span id="detailTelepon">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtNpwp"><td class="text-muted">NPWP</td><td>: <span id="detailNpwp">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: intChannelID (FK mChannel)"><td class="text-muted">Channel Distribusi</td><td>: <span class="badge bg-light text-dark" id="detailChannel2">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtOutletType"><td class="text-muted">Tipe Outlet</td><td>: <span class="badge bg-light text-dark" id="detailTipe">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtPemilik"><td class="text-muted" style="width:170px;">Nama Pemilik</td><td>: <span id="detailPemilik">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtTelepon"><td class="text-muted">No. HP / WhatsApp</td><td>: <span id="detailTelepon">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtNpwp"><td class="text-muted">NPWP</td><td>: <span id="detailNpwp">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | intChannelID (FK mChannel)"><td class="text-muted">Channel Distribusi</td><td>: <span class="badge bg-light text-dark" id="detailChannel2">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtOutletType"><td class="text-muted">Tipe Outlet</td><td>: <span class="badge bg-light text-dark" id="detailTipe">-</span></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -96,12 +96,12 @@
                                 <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-map-location-dot me-1"></i> Alamat & Wilayah</h5>
                                 <table class="table table-borderless m-0">
                                     <tbody>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtAlamat"><td class="text-muted" style="width:150px;">Alamat</td><td>: <span id="detailAlamat">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtRtRw"><td class="text-muted">RT / RW</td><td>: <span id="detailRtrw">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtKelurahan"><td class="text-muted">Kelurahan</td><td>: <span id="detailKelurahan">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtKecamatan"><td class="text-muted">Kecamatan</td><td>: <span id="detailKecamatan">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtKota"><td class="text-muted">Kota</td><td>: <span id="detailKota">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: decLat, decLng"><td class="text-muted">Koordinat GPS</td><td>: <span id="detailGps">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtAlamat"><td class="text-muted" style="width:150px;">Alamat</td><td>: <span id="detailAlamat">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtRtRw"><td class="text-muted">RT / RW</td><td>: <span id="detailRtrw">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtKelurahan"><td class="text-muted">Kelurahan</td><td>: <span id="detailKelurahan">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtKecamatan"><td class="text-muted">Kecamatan</td><td>: <span id="detailKecamatan">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtKota"><td class="text-muted">Kota</td><td>: <span id="detailKota">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | decLat, decLng"><td class="text-muted">Koordinat GPS</td><td>: <span id="detailGps">-</span></td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -115,11 +115,11 @@
                                 <h5 class="border-bottom pb-2 text-success fw-bold mb-3"><i class="fa fa-user-tie me-1"></i> Sales & Kunjungan</h5>
                                 <table class="table table-borderless m-0">
                                     <tbody>
-                                        <tr title="Tabel: mPelanggan | Kolom: intSalesmanID (FK mPegawai)"><td class="text-muted" style="width:170px;">Salesman / PIC</td><td>: <strong class="text-primary" id="detailSalesman">-</strong></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: intDaftarHargaID (FK mDaftarHarga)"><td class="text-muted">Daftar Harga</td><td>: <span class="badge bg-light text-dark" id="detailDaftarHarga">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: txtWaktuPembayaran"><td class="text-muted">Waktu Pembayaran</td><td>: <span class="badge bg-light text-dark" id="detailWaktuPembayaran">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: dtKunjunganTerakhir"><td class="text-muted">Kunjungan Terakhir</td><td>: <span id="detailKunjungan">-</span></td></tr>
-                                        <tr title="Tabel: mPelanggan | Kolom: dtTransaksiTerakhir"><td class="text-muted">Transaksi Terakhir</td><td>: <span id="detailTransaksi">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | intSalesmanID (FK mPegawai)"><td class="text-muted" style="width:170px;">Salesman / PIC</td><td>: <strong class="text-primary" id="detailSalesman">-</strong></td></tr>
+                                        <tr title="Source : mPelanggan | intDaftarHargaID (FK mDaftarHarga)"><td class="text-muted">Daftar Harga</td><td>: <span class="badge bg-light text-dark" id="detailDaftarHarga">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | txtWaktuPembayaran"><td class="text-muted">Waktu Pembayaran</td><td>: <span class="badge bg-light text-dark" id="detailWaktuPembayaran">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | dtKunjunganTerakhir"><td class="text-muted">Kunjungan Terakhir</td><td>: <span id="detailKunjungan">-</span></td></tr>
+                                        <tr title="Source : mPelanggan | dtTransaksiTerakhir"><td class="text-muted">Transaksi Terakhir</td><td>: <span id="detailTransaksi">-</span></td></tr>
                                     </tbody>
                                 </table>
                             </div>

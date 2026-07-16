@@ -103,7 +103,7 @@
       "narrative": "Membuka modal form untuk menambah data baru."
     },
     {
-      "file": "",
+      "file": "ss_btn_produk_detail-ubah.png",
       "label": "Detail / Ubah",
       "id": "—",
       "style": "btn-outline-secondary",
@@ -121,7 +121,7 @@
   ],
   "master-pelanggan": [
     {
-      "file": "ss_btn_pelanggan_detail.png",
+      "file": "ss_btn_common_detail.png",
       "label": "Detail",
       "id": "—",
       "style": "btn-outline-secondary",
@@ -129,7 +129,7 @@
       "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
     },
     {
-      "file": "ss_btn_pelanggan_kembali.png",
+      "file": "ss_btn_common_kembali.png",
       "label": "Kembali",
       "id": "—",
       "style": "btn-secondary",
@@ -155,7 +155,7 @@
       "narrative": "Mengunggah file CSV untuk sinkronisasi data."
     },
     {
-      "file": "ss_btn_pegawai_lihat-detail.png",
+      "file": "ss_btn_common_lihat-detail.png",
       "label": "Lihat Detail",
       "id": "—",
       "style": "btn-outline-secondary",
@@ -163,7 +163,7 @@
       "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
     },
     {
-      "file": "ss_btn_pegawai_kembali.png",
+      "file": "ss_btn_common_kembali.png",
       "label": "Kembali",
       "id": "—",
       "style": "btn-secondary",
@@ -189,7 +189,7 @@
       "narrative": "Mengunggah file CSV untuk sinkronisasi data."
     },
     {
-      "file": "ss_btn_stokis_lihat-detail.png",
+      "file": "ss_btn_common_lihat-detail.png",
       "label": "Lihat Detail",
       "id": "—",
       "style": "btn-outline-secondary",
@@ -197,7 +197,7 @@
       "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
     },
     {
-      "file": "ss_btn_stokis_kembali.png",
+      "file": "ss_btn_common_kembali.png",
       "label": "Kembali",
       "id": "—",
       "style": "btn-secondary",
@@ -213,7 +213,7 @@
       "narrative": "Membuka panel Stok per Produk menampilkan data terkait pada halaman detail."
     },
     {
-      "file": "",
+      "file": "ss_btn_stokis_riwayat-input-stok-oleh-motoris.png",
       "label": "Riwayat Input Stok oleh Motoris",
       "id": "—",
       "style": "btn-secondary",
@@ -221,7 +221,7 @@
       "narrative": "Membuka panel Riwayat Input Stok oleh Motoris menampilkan data terkait pada halaman detail."
     },
     {
-      "file": "",
+      "file": "ss_btn_stokis_riwayat-status-active-inactive-dari-uplo.png",
       "label": "Riwayat Status (Active / Inactive) — dari Upload",
       "id": "—",
       "style": "btn-secondary",

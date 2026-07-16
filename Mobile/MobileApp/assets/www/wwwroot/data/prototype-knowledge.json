@@ -12,7 +12,7 @@
   "techStack": {
     "architecture": "Multi-page HTML (MPA) dengan vanilla JavaScript, tanpa SPA framework.",
     "desktopLayout": "wwwroot/js/layout.js — sidebar, navbar, menu Vuexy/Bootstrap 5.",
-    "desktopData": "wwwroot/js/canvassing-store.js — CRUD lokal untuk canvassing desktop.",
+    "desktopData": "Data desktop disimulasikan per modul menggunakan localStorage dan seed JSON lokal.",
     "mobileData": "wwwroot/js/sfa-store.js — auth, transaksi, GPS, sync queue mobile.",
     "mockData": "wwwroot/data/*.json — data referensi awal.",
     "dialogs": "SweetAlert2 dan Bootstrap modals.",
@@ -38,10 +38,6 @@
       "subModules": ["Faktur", "StokMotoris"],
       "description": "Modul faktur penjualan dan pemantauan stok motoris."
     },
-    "canvassing": {
-      "path": "Views/FPRS/Canvassing/",
-      "description": "Manajemen load-sheet canvassing, kartu ringkasan, pencarian, dan konfirmasi SweetAlert."
-    },
     "kunjungan": {
       "path": "Views/FPRS/Kunjungan/",
       "subModules": ["Informasi", "Geografis", "Rute"],
@@ -59,7 +55,7 @@
     "note": "Chatbox AI saat ini hanya tersedia di desktop FPRS (via layout.js)."
   },
   "dataSimulation": {
-    "desktop": "canvassing-store.js menyimpan dan mengelola data canvassing di localStorage.",
+    "desktop": "Data desktop disimpan lokal di browser menggunakan localStorage sesuai modul yang aktif.",
     "mobile": "sfa-store.js mengelola auth, outlet, faktur, pembayaran, dan antrean sync offline.",
     "syncQueue": "Transaksi mobile masuk antrean pending; processQueue() mensimulasikan upload dengan delay 350ms dan 5% kegagalan acak untuk uji retry."
   },
@@ -84,15 +80,11 @@
     },
     {
       "keywords": ["desktop", "mobile", "beda", "perbedaan", "web", "portal"],
-      "answer": "Desktop (Views/FPRS/) adalah panel admin back-office: Master Data, Penjualan, Canvassing, Kunjungan — di-render via layout.js. Mobile (Views/Mobile/) mensimulasikan aplikasi sales lapangan: kunjungan outlet, order, faktur, kulakan, sync offline — bisa dijalankan di browser atau dibungkus APK Flutter."
+      "answer": "Desktop (Views/FPRS/) adalah panel admin back-office: Master Data, Penjualan, dan Kunjungan — di-render via layout.js. Mobile (Views/Mobile/) mensimulasikan aplikasi sales lapangan: kunjungan outlet, order, faktur, kulakan, sync offline — bisa dijalankan di browser atau dibungkus APK Flutter."
     },
     {
       "keywords": ["master", "data", "modul", "crud"],
       "answer": "Ada 17 sub-modul Master Data di Views/FPRS/MasterData/: Akun, Alasan, Brand, DaftarHarga, Divisi, GrupPelanggan, KategoriProduk, KonfigurasiAkses, MetodePembayaran, Pajak, Pegawai, Pelanggan, Posisi, Produk, Supplier, Unit, WaktuPembayaran. Masing-masing punya tabel, form modal, validasi, dan CRUD lokal."
-    },
-    {
-      "keywords": ["canvassing", "kanvas"],
-      "answer": "Modul Canvassing (Views/FPRS/Canvassing/) mengelola load-sheet distribusi barang canvassing desktop. Data disimpan lokal via canvassing-store.js dengan kartu ringkasan interaktif dan konfirmasi SweetAlert."
     },
     {
       "keywords": ["kunjungan", "rute", "geografis", "peta", "map"],

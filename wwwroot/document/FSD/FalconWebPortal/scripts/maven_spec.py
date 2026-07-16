@@ -28,7 +28,7 @@ Prototipe Falcon FPRS akan dikembangkan ke aplikasi produksi pada codebase **MAV
 
 **Database:** PostgreSQL via `CentralContext` (`PostgreDBConnection`).
 
-**Tooltip prototipe:** Setiap label/kolom UI di halaman Master Data memiliki atribut `title` berformat `Tabel: mXxx | Kolom: txtYyy` untuk memudahkan validasi mapping saat UAT dan pengembangan MAVEN.
+**Tooltip prototipe:** Setiap label/kolom UI di halaman Master Data memiliki atribut `title` berformat `Source : mXxx | txtYyy` untuk memudahkan validasi mapping saat UAT dan pengembangan MAVEN.
 
 ---
 '''
@@ -130,134 +130,246 @@ MAVEN_MAPPING = {
 def chapter_erd() -> str:
     return '''## 7. Struktur Data & ERD
 
-### 7.1 Prototipe (localStorage)
+Cara baca bab ini:
 
-| Entity | localStorage Key | Deskripsi |
-|--------|------------------|-----------|
-| `M_Produk` | `md_produk` | Master produk/SKU (kode, umbrella brand, harga, pajak, status) |
-| `M_Pelanggan` | `md_pelanggan` | Master pelanggan/outlet (sumber mobile) |
-| `M_Channel` | `md_channel` | Klasifikasi channel pelanggan |
-| `M_Pegawai` | `md_pegawai` | Master pegawai (Motoris/SPG GT, NIK, Branch/Region) |
-| `M_Stokis` | `md_stokis` | Master stokis/grosir (Branch/Region, GPS) |
-| `M_Pajak` | `md_pajak` | Skema pajak (PPN/DPP) |
-| `M_Alasan` | `md_alasan` | Kode alasan operasional |
+1. **7.1** — ERD produksi (1 halaman): relasi + **kolom lengkap** sesuai skrip DDL `001`/`002`.
+2. **7.2** — tabel teks FK yang **1:1** dengan garis di diagram 7.1.
+3. **7.3–7.4** — catatan desain + DDL (query penuh).
 
-Relasi prototipe disimpan sebagai **string nama** (bukan FK). Di produksi MAVEN diganti kolom `intXxxID`.
+### 7.1 ERD Produksi (1 halaman)
 
-### 7.2 ERD Produksi MAVEN (PostgreSQL)
-
-Diagram berikut menggambarkan target database produksi. Detail kolom per tabel ada di subsection mapping modul (3.1.6–3.7.6) dan dokumen referensi `docs/web/erd_master_data_maven.md`.
+Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql` dan `002_*.sql`.
+Kolom digambar **lengkap** (termasuk audit). Lookup tanpa FK constraint (`mKategoriProduk`, `mDivisi`, `mDaftarHarga`) **tidak** digambar — kolom cadangan dicatat di bawah.
 
 ```mermaid
+%%{init: {"theme":"default","themeVariables":{"fontSize":"16px"},"er":{"layoutDirection":"TB","entityPadding":8,"fontSize":16}}}%%
 erDiagram
-    mProduk }o--|| mKategoriProduk : "intKategoriID"
-    mProduk }o--|| mBrand : "intBrandID"
-    mProduk }o--|| mDivisi : "intDivisiID"
-    mProduk }o--|| mUnit : "intUnitID"
-    mProduk }o--|| mPajak : "intPajakID"
-    mKategoriProduk }o--o| mKategoriProduk : "intParentKategoriID"
-
-    mPelanggan }o--|| mChannel : "intChannelID"
-    mPelanggan }o--|| mDaftarHarga : "intDaftarHargaID"
-    mPelanggan }o--|| mPegawai : "intSalesmanID"
+    mPajak ||--o{ mProduk : intPajakID
+    mUnit ||--o{ mProduk : intUnitID
+    mBrand ||--o{ mProduk : intBrandID
+    mChannel ||--o{ mPelanggan : intChannelID
+    mPegawai ||--o{ mPelanggan : intSalesmanID
+    mPegawai ||--o{ mPegawaiStatusHist : intPegawaiID
+    mStokis ||--o{ mStokisStatusHist : intStokisID
+    mStokis ||--o{ mStokisStockHist : intStokisID
 
     mProduk {
         int intProdukID PK
         uuid txtGuid UK
         varchar txtKode UK
         varchar txtNama
+        varchar txtPartnerId
         numeric decHargaBeli
         numeric decHargaJual
-        int intKategoriID FK
+        int intKategoriID
         int intBrandID FK
-        int intDivisiID FK
+        int intDivisiID
         int intUnitID FK
         int intPajakID FK
+        varchar txtUmbrella
+        varchar txtSupplier
+        numeric decBerat
+        numeric decPanjang
+        numeric decLebar
+        numeric decTinggi
         boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mPajak {
+        int intPajakID PK
+        uuid txtGuid UK
+        varchar txtKodePajak UK
+        varchar txtNamaPajak
+        varchar txtPartnerId
+        numeric decPersentase
+        varchar txtNilaiDpp
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mUnit {
+        int intUnitID PK
+        uuid txtGuid UK
+        varchar txtNama UK
+        varchar txtDeskripsi
+        varchar txtUomPajak
+        varchar txtPartnerId
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mBrand {
+        int IntId PK
+        uuid TxtGuidBrand
+        varchar BrandName
+        varchar BrandDesc
+        varchar BrandCodeOra
+        varchar BrandDescMasking
+        boolean IsReadyProduction
+        boolean BitActive
+        varchar TxtCreatedBy
+        varchar TxtUpdatedBy
+        timestamp DtmCreatedDate
+        timestamp DtmUpdatedDate
     }
     mPelanggan {
         int intPelangganID PK
         uuid txtGuid UK
         varchar txtKode UK
         varchar txtNama
+        varchar txtPartnerId
+        varchar txtAlamat
+        varchar txtTelepon
+        varchar txtPemilik
+        varchar txtNpwp
+        varchar txtRtRw
+        varchar txtKelurahan
+        varchar txtKecamatan
+        varchar txtKota
         int intChannelID FK
-        int intDaftarHargaID FK
+        int intDaftarHargaID
         int intSalesmanID FK
+        varchar txtGrupPelanggan
+        varchar txtOutletType
+        varchar txtWaktuPembayaran
+        timestamp dtKunjunganTerakhir
+        timestamp dtTransaksiTerakhir
         numeric decLat
         numeric decLng
+        boolean bitHasGps
+        varchar txtPhoto
         boolean bitActive
-    }
-    mPegawai {
-        int intPegawaiID PK
-        varchar txtKode UK
-        varchar txtNama
-        varchar txtRole
-        boolean bitActive
-    }
-    mStokis {
-        int intStokisID PK
-        varchar txtOutletId UK
-        varchar txtNama
-        numeric decLat
-        numeric decLng
-        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
     }
     mChannel {
         int intChannelID PK
+        uuid txtGuid UK
         varchar txtNama UK
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
     }
-    mPajak {
-        int intPajakID PK
-        varchar txtKodePajak UK
-        numeric decPersentase
+    mPegawai {
+        int intPegawaiID PK
+        uuid txtGuid UK
+        varchar txtKode UK
+        varchar txtNama
+        varchar txtRole
+        varchar txtTelepon
+        varchar txtBranch
+        varchar txtRegion
+        varchar txtKeterangan
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mPegawaiStatusHist {
+        int intHistID PK
+        int intPegawaiID FK
+        varchar txtKode
+        boolean bitActive
+        varchar txtSumber
+        varchar txtKeterangan
+        timestamp dtInserted
+        varchar txtInsertedBy
+    }
+    mStokis {
+        int intStokisID PK
+        uuid txtGuid UK
+        varchar txtOutletId UK
+        varchar txtNama
+        varchar txtAlamat
+        varchar txtKota
+        varchar txtBranch
+        varchar txtRegion
+        varchar txtTelepon
+        numeric decLat
+        numeric decLng
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mStokisStatusHist {
+        int intHistID PK
+        int intStokisID FK
+        varchar txtOutletId
+        boolean bitActive
+        varchar txtSumber
+        varchar txtKeterangan
+        timestamp dtInserted
+        varchar txtInsertedBy
+    }
+    mStokisStockHist {
+        int intHistID PK
+        int intStokisID FK
+        varchar txtOutletId
+        varchar txtKodeProduk
+        varchar txtNamaProduk
+        numeric decQty
+        varchar txtMotoris
+        timestamp dtInput
+        varchar txtKeterangan
+        timestamp dtInserted
+        varchar txtInsertedBy
     }
     mAlasan {
         int intAlasanID PK
+        uuid txtGuid UK
         varchar txtNama
+        varchar txtDeskripsi
         varchar txtTipe
-    }
-    mKategoriProduk {
-        int intKategoriID PK
-        varchar txtNama UK
-        int intParentKategoriID FK
-    }
-    mDivisi {
-        int intDivisiID PK
-        varchar txtNama UK
-    }
-    mUnit {
-        int intUnitID PK
-        varchar txtNama UK
-    }
-    mDaftarHarga {
-        int intDaftarHargaID PK
-        varchar txtNama UK
-        boolean bitIsDefault
-    }
-    mBrand {
-        int IntId PK
-        varchar BrandName
-        varchar BrandDesc
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
     }
 ```
 
-### 7.3 Daftar Relasi (FK)
+> `mAlasan` standalone (tanpa FK). `mBrand` reuse tabel existing MAVEN.
 
-| Tabel Anak | Kolom FK | Tabel Induk | Kardinalitas |
-|------------|----------|-------------|--------------|
-| `mProduk` | `intKategoriID` | `mKategoriProduk` | many-to-one |
-| `mProduk` | `intBrandID` | `mBrand` | many-to-one (reuse existing) |
-| `mProduk` | `intDivisiID` | `mDivisi` | many-to-one |
-| `mProduk` | `intUnitID` | `mUnit` | many-to-one |
-| `mProduk` | `intPajakID` | `mPajak` | many-to-one |
-| `mKategoriProduk` | `intParentKategoriID` | `mKategoriProduk` | self, many-to-one (nullable) |
-| `mPelanggan` | `intChannelID` | `mChannel` | many-to-one |
-| `mPelanggan` | `intDaftarHargaID` | `mDaftarHarga` | many-to-one |
-| `mPelanggan` | `intSalesmanID` | `mPegawai` | many-to-one |
+**Kolom cadangan v1 (belum ada FK di DDL):** `intKategoriID`, `intDivisiID`, `intDaftarHargaID` — nullable; tabel lookup belum digambar.
 
-> `mStokis` dan `mAlasan` berdiri sendiri (tanpa FK di level master). `totalPelanggan` (channel) dan `totalProduk` (brand) adalah agregasi COUNT, bukan kolom fisik.
+### 7.2 Daftar Relasi FK (selaras diagram 7.1)
 
-### 7.4 Catatan Desain Database
+| # | Table Turunan/Child Table | Kolom FK | Tabel Induk | Kardinalitas | Wajib terisi? |
+|---|---------------------------|----------|-------------|--------------|---------------|
+| 1 | `mProduk` | `intPajakID` | `mPajak` | many-to-one | Ya (hitung harga jual) |
+| 2 | `mProduk` | `intUnitID` | `mUnit` | many-to-one | Ya (default PCS) |
+| 3 | `mProduk` | `intBrandID` | `mBrand` | many-to-one | Ya (reuse MAVEN) |
+| 4 | `mPelanggan` | `intChannelID` | `mChannel` | many-to-one | Disarankan |
+| 5 | `mPelanggan` | `intSalesmanID` | `mPegawai` | many-to-one | Opsional |
+| 6 | `mPegawaiStatusHist` | `intPegawaiID` | `mPegawai` | many-to-one | Ya (audit CSV) |
+| 7 | `mStokisStatusHist` | `intStokisID` | `mStokis` | many-to-one | Ya (audit CSV) |
+| 8 | `mStokisStockHist` | `intStokisID` | `mStokis` | many-to-one | Ya (riwayat stok) |
+
+Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan** kolom tabel.
+
+### 7.3 Catatan Desain Database
 
 - **Status → boolean:** field `status` string prototipe dipetakan ke `bitActive`.
 - **ID prototype → PK + GUID:** `id` integer menjadi `intXxxID` serial + `txtGuid` uuid.
@@ -265,11 +377,13 @@ erDiagram
 - **Reuse `mBrand`:** tabel brand sudah ada di MAVEN — jangan buat duplikat.
 - **Blok audit wajib:** `bitActive`, `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive`.
 
-### 7.5 Query Pembuatan Tabel (DDL PostgreSQL)
+### 7.4 Query Pembuatan Tabel (DDL PostgreSQL)
 
-Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.5.1) dulu, lalu master inti (7.5.2). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
+Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu master inti (7.4.2). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
 
-#### 7.5.1 Tabel Lookup
+> Implementasi MAVEN juga menyediakan file terpisah: `MAVEN.DAL/Scripts/001_mUnit_mPajak_mProduk.sql` dan `002_mChannel_mAlasan_mPegawai_mPelanggan_mStokis.sql` (termasuk tabel riwayat).
+
+#### 7.4.1 Tabel Lookup
 
 ```sql
 -- Kategori Produk (self-reference)
@@ -405,7 +519,7 @@ CREATE TABLE "mPegawai" (
 );
 ```
 
-#### 7.5.2 Tabel Master Inti
+#### 7.4.2 Tabel Master Inti
 
 ```sql
 -- Produk (FK: kategori, brand, divisi, unit, pajak)
@@ -507,59 +621,4 @@ CREATE TABLE "mStokis" (
 > `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join.
 
 ---
-'''
-
-
-def appendix_maven_extra() -> str:
-    return '''
-### 8.2 Status Prototipe vs Produksi
-
-| Aspek | Prototipe Saat Ini | Produksi Target (MAVEN) |
-|-------|-------------------|-------------------------|
-| Persistensi | localStorage + JSON seed (`wwwroot/data/`) | PostgreSQL via `CentralContext` |
-| Arsitektur | HTML statis + inline JS | ASP.NET Core 8 MVC (4 layer) |
-| Autentikasi | Tidak ada login web admin | SSO / JWT |
-| RBAC | Simulasi client-side | Server-side enforcement |
-| Relasi data | String nama (channel, brand, dll.) | FK `intXxxID` + integritas referensial |
-| Status | String `"active"` / `"Active"` | Boolean `bitActive` |
-| Brand | Seed `brand.json` | Reuse tabel `mBrand` MAVEN existing |
-| Audit trail | Tidak ada | `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive` |
-| Tooltip UI | `title="Tabel: mXxx | Kolom: txtYyy"` | Acuan validasi mapping saat UAT |
-
-### 8.3 Build Dokumen
-
-```powershell
-cd wwwroot/document/FSD/FalconWebPortal
-py scripts/capture_masterdata_full.py    # screenshot halaman (opsional)
-py scripts/assemble_fsd_masterdata.py    # regenerate markdown
-py scripts/build_masterdata_fsd.py       # render DOCX ke Document/
-```
-
-### 8.4 Tooltip UI → Database Mapping
-
-Setiap label form dan header kolom tabel di halaman Master Data prototipe memiliki atribut HTML `title` native (bukan Bootstrap tooltip) dengan format:
-
-```
-Tabel: mXxx | Kolom: txtYyy
-```
-
-| Modul | File | Contoh Tooltip |
-|-------|------|----------------|
-| Produk | `Produk/index.html`, `detail.html` | `Tabel: mProduk | Kolom: txtKode` |
-| Pelanggan | `Pelanggan/index.html`, `detail.html` | `Tabel: mPelanggan | Kolom: txtNama` |
-| Pegawai | `Pegawai/index.html`, `detail.html` | `Tabel: mPegawai | Kolom: txtKode` |
-| Stokis | `Stokis/index.html`, `detail.html` | `Tabel: mStokis | Kolom: txtOutletId` |
-| Channel | `Channel/index.html` | `Tabel: mChannel | Kolom: txtNama` |
-| Pajak | `Pajak/index.html` | `Tabel: mPajak | Kolom: txtKodePajak` |
-| Alasan | `Alasan/index.html` | `Tabel: mAlasan | Kolom: txtNama` |
-
-Tooltip ini memudahkan tim bisnis dan developer memverifikasi kesesuaian UI prototipe dengan skema database MAVEN saat walkthrough UAT.
-
-### 8.5 Dokumen Terkait
-
-| Dokumen | Lokasi | Keterangan |
-|---------|--------|------------|
-| ERD MAVEN detail | `docs/web/erd_master_data_maven.md` | Spesifikasi kolom lengkap + DDL |
-| Modul Stokis | `docs/web/master_stokis.md` | Aturan CSV upload |
-| Build FSD | `docs/web/pages/tools_generate_fsd.md` | Instruksi pipeline DOCX |
 '''

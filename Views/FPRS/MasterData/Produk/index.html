@@ -76,7 +76,7 @@
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
-                        <tr><th style="width:50px;">NO</th><th title="Tabel: mProduk | Kolom: txtKode">KODE</th><th title="Tabel: mProduk | Kolom: txtNama">PRODUK</th><th title="Tabel: mProduk | Kolom: txtUmbrella">UMBRELLA BRAND</th><th title="Tabel: mProduk | Kolom: intBrandID (FK mBrand.BrandName)">BRAND</th><th title="Tabel: mProduk | Kolom: intUnitID (FK mUnit.txtNama)">UNIT</th><th style="text-align:right;" title="Tabel: mProduk | Kolom: decHargaJual">HARGA JUAL</th><th title="Tabel: mProduk | Kolom: intPajakID (FK mPajak.txtNamaPajak)">PAJAK</th><th style="width:80px;" title="Tabel: mProduk | Kolom: bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
+                        <tr><th style="width:50px;">NO</th><th title="Source : mProduk | txtKode">KODE</th><th title="Source : mProduk | txtNama">PRODUK</th><th title="Source : mProduk | txtUmbrella">UMBRELLA BRAND</th><th title="Source : mProduk | intBrandID (FK mBrand.BrandName)">BRAND</th><th title="Source : mProduk | intUnitID (FK mUnit.txtNama)">UNIT</th><th style="text-align:right;" title="Source : mProduk | decHargaJual">HARGA JUAL</th><th title="Source : mProduk | intPajakID (FK mPajak.txtNamaPajak)">PAJAK</th><th style="width:80px;" title="Source : mProduk | bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
                         <tr class="filter-row">
                             <th></th>
                             <th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
@@ -98,7 +98,7 @@
 
 const KEY='md_produk';
 const SEED_VER_KEY='md_produk_seed_ver';
-const SEED_VER='umbrella-jul2026-b';
+const SEED_VER='umbrella7-jul2026';
 const fmt=v=>new Intl.NumberFormat('id-ID').format(v);
 function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
@@ -129,7 +129,7 @@ function render(){
         $('#tblBody').append(`<tr>
             <td>${i+1}</td>
             <td><code>${item.kode}</code></td>
-            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a>${item.divisi?'<br><small class="text-muted">'+item.divisi+'</small>':''}</td>
+            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a></td>
             <td>${item.umbrella||'-'}</td>
             <td>${item.brand||'-'}</td>
             <td><small>${item.unitNama||'-'}</small></td>

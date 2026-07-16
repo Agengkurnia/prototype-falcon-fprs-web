@@ -22,7 +22,8 @@
       "storageKey": "md_produk",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_02_master_produk_index.png"
+        "ss_02_master_produk_index.png",
+        "ss_03_master_produk_detail.png"
       ],
       "sections": {
         "overview": {
@@ -172,7 +173,8 @@
       "storageKey": "md_pegawai",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_19_master_pegawai_index.png"
+        "ss_19_master_pegawai_index.png",
+        "ss_20_master_pegawai_detail.png"
       ],
       "sections": {
         "overview": {
@@ -208,7 +210,8 @@
       "storageKey": "md_pelanggan",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_15_master_pelanggan_index.png"
+        "ss_15_master_pelanggan_index.png",
+        "ss_16_master_pelanggan_detail.png"
       ],
       "sections": {
         "overview": {
@@ -243,7 +246,8 @@
       "storageKey": "md_stokis",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_45_master_stokis_index.png"
+        "ss_45_master_stokis_index.png",
+        "ss_46_master_stokis_detail.png"
       ],
       "sections": {
         "overview": {
@@ -360,41 +364,6 @@
           "default": true
         },
         "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "screenshots": {
-          "default": true
-        },
-        "businessRules": {
-          "default": true,
-          "source": "ai"
-        }
-      }
-    },
-    {
-      "id": "canvassing",
-      "label": "Canvassing",
-      "group": "operational",
-      "enabled": true,
-      "type": "page",
-      "htmlPath": "Views/FPRS/Canvassing/index.html",
-      "formPath": "Views/FPRS/Canvassing/add.html",
-      "apiEndpoint": null,
-      "storageKey": "canvassing",
-      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
-      "screenshots": [
-        "ss_41_canvassing_index.png"
-      ],
-      "sections": {
-        "overview": {
-          "default": true
-        },
-        "columns": {
-          "default": true,
-          "source": "html"
-        },
-        "fields": {
           "default": true,
           "source": "html"
         },

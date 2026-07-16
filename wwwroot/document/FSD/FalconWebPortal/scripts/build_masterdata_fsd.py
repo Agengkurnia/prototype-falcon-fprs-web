@@ -54,11 +54,20 @@ def build() -> str:
             },
             mermaid_handlers=[
                 MermaidHandler(
-                    lambda c: 'erDiagram' in c and 'M_Channel' in c,
+                    lambda c: 'subgraph L1' in c and 'Admin Master Data' in c,
+                    os.path.join(SCREENSHOTS_DIR, 'ss_md_swimlane.png'),
+                    'Swimlane', 'Business Flow',
+                ),
+                MermaidHandler(
+                    lambda c: 'erDiagram' in c and 'mChannel' in c,
                     os.path.join(SCREENSHOTS_DIR, 'ss_md_erd.png'),
                     'ERD', 'ERD – Modul Data Master',
                 ),
             ],
+            default_image_width_cm=17.0,
+            swimlane_image_width_cm=17.0,
+            erd_image_width_cm=17.0,
+            erd_png_min_width=2800,
             deliverable=DeliverableConfig(
                 project_log_name=PROJECT_LOG_NAME,
                 deliverable_code=DELIVERABLE_CODE,

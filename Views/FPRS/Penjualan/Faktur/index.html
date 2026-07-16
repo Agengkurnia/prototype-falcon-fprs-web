@@ -11,6 +11,12 @@
 
 /* ---- FAKTUR-SPECIFIC OVERRIDES ---- */
 
+@media (min-width: 993px) {
+    .summary-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 /* KPI Card: Paid */
 .summary-card.paid .summary-card-icon {
     background-color: rgba(40, 199, 111, 0.12);
@@ -252,9 +258,6 @@
                 <button class="btn btn-outline-secondary btn-sm" id="btnEkspor" title="Ekspor ke Excel">
                     <i class="fa fa-file-export me-1"></i> Ekspor
                 </button>
-                <a href="add.html" class="btn btn-success" id="btnTambahFaktur">
-                    <i class="fa fa-plus me-1"></i> Tambah Faktur Penjualan
-                </a>
             </div>
         </div>
 
@@ -273,13 +276,6 @@
                 <div class="stat-title">Paid</div>
                 <div class="stat-value" id="valPaid">0</div>
                 <div class="stat-desc">Sudah lunas</div>
-            </div>
-            <!-- Unpaid -->
-            <div class="summary-card unpaid" data-filter="Unpaid" title="Filter: Belum Dibayar" id="cardUnpaid">
-                <div class="summary-card-icon"><i class="fa fa-exclamation-circle"></i></div>
-                <div class="stat-title">Unpaid</div>
-                <div class="stat-value" id="valUnpaid">0</div>
-                <div class="stat-desc">Belum terbayar</div>
             </div>
             <!-- Total Nilai -->
             <div class="summary-card nilai" title="Total nilai tagihan" id="cardNilai">
@@ -470,12 +466,10 @@
         function updateSummaryCards(data) {
             const total = data.length;
             const paid = data.filter(d => d.status === 'Paid').length;
-            const unpaid = data.filter(d => d.status === 'Unpaid').length;
             const totalNilai = data.reduce((a, d) => a + (d.jumlahTagihan || 0), 0);
 
             document.getElementById('valTotal').textContent = total;
             document.getElementById('valPaid').textContent = paid;
-            document.getElementById('valUnpaid').textContent = unpaid;
             document.getElementById('valNilai').textContent = fmtShort(totalNilai);
         }
 
@@ -497,7 +491,6 @@
                 const act = `
                     <div class="row-actions" style="justify-content:center;">
                         <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Lihat Detail"><i class="fa fa-eye"></i></a>
-                        ${item.status === 'Draft' ? `<a href="add.html?id=${item.id}" class="btn-action btn-action-edit" title="Edit"><i class="fa fa-pen"></i></a>` : ''}
                         <button class="btn-action" style="color:#adb5bd;" title="Cetak Faktur" onclick="cetakFaktur('${item.id}')"><i class="fa fa-print"></i></button>
                     </div>`;
 

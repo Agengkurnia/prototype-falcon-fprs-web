@@ -51,16 +51,16 @@ SCREENSHOT_ALIASES = {}  # legacy names migrated to ss_NN in registry
 
 SS_BY_MODULE = {
     'dashboard': ['ss_01_dashboard.png'],
-    'master-produk': ['ss_02_master_produk_index.png'],
+    'master-produk': ['ss_02_master_produk_index.png', 'ss_03_master_produk_detail.png'],
     'master-unit': ['ss_05_master_unit_index.png', 'ss_06_master_unit_modal.png'],
     'master-divisi': ['ss_07_master_divisi_index.png', 'ss_08_master_divisi_modal.png'],
     'master-daftar-harga': ['ss_09_master_daftar_harga_index.png', 'ss_10_master_daftar_harga_modal.png'],
     'master-kategori-produk': ['ss_11_master_kategori_index.png', 'ss_12_master_kategori_modal.png'],
     'master-brand': ['ss_13_master_brand_index.png', 'ss_14_master_brand_modal.png'],
-    'master-pelanggan': ['ss_15_master_pelanggan_index.png'],
+    'master-pelanggan': ['ss_15_master_pelanggan_index.png', 'ss_16_master_pelanggan_detail.png'],
     'master-grup-pelanggan': ['ss_17_master_grup_pelanggan_index.png', 'ss_18_master_grup_modal.png'],
     'master-channel': ['ss_47_master_channel_index.png', 'ss_48_master_channel_modal.png'],
-    'master-pegawai': ['ss_19_master_pegawai_index.png'],
+    'master-pegawai': ['ss_19_master_pegawai_index.png', 'ss_20_master_pegawai_detail.png'],
     'master-akun': ['ss_21_master_akun_index.png', 'ss_22_master_akun_modal_tambah.png', 'ss_23_master_akun_modal_edit.png'],
     'master-posisi': ['ss_24_master_posisi_index.png', 'ss_25_master_posisi_modal.png'],
     'master-konfigurasi-akses': ['ss_26_master_konfig_akses_index.png', 'ss_27_master_konfig_modal.png'],
@@ -69,7 +69,7 @@ SS_BY_MODULE = {
     'master-pajak': ['ss_32_master_pajak_index.png', 'ss_33_master_pajak_modal.png'],
     'master-alasan': ['ss_34_master_alasan_index.png', 'ss_35_master_alasan_modal.png'],
     'master-supplier': ['ss_36_master_supplier_index.png', 'ss_37_master_supplier_add.png'],
-    'master-stokis': ['ss_45_master_stokis_index.png'],
+    'master-stokis': ['ss_45_master_stokis_index.png', 'ss_46_master_stokis_detail.png'],
     'penjualan-faktur': ['ss_38_faktur_index.png', 'ss_39_faktur_add.png'],
     'penjualan-stok-motoris': ['ss_40_stok_motoris_index.png'],
     'canvassing': ['ss_41_canvassing_index.png'],
@@ -80,10 +80,10 @@ SS_BY_MODULE = {
 
 # Max page screenshots embedded per module (avoids duplicate-looking add/edit pairs)
 SCREENSHOT_EMBED_LIMIT = {
-    'master-produk': 1,
-    'master-pelanggan': 1,
-    'master-pegawai': 1,
-    'master-stokis': 1,
+    'master-produk': 2,
+    'master-pelanggan': 2,
+    'master-pegawai': 2,
+    'master-stokis': 2,
     'master-channel': 2,
     'master-pajak': 2,
     'master-alasan': 2,
@@ -375,22 +375,93 @@ def field_type(tag: str, classes: str, inp_type: str) -> str:
     return 'Text'
 
 
-def extract_columns(html: str) -> list[str]:
+SOURCE_TITLE_RE = re.compile(
+    r'title\s*=\s*["\']Source\s*:\s*([^|"\']+?)\s*\|\s*([^"\']+)["\']',
+    re.I,
+)
+
+
+def source_keterangan(attrs_or_html: str) -> str:
+    """Parse `title="Source : mTable | column"` → `` `mTable` | `column` `` (pipe escaped for MD tables)."""
+    if not attrs_or_html:
+        return ''
+    m = SOURCE_TITLE_RE.search(attrs_or_html)
+    if not m:
+        return ''
+    table, col = m.group(1).strip(), m.group(2).strip()
+    # Escape | so markdown table cells do not split
+    return f'`{table}` \\| `{col}`'
+
+
+def extract_columns(html: str) -> list[dict]:
+    """Return list of {label, keterangan} from thead (skip AKSI)."""
     m = re.search(r'<thead>.*?<tr>(.*?)</tr>', html, re.DOTALL | re.I)
     if not m:
         return []
     cols = []
-    for t in re.findall(r'<th[^>]*>(.*?)</th>', m.group(1), re.DOTALL | re.I):
-        label = strip_tags(t)
-        if label and label.upper() != 'AKSI':
-            cols.append(label)
+    for attrs, inner in re.findall(r'<th([^>]*)>(.*?)</th>', m.group(1), re.DOTALL | re.I):
+        label = strip_tags(inner)
+        if not label or label.upper() == 'AKSI':
+            continue
+        cols.append({
+            'label': label,
+            'keterangan': source_keterangan(attrs) or 'Kolom grid dashboard list',
+        })
     return cols
+
+
+def extract_field_error_map(html: str) -> dict[str, list[str]]:
+    """Map field id → validation messages from showFieldError(...) in page JS."""
+    by_id: dict[str, list[str]] = {}
+    patterns = [
+        r"showFieldError\(\s*['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]",
+        r"showFieldError\(\s*['\"]([^'\"]+)['\"]\s*,\s*`([^`]+)`",
+    ]
+    for pat in patterns:
+        for m in re.finditer(pat, html):
+            fid, msg = m.group(1), m.group(2).strip()
+            if not msg or msg.lower() in SKIP_VALIDATION_MSGS:
+                continue
+            by_id.setdefault(fid, [])
+            if msg not in by_id[fid]:
+                by_id[fid].append(msg)
+    return by_id
+
+
+def build_validation(
+    chunk: str,
+    tag: str,
+    elem_id: str,
+    error_map: dict[str, list[str]] | None = None,
+) -> str:
+    parts: list[str] = []
+    if '<span class="required-mark">' in chunk or re.search(r'\brequired\b', tag, re.I):
+        parts.append('Wajib')
+    ml = re.search(r'\bmaxlength=["\'](\d+)["\']', tag, re.I)
+    if ml:
+        parts.append(f'maks. {ml.group(1)} karakter')
+    mn = re.search(r'\bmin=["\']([^"\']+)["\']', tag, re.I)
+    if mn:
+        parts.append(f'min={mn.group(1)}')
+    mx = re.search(r'\bmax=["\']([^"\']+)["\']', tag, re.I)
+    if mx and not re.search(r'\bmaxlength=', tag, re.I):
+        parts.append(f'max={mx.group(1)}')
+    if re.search(r'\breadonly\b', tag, re.I) or re.search(r'\bdisabled\b', tag, re.I):
+        parts.append('readonly')
+    msgs = (error_map or {}).get(elem_id) or []
+    for msg in msgs:
+        # shorten template literals like Kode "${kode}" already...
+        short = re.sub(r'\$\{[^}]+\}', '{nilai}', msg)
+        if short not in parts:
+            parts.append(short)
+    return '; '.join(parts) if parts else '—'
 
 
 def extract_fields(html: str) -> list[dict]:
     """Label + nearest input/select id within col blocks or modal body."""
     fields = []
     seen = set()
+    error_map = extract_field_error_map(html)
 
     modal_m = re.search(
         r'<div[^>]*class="[^"]*modal-body[^"]*"[^>]*>(.*?)</div>\s*<div[^>]*class="[^"]*modal-footer',
@@ -403,40 +474,71 @@ def extract_fields(html: str) -> list[dict]:
         search_html, re.DOTALL | re.I,
     ):
         chunk = block.group(1)
-        lm = re.search(r'<label[^>]*class="[^"]*form-label[^"]*"[^>]*>(.*?)</label>', chunk, re.I)
-        if not lm:
+        lm = re.search(
+            r'<label([^>]*)>(.*?)</label>',
+            chunk, re.I | re.DOTALL,
+        )
+        if not lm or 'form-label' not in lm.group(1):
+            # also accept label with form-label in the opening tag regardless of attr order
+            lm2 = re.search(
+                r'<label[^>]*class="[^"]*form-label[^"]*"[^>]*>(.*?)</label>',
+                chunk, re.I | re.DOTALL,
+            )
+            if not lm2:
+                continue
+            # re-match with attrs
+            lm = re.search(
+                r'<label([^>]*)>(.*?)</label>',
+                chunk[chunk.lower().find('<label'):],
+                re.I | re.DOTALL,
+            )
+            if not lm:
+                continue
+        label_attrs, label_inner = lm.group(1), lm.group(2)
+        if 'form-label' not in label_attrs:
             continue
-        label = strip_tags(lm.group(1))
+        label = strip_tags(label_inner)
         im = re.search(
-            r'<(input|select|textarea)[^>]*>',
+            r'<(input|select|textarea)([^>]*)>',
             chunk, re.I,
         )
         if not im:
             fields.append({
                 'label': label, 'id': '—', 'type': '—',
-                'mandatory': '—', 'default': '—', 'validation': '—', 'note': 'TBD — verifikasi HTML',
+                'mandatory': '—', 'default': '—', 'validation': '—',
+                'note': source_keterangan(label_attrs) or 'TBD — verifikasi HTML',
             })
             continue
         tag = im.group(0)
+        tag_attrs = im.group(2)
         fid = re.search(r'\bid=["\']([^"\']+)["\']', tag, re.I)
         ftype = re.search(r'\btype=["\']([^"\']+)["\']', tag, re.I)
         elem_id = fid.group(1) if fid else '—'
         if elem_id in ('editId',) or label in seen:
             continue
         seen.add(label)
-        mandatory = 'Ya' if '<span class="required-mark">' in chunk or 'required' in tag else 'Tidak'
+        mandatory = (
+            'Ya'
+            if '<span class="required-mark">' in chunk or re.search(r'\brequired\b', tag, re.I)
+            else 'Tidak'
+        )
         default_m = re.search(r'\bvalue=["\']([^"\']*)["\']', tag)
         default = default_m.group(1) if default_m and default_m.group(1) else '(kosong)'
         inp_type = ftype.group(1) if ftype else 'text'
         tag_name = re.match(r'<(\w+)', tag, re.I).group(1).lower()
+        note = (
+            source_keterangan(label_attrs)
+            or source_keterangan(tag_attrs)
+            or '—'
+        )
         fields.append({
             'label': label,
             'id': f'`{elem_id}`' if elem_id != '—' else '—',
             'type': field_type(tag_name, tag, inp_type),
             'mandatory': mandatory,
             'default': default,
-            'validation': '—',
-            'note': '—',
+            'validation': build_validation(chunk, tag, elem_id, error_map),
+            'note': note,
         })
     return fields
 
@@ -452,25 +554,27 @@ def extract_modal_fields(html: str) -> list[dict]:
     body = modal_m.group(1)
     fields: list[dict] = []
     seen: set[str] = set()
+    error_map = extract_field_error_map(html)
 
-    for lm in re.finditer(
-        r'<label[^>]*class="[^"]*form-label[^"]*"[^>]*(?:for=["\']([^"\']+)["\'])?[^>]*>(.*?)</label>',
-        body, re.DOTALL | re.I,
-    ):
+    for lm in re.finditer(r'<label([^>]*)>(.*?)</label>', body, re.DOTALL | re.I):
+        label_attrs = lm.group(1)
+        if 'form-label' not in label_attrs:
+            continue
         label = strip_tags(lm.group(2))
         if not label or label in seen or label.lower() == 'active':
             continue
-        for_id = lm.group(1)
+        for_m = re.search(r'\bfor=["\']([^"\']+)["\']', label_attrs, re.I)
+        for_id = for_m.group(1) if for_m else None
         chunk = body[lm.start():lm.start() + 800]
-        im = re.search(r'<(input|select|textarea)[^>]*>', chunk, re.I)
+        im = re.search(r'<(input|select|textarea)([^>]*)>', chunk, re.I)
         if not im and for_id:
             im = re.search(
-                rf'<(?:input|select|textarea)[^>]*\bid=["\']{re.escape(for_id)}["\']',
+                rf'<(input|select|textarea)([^>]*\bid=["\']{re.escape(for_id)}["\'][^>]*)>',
                 body, re.I,
             )
         if not im:
             continue
-        tag = im.group(0)
+        tag, tag_attrs = im.group(0), im.group(2)
         fid = re.search(r'\bid=["\']([^"\']+)["\']', tag, re.I)
         elem_id = fid.group(1) if fid else (for_id or '—')
         if elem_id in ('editId',):
@@ -479,15 +583,20 @@ def extract_modal_fields(html: str) -> list[dict]:
         ftype = re.search(r'\btype=["\']([^"\']+)["\']', tag, re.I)
         inp_type = ftype.group(1) if ftype else 'text'
         tag_name = re.match(r'<(\w+)', tag, re.I).group(1).lower()
-        mandatory = 'Ya' if '<span class="required-mark">' in chunk or 'required' in tag else 'Tidak'
+        mandatory = (
+            'Ya'
+            if '<span class="required-mark">' in chunk or re.search(r'\brequired\b', tag, re.I)
+            else 'Tidak'
+        )
+        note = source_keterangan(label_attrs) or source_keterangan(tag_attrs) or '—'
         fields.append({
             'label': label,
             'id': f'`{elem_id}`',
             'type': field_type(tag_name, tag, inp_type),
             'mandatory': mandatory,
             'default': '(kosong)',
-            'validation': '—',
-            'note': '—',
+            'validation': build_validation(chunk, tag, elem_id, error_map),
+            'note': note,
         })
 
     if 'custSection' in body:
@@ -846,8 +955,10 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
         lines.append('| Kolom | Field Key | Render | Sortable | Keterangan |')
         lines.append('|-------|-----------|--------|----------|------------|')
         for c in cols:
-            key = re.sub(r'[^A-Za-z0-9]', '', c.title())
-            lines.append(f'| {c} | `{key}` | Text | Ya | Kolom grid dashboard list |')
+            label = c['label'] if isinstance(c, dict) else c
+            ket = c.get('keterangan', 'Kolom grid dashboard list') if isinstance(c, dict) else 'Kolom grid dashboard list'
+            key = re.sub(r'[^A-Za-z0-9]', '', label.title())
+            lines.append(f'| {label} | `{key}` | Text | Ya | {ket} |')
         lines.append('')
 
     dash_buttons = filter_buttons_by_context(all_buttons, 'dashboard')
