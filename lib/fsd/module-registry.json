@@ -96,7 +96,7 @@
       "enabled": true,
       "type": "modal",
       "htmlPath": "Views/FPRS/MasterData/Channel/index.html",
-      "apiEndpoint": null,
+      "apiEndpoint": "/api/v1/Channel",
       "storageKey": "md_channel",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
@@ -130,14 +130,14 @@
       "label": "Master Data — Pajak",
       "group": "masterData",
       "enabled": true,
-      "type": "modal",
+      "type": "page",
       "htmlPath": "Views/FPRS/MasterData/Pajak/index.html",
-      "apiEndpoint": "/api/v1/Tax",
+      "apiEndpoint": null,
+      "note": "View-only; data sourced from Oracle",
       "storageKey": "md_pajak",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
-        "ss_32_master_pajak_index.png",
-        "ss_33_master_pajak_modal.png"
+        "ss_32_master_pajak_index.png"
       ],
       "sections": {
         "overview": {
@@ -148,12 +148,10 @@
           "source": "html"
         },
         "fields": {
-          "default": true,
-          "source": "html"
+          "default": false
         },
         "validation": {
-          "default": true,
-          "source": "html"
+          "default": false
         },
         "businessRules": {
           "default": true,

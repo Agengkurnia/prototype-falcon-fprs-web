@@ -14,27 +14,14 @@
 
             <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
                 <div><h2 class="title-page mb-1">Pajak</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Pajak</li></ol></nav></div>
-                <button class="btn btn-success" onclick="openModal()"><i class="fa fa-plus me-1"></i> Tambah Pajak</button>
+                <span class="badge bg-label-info align-self-center"><i class="fa fa-database me-1"></i> Data pajak dari Oracle (view-only)</span>
             </div>
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
-                    <thead><tr><th style="width:50px;">NO</th><th title="Source : mPajak | txtKodePajak">KODE PAJAK</th><th title="Source : mPajak | txtNamaPajak">NAMA PAJAK</th><th title="Source : mPajak | decPersentase">PERSENTASE (%)</th><th title="Source : mPajak | txtNilaiDpp">NILAI DPP</th><th style="width:100px;text-align:center;">AKSI</th></tr></thead>
+                    <thead><tr><th style="width:50px;">NO</th><th title="Source : mPajak | txtKodePajak">KODE PAJAK</th><th title="Source : mPajak | txtNamaPajak">NAMA PAJAK</th><th title="Source : mPajak | decPersentase">PERSENTASE (%)</th><th title="Source : mPajak | txtNilaiDpp">NILAI DPP</th></tr></thead>
                     <tbody id="tblBody"></tbody>
                 </table>
             </div></div></div>
-<div class="modal fade" id="modalForm" tabindex="-1">
-    <div class="modal-dialog"><div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Pajak</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body">
-            <input type="hidden" id="editId" />
-            <div class="mb-3"><label class="form-label" title="Source : mPajak | txtKodePajak">Kode Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputKode" placeholder="Contoh: PPN" maxlength="20" title="Source : mPajak | txtKodePajak" /></div>
-            <div class="mb-3"><label class="form-label" title="Source : mPajak | txtNamaPajak">Nama Pajak <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama pajak..." maxlength="95" title="Source : mPajak | txtNamaPajak" /></div>
-            <div class="mb-3"><label class="form-label" title="Source : mPajak | decPersentase">Persentase (%) <span class="required-mark">*</span></label><input type="number" class="form-control" id="inputPersen" placeholder="0" min="0" max="100" step="0.01" title="Source : mPajak | decPersentase" /></div>
-            <div class="mb-3"><label class="form-label" title="Source : mPajak | txtNilaiDpp">Nilai DPP</label><input type="text" class="form-control" id="inputDpp" placeholder="Nilai DPP (opsional)" title="Source : mPajak | txtNilaiDpp" /></div>
-        </div>
-        <div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
-    </div></div>
-</div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
     <script>
@@ -47,32 +34,10 @@ function loadData(){if(!localStorage.getItem(KEY)){fetch('../../../../wwwroot/da
 function render(){
     if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
     $('#tblBody').empty();
-    getData().forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.kodePajak}</strong></td><td>${item.namaPajak}</td><td>${item.persentase}%</td><td>${item.nilaiDpp||'-'}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button><button class="btn-action btn-action-delete" onclick="del('${item.id}','${item.namaPajak}')" title="Hapus"><i class="fa fa-trash"></i></button></div></td></tr>`);});
-    $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[5]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
+    getData().forEach((item,i)=>{$('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.kodePajak}</strong></td><td>${item.namaPajak}</td><td>${item.persentase}%</td><td>${item.nilaiDpp||'-'}</td></tr>`);});
+    $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
 }
-function openModal(item=null){
-    document.getElementById('editId').value=item?item.id:'';
-    document.getElementById('inputKode').value=item?item.kodePajak:'';
-    document.getElementById('inputNama').value=item?item.namaPajak:'';
-    document.getElementById('inputPersen').value=item?item.persentase:0;
-    document.getElementById('inputDpp').value=item?item.nilaiDpp:'';
-    document.getElementById('modalTitle').textContent=item?'Ubah Pajak':'Tambah Pajak';
-    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
-}
-function editItem(id){const item=getData().find(d=>String(d.id)===String(id));if(item)openModal(item);}
-function saveItem(){
-    const kode=document.getElementById('inputKode').value.trim();
-    const nama=document.getElementById('inputNama').value.trim();
-    if(!kode||!nama){Swal.fire('Peringatan','Kode dan Nama pajak wajib diisi.','warning');return;}
-    const data=getData();const id=document.getElementById('editId').value;
-    const obj={id:id?(isNaN(id)?id:parseInt(id)):Date.now(),kodePajak:kode,namaPajak:nama,persentase:parseFloat(document.getElementById('inputPersen').value)||0,nilaiDpp:document.getElementById('inputDpp').value.trim(),partnerId:''};
-    if(id){const idx=data.findIndex(d=>String(d.id)===String(id));if(idx>-1)data[idx]=obj;}else{data.push(obj);}
-    saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();
-    Swal.fire({icon:'success',title:'Berhasil!',text:`Pajak "${nama}" telah disimpan.`,timer:1500,showConfirmButton:false});
-}
-function del(id,nama){Swal.fire({title:`Hapus Pajak "${nama}"?`,icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#6c757d',confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal'}).then(r=>{if(r.isConfirmed){saveData(getData().filter(d=>String(d.id)!==String(id)));render();Swal.fire({icon:'success',title:'Dihapus!',timer:1200,showConfirmButton:false});}});}
 $(document).ready(loadData);
-window.openModal = openModal; window.del = del; window.editItem = editItem; window.saveItem = saveItem;
         });
     </script>
 </body>

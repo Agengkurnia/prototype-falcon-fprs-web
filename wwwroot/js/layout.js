@@ -274,7 +274,7 @@ class Layout {
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Master Pelanggan">Master Pelanggan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                             <!-- Master Pegawai (child tunggal, dinaikkan) -->

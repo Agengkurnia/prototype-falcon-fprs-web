@@ -43,7 +43,8 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/libs/sweetalert2/sweetalert2.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-bs5/datatables.bootstrap5.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css',
-            'wwwroot/css/styles-vuexy.css'
+            'wwwroot/css/styles-vuexy.css',
+            'wwwroot/css/prototype-chat.css'
         ];
 
         // Contextual loading of module CSS stylesheets
@@ -273,7 +274,7 @@ class Layout {
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Master Pelanggan">Master Pelanggan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
                                 </ul>
                             </li>
                             <!-- Master Pegawai (child tunggal, dinaikkan) -->
@@ -287,6 +288,7 @@ class Layout {
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Stokis/index.html" class="menu-link"><div data-i18n="Stokis">Stokis / Grosir</div></a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -302,6 +304,11 @@ class Layout {
                             <li class="menu-item">
                                 <a href="${this.basePath}Views/FPRS/Penjualan/Faktur/index.html" class="menu-link">
                                     <div data-i18n="Faktur">Faktur</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="${this.basePath}Views/FPRS/Penjualan/StokMotoris/index.html" class="menu-link">
+                                    <div data-i18n="Stok Motoris">Stok Motoris</div>
                                 </a>
                             </li>
                         </ul>
@@ -454,7 +461,12 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/js/extensions/i18nextBrowserLanguageDetector.min.js',
             'wwwroot/lib/vuexy/vendor/js/extensions/jquery-i18next.min.js',
             'wwwroot/lib/vuexy/vendor/js/unison-js/unison-js.min.js',
-            'wwwroot/js/role-manager.js'
+            'wwwroot/js/vendor/crypto-js.js',
+            'wwwroot/js/cls-rijndael.browser.js',
+            'wwwroot/js/master-data-param.js',
+            'wwwroot/js/master-source-tooltip.js',
+            'wwwroot/js/role-manager.js',
+            'wwwroot/js/prototype-chat.js'
         ];
 
         for (const src of scripts) {

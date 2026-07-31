@@ -4,7 +4,7 @@
 `Views/FPRS/MasterData/Channel/index.html`
 
 ## Fungsi
-Master **Channel** (sebelumnya "Grup Pelanggan"). Modal CRUD sederhana; kolom list: No, Nama Channel, Total Pelanggan, Aksi.
+Master **Channel** (sebelumnya "Grup Pelanggan") — bersumber **Master Data API** (badge di sidebar). Modal CRUD sederhana; kolom list: No, Nama Channel, Total Pelanggan, Aksi.
 
 - **Total Pelanggan** dihitung dari **Master Pelanggan** (`md_pelanggan`) berdasarkan field `channel` (relasi **1 pelanggan → 1 channel**, **1 channel → banyak pelanggan**).
 - **Modal edit**: di bawah input Nama Channel terdapat **daftar pelanggan pada channel tsb dengan pagination** (5/hal), datanya diambil dari Master Pelanggan. Section ini hanya tampil saat mode Ubah.
