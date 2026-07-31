@@ -121,6 +121,8 @@ Modul **Canvassing** dan **Kunjungan** menggunakan kartu interaktif, filter, Swe
 | [pages/README.md](pages/README.md) | **Indeks dokumentasi per halaman / modul** |
 | [pages/tools_generate_fsd.md](pages/tools_generate_fsd.md) | **FSD modul Data Master (WEB)** — skrip, capture full-page, deliverable `Document/` |
 | [FSD_Falcon_Web_Portal.md](FSD_Falcon_Web_Portal.md) | *(Legacy)* FSD full-portal auto-generate lama — sebagian usang |
+| [pages/penjualan_stok_motoris.md](pages/penjualan_stok_motoris.md) | Penjualan — Stok Motoris (dashboard) |
+| [pages/penjualan_stok_motoris_scalability.md](pages/penjualan_stok_motoris_scalability.md) | **Skalabilitas Fase A** — seed 6 bulan, agregasi SQL, batas export |
 | [pages/master_stokis.md](pages/master_stokis.md) | Master Stokis — CRUD, validasi form, CSV, integrasi mobile |
 | [master_stokis.md](master_stokis.md) | Ringkasan Master Stokis |
 | [master_data_integration.md](master_data_integration.md) | Analisis integrasi portal Master Data Kalbe |

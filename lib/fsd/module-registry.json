@@ -313,13 +313,13 @@
       "enabled": true,
       "type": "page",
       "htmlPath": "Views/FPRS/Penjualan/Faktur/index.html",
-      "formPath": "Views/FPRS/Penjualan/Faktur/add.html",
+      "formPath": "Views/FPRS/Penjualan/Faktur/detail.html",
       "apiEndpoint": "/api/v1/Invoice",
-      "storageKey": "md_faktur",
+      "storageKey": "fprs_faktur",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
         "ss_38_faktur_index.png",
-        "ss_39_faktur_add.png"
+        "ss_39_faktur_detail.png"
       ],
       "sections": {
         "overview": {

@@ -59,6 +59,16 @@
         .dot-yellow { background: #FB8C00; }
         .dot-red { background: #dc3545; }
 
+        .btn-web-admin {
+            background: #fff; color: #005D41;
+            border: 1.5px solid #005D41; border-radius: 24px;
+            padding: 13px; font-size: 15px; font-weight: 700;
+            width: 100%; cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; margin-bottom: 10px;
+        }
+        .btn-web-admin:active { background: #EBF8F4; color: #005D41; }
+
         .btn-logout {
             background: #FCE4D6; color: #C65911;
             border: 1px solid #F4B697; border-radius: 24px;
@@ -120,12 +130,12 @@
                 </div>
             </div>
 
-            <!-- Info Kanvas -->
+            <!-- Info Penjualan -->
             <div class="info-card">
-                <div class="info-card-header">Periode Kanvas</div>
+                <div class="info-card-header">Periode Penjualan</div>
                 <div class="info-item">
                     <span class="lbl">Periode Aktif</span>
-                    <span class="val">13 Jan 2026 – 01 Jan 2027</span>
+                    <span class="val" id="infoSalesPeriod">-</span>
                 </div>
                 <div class="info-item">
                     <span class="lbl">Area</span>
@@ -196,6 +206,11 @@
                 </button>
             </div>
 
+            <!-- Switch to Web Admin -->
+            <a href="../../index.html" class="btn-web-admin">
+                <i class="fas fa-desktop"></i> Ke Web Admin
+            </a>
+
             <!-- Logout -->
             <button class="btn-logout" onclick="confirmLogout()">
                 <i class="fas fa-sign-out-alt"></i> Keluar dari Akun
@@ -204,20 +219,20 @@
         </div>
     </div>
 
-    <div class="mobile-nav">
+    <nav class="mobile-nav" aria-label="Navigasi utama">
         <a href="dasbor.html" class="mobile-nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
             <span>Dasbor</span>
         </a>
         <a href="home.html" class="mobile-nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>Beranda</span>
         </a>
-        <a href="profil.html" class="mobile-nav-item active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <a href="profil.html" class="mobile-nav-item active" aria-current="page">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>Profil</span>
         </a>
-    </div>
+    </nav>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -225,27 +240,29 @@
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
     $(document).ready(function() {
-        const user = SfaStore.getUser();
+        const user = SfaStore.getUser() || {};
         const kpi = SfaStore.getTodayKpi();
         const queue = SfaStore.getSyncQueue();
         const pending = queue.filter(q => q.status === 'pending' || q.status === 'failed').length;
 
         // Avatar initials
-        const initials = (user.name || 'S').charAt(0).toUpperCase();
+        const name = user.name || user.username || 'Salesman';
+        const initials = name.charAt(0).toUpperCase();
         $('#avatarCircle').text(initials);
-        $('#profileName').text(user.name.toUpperCase());
+        $('#profileName').text(name.toUpperCase());
         $('#profileBranch').text(`Cabang ${user.branch || 'Jakarta'}`);
-        $('#profileRole').text(user.role || 'canvasser');
+        $('#profileRole').text(user.role || 'Canvasser');
 
         // Info items
-        $('#infoUsername').text(user.username || '-');
-        $('#infoRole').text(user.role || '-');
-        $('#infoBranch').text(user.branch || '-');
+        $('#infoUsername').text(user.username || user.name || '-');
+        $('#infoRole').text(user.role || 'Canvasser');
+        $('#infoBranch').text(user.branch || 'Jakarta');
         $('#infoLoginTime').text(user.loginTime ? SfaStore.formatDate(user.loginTime) : '-');
+        $('#infoSalesPeriod').text(SfaStore.getActiveSalesPeriod().label);
 
         // KPI
-        $('#infoTargetVisit').text(kpi.pelanggan + ' outlet');
-        $('#infoTodayVisit').text(kpi.kunjungan + ' kunjungan');
+        $('#infoTargetVisit').text((kpi.pelanggan || 0) + ' outlet');
+        $('#infoTodayVisit').text((kpi.kunjungan || 0) + ' kunjungan');
 
         // Sync
         $('#syncQueueBadge').text(`${pending} Pending`);

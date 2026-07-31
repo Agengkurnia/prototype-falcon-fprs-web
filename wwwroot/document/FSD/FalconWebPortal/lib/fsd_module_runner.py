@@ -174,11 +174,15 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
         for h in config.plantuml_handlers:
             if h.match(code):
                 render_kroki_plantuml(inject_plantuml_swimlane_style(code), h.png_path, h.label)
+                if os.path.exists(h.png_path) and 'entity ' in code.lower():
+                    ensure_png_min_width(h.png_path, config.erd_png_min_width)
                 handled = True
                 break
         if not handled:
             generic = os.path.join(screenshots, f'{config.slug}_plantuml_{i + 1}.png')
             render_kroki_plantuml(inject_plantuml_swimlane_style(code), generic, f'PlantUML-{i + 1}')
+            if os.path.exists(generic) and 'entity ' in code.lower():
+                ensure_png_min_width(generic, config.erd_png_min_width)
 
     plantuml_counter = [0]
 

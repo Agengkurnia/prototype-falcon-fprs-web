@@ -34,7 +34,7 @@ MASTER_DATA_ORDER = [
     'master-produk', 'master-pelanggan', 'master-channel',
     'master-pegawai', 'master-stokis', 'master-pajak', 'master-alasan',
 ]
-PENJUALAN_ORDER = ['penjualan-faktur', 'penjualan-stok-motoris', 'canvassing']
+PENJUALAN_ORDER = ['penjualan-faktur', 'penjualan-stok-motoris']
 KUNJUNGAN_ORDER = ['kunjungan-informasi', 'kunjungan-geografis', 'kunjungan-rute']
 
 BR_PREFIX = {
@@ -70,7 +70,7 @@ SS_BY_MODULE = {
     'master-alasan': ['ss_34_master_alasan_index.png', 'ss_35_master_alasan_modal.png'],
     'master-supplier': ['ss_36_master_supplier_index.png', 'ss_37_master_supplier_add.png'],
     'master-stokis': ['ss_45_master_stokis_index.png', 'ss_46_master_stokis_detail.png'],
-    'penjualan-faktur': ['ss_38_faktur_index.png', 'ss_39_faktur_add.png'],
+    'penjualan-faktur': ['ss_38_faktur_index.png', 'ss_39_faktur_detail.png'],
     'penjualan-stok-motoris': ['ss_40_stok_motoris_index.png'],
     'canvassing': ['ss_41_canvassing_index.png'],
     'kunjungan-informasi': ['ss_42_kunjungan_informasi.png'],
@@ -87,6 +87,8 @@ SCREENSHOT_EMBED_LIMIT = {
     'master-channel': 2,
     'master-pajak': 2,
     'master-alasan': 2,
+    'penjualan-faktur': 2,
+    'penjualan-stok-motoris': 1,
 }
 
 MODULE_ENRICHMENT = {
@@ -121,6 +123,20 @@ MODULE_ENRICHMENT = {
         'Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat stok). Menampilkan '
         '**Branch** dan **Region** (menggantikan kolom Kota), koordinat GPS untuk validasi check-in mobile, serta '
         'island **Riwayat Input Stok oleh Motoris** pada halaman detail.'
+    ),
+    'penjualan-faktur': (
+        'Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Unpaid/nilai) dan DataTable `#tblFaktur` '
+        'dengan filter tanggal, pelanggan, sales, dan status. Data faktur bersumber dari aktivitas **Mobile SFA** '
+        '(`localStorage` key `fprs_faktur`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris '
+        'adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` '
+        'menampilkan header pelanggan, item line, ringkasan pembayaran, dan tombol Cetak menuju `print.html`.'
+    ),
+    'penjualan-stok-motoris': (
+        'Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, '
+        'Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan '
+        'dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur`. '
+        'Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** '
+        'memuat ulang data master dan meregenerasi dashboard.'
     ),
 }
 
@@ -231,17 +247,17 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'penjualan-faktur': {
         'purpose': (
-            'Membuat dan memantau faktur penjualan dari order lapangan; mencatat header, item, diskon, '
-            'dan status pembayaran untuk rekonsiliasi admin.'
+            'Memantau dan mencetak faktur penjualan yang dihasilkan dari order Mobile SFA. Web Admin '
+            'bersifat view-only (list, detail, print); tidak membuat/mengubah faktur di portal.'
         ),
-        'users': 'Admin Sales, Supervisor, Finance (monitoring & koreksi).',
+        'users': 'Super Admin, Sales Manager, RSM (lihat sesuai cakupan region); Finance (monitoring).',
     },
     'penjualan-stok-motoris': {
         'purpose': (
-            'Memantau stok produk yang dibawa motoris/canvasser di lapangan untuk kontrol availability '
-            'sebelum kunjungan dan penjualan.'
+            'Memantau stok & aktivitas motoris (KPI, saldo, kunjungan, audit) serta mengekspor report Excel '
+            'SalesInvoices / DailyVisits untuk analisis operasional.'
         ),
-        'users': 'Supervisor Sales, Admin Operations, Warehouse (read-only monitoring).',
+        'users': 'Super Admin, Sales Manager, RSM (lihat sesuai cakupan region); Admin Operations.',
     },
     'canvassing': {
         'purpose': (
@@ -870,12 +886,21 @@ def crud_table(mod: dict) -> str:
             ('Update', 'Klik Edit → ubah nama/bit Active → Simpan', 'Admin', '—'),
             ('Delete', '—', '—', 'Tombol hapus dihilangkan; gunakan bit Active'),
         ]
+    elif mid == 'penjualan-faktur':
+        rows = [
+            ('Create', '—', '—', 'Dibuat dari Mobile SFA; tidak tersedia di Web Admin'),
+            ('Read', 'dashboard list + `detail.html` + `print.html`', 'Super Admin, Sales Manager, RSM', 'View-only; cakupan region sesuai RBAC'),
+            ('Update', '—', '—', 'Tidak tersedia di Web Admin'),
+            ('Delete', '—', '—', 'Tidak tersedia di Web Admin'),
+            ('Export', 'Tombol Ekspor (rencana Excel)', 'Super Admin, Sales Manager, RSM', 'Prototipe: mock Swal; produksi: file Excel header-level'),
+        ]
     elif mid in ('penjualan-stok-motoris', 'kunjungan-geografis'):
         rows = [
-            ('Read', 'Buka dashboard list', 'Admin, Supervisor', 'Dashboard/monitoring read-only'),
+            ('Read', 'Buka dashboard monitoring', 'Super Admin, Sales Manager, RSM', 'Dashboard/monitoring read-only'),
             ('Create', '—', '—', 'Tidak tersedia di UI'),
-            ('Update', '—', '—', 'Tidak tersedia'),
+            ('Update', '—', '—', 'Tidak tersedia (Refresh meregenerasi snapshot lokal)'),
             ('Delete', '—', '—', 'Tidak tersedia'),
+            ('Export', 'Export Excel → `SalesInvoices` + `DailyVisits`', 'Super Admin, Sales Manager, RSM', 'Filter UI + scope region berlaku'),
         ]
     elif ui_type == 'modal':
         rows = [

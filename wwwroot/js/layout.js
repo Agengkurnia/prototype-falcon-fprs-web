@@ -327,11 +327,11 @@ class Layout {
                         </ul>
                     </li>
 
-                    <!-- Tools -->
+                    <!-- SFA Mobile WebView -->
                     <li class="menu-item">
-                        <a href="${this.basePath}Views/FPRS/Tools/GenerateFSD/index.html" class="menu-link">
-                            <i class="menu-icon tf-icons fas fa-file-word" style="color:#6f42c1;"></i>
-                            <div data-i18n="Generate FSD">Generate FSD</div>
+                        <a href="${this.basePath}Views/Mobile/home.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-mobile-alt" style="color:#00897b;"></i>
+                            <div data-i18n="SFA Mobile">SFA Mobile</div>
                         </a>
                     </li>
                 </ul>

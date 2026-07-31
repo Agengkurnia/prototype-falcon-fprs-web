@@ -319,6 +319,14 @@ class Layout {
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/Kunjungan/Rute/index.html" class="menu-link"><div data-i18n="Management Rute">Management Rute</div></a></li>
                         </ul>
                     </li>
+
+                    <!-- SFA Mobile WebView -->
+                    <li class="menu-item">
+                        <a href="${this.basePath}Views/Mobile/home.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-mobile-alt" style="color:#00897b;"></i>
+                            <div data-i18n="SFA Mobile">SFA Mobile</div>
+                        </a>
+                    </li>
                 </ul>
             </aside>
         `;

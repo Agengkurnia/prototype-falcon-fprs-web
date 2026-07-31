@@ -32,6 +32,7 @@
 |-----------|-----------|-----------|----------------|
 | Muhammad Rafi | SHP Channel & Customer Development |  |  |
 | Silvester Mario Nian Destrada | SHP Channel & Customer Development |  |  |
+| Aldira Rahmania | SHP Channel & Customer Development |  |  |
 | Ageng Kurniawan Sugianto | IT Product |  |  |
 | Albet | IT Product |  |  |
 
@@ -386,7 +387,7 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
-| — | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
+| ![](screenshots/ss_btn_channel_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
 
 #### 3.3.5 Business Rules
 
@@ -835,19 +836,7 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 
 ## 6. Data Layer & Integrasi
 
-### 6.1 Sumber Data (Source of Truth)
-
-| Modul | Sumber kebenaran (produksi) | API / integrasi | localStorage (prototipe) | Seed prototipe |
-|-------|-----------------------------|-----------------|--------------------------|----------------|
-| Master Data — Produk | Master Data API (SKU LOV) + input lokal harga/pajak/status | `/api/v1/Sku` | `md_produk` | `wwwroot/data/produk.json` |
-| Master Data — Pelanggan | Mobile SFA (sumber kebenaran); web read-only | `/api/v1/Customer` | `md_pelanggan` | `wwwroot/data/pelanggan.json` |
-| Master Data — Channel | Input lokal Web Admin | `— (tidak ada / lokal)` | `md_channel` | `wwwroot/data/channel.json` |
-| Master Data — Pegawai | File CSV upload (sumber kebenaran operasional) | `— (tidak ada / lokal)` | `md_pegawai` | `wwwroot/data/pegawai.json` |
-| Master Data — Stokis | File CSV upload (sumber kebenaran operasional) | `— (tidak ada / lokal)` | `md_stokis` | `wwwroot/data/stokis.json` |
-| Master Data — Pajak | Input lokal Web Admin (referensi harga jual produk) | `/api/v1/Tax` | `md_pajak` | `wwwroot/data/pajak.json` |
-| Master Data — Alasan | Input lokal Web Admin | `/api/v1/Reason` | `md_alasan` | `wwwroot/data/alasan.json` |
-
-### 6.2 Integrasi Master Data API (Rencana Produksi)
+### 6.1 Integrasi Master Data API (Rencana Produksi)
 
 | Item | Nilai |
 |------|-------|
@@ -865,7 +854,7 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 | `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |
 | — | Channel, Pegawai, Stokis | Lokal / CSV | Tidak bergantung Master Data API |
 
-### 6.3 Persistensi Produksi MAVEN
+### 6.2 Persistensi Produksi MAVEN
 
 | Lapisan | Teknologi |
 |---------|-----------|

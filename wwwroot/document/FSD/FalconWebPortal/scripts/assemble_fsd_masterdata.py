@@ -35,6 +35,7 @@ TANGGAL = '10 Juli 2026'
 DOCUMENT_APPROVAL = [
     ('Muhammad Rafi', 'SHP Channel & Customer Development'),
     ('Silvester Mario Nian Destrada', 'SHP Channel & Customer Development'),
+    ('Aldira Rahmania', 'SHP Channel & Customer Development'),
     ('Ageng Kurniawan Sugianto', 'IT Product'),
     ('Albet', 'IT Product'),
 ]
@@ -327,35 +328,9 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 
 
 def chapter_integration(reg: dict) -> str:
-    by_id = {m['id']: m for m in reg['modules'] if m.get('enabled', True)}
-    rows = []
-    source_map = {
-        'master-produk': ('Master Data API (SKU LOV) + input lokal harga/pajak/status', 'produk.json'),
-        'master-pelanggan': ('Mobile SFA (sumber kebenaran); web read-only', 'pelanggan.json'),
-        'master-channel': ('Input lokal Web Admin', 'channel.json'),
-        'master-pegawai': ('File CSV upload (sumber kebenaran operasional)', 'pegawai.json'),
-        'master-stokis': ('File CSV upload (sumber kebenaran operasional)', 'stokis.json'),
-        'master-pajak': ('Input lokal Web Admin (referensi harga jual produk)', 'pajak.json'),
-        'master-alasan': ('Input lokal Web Admin', 'alasan.json'),
-    }
-    for mid in MASTER_DATA_ORDER:
-        m = by_id.get(mid)
-        if not m:
-            continue
-        api = m.get('apiEndpoint') or '— (tidak ada / lokal)'
-        sk = m.get('storageKey') or '—'
-        src, seed = source_map.get(mid, ('—', '—'))
-        rows.append(f'| {m["label"]} | {src} | `{api}` | `{sk}` | `wwwroot/data/{seed}` |')
-
     return '''## 6. Data Layer & Integrasi
 
-### 6.1 Sumber Data (Source of Truth)
-
-| Modul | Sumber kebenaran (produksi) | API / integrasi | localStorage (prototipe) | Seed prototipe |
-|-------|-----------------------------|-----------------|--------------------------|----------------|
-''' + '\n'.join(rows) + '''
-
-### 6.2 Integrasi Master Data API (Rencana Produksi)
+### 6.1 Integrasi Master Data API (Rencana Produksi)
 
 | Item | Nilai |
 |------|-------|
@@ -373,7 +348,7 @@ def chapter_integration(reg: dict) -> str:
 | `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |
 | — | Channel, Pegawai, Stokis | Lokal / CSV | Tidak bergantung Master Data API |
 
-### 6.3 Persistensi Produksi MAVEN
+### 6.2 Persistensi Produksi MAVEN
 
 | Lapisan | Teknologi |
 |---------|-----------|

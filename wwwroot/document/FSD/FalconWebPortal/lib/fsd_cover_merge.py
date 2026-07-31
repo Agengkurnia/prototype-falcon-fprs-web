@@ -10,6 +10,7 @@ Digunakan oleh semua build_fsd_*.py di FSD Generator Engine.
 import os
 import re
 import shutil
+from copy import deepcopy
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -34,6 +35,7 @@ COVER_TABLE_COUNT = 2
 DEFAULT_DOCUMENT_APPROVAL = [
     {'name': 'Muhammad Rafi', 'title': 'SHP Channel & Customer Development'},
     {'name': 'Silvester Mario Nian Destrada', 'title': 'SHP Channel & Customer Development'},
+    {'name': 'Aldira Rahmania', 'title': 'SHP Channel & Customer Development'},
     {'name': 'Ageng Kurniawan Sugianto', 'title': 'IT Product'},
     {'name': 'Albet', 'title': 'IT Product'},
 ]
@@ -274,15 +276,21 @@ def _set_merged_row_text(row, start_col: int, end_col: int, text: str):
         row.cells[ci].text = text
 
 
+def _ensure_table_rows(table, target_count: int) -> None:
+    """Tambah baris (clone baris terakhir) sampai jumlah baris >= target_count."""
+    while len(table.rows) < target_count:
+        last_tr = table.rows[-1]._tr
+        table._tbl.append(deepcopy(last_tr))
+
+
 def update_document_approval(doc: Document, rows: list[dict] | None = None):
     if len(doc.tables) <= APPROVAL_TABLE_INDEX:
         return
     approval = rows or DEFAULT_DOCUMENT_APPROVAL
     table = doc.tables[APPROVAL_TABLE_INDEX]
+    _ensure_table_rows(table, APPROVAL_DATA_START_ROW + len(approval))
     for i, person in enumerate(approval):
         ri = APPROVAL_DATA_START_ROW + i
-        if ri >= len(table.rows):
-            break
         row = table.rows[ri]
         name = person.get('name', '')
         title = person.get('title', '')
@@ -369,6 +377,47 @@ def trim_template_body(doc: Document, keep: int = FRONT_MATTER_KEEP):
         body.remove(child)
 
 
+def strip_page_number_from_footers(doc: Document):
+    """Hapus field PAGE di footer — halaman cover & approval tidak memakai nomor halaman."""
+    from docx.oxml.ns import qn
+
+    for section in doc.sections:
+        for footer in (section.footer, section.even_page_footer, section.first_page_footer):
+            if footer is None:
+                continue
+            for p in list(footer.paragraphs):
+                instr = ''.join(
+                    (node.text or '')
+                    for node in p._p.findall('.//' + qn('w:instrText'))
+                )
+                if 'PAGE' not in instr.upper():
+                    continue
+                visible = (p.text or '').strip()
+                if not visible or visible.isdigit():
+                    p._element.getparent().remove(p._element)
+                    continue
+                in_field = False
+                for child in list(p._p):
+                    if child.tag == qn('w:pPr'):
+                        continue
+                    if child.tag != qn('w:r'):
+                        if in_field:
+                            p._p.remove(child)
+                        continue
+                    fld = child.find(qn('w:fldChar'))
+                    instr_el = child.find(qn('w:instrText'))
+                    if fld is not None:
+                        ftype = fld.get(qn('w:fldCharType'))
+                        if ftype == 'begin':
+                            in_field = True
+                        elif ftype == 'end':
+                            in_field = False
+                        p._p.remove(child)
+                        continue
+                    if instr_el is not None or in_field:
+                        p._p.remove(child)
+
+
 def merge_cover_and_content(
     content_path: str,
     output_path: str,
@@ -386,6 +435,7 @@ def merge_cover_and_content(
 
     set_cover_logo(master, logo_path)
     update_cover_pages(master, meta)
+    strip_page_number_from_footers(master)
     trim_template_body(master)
 
     composer = Composer(master)

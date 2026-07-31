@@ -327,11 +327,11 @@ class Layout {
                         </ul>
                     </li>
 
-                    <!-- Tools -->
+                    <!-- SFA Mobile WebView -->
                     <li class="menu-item">
-                        <a href="${this.basePath}Views/FPRS/Tools/GenerateFSD/index.html" class="menu-link">
-                            <i class="menu-icon tf-icons fas fa-file-word" style="color:#6f42c1;"></i>
-                            <div data-i18n="Generate FSD">Generate FSD</div>
+                        <a href="${this.basePath}Views/Mobile/home.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-mobile-alt" style="color:#00897b;"></i>
+                            <div data-i18n="SFA Mobile">SFA Mobile</div>
                         </a>
                     </li>
                 </ul>
@@ -461,6 +461,10 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/js/extensions/i18nextBrowserLanguageDetector.min.js',
             'wwwroot/lib/vuexy/vendor/js/extensions/jquery-i18next.min.js',
             'wwwroot/lib/vuexy/vendor/js/unison-js/unison-js.min.js',
+            'wwwroot/js/vendor/crypto-js.js',
+            'wwwroot/js/cls-rijndael.browser.js',
+            'wwwroot/js/master-data-param.js',
+            'wwwroot/js/master-source-tooltip.js',
             'wwwroot/js/role-manager.js',
             'wwwroot/js/prototype-chat.js'
         ];

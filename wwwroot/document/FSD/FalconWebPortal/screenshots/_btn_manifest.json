@@ -17,7 +17,7 @@
       "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
     },
     {
-      "file": "",
+      "file": "ss_btn_channel_simpan.png",
       "label": "Simpan",
       "id": "saveItem()",
       "style": "btn-success",
@@ -227,6 +227,50 @@
       "style": "btn-secondary",
       "function": "—",
       "narrative": "Membuka panel Riwayat Status (Active / Inactive) — dari Upload menampilkan data terkait pada halaman detail."
+    }
+  ],
+  "penjualan-faktur": [
+    {
+      "file": "ss_btn_penjualan-faktur_ekspor.png",
+      "label": "Ekspor",
+      "id": "btnEkspor",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menjalankan aksi terkait tombol Ekspor."
+    },
+    {
+      "file": "ss_btn_common_lihat-detail.png",
+      "label": "Lihat Detail",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "",
+      "label": "Cetak Faktur",
+      "id": "cetakFaktur('SI-2606146101')",
+      "style": "btn-outline-secondary",
+      "function": "cetakFaktur('SI-2606146101')",
+      "narrative": "Menjalankan aksi terkait tombol Cetak Faktur."
+    }
+  ],
+  "penjualan-stok-motoris": [
+    {
+      "file": "ss_btn_penjualan-stok-motoris_export-excel.png",
+      "label": "Export Excel",
+      "id": "exportToExcel()",
+      "style": "btn-outline-secondary",
+      "function": "exportToExcel()",
+      "narrative": "Menjalankan aksi terkait tombol Export Excel."
+    },
+    {
+      "file": "",
+      "label": "Refresh",
+      "id": "refreshDashboard()",
+      "style": "btn-success",
+      "function": "refreshDashboard()",
+      "narrative": "Menjalankan aksi terkait tombol Refresh."
     }
   ]
 }

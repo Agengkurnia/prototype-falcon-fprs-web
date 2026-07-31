@@ -59,6 +59,16 @@
         .dot-yellow { background: #FB8C00; }
         .dot-red { background: #dc3545; }
 
+        .btn-web-admin {
+            background: #fff; color: #005D41;
+            border: 1.5px solid #005D41; border-radius: 24px;
+            padding: 13px; font-size: 15px; font-weight: 700;
+            width: 100%; cursor: pointer; transition: background 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-decoration: none; margin-bottom: 10px;
+        }
+        .btn-web-admin:active { background: #EBF8F4; color: #005D41; }
+
         .btn-logout {
             background: #FCE4D6; color: #C65911;
             border: 1px solid #F4B697; border-radius: 24px;
@@ -195,6 +205,11 @@
                     <i class="fas fa-sync d-block mb-1 fs-5"></i>Sync Detail
                 </button>
             </div>
+
+            <!-- Switch to Web Admin -->
+            <a href="../../index.html" class="btn-web-admin">
+                <i class="fas fa-desktop"></i> Ke Web Admin
+            </a>
 
             <!-- Logout -->
             <button class="btn-logout" onclick="confirmLogout()">
