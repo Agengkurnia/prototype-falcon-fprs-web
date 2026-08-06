@@ -31,14 +31,15 @@ Halaman masuk aplikasi SFA mobile. Mensimulasikan autentikasi dan menyimpan sess
 - Semua kredensial non-kosong diterima (prototype) setelah delay ~1,2 detik
 - Role otomatis:
   - Username `md`, `moderntrade`, `modern.trade` → role **`md`**
-  - Selain itu → role **`canvasser`** (motoris)
+  - Selain itu → role **`motoris`**
+- Session lama `canvasser` di-migrate ke `motoris` saat `SfaStore.getUser()`
 
 ## Kredensial Demo
 | User | Role | Catatan |
 |------|------|---------|
-| `md` / `moderntrade` | MD | Filter Rute Harian + Overdue |
-| `sales01` | canvasser | Urut outlet by GPS |
-| `SINGARAJA` | canvasser | Legacy demo |
+| `md` / `moderntrade` | MD | Cek Stok wajib di visit; Limit MD Reguler |
+| `sales01` | motoris | Default prototype; target Limit Motoris Reguler |
+| `SINGARAJA` | motoris | Legacy demo |
 
 ## Cara Uji
 1. Buka halaman login

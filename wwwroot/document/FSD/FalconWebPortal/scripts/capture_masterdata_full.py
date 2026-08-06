@@ -34,7 +34,8 @@ from fsd_ui_section import REUSABLE_BUTTON_FILES  # noqa: E402
 
 MASTER_ORDER = [
     'master-produk', 'master-pelanggan', 'master-channel',
-    'master-pegawai', 'master-stokis', 'master-pajak', 'master-alasan',
+    'master-pegawai', 'master-stokis', 'master-limit-target-harian',
+    'master-pajak', 'master-alasan',
 ]
 
 # Screenshot halaman detail (page + formPath) — indeks 1 di SS_BY_MODULE
@@ -43,6 +44,7 @@ DETAIL_SHOT_BY_MODULE = {
     'master-pelanggan': 'ss_16_master_pelanggan_detail.png',
     'master-pegawai': 'ss_20_master_pegawai_detail.png',
     'master-stokis': 'ss_46_master_stokis_detail.png',
+    'master-limit-target-harian': 'ss_50_master_limit_detail.png',
 }
 
 
@@ -302,7 +304,13 @@ def capture(base_url, only=None):
                 index_url = base_url.rstrip('/') + '/' + mod['htmlPath'].replace('\\', '/')
                 page.goto(index_url, wait_until='domcontentloaded', timeout=30000)
                 wait_ready(page)
-                page.wait_for_selector('.btn-success, .btn-action, a.btn', timeout=8000)
+                try:
+                    page.wait_for_selector(
+                        '.btn-success, .btn-action, a.btn, #tbl tbody tr, #tblBody tr, .dataTables_wrapper',
+                        timeout=8000,
+                    )
+                except Exception:
+                    pass
                 time.sleep(0.5)
                 full_shot(page, shots[0])
                 done += 1

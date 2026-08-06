@@ -1,0 +1,397 @@
+#!/usr/bin/env python3
+"""
+Assemble FSD Data Master (Web Admin Man Power GT) — subset "Data Master" saja.
+
+Menghasilkan source/FSD_Falcon_Web_MasterData_v1.0.md dari preamble (cover +
+Document Approval standar FSD Generator Engine) + fragmen per-modul yang
+di-extract langsung dari HTML (extract_module_spec.module_section).
+
+Modul dalam lingkup: Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan.
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+WORKSPACE_DIR = os.path.dirname(SCRIPT_DIR)
+SOURCE_DIR = os.path.join(WORKSPACE_DIR, 'source')
+OUTPUT_MD = os.path.join(SOURCE_DIR, 'FSD_Falcon_Web_MasterData_v1.0.md')
+
+sys.path.insert(0, SCRIPT_DIR)
+from extract_module_spec import (  # noqa: E402
+    MASTER_DATA_ORDER,
+    load_registry,
+    module_section,
+)
+from maven_spec import (  # noqa: E402
+    MAVEN_MAPPING,
+    chapter_erd,
+)
+
+TANGGAL = '4 Agustus 2026'
+VERSI = '1.3'
+
+# Document Approval — standar SHP (lihat fsd_cover_merge.DEFAULT_DOCUMENT_APPROVAL)
+DOCUMENT_APPROVAL = [
+    ('Muhammad Rafi', 'SHP Channel & Customer Development'),
+    ('Silvester Mario Nian Destrada', 'SHP Channel & Customer Development'),
+    ('Aldira Rahmania', 'SHP Channel & Customer Development'),
+    ('Ageng Kurniawan Sugianto', 'IT Product'),
+    ('Albet', 'IT Product'),
+]
+
+
+def preamble() -> str:
+    approval_rows = '\n'.join(
+        f'| {name} | {title} |  |  |' for name, title in DOCUMENT_APPROVAL
+    )
+    return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
+## Modul: Man Power GT — Data Master (Web Admin)
+### Sistem: Man Power GT
+### Versi Dokumen: {VERSI}
+
+---
+
+| Atribut | Keterangan |
+|---------|------------|
+| **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
+| **Versi** | {VERSI} |
+| **Tanggal** | {TANGGAL} |
+| **Divisi** | IT / Business – Man Power GT |
+| **Status** | Draft |
+| **Dibuat oleh** | Tim IT – Man Power GT |
+
+---
+
+## Riwayat Revisi
+
+| Versi | Tanggal | Diubah Oleh | Keterangan |
+|---------|-------------|-------------|------------|
+| **1.3** | **{TANGGAL}** | **Tim IT** | Rename sistem ke **Man Power GT**; tambah modul **Limit**; lingkup 8 modul Data Master |
+| **1.2** | **10 Juli 2026** | **Tim IT** | Perkaya business flow produksi, RBAC/approval, sumber data & API; rapikan ERD (diagram relasi vs teks FK) |
+| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur produksi MAVEN, mapping UI→database, ERD lengkap, DDL PostgreSQL, tooltip prototipe |
+| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin |
+
+---
+
+## Persetujuan Dokumen (Document Approval)
+
+| Full Name | Job Title | Signature | Signature Date |
+|-----------|-----------|-----------|----------------|
+{approval_rows}
+
+---
+
+## 1. Pendahuluan
+
+### 1.1 Latar Belakang
+
+**Man Power GT** (*Man Power General Trade*) adalah sistem internal PT Kalbe
+Nutritionals untuk mengelola tenaga lapangan General Trade (motoris / canvasser),
+administrasi data master terkait, monitoring penjualan lapangan, dan pelacakan
+kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** pada
+Web Admin (`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi
+fondasi seluruh transaksi Man Power GT.
+
+Prototipe Web Portal berupa *high-fidelity interactive prototype* berbasis HTML
+statis (MPA) bertema Vuexy/Bootstrap yang menggunakan **localStorage** dan file
+JSON seed di `wwwroot/data/` sebagai lapisan persistensi sisi klien, mensimulasikan
+alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MAVEN.
+
+### 1.2 Tujuan Dokumen
+
+1. Mendeskripsikan fungsionalitas **per halaman dan per komponen UI** modul Data Master.
+2. Menjadi acuan pengembangan backend/API dan UAT untuk data referensi Man Power GT.
+3. Mendokumentasikan business rules (UI + produksi), pola CRUD, sumber data, integrasi API, RBAC, dan data layer.
+4. Menyelaraskan format dokumentasi dengan standar **FSD Generator Engine** (Kalbe Nutritionals).
+
+### 1.3 Ruang Lingkup
+
+| Dalam lingkup | Di luar lingkup |
+|---------------|-----------------|
+| Modul Data Master Web (`Views/FPRS/MasterData/`) — **8 modul**: Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Modul Penjualan, Kunjungan, Dashboard |
+| Persistensi prototipe (localStorage + JSON seed) | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
+| Desain database produksi MAVEN (PostgreSQL + EF Core) | Modul DOFS MAVEN yang sudah ada |
+| Mapping UI → tabel/kolom MAVEN & skrip DDL | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
+| Target RBAC produksi (KNGlobal `mMenu` / `mRoleAccess`) | — |
+
+### 1.4 Stakeholder
+
+| Peran | Tim/Divisi | Keterlibatan |
+|-------|------------|--------------|
+| Admin Master Data | IT / Operations | CRUD & sinkronisasi data referensi |
+| Supervisor Sales | Sales | Validasi data outlet & pegawai (read) |
+| Developer | IT | Implementasi API & UI produksi (MAVEN) |
+| Business Analyst | PDV / Sales | Validasi alur bisnis & sumber data |
+| IT Security / Access Admin | IT | Konfigurasi role access KNGlobal |
+
+---
+
+## 2. Arsitektur & Alur Data Master
+
+### 2.1 Ringkasan Teknis
+
+| Aspek | Prototipe | Produksi (MAVEN) |
+|-------|-----------|------------------|
+| Arsitektur | Static MPA — satu `.html` per halaman | ASP.NET Core MVC + service layer |
+| UI Framework | Bootstrap 5.3, Vuexy Admin Theme | Vuexy + Razor Views |
+| JavaScript | jQuery, DataTables, Select2, SweetAlert2 | Sama (server-side DataTable) |
+| Persistensi | `localStorage` + seed `wwwroot/data/*.json` | PostgreSQL via `CentralContext` (EF Core) |
+| Auth / Menu | Tidak ada login | KNGlobal SSO + `mMenu` / `mRoleAccess` |
+| Navigasi | `wwwroot/js/layout.js` | Menu dinamis dari KNGlobal |
+| Branding | Kalbe hijau `#005d41`, font Kalbe Geometric | Sama |
+
+### 2.2 Pola Pengelolaan Data Master
+
+Modul Data Master memakai **empat pola** pengelolaan data:
+
+| Pola | Modul | Cara Kelola | Sumber kebenaran (produksi) |
+|------|-------|-------------|------------------------------|
+| Form (add/edit) | Produk, Limit | Halaman detail fleksibel (+ LOV SKU untuk Produk) | Katalog SKU dari Master Data API; harga/pajak/status di DB; Limit: versi min/max/HKE |
+| Modal CRUD | Channel, Pajak, Alasan | Modal di dalam Index | Tabel lokal MAVEN (`mChannel`, `mPajak`, `mAlasan`) |
+| Upload-only (CSV + history) | Pegawai, Stokis | Download/Upload CSV, status disinkronkan | File CSV sebagai input; hasil di `mPegawai` / `mStokis` + tabel riwayat |
+| View-only (sumber mobile) | Pelanggan | Detail read-only | Mobile SFA → sync ke `mPelanggan` (v1: seed/import manual) |
+
+### 2.3 Business Flow (Swimlane)
+
+Alur berikut menggambarkan pengelolaan Data Master **saat menggunakan database produksi** (MAVEN / PostgreSQL), bukan localStorage prototipe.
+
+**Lane:**
+
+| # | Lane ID | Label | Tipe |
+|---|---------|-------|------|
+| 1 | L1 | Admin Master Data | User |
+| 2 | L2 | Sistem Man Power GT | System |
+| 3 | L3 | Master Data API / Mobile SFA | External |
+
+```mermaid
+flowchart LR
+  subgraph L1[Admin Master Data]
+    direction TB
+    A1[Buka modul Data Master]
+    A2[Isi form / modal / upload]
+    A3[Tinjau data]
+  end
+  subgraph L2[Sistem Man Power GT]
+    direction TB
+    B1[Baca data dari database]
+    B2[Tampilkan daftar]
+    B3[Validasi via Client Side]
+    B4[Simpan ke database]
+  end
+  subgraph L3[Master Data API / Mobile SFA]
+    direction TB
+    C1[Sumber LOV Produk]
+    C2[Data outlet dari mobile]
+    C3[Sinkronisasi API]
+  end
+  A1 --> B1 --> B2 --> A2 --> B3 --> B4 --> A3
+  C1 -.-> A2
+  C2 -.-> B1
+  B4 -.-> C3
+```
+
+### 2.4 Ringkasan Alur per Pola (Produksi)
+
+| Pola | Trigger | Validasi utama | Hasil | Approval |
+|------|---------|----------------|-------|----------|
+| Form Produk | Create / Edit | Kode dari LOV API; harga beli > 0; kode unik | Insert/update `mProduk` | Tidak ada — langsung simpan |
+| Form Limit | Create / Edit | Jabatan + type; versi min/max/HKE | Persist limit target harian | Tidak ada |
+| Modal Channel/Pajak/Alasan | Tambah / Ubah (/ Hapus) | Field wajib; unik nama/kode; Pajak cek FK produk sebelum hapus | Persist ke tabel terkait | Tidak ada |
+| CSV Pegawai/Stokis | Upload file | Header dikenali; baris wajib; Stokis: GPS unik | Upsert Active; absen di file → Inactive + hist | Tidak ada |
+| Pelanggan | Buka list/detail | — (read-only) | Tampil dari `mPelanggan` | N/A |
+
+**Catatan approval:** modul Data Master **tidak** memakai workflow approval multi-level. Perubahan langsung tersimpan jika user punya `bitEdit` (atau hak upload untuk Pegawai/Stokis). Audit trail: `txtInsertedBy` / `txtUpdatedBy` / `dtInserted` / `dtUpdated`.
+
+'''
+
+
+
+def chapter_master_data(reg: dict, all_rules: list) -> str:
+    by_id = {m['id']: m for m in reg['modules'] if m.get('enabled', True)}
+    br_counters: dict = {}
+    lines = [
+        '## 3. Modul Data Master',
+        '',
+        'Bab ini mendeskripsikan setiap modul Data Master: kolom dashboard list (DataTable), '
+        'field form/modal/detail, tombol aksi, business rules (hasil ekstraksi validasi UI), '
+        'dan pola CRUD. Konten field/kolom/validasi diambil langsung dari file HTML sumber.',
+        '',
+    ]
+    sub = 0
+    for mid in MASTER_DATA_ORDER:
+        mod = by_id.get(mid)
+        if not mod:
+            continue
+        sub += 1
+        lines.append(module_section('3', sub, mod, br_counters, all_rules))
+        mapping = MAVEN_MAPPING.get(mid)
+        if mapping:
+            lines.append(mapping)
+    return '\n'.join(lines)
+
+
+def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
+    lines = [
+        '## 4. Aturan Bisnis (Rekap)',
+        '',
+        'Bab ini memisahkan aturan yang **terdeteksi dari validasi UI prototipe** '
+        'dengan aturan **produksi** yang wajib diimplementasikan di MAVEN '
+        '(meski belum tampak di prototipe).',
+        '',
+        '### 4.1 Aturan dari Validasi UI Prototipe',
+        '',
+        'Rule ID memakai prefix `BR-MD`. Sumber: pesan validasi / SweetAlert di HTML.',
+        '',
+        '| Rule ID | Aturan |',
+        '|---------|--------|',
+    ]
+    if rules:
+        for rid, rule in rules:
+            lines.append(f'| {rid} | {rule} |')
+    else:
+        lines.append('| — | *(Tidak ada validasi UI eksplisit yang terdeteksi)* |')
+
+    lines += [
+        '',
+        '### 4.2 Aturan Produksi (di luar prototipe)',
+        '',
+        'Aturan berikut **wajib** di backend MAVEN / kebijakan operasional, '
+        'meskipun prototipe hanya mensimulasikan sebagian.',
+        '',
+        '| Rule ID | Modul | Aturan |',
+        '|---------|-------|--------|',
+        '| BR-PR01 | Semua | Akses halaman membutuhkan `bitView` pada `mRoleAccess` untuk `txtMenuCode` terkait; tanpa hak → HTTP 403. |',
+        '| BR-PR02 | Semua | Create/Update/Delete/Upload membutuhkan `bitEdit` (atau `bitDelete` untuk hapus); audit `txtInsertedBy` / `txtUpdatedBy` wajib terisi dari user login. |',
+        '| BR-PR03 | Semua | **Tidak ada approval workflow** untuk Data Master v1 — simpan langsung setelah validasi lolos. |',
+        '| BR-PR04 | Produk | Identitas SKU (kode/nama/umbrella/brand) bersumber Master Data API; aplikasi hanya boleh mengubah harga beli, skema pajak, unit default PCS, dan status. |',
+        '| BR-PR05 | Produk | Harga jual = f(harga beli, persentase pajak); tidak diinput manual. |',
+        '| BR-PR06 | Pajak | Hapus ditolak jika `mProduk.intPajakID` masih mereferensikan record tersebut. |',
+        '| BR-PR07 | Channel | Nama channel unik; nonaktifkan via `bitActive` (bukan hard-delete). |',
+        '| BR-PR08 | Pelanggan | Web Admin **read-only**; create/update hanya dari Mobile SFA / job sync (fase integrasi). |',
+        '| BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |',
+        '| BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |',
+        '| BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |',
+        '| BR-PR12 | Limit | Identitas unik jabatan + type jabatan; target mobile memakai nilai minimal harian; versi memuat min/max/HKE. |',
+        '',
+        '---',
+        '',
+    ]
+    return '\n'.join(lines)
+
+
+def chapter_rbac() -> str:
+    return '''## 5. Hak Akses & RBAC
+
+### 5.1 Prototipe vs Produksi
+
+| Aspek | Prototipe | Produksi (MAVEN) |
+|-------|-----------|------------------|
+| Login | Tidak ada | KNGlobal SSO |
+| Menu | Hardcoded `layout.js` | `KNGlobalDB.dbo.mMenu` (`intProgramID` Man Power GT) |
+| Enforcement | Tidak ada | `CheckRoleAccessMenu(txtMenuCode)` → `mRoleAccess` |
+| Permission flag | — | `bitView`, `bitEdit`, `bitDelete`, `bitSuperuser` |
+
+### 5.2 Mapping Menu Code (KNGlobal)
+
+Konstanta di aplikasi **harus** match `mMenu.txtMenuCode` (bukan `txtMenuName`):
+
+| Modul | `txtMenuCode` | `txtMenuName` | Route MAVEN | Hak minimum list | Hak tulis |
+|-------|---------------|--------------|-------------|------------------|-----------|
+| Produk | `MPR` | Product | `/MasterData/Product` | `bitView` | `bitEdit` |
+| Pelanggan | `MPL` | Customer | `/MasterData/Customer` | `bitView` | — (read-only) |
+| Channel | `MCH` | Channel | `/MasterData/Channel` | `bitView` | `bitEdit` |
+| Pegawai | `MPE` | Employee | `/MasterData/Pegawai` | `bitView` | `bitEdit` (upload) |
+| Pajak | `MTX` | Tax | `/MasterData/Tax` | `bitView` | `bitEdit` / `bitDelete` |
+| Alasan | `MRS` | Reason | `/MasterData/Reason` | `bitView` | `bitEdit` / `bitDelete` |
+| Stokis | `MST` | Stokis | `/MasterData/Stokis` | `bitView` | `bitEdit` (upload) |
+| Limit | `MLT` | Limit | `/MasterData/Limit` | `bitView` | `bitEdit` |
+
+Parent menu Data Master: `intParentID = 3936`, `intModuleID = 2749` (sama untuk semua child di seed awal).
+
+### 5.3 Matriks Role Target
+
+| Modul | Admin Master Data | Supervisor Sales | Keterangan |
+|-------|-------------------|------------------|------------|
+| Produk | Create / Read / Update | Read | Hapus tidak tersedia |
+| Pelanggan | Read | Read | View-only; sumber mobile |
+| Channel | Create / Read / Update | Read | Nonaktif via bit Active |
+| Pegawai | Upload / Read | Read | Sinkronisasi CSV |
+| Stokis | Upload / Read | Read | Sinkronisasi CSV |
+| Limit | Create / Read / Update | Read | Target harian per jabatan |
+| Pajak | Create / Read / Update / Delete | Read | Cek FK produk sebelum hapus |
+| Alasan | Create / Read / Update / Delete | Read | Kode operasional |
+
+### 5.4 Approval
+
+Data Master **tidak** masuk antrian approval (berbeda dengan modul transaksi DOFS / Task Approval).
+Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan diperlukan
+*maker-checker*, itu diluar scope FSD v1.3 dan harus ditambahkan sebagai change request terpisah.
+
+---
+'''
+
+
+def chapter_integration(reg: dict) -> str:
+    return '''## 6. Data Layer & Integrasi
+
+### 6.1 Integrasi Master Data API (Rencana Produksi)
+
+| Item | Nilai |
+|------|-------|
+| Portal referensi (dev) | `https://newmasterdatadev.kalbenutritionals.web.id/` |
+| Pola konsumsi di MAVEN | Service External (`clsMasterData_*API`) → LOV / metadata |
+| Auth API | Mengikuti standar Master Data Kalbe (token/header sesuai environment) |
+
+**Pemakaian per endpoint:**
+
+| Endpoint | Modul | Arah | Digunakan untuk |
+|----------|-------|------|-----------------|
+| `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
+| `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
+| `/api/v1/Tax` | Pajak | Opsional sync | Referensi skema pajak; v1 boleh fully lokal di `mPajak` |
+| `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |
+| — | Channel, Pegawai, Stokis, Limit | Lokal / CSV | Tidak bergantung Master Data API |
+
+### 6.2 Persistensi Produksi MAVEN
+
+| Lapisan | Teknologi |
+|---------|-----------|
+| DB | PostgreSQL (Central DB) |
+| ORM | EF Core `CentralContext` |
+| Identitas record di URL | `txtGuid` (UUID) |
+| Menu / RBAC | SQL Server `KNGlobalDB` (`mMenu`, `mRoleAccess`) |
+
+Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`. Seed UAT opsional: `003_seed_masterdata_uat.sql`.
+
+---
+'''
+
+
+def assemble() -> str:
+    os.makedirs(SOURCE_DIR, exist_ok=True)
+    import extract_module_spec as ems  # noqa: E402
+    ems._BTN_MANIFEST = None
+    reg = load_registry()
+    all_rules: list[tuple[str, str]] = []
+
+    md_chapter = chapter_master_data(reg, all_rules)
+
+    parts = [
+        preamble(),
+        md_chapter,
+        chapter_business_rules(all_rules),
+        chapter_rbac(),
+        chapter_integration(reg),
+        chapter_erd(),
+    ]
+    content = '\n'.join(parts)
+    with open(OUTPUT_MD, 'w', encoding='utf-8') as f:
+        f.write(content)
+    print(f'Assembled: {OUTPUT_MD} ({len(content):,} chars, {content.count(chr(10)):,} lines, {len(all_rules)} rules)')
+    return OUTPUT_MD
+
+
+if __name__ == '__main__':
+    assemble()

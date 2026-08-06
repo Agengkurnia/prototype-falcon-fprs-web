@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         /* ============================================================
            HOME PAGE STYLES
@@ -57,7 +58,7 @@
             margin-bottom: 8px;
         }
         .header-date {
-            font-size: 12px;
+            font-size: 13px;
             opacity: 0.85;
             margin-bottom: 2px;
         }
@@ -73,7 +74,7 @@
             letter-spacing: 0.3px;
         }
         .header-role-text {
-            font-size: 12px;
+            font-size: 13px;
             opacity: 0.9;
             margin-bottom: 14px;
         }
@@ -139,17 +140,17 @@
             opacity: 0.9;
         }
         .canvas-banner-title {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             line-height: 1.3;
         }
         .canvas-banner-period {
-            font-size: 11px;
+            font-size: 12px;
             opacity: 0.85;
             line-height: 1.3;
         }
         .canvas-banner > i {
-            font-size: 12px;
+            font-size: 13px;
             opacity: 0.7;
         }
 
@@ -179,7 +180,7 @@
             letter-spacing: 0.4px;
         }
         .kpi-link {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-primary);
             text-decoration: none;
@@ -212,7 +213,7 @@
             margin-bottom: 4px;
         }
         .kpi-lbl {
-            font-size: 11px;
+            font-size: 12px;
             color: #6B6063;
             line-height: 1.2;
         }
@@ -222,7 +223,7 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            font-size: 11px;
+            font-size: 12px;
             margin-bottom: 6px;
         }
         .kpi-progress-label {
@@ -268,7 +269,7 @@
             margin-bottom: 24px;
         }
         .last-sync-text {
-            font-size: 11px;
+            font-size: 12px;
             color: #6B6063;
             text-align: center;
             margin-bottom: 8px;
@@ -301,19 +302,28 @@
             font-weight: 600;
             color: var(--color-black);
         }
-        .sync-icon-rotate { color: var(--color-primary); }
+        .sync-icon-rotate { color: #1F4E79; }
         .sync-icon-rotate.spinning {
-            animation: rotate 1s linear infinite;
+            animation: bounceDown 0.8s ease-in-out infinite;
+        }
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
         }
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
         .sync-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: #6B6063;
+        }
+        .sync-bar-right .sync-chevron {
             transition: transform 0.25s ease;
         }
-        .sync-accordion-bar[aria-expanded="true"] .sync-bar-right {
+        .sync-accordion-bar[aria-expanded="true"] .sync-bar-right .sync-chevron {
             transform: rotate(180deg);
         }
 
@@ -333,6 +343,43 @@
             margin-bottom: 8px;
         }
         .sync-detail-row:last-of-type { margin-bottom: 12px; }
+        .sync-status-indicators {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sync-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 12px;
+            line-height: 1;
+        }
+        .sync-pill-pending { background: #FFF8E1; color: #F57F17; }
+        .sync-pill-error { background: #FFEBEE; color: #C62828; }
+        .sync-pill-ok { background: #E8F5E9; color: #2E7D32; }
+        .sync-menu-dot {
+            position: absolute;
+            top: 2px;
+            right: 8px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 9px;
+            background: #C62828;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .sync-menu-dot.pending-only { background: #F57F17; }
 
         /* ===== Menu Circular Grid ===== */
         .menu-section {
@@ -341,9 +388,9 @@
         .menu-circle-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            row-gap: 22px;
-            column-gap: 8px;
-            padding: 0 16px;
+            row-gap: 16px;
+            column-gap: 6px;
+            padding: 0 12px;
         }
         .menu-circle-card {
             display: flex;
@@ -353,11 +400,11 @@
             text-decoration: none;
             color: inherit;
             position: relative;
-            padding: 4px;
+            padding: 4px 2px;
         }
         .circle-icon-wrapper {
-            width: 56px;
-            height: 56px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             background-color: #F1F7E5;
             display: flex;
@@ -376,12 +423,12 @@
             box-shadow: 0 0 0 4px rgba(0, 93, 65, 0.08);
         }
         .circle-menu-label {
-            font-size: 12px;
-            font-weight: 500;
+            font-size: 11px;
+            font-weight: 600;
             color: var(--color-black);
-            line-height: 1.25;
+            line-height: 1.3;
             word-wrap: break-word;
-            max-width: 84px;
+            max-width: 100%;
         }
 
         /* ===== Bottom Nav (override) ===== */
@@ -441,7 +488,7 @@
         }
     </style>
 </head>
-<body class="home-bg">
+<body class="home-bg" data-prototype-doc="home">
 
     <div class="mobile-wrapper">
         <a href="#main-menu" class="skip-link">Lewati ke menu utama</a>
@@ -458,7 +505,7 @@
                     <button type="button"
                             class="header-icon-btn"
                             aria-label="Notifikasi"
-                            onclick="alertUnderDevelopment('Notifikasi')">
+                            onclick="showNotifications()">
                         <i class="fas fa-bell" aria-hidden="true"></i>
                         <span class="notif-dot" aria-hidden="true"></span>
                         <span class="sr-only">Ada notifikasi baru</span>
@@ -466,19 +513,19 @@
                 </div>
                 <div class="header-username" id="userName">SINGARAJA</div>
                 <div class="header-role-text">
-                    Anda bekerja sebagai <strong id="userRole">canvasser</strong>
+                    Anda bekerja sebagai <strong id="userRole">motoris</strong>
                 </div>
 
                 <a href="javascript:void(0)"
                    class="canvas-banner"
                    role="button"
-                   aria-label="Lihat detail periode kanvas aktif"
-                   onclick="alertUnderDevelopment('Detail Periode Kanvas')">
+                   aria-label="Lihat detail periode penjualan aktif"
+                   onclick="showCanvasPeriodDetails()">
                     <div class="canvas-banner-content">
                         <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                         <div>
-                            <div class="canvas-banner-title">Periode Kanvas Aktif</div>
-                            <div class="canvas-banner-period">13 Jan 2026 — 01 Jan 2027</div>
+                            <div class="canvas-banner-title">Periode Penjualan</div>
+                            <div class="canvas-banner-period" id="salesPeriodLabel">-</div>
                         </div>
                     </div>
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
@@ -497,7 +544,7 @@
                 <div class="kpi-grid">
                     <div class="kpi-column">
                         <span class="kpi-val" id="kpiEfektif" aria-live="polite">0</span>
-                        <span class="kpi-lbl">K. Efektif</span>
+                        <span class="kpi-lbl">Faktur (EC)</span>
                     </div>
                     <div class="kpi-column">
                         <span class="kpi-val" id="kpiKunjungan" aria-live="polite">0</span>
@@ -527,10 +574,17 @@
                 </div>
             </section>
 
-            <!-- ===== Sync Section ===== -->
-            <section class="sync-section" aria-label="Status sinkronisasi">
+            <!-- ===== Action Button: Rute Kunjungan Harian ===== -->
+            <div style="padding: 0 16px; margin: 8px 0 24px;">
+                <a href="visit_list.html" class="btn-mobile-primary d-flex align-items-center justify-content-center gap-2 py-3" style="text-decoration:none; font-size:16px;">
+                    <i class="fas fa-route"></i> Rute Kunjungan
+                </a>
+            </div>
+
+            <!-- ===== Download Data Section ===== -->
+            <section class="sync-section" aria-label="Unduh data dari server">
                 <div class="last-sync-text">
-                    Terakhir disinkronkan: <span id="syncTimestamp">Belum pernah</span>
+                    Terakhir diunduh: <span id="syncTimestamp">Belum pernah</span>
                 </div>
 
                 <button type="button"
@@ -540,11 +594,12 @@
                         aria-controls="syncDetailsPanel"
                         onclick="toggleSyncDetails()">
                     <div class="sync-bar-left">
-                        <i class="fas fa-sync sync-icon-rotate" id="syncIcon" aria-hidden="true"></i>
-                        <span>Sinkronisasi Data</span>
+                        <i class="fas fa-cloud-download-alt sync-icon-rotate" id="syncIcon" aria-hidden="true"></i>
+                        <span>Unduh Data dari Server</span>
                     </div>
                     <div class="sync-bar-right">
-                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        <div class="sync-status-indicators" id="syncStatusIndicators" aria-live="polite"></div>
+                        <i class="fas fa-chevron-down sync-chevron" aria-hidden="true"></i>
                     </div>
                 </button>
 
@@ -552,20 +607,9 @@
                      id="syncDetailsPanel"
                      role="region"
                      aria-labelledby="syncAccordionBtn">
-                    <div class="sync-detail-row">
-                        <span>Data Master</span>
-                        <span class="badge-mobile badge-mobile-success">Selesai</span>
-                    </div>
-                    <div class="sync-detail-row">
-                        <span>Data Pelanggan</span>
-                        <span class="badge-mobile badge-mobile-success">Selesai</span>
-                    </div>
-                    <div class="sync-detail-row">
-                        <span>Transaksi Offline</span>
-                        <span class="badge-mobile badge-mobile-info" id="offlineCount">0 Pending</span>
-                    </div>
-                    <button type="button" class="btn-mobile-primary mt-8" onclick="triggerSyncProcess()">
-                        <i class="fas fa-sync" aria-hidden="true"></i> Sinkronisasikan Sekarang
+                    <div id="downloadPackageList"></div>
+                    <button type="button" class="btn-mobile-primary mt-8" onclick="triggerDownloadProcess()">
+                        <i class="fas fa-cloud-download-alt" aria-hidden="true"></i> Unduh Sekarang
                     </button>
                 </div>
             </section>
@@ -575,52 +619,26 @@
                 <h2 id="menuHeading" class="section-heading">Menu Utama</h2>
                 <div class="menu-circle-grid" role="list">
 
-                    <!-- Faktur Penjualan: Daftar faktur/invoice yang sudah dibuat hari ini -->
-                    <a href="visit_list.html" class="menu-circle-card" role="listitem" aria-label="Faktur Penjualan">
+                    <a href="product_catalog.html" class="menu-circle-card" role="listitem" aria-label="Cek Stok dan Belanja Stokis">
+                        <div class="circle-icon-wrapper" style="background-color: #EBF8F4; border-color: #C2ECE0;">
+                            <i class="fas fa-warehouse" style="color: #009E73;" aria-hidden="true"></i>
+                        </div>
+                        <span class="circle-menu-label">Cek Stok dan Belanja Stokis</span>
+                    </a>
+
+                    <a href="invoice_list.html?backTo=home" class="menu-circle-card" role="listitem" aria-label="Faktur Penjualan">
                         <div class="circle-icon-wrapper" style="background-color: #E6F2ED; border-color: #C6E2D6;">
                             <i class="fas fa-file-invoice-dollar" style="color: #005D41;" aria-hidden="true"></i>
                         </div>
                         <span class="circle-menu-label">Faktur Penjualan</span>
                     </a>
 
-                    <!-- Pembayaran: Tagih piutang / AR outstanding pelanggan -->
-                    <a href="collection_list.html" class="menu-circle-card" role="listitem" aria-label="Pembayaran Pelanggan">
-                        <div class="circle-icon-wrapper" style="background-color: #F1F7E5; border-color: #DDE8C1;">
-                            <i class="fas fa-hand-holding-usd" style="color: #78B500;" aria-hidden="true"></i>
-                        </div>
-                        <span class="circle-menu-label">Pembayaran</span>
-                    </a>
-
-                    <!-- Pelanggan: Daftar outlet/toko yang bisa dikunjungi (termasuk geo tag di detail) -->
-                    <a href="outlet_list.html" class="menu-circle-card" role="listitem" aria-label="Daftar Pelanggan">
-                        <div class="circle-icon-wrapper" style="background-color: #F6FAED; border-color: #E4F0CD;">
-                            <i class="fas fa-store" style="color: #5E8E00;" aria-hidden="true"></i>
-                        </div>
-                        <span class="circle-menu-label">Pelanggan</span>
-                    </a>
-
-                    <!-- Produk: Katalog produk yang tersedia untuk dijual -->
-                    <a href="product_catalog.html" class="menu-circle-card" role="listitem" aria-label="Katalog Produk">
-                        <div class="circle-icon-wrapper" style="background-color: #EBF8F4; border-color: #C2ECE0;">
-                            <i class="fas fa-boxes" style="color: #009E73;" aria-hidden="true"></i>
-                        </div>
-                        <span class="circle-menu-label">Produk</span>
-                    </a>
-
-                    <!-- Target: Lihat target penjualan harian/bulanan -->
-                    <a href="target.html" class="menu-circle-card" role="listitem" aria-label="Target Penjualan">
-                        <div class="circle-icon-wrapper" style="background-color: #FFF4E6; border-color: #FFD9A8;">
-                            <i class="fas fa-bullseye" style="color: #B25900;" aria-hidden="true"></i>
-                        </div>
-                        <span class="circle-menu-label">Target</span>
-                    </a>
-
-                    <!-- Sinkronisasi: Status & proses sync data offline ke server -->
-                    <a href="sync_detail.html" class="menu-circle-card" role="listitem" aria-label="Detail Sinkronisasi">
+                    <a href="sync_detail.html" class="menu-circle-card" role="listitem" aria-label="Antrean Upload">
+                        <span class="sync-menu-dot d-none" id="syncMenuBadge" aria-hidden="true"></span>
                         <div class="circle-icon-wrapper" style="background-color: #EAF1FB; border-color: #B7CFEE;">
-                            <i class="fas fa-cloud-download-alt" style="color: #1F4E79;" aria-hidden="true"></i>
+                            <i class="fas fa-cloud-upload-alt" style="color: #1F4E79;" aria-hidden="true"></i>
                         </div>
-                        <span class="circle-menu-label">Sinkronisasi</span>
+                        <span class="circle-menu-label">Antrean Upload</span>
                     </a>
 
                 </div>
@@ -631,7 +649,7 @@
         <!-- ===== Bottom Navigation (3 tab, SimpliDOTS style) ===== -->
         <nav class="mobile-nav" aria-label="Navigasi utama">
             <a href="dasbor.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="3" width="7" height="9" rx="1"></rect>
                     <rect x="14" y="3" width="7" height="5" rx="1"></rect>
                     <rect x="14" y="12" width="7" height="9" rx="1"></rect>
@@ -640,14 +658,14 @@
                 <span>Dasbor</span>
             </a>
             <a href="home.html" class="mobile-nav-item active" aria-current="page">
-                <svg viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;">
-                    <path d="M3 12L12 4l9 8"></path>
-                    <path d="M5 10v10h14V10"></path>
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
                 </svg>
                 <span>Beranda</span>
             </a>
             <a href="profil.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
@@ -660,21 +678,28 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../wwwroot/js/sfa-store.js"></script>
+    <script src="../../wwwroot/js/prototype-page-doc.js"></script>
     <script>
         // ===== Initial render =====
         $(document).ready(function() {
             renderUserSession();
             renderDateAndGreeting();
+            renderSalesPeriod();
             updateKPIFromStorage();
-            updateSyncBadge();
-            renderLastSyncTimestamp();
+            updateDownloadBadge();
+            renderLastDownloadTimestamp();
             wireKeyboardAccordion();
         });
 
+        function renderSalesPeriod() {
+            const period = SfaStore.getActiveSalesPeriod();
+            $('#salesPeriodLabel').text(period.label);
+        }
+
         function renderUserSession() {
-            const user = SfaStore.getUser() || { name: 'Pengguna', role: 'canvasser' };
+            const user = SfaStore.getUser() || { name: 'Pengguna', role: 'motoris' };
             $('#userName').text((user.name || 'Pengguna').toUpperCase());
-            $('#userRole').text(user.role || 'canvasser');
+            $('#userRole').text(user.role || 'motoris');
         }
 
         function renderDateAndGreeting() {
@@ -691,13 +716,13 @@
         }
 
         function updateKPIFromStorage() {
-            const kpi = SfaStore.getTodayKpi() || { efektif: 0, kunjungan: 0, totalRupiah: 0, pelanggan: 0 };
+            const kpi = SfaStore.getTodayKpi() || { efektif: 0, fakturCount: 0, kunjungan: 0, totalRupiah: 0, pelanggan: 0 };
 
-            $('#kpiEfektif').text(kpi.efektif);
+            $('#kpiEfektif').text(kpi.fakturCount != null ? kpi.fakturCount : kpi.efektif);
             $('#kpiKunjungan').text(kpi.kunjungan);
             $('#kpiTotalFaktur').text(SfaStore.formatRupiah(kpi.totalRupiah));
 
-            const target = kpi.pelanggan || 0;
+            const target = kpi.targetKunjungan || 0;
             const done = kpi.kunjungan || 0;
             const pct = target > 0 ? Math.min(Math.round((done / target) * 100), 100) : 0;
 
@@ -707,19 +732,87 @@
             $('#kpiProgressBar').attr('aria-valuenow', pct);
         }
 
-        function updateSyncBadge() {
-            const queue = SfaStore.getSyncQueue() || [];
-            const pending = queue.filter(q => q.status === 'pending' || q.status === 'failed').length;
-            $('#offlineCount').text(pending + ' Pending');
+        function packageStatusBadge(pkg) {
+            if (pkg.status === 'success') {
+                return '<span class="badge-mobile badge-mobile-success"><i class="fas fa-check-circle me-1"></i>Terunduh</span>';
+            }
+            if (pkg.status === 'failed') {
+                return '<span class="badge-mobile badge-mobile-danger"><i class="fas fa-times-circle me-1"></i>Error</span>';
+            }
+            if (pkg.status === 'downloading') {
+                return '<span class="badge-mobile badge-mobile-info"><i class="fas fa-spinner fa-spin me-1"></i>Mengunduh</span>';
+            }
+            return '<span class="badge-mobile badge-mobile-warning"><i class="fas fa-clock me-1"></i>Belum</span>';
         }
 
-        function renderLastSyncTimestamp() {
-            const ts = (typeof SfaStore.getLastSync === 'function') ? SfaStore.getLastSync() : null;
-            if (ts) {
-                $('#syncTimestamp').text(ts);
-            } else {
-                $('#syncTimestamp').text('Belum pernah');
+        function renderDownloadPackages() {
+            const failed = (SfaStore.getDownloadStatus().packages || [])
+                .filter(p => p.status === 'failed');
+            const $list = $('#downloadPackageList');
+            $list.empty();
+
+            if (failed.length === 0) {
+                $list.append(`
+                    <div class="text-center py-2" style="font-size:12px; color:#6B6063; margin-bottom:12px;">
+                        Tidak ada paket yang gagal diunduh.
+                    </div>
+                `);
+                return;
             }
+
+            failed.forEach(pkg => {
+                const errHint = pkg.errorMessage
+                    ? `<div style="font-size:10px; color:#C62828; margin-top:2px;">${pkg.errorMessage}</div>` : '';
+                $list.append(`
+                    <div class="sync-detail-row" style="align-items:flex-start;">
+                        <div>
+                            <span>${pkg.label}</span>
+                            ${errHint}
+                        </div>
+                        ${packageStatusBadge(pkg)}
+                    </div>
+                `);
+            });
+        }
+
+        function updateDownloadBadge() {
+            const packages = SfaStore.getDownloadStatus().packages || [];
+            const pending = packages.filter(p => p.status === 'pending' || p.status === 'downloading').length;
+            const failed = packages.filter(p => p.status === 'failed').length;
+
+            let indicators = '';
+            if (pending > 0) {
+                indicators += `<span class="sync-pill sync-pill-pending"><i class="fas fa-clock"></i>${pending}</span>`;
+            }
+            if (failed > 0) {
+                indicators += `<span class="sync-pill sync-pill-error"><i class="fas fa-exclamation-circle"></i>${failed}</span>`;
+            }
+            if (!indicators) {
+                indicators = `<span class="sync-pill sync-pill-ok"><i class="fas fa-check-circle"></i></span>`;
+            }
+            $('#syncStatusIndicators').html(indicators);
+            renderDownloadPackages();
+
+            const queue = SfaStore.getSyncQueue() || [];
+            const uploadPending = queue.filter(q => q.status === 'pending' || q.status === 'uploading').length;
+            const uploadFailed = queue.filter(q => q.status === 'failed').length;
+            const $menuBadge = $('#syncMenuBadge');
+            const uploadAlert = uploadPending + uploadFailed;
+            if (uploadAlert > 0) {
+                $menuBadge.removeClass('d-none pending-only');
+                if (uploadFailed > 0) {
+                    $menuBadge.text(uploadFailed > 9 ? '9+' : uploadFailed);
+                } else {
+                    $menuBadge.addClass('pending-only').text(uploadPending > 9 ? '9+' : uploadPending);
+                }
+            } else {
+                $menuBadge.addClass('d-none');
+            }
+        }
+
+        function renderLastDownloadTimestamp() {
+            const ts = SfaStore.getDownloadStatus().lastDownload;
+            $('#syncTimestamp').text(ts || 'Belum pernah');
         }
 
         // ===== Accordion (a11y) =====
@@ -746,39 +839,42 @@
             });
         }
 
-        // ===== Sync action =====
-        function triggerSyncProcess() {
+        // ===== Download action =====
+        function triggerDownloadProcess() {
             $('#syncIcon').addClass('spinning');
 
             Swal.fire({
-                title: 'Sinkronisasi...',
-                text: 'Mengunduh data pelanggan & mengunggah transaksi offline',
+                title: 'Mengunduh Data...',
+                html: '<div id="downloadProgressText" style="font-size:13px; color:#666;">Menghubungkan ke server...</div>',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
 
-            setTimeout(() => {
+            SfaStore.runDownloadFromServer((pkg, current, total) => {
+                $('#downloadProgressText').text(`Mengunduh ${pkg.label} (${current}/${total})...`);
+                updateDownloadBadge();
+            }).then(() => {
                 const now = new Date();
                 const timeStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) +
                     ' | ' +
                     now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+                SfaStore.setLastDownload(timeStr);
                 $('#syncTimestamp').text(timeStr);
-                $('#offlineCount').text('0 Pending');
                 $('#syncIcon').removeClass('spinning');
+                updateDownloadBadge();
 
-                if (typeof SfaStore.setLastSync === 'function') {
-                    SfaStore.setLastSync(timeStr);
-                }
-
+                const failed = SfaStore.getDownloadStatus().packages.filter(p => p.status === 'failed').length;
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil Sinkron',
-                    text: 'Data master, rute, dan faktur berhasil diperbarui.',
-                    timer: 1500,
+                    icon: failed > 0 ? 'warning' : 'success',
+                    title: failed > 0 ? 'Unduhan Sebagian Gagal' : 'Unduhan Berhasil',
+                    text: failed > 0
+                        ? 'Sebagian paket data gagal diunduh. Coba lagi atau periksa koneksi.'
+                        : 'Data master, pelanggan, dan rute berhasil diunduh ke perangkat.',
+                    timer: 2000,
                     showConfirmButton: false
                 });
-            }, 1500);
+            });
         }
 
         function alertUnderDevelopment(featureName) {
@@ -788,6 +884,90 @@
                 text: `Modul '${featureName}' sedang disimulasikan. Hubungkan dengan API SFA untuk integrasi data nyata.`,
                 confirmButtonColor: '#005D41',
                 confirmButtonText: 'Mengerti'
+            });
+        }
+
+        function showCanvasPeriodDetails() {
+            const user = SfaStore.getUser() || { name: 'SINGARAJA', role: 'motoris' };
+            const userName = (user.name || 'SINGARAJA').toUpperCase();
+            const userRole = (user.role || 'motoris').toUpperCase();
+            const period = SfaStore.getActiveSalesPeriod();
+            const stockistList = SfaStore.getStockists()
+                .map(s => `<li class="mb-1">${s.name}</li>`)
+                .join('');
+
+            Swal.fire({
+                title: '<span style="font-size:16px; font-weight:700; color:#005D41;">Detail Periode Penjualan</span>',
+                html: `
+                    <div class="text-start p-2" style="font-size: 13px;">
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 12px;">Durasi Periode</label>
+                            <span class="fw-bold text-dark">${period.label}</span>
+                        </div>
+                        <div class="mb-3 border-bottom pb-2" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 12px;">Petugas Canvasser</label>
+                            <span class="fw-bold text-dark">${userName} (${userRole})</span>
+                        </div>
+                        <div class="mb-0" style="text-align: left;">
+                            <label class="text-muted d-block" style="font-size: 12px;">Gudang / Stockist Asal</label>
+                            <ul class="fw-bold text-dark mb-0 ps-3" style="font-size: 13px;">${stockistList}</ul>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Tutup',
+                width: '360px'
+            });
+        }
+
+        function showNotifications() {
+            // Hide the red notification dot to simulate "marking as read"
+            $('.notif-dot').fadeOut(300);
+
+            Swal.fire({
+                title: '<span style="font-size:16px; font-weight:700; color:#005D41;">Notifikasi Masuk</span>',
+                html: `
+                    <div class="list-group list-group-flush text-start" style="max-height: 300px; overflow-y: auto; font-size: 12px; font-family: inherit;">
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-danger text-white" style="font-size: 9px; padding: 2px 6px;">PENTING</span>
+                                <span class="text-muted" style="font-size: 10px;">15 mnt lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Overdue Outstanding (AP)</div>
+                            <div class="text-muted" style="line-height: 1.4;">Apotek Roxy Salemba memiliki tagihan lewat jatuh tempo sebesar Rp 3.750.000. Harap tindak lanjuti hari ini.</div>
+                        </div>
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-success text-white" style="font-size: 9px; padding: 2px 6px;">PRESTASI</span>
+                                <span class="text-muted" style="font-size: 10px;">1 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Target Kunjungan Terlampaui</div>
+                            <div class="text-muted" style="line-height: 1.4;">Selamat! Anda telah melampaui 80% dari target kunjungan harian Anda hari ini. Pertahankan kinerjanya!</div>
+                        </div>
+                        <div class="list-group-item p-3 border-bottom" style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-primary text-white" style="font-size: 9px; padding: 2px 6px;">PROMO</span>
+                                <span class="text-muted" style="font-size: 10px;">3 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Promo Khusus Canvasser</div>
+                            <div class="text-muted" style="line-height: 1.4;">Promo Morinaga Chil*Kid Gold (Beli 3 Karton gratis 1 Karton) resmi diperpanjang hingga 30 Juni 2026.</div>
+                        </div>
+                        <div class="list-group-item p-3 style="text-align: left;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-secondary text-white" style="font-size: 9px; padding: 2px 6px;">SISTEM</span>
+                                <span class="text-muted" style="font-size: 10px;">4 jam lalu</span>
+                            </div>
+                            <div class="fw-bold text-dark mb-1">Auto-Sync Sukses</div>
+                            <div class="text-muted" style="line-height: 1.4;">Sinkronisasi database offline dengan server utama Kalbe telah selesai diunggah.</div>
+                        </div>
+                    </div>
+                `,
+                confirmButtonColor: '#005D41',
+                confirmButtonText: 'Tutup',
+                width: '380px',
+                customClass: {
+                    htmlContainer: 'p-0 text-start'
+                }
             });
         }
     </script>

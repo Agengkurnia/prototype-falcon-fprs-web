@@ -10,21 +10,21 @@
     // SEED DATA
     // =========================================================
     const SEED_CUSTOMERS = [
-        { id: 'OL-10492', name: 'Apotek Sehat Prima',      outletType: 'Apotek',         address: 'Jl. Kebayoran Baru No.12', kota: 'Jakarta Selatan', owner: 'Drs. Hendra S.',  phone: '0812-1111-2222', channel: 'GT', status: 'Aktif',     lat: -6.2200, lng: 106.8100, arBalance: 0,         top: 14 },
-        { id: 'OL-10511', name: 'Toko Ibu & Anak Melati',  outletType: 'Baby Shop',      address: 'Jl. Fatmawati Raya No.55', kota: 'Jakarta Selatan', owner: 'Siti Rahayu',     phone: '0813-3333-4444', channel: 'GT', status: 'Aktif',     lat: -6.2890, lng: 106.7940, arBalance: 1850000,   top: 30 },
-        { id: 'OL-10283', name: 'Apotek Roxy Salemba',     outletType: 'Apotek',         address: 'Jl. Salemba Raya No.15',  kota: 'Jakarta Pusat',   owner: 'H. Syamsul A.',   phone: '0821-5555-6666', channel: 'GT', status: 'Aktif',     lat: -6.2010, lng: 106.8440, arBalance: 3750000,   top: 30 },
-        { id: 'OL-10772', name: 'Klinik Bunda Mulia',      outletType: 'Klinik',         address: 'Jl. Menteng Raya No.88',  kota: 'Jakarta Pusat',   owner: 'dr. Susi W.',     phone: '0815-7777-8888', channel: 'MT', status: 'Aktif',     lat: -6.1960, lng: 106.8370, arBalance: 0,         top: 14 },
-        { id: 'OL-10819', name: 'Minimart Keluarga Jaya',  outletType: 'Outlet Regular', address: 'Jl. Tebet Raya No.101',   kota: 'Jakarta Selatan', owner: 'Budi Santoso',    phone: '0817-9999-0000', channel: 'GT', status: 'Aktif',     lat: -6.2250, lng: 106.8510, arBalance: 2100000,   top: 30 },
-        { id: 'OL-10902', name: 'RS Ibu Prima',            outletType: 'Rumah Sakit',    address: 'Jl. Kuningan No.22',      kota: 'Jakarta Selatan', owner: 'Dr. Andika P.',   phone: '0818-1212-3434', channel: 'MT', status: 'Aktif',     lat: -6.2310, lng: 106.8320, arBalance: 8500000,   top: 14 },
-        { id: 'OL-11002', name: 'Apotek 24 Jam Selaras',   outletType: 'Apotek',         address: 'Jl. Kemang Raya No.67',   kota: 'Jakarta Selatan', owner: 'Farida Hanum',    phone: '0819-5656-7878', channel: 'GT', status: 'Aktif',     lat: -6.2620, lng: 106.8130, arBalance: 0,         top: 30 },
-        { id: 'OL-11145', name: 'Posyandu Melati RW 05',   outletType: 'Posyandu',       address: 'Jl. Senopati No.10',      kota: 'Jakarta Selatan', owner: 'Ibu Kartini',     phone: '0822-2345-6789', channel: 'GT', status: 'Potential', lat: -6.2380, lng: 106.8090, arBalance: 0,         top: 0  },
-        { id: 'OL-11239', name: 'Apotek Kimia Farma 88',   outletType: 'Apotek',         address: 'Jl. Sudirman No.88',      kota: 'Jakarta Pusat',   owner: 'Manager KF88',    phone: '0821-8080-9090', channel: 'MT', status: 'Aktif',     lat: -6.2100, lng: 106.8200, arBalance: 5600000,   top: 14 },
-        { id: 'OL-11340', name: 'Toko Nutrisi Mama',       outletType: 'Baby Shop',      address: 'Jl. Blok M No.34',        kota: 'Jakarta Selatan', owner: 'Nurhayati',       phone: '0823-4567-8901', channel: 'GT', status: 'Aktif',     lat: -6.2440, lng: 106.7990, arBalance: 750000,    top: 30 },
-        { id: 'OL-11451', name: 'Koperasi Karyawan PLN',   outletType: 'Koperasi',       address: 'Jl. Gatot Subroto No.47', kota: 'Jakarta Selatan', owner: 'Kop. PLN Jaksel', phone: '0824-6789-0123', channel: 'GT', status: 'Aktif',     lat: -6.2280, lng: 106.8270, arBalance: 0,         top: 30 },
-        { id: 'OL-11562', name: 'Apotek Generik Sehat',    outletType: 'Apotek',         address: 'Jl. Pancoran No.9',       kota: 'Jakarta Selatan', owner: 'Agus Santoso',    phone: '0825-1111-2345', channel: 'GT', status: 'Aktif',     lat: -6.2555, lng: 106.8430, arBalance: 1200000,   top: 30 },
-        { id: 'OL-11673', name: 'Baby World Pondok Indah', outletType: 'Baby Shop',      address: 'Jl. Metro Pondok Indah',  kota: 'Jakarta Selatan', owner: 'Chandra W.',      phone: '0826-3456-7890', channel: 'MT', status: 'Aktif',     lat: -6.2680, lng: 106.7880, arBalance: 4200000,   top: 14 },
-        { id: 'OL-11784', name: 'Puskesmas Mampang',       outletType: 'Puskesmas',      address: 'Jl. Mampang Prapatan 12', kota: 'Jakarta Selatan', owner: 'dr. Teguh',       phone: '0827-5678-9012', channel: 'GT', status: 'Aktif',     lat: -6.2490, lng: 106.8160, arBalance: 0,         top: 0  },
-        { id: 'OL-11895', name: 'Apotek Kasih Ibu',        outletType: 'Apotek',         address: 'Jl. Cipete Raya No.23',   kota: 'Jakarta Selatan', owner: 'Dewi Lestari',    phone: '0828-7890-1234', channel: 'GT', status: 'Aktif',     lat: -6.2810, lng: 106.7960, arBalance: 0,         top: 30 }
+        { id: 'OL-10492', name: 'Apotek Sehat Prima',      outletType: 'Apotek',         address: 'Jl. Kebayoran Baru No.12', kota: 'Jakarta Selatan', owner: 'Drs. Hendra S.',  phone: '0812-1111-2222', channel: 'GT', status: 'Aktif',     lat: -6.2200, lng: 106.8100, arBalance: 0,         top: 14, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-10511', name: 'Toko Ibu & Anak Melati',  outletType: 'Baby Shop',      address: 'Jl. Fatmawati Raya No.55', kota: 'Jakarta Selatan', owner: 'Siti Rahayu',     phone: '0813-3333-4444', channel: 'GT', status: 'Aktif',     lat: -6.2890, lng: 106.7940, arBalance: 1850000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-10283', name: 'Apotek Roxy Salemba',     outletType: 'Apotek',         address: 'Jl. Salemba Raya No.15',  kota: 'Jakarta Pusat',   owner: 'H. Syamsul A.',   phone: '0821-5555-6666', channel: 'GT', status: 'Aktif',     lat: -6.2010, lng: 106.8440, arBalance: 3750000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-10772', name: 'Klinik Bunda Mulia',      outletType: 'Klinik',         address: 'Jl. Menteng Raya No.88',  kota: 'Jakarta Pusat',   owner: 'dr. Susi W.',     phone: '0815-7777-8888', channel: 'MT', status: 'Aktif',     lat: -6.1960, lng: 106.8370, arBalance: 0,         top: 14, imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-10819', name: 'Minimart Keluarga Jaya',  outletType: 'Outlet Regular', address: 'Jl. Tebet Raya No.101',   kota: 'Jakarta Selatan', owner: 'Budi Santoso',    phone: '0817-9999-0000', channel: 'GT', status: 'Aktif',     lat: -6.2250, lng: 106.8510, arBalance: 2100000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-10902', name: 'RS Ibu Prima',            outletType: 'Rumah Sakit',    address: 'Jl. Kuningan No.22',      kota: 'Jakarta Selatan', owner: 'Dr. Andika P.',   phone: '0818-1212-3434', channel: 'MT', status: 'Aktif',     lat: -6.2310, lng: 106.8320, arBalance: 8500000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-11002', name: 'Apotek 24 Jam Selaras',   outletType: 'Apotek',         address: 'Jl. Kemang Raya No.67',   kota: 'Jakarta Selatan', owner: 'Farida Hanum',    phone: '0819-5656-7878', channel: 'GT', status: 'Aktif',     lat: -6.2620, lng: 106.8130, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11145', name: 'Posyandu Melati RW 05',   outletType: 'Posyandu',       address: 'Jl. Senopati No.10',      kota: 'Jakarta Selatan', owner: 'Ibu Kartini',     phone: '0822-2345-6789', channel: 'GT', status: 'Potential', lat: -6.2380, lng: 106.8090, arBalance: 0,         top: 0,  imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-11239', name: 'Apotek Kimia Farma 88',   outletType: 'Apotek',         address: 'Jl. Sudirman No.88',      kota: 'Jakarta Pusat',   owner: 'Manager KF88',    phone: '0821-8080-9090', channel: 'MT', status: 'Aktif',     lat: -6.2100, lng: 106.8200, arBalance: 5600000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11340', name: 'Toko Nutrisi Mama',       outletType: 'Baby Shop',      address: 'Jl. Blok M No.34',        kota: 'Jakarta Selatan', owner: 'Nurhayati',       phone: '0823-4567-8901', channel: 'GT', status: 'Aktif',     lat: -6.2440, lng: 106.7990, arBalance: 750000,    top: 30, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-11451', name: 'Koperasi Karyawan PLN',   outletType: 'Koperasi',       address: 'Jl. Gatot Subroto No.47', kota: 'Jakarta Selatan', owner: 'Kop. PLN Jaksel', phone: '0824-6789-0123', channel: 'GT', status: 'Aktif',     lat: -6.2280, lng: 106.8270, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/minimarket.png' },
+        { id: 'OL-11562', name: 'Apotek Generik Sehat',    outletType: 'Apotek',         address: 'Jl. Pancoran No.9',       kota: 'Jakarta Selatan', owner: 'Agus Santoso',    phone: '0825-1111-2345', channel: 'GT', status: 'Aktif',     lat: -6.2555, lng: 106.8430, arBalance: 1200000,   top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' },
+        { id: 'OL-11673', name: 'Baby World Pondok Indah', outletType: 'Baby Shop',      address: 'Jl. Metro Pondok Indah',  kota: 'Jakarta Selatan', owner: 'Chandra W.',      phone: '0826-3456-7890', channel: 'MT', status: 'Aktif',     lat: -6.2680, lng: 106.7880, arBalance: 4200000,   top: 14, imageUrl: '../../wwwroot/assets/images/outlets/baby_shop.png' },
+        { id: 'OL-11784', name: 'Puskesmas Mampang',       outletType: 'Puskesmas',      address: 'Jl. Mampang Prapatan 12', kota: 'Jakarta Selatan', owner: 'dr. Teguh',       phone: '0827-5678-9012', channel: 'GT', status: 'Aktif',     lat: -6.2490, lng: 106.8160, arBalance: 0,         top: 0,  imageUrl: '../../wwwroot/assets/images/outlets/clinic.png' },
+        { id: 'OL-11895', name: 'Apotek Kasih Ibu',        outletType: 'Apotek',         address: 'Jl. Cipete Raya No.23',   kota: 'Jakarta Selatan', owner: 'Dewi Lestari',    phone: '0828-7890-1234', channel: 'GT', status: 'Aktif',     lat: -6.2810, lng: 106.7960, arBalance: 0,         top: 30, imageUrl: '../../wwwroot/assets/images/outlets/apotek.png' }
     ];
 
     const SEED_PRODUCTS = [
@@ -157,6 +157,15 @@
         }
     ];
 
+    const SEED_STOCKISTS = [
+        { id: 'STK-001', name: 'Grosir Sinar Jaya',    address: 'Jl. Pasar Baru No.12, Jakarta Pusat',      kota: 'Jakarta Pusat',  tipe: 'Grosir',        lat: -6.1625, lng: 106.8342 },
+        { id: 'STK-002', name: 'PT Sumber Makmur',     address: 'Jl. Mangga Dua Raya, Jakarta Utara',       kota: 'Jakarta Utara',  tipe: 'Distributor',   lat: -6.1350, lng: 106.8230 },
+        { id: 'STK-003', name: 'CV Berkah Jaya',       address: 'Jl. Rawa Belong, Jakarta Barat',           kota: 'Jakarta Barat',  tipe: 'Grosir',        lat: -6.1980, lng: 106.7720 },
+        { id: 'STK-004', name: 'PT Indo Distribusi',   address: 'Jl. Cakung Cilincing, Jakarta Timur',      kota: 'Jakarta Timur',  tipe: 'Distributor',   lat: -6.1520, lng: 106.9450 },
+        { id: 'STK-005', name: 'PT Kalbe Farma Dist.', address: 'Jl. Letjen S. Parman, Jakarta Barat',      kota: 'Jakarta Barat',  tipe: 'Principal',     lat: -6.1890, lng: 106.7980 },
+        { id: 'STK-006', name: 'CV Karya Mandiri',     address: 'Jl. Condet Raya, Jakarta Timur',           kota: 'Jakarta Timur',  tipe: 'Grosir',        lat: -6.2780, lng: 106.8520 }
+    ];
+
     const SEED_COLLECTIONS = [
         // AR outstanding untuk beberapa outlet
         { id: 'AR-2026-0011', customerId: 'OL-10511', invoiceNo: 'FKT-2026-0045', date: '2026-05-12', amount: 1850000, balance: 1850000, status: 'outstanding', dueDate: '2026-06-11' },
@@ -182,8 +191,35 @@
         CUSTOMERS:   'sfa_customers',
         PRODUCTS:    'sfa_products',
         SYNC_QUEUE:  'sfa_sync_queue',
-        SEEDED:      'sfa_seeded_v3'
+        SYNC_QUEUE_CLEARED: 'sfa_sync_queue_cleared',
+        DOWNLOAD_STATUS: 'sfa_download_status',
+        SEEDED:      'sfa_seeded_v10_target35',
+        ACTIVE_STOCKIST: 'sfa_active_stockist',
+        TARGET_HARIAN: 'md_limit_target',
+        TARGET_HARIAN_SEED_VER: 'md_limit_target_seed_ver'
     };
+
+    const TARGET_HARIAN_SEED_VER_VAL = '4';
+    const SEED_TARGET_HARIAN = [
+        {
+            id: 1,
+            jabatan: 'MD',
+            typeJabatan: 'MD Reguler',
+            versions: [
+                { id: 'md-h1', minimalHarian: 20, maximalHarian: 30, targetHke: 6, targetHkeBulanan: 20, tanggalMulai: '2026-01-01', tanggalSelesai: '2026-06-30', active: true },
+                { id: 'md-h2', minimalHarian: 22, maximalHarian: 32, targetHke: 6, targetHkeBulanan: 22, tanggalMulai: '2026-07-01', tanggalSelesai: '2026-12-31', active: true }
+            ]
+        },
+        {
+            id: 2,
+            jabatan: 'Motoris',
+            typeJabatan: 'Motoris Reguler',
+            versions: [
+                { id: 'mot-h1', minimalHarian: 28, maximalHarian: 35, targetHke: 6, targetHkeBulanan: 24, tanggalMulai: '2026-01-01', tanggalSelesai: '2026-06-30', active: true },
+                { id: 'mot-h2', minimalHarian: 30, maximalHarian: 35, targetHke: 6, targetHkeBulanan: 26, tanggalMulai: '2026-07-01', tanggalSelesai: '2026-12-31', active: true }
+            ]
+        }
+    ];
 
     // =========================================================
     // HELPERS
@@ -201,25 +237,537 @@
         return new Date().toISOString().slice(0, 10);
     }
 
+    function getActiveSalesPeriod(date) {
+        const d = date ? new Date(date) : new Date();
+        const year = d.getFullYear();
+        const month = d.getMonth();
+        const start = new Date(year, month, 1);
+        const end = new Date(year, month + 1, 0);
+        const fmt = (dt) => dt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        return {
+            label: fmt(start) + ' — ' + fmt(end),
+            startDate: start.toISOString().slice(0, 10),
+            endDate: end.toISOString().slice(0, 10),
+            monthName: start.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+        };
+    }
+
+    function getStockists() {
+        try {
+            const raw = localStorage.getItem('md_stokis');
+            if (raw) {
+                const list = JSON.parse(raw);
+                return list
+                    .filter(s => (s.status || 'Active') === 'Active')
+                    .map(s => ({
+                        id: s.kode || String(s.id),
+                        name: s.nama,
+                        address: s.alamat || [s.branch, s.region].filter(Boolean).join(', '),
+                        kota: s.branch || s.kota || '',
+                        branch: s.branch || '',
+                        region: s.region || '',
+                        telepon: s.telepon || '',
+                        tipe: s.tipe || 'Grosir',
+                        lat: s.lat,
+                        lng: s.lng
+                    }));
+            }
+        } catch (e) { /* fallback seed */ }
+        return SEED_STOCKISTS;
+    }
+    function getStockistById(id) {
+        return getStockists().find(s => s.id === id) || SEED_STOCKISTS.find(s => s.id === id) || null;
+    }
+
+    function getActiveStockist() {
+        const id = localStorage.getItem(KEYS.ACTIVE_STOCKIST);
+        return id ? getStockistById(id) : null;
+    }
+    function setActiveStockist(id) {
+        if (id) localStorage.setItem(KEYS.ACTIVE_STOCKIST, id);
+        else localStorage.removeItem(KEYS.ACTIVE_STOCKIST);
+    }
+
+    function haversineMeters(lat1, lng1, lat2, lng2) {
+        const R = 6371000;
+        const toRad = d => d * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLng = toRad(lng2 - lng1);
+        const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function formatDistanceMeters(m) {
+        if (m == null || !isFinite(m)) return '—';
+        if (m < 1000) return Math.round(m) + ' m';
+        return (m / 1000).toFixed(1) + ' km';
+    }
+
+    function getNearestStockists(lat, lng, limit = 5) {
+        return getStockists()
+            .map(s => {
+                if (s.lat == null || s.lng == null) {
+                    return { ...s, distanceM: null, distanceLabel: '—' };
+                }
+                const distanceM = haversineMeters(lat, lng, s.lat, s.lng);
+                return { ...s, distanceM, distanceLabel: formatDistanceMeters(distanceM) };
+            })
+            .sort((a, b) => {
+                if (a.distanceM == null) return 1;
+                if (b.distanceM == null) return -1;
+                return a.distanceM - b.distanceM;
+            })
+            .slice(0, limit);
+    }
+
     // =========================================================
     // SEED: Run once per session install
     // =========================================================
     function seedIfNeeded() {
-        if (read(KEYS.SEEDED)) return;
+        const lastSeed = read(KEYS.SEEDED);
+        const todayString = todayStr();
+        if (lastSeed === todayString) return;
+
         write(KEYS.CUSTOMERS,   SEED_CUSTOMERS);
         write(KEYS.PRODUCTS,    SEED_PRODUCTS);
         write(KEYS.COLLECTIONS, SEED_COLLECTIONS);
-        write(KEYS.VISITS,      []);
-        write(KEYS.INVOICES,    []);
-        write(KEYS.SYNC_QUEUE,  []);
-        write(KEYS.SEEDED, true);
-        console.log('[SfaStore] Seed data loaded.');
+        write(KEYS.VISITS,      buildSeedVisits());
+        write(KEYS.INVOICES,    buildSeedInvoices());
+        if (!Array.isArray(read(KEYS.SYNC_QUEUE)) || read(KEYS.SYNC_QUEUE).length === 0) {
+            write(KEYS.SYNC_QUEUE, buildSeedSyncQueue());
+            localStorage.removeItem(KEYS.SYNC_QUEUE_CLEARED);
+        }
+        write(KEYS.DOWNLOAD_STATUS, buildDefaultDownloadStatus());
+        ensureTargetHarianSeed(false);
+        write(KEYS.SEEDED,      todayString);
+        console.log('[SfaStore] Seed data v9 (Today route demo) loaded/refreshed for ' + todayString);
+    }
+
+    function ensureTargetHarianSeed(force) {
+        const ver = localStorage.getItem(KEYS.TARGET_HARIAN_SEED_VER);
+        const existing = read(KEYS.TARGET_HARIAN);
+        if (!force && ver === TARGET_HARIAN_SEED_VER_VAL && Array.isArray(existing) && existing.length) return;
+        write(KEYS.TARGET_HARIAN, SEED_TARGET_HARIAN);
+        localStorage.setItem(KEYS.TARGET_HARIAN_SEED_VER, TARGET_HARIAN_SEED_VER_VAL);
+        // bersihkan model lama (versi tanggal)
+        localStorage.removeItem('md_target_harian');
+        localStorage.removeItem('md_target_harian_seed_ver');
+    }
+
+    function getLimitTargets() {
+        ensureTargetHarianSeed(false);
+        return read(KEYS.TARGET_HARIAN) || [];
+    }
+
+    /** @deprecated gunakan getLimitTargets */
+    function getTargetHarianVersions() {
+        return getLimitTargets();
+    }
+
+    function getLimitVersions(item) {
+        if (!item) return [];
+        if (Array.isArray(item.versions)) return item.versions;
+        return [];
+    }
+
+    function resolveLimitVersionOnDate(item, dateStr) {
+        const ds = dateStr || todayStr();
+        const versions = getLimitVersions(item).filter(v => v && v.active !== false);
+        const hit = versions.find(v =>
+            v.tanggalMulai && v.tanggalSelesai &&
+            ds >= v.tanggalMulai && ds <= v.tanggalSelesai
+        );
+        if (hit) return hit;
+        if (versions.length) {
+            return versions.slice().sort((a, b) => String(b.tanggalMulai || '').localeCompare(String(a.tanggalMulai || '')))[0];
+        }
+        return null;
+    }
+
+    /** Map role login mobile → header Master Limit */
+    function resolveUserLimitKey(user) {
+        const role = String((user || getUser() || {}).role || 'motoris').toLowerCase().replace(/[\s-]+/g, '_');
+        if (role === 'md' || role === 'modern_trade' || role === 'moderntrade') {
+            return { jabatan: 'MD', typeJabatan: 'MD Reguler' };
+        }
+        // motoris / canvasser / default → Motoris Reguler
+        return { jabatan: 'Motoris', typeJabatan: 'Motoris Reguler' };
+    }
+
+    function getLimitByJabatan(jabatan, typeJabatan) {
+        return getLimitTargets().find(v =>
+            String(v.jabatan || '') === String(jabatan || '') &&
+            String(v.typeJabatan || '') === String(typeJabatan || '')
+        ) || null;
+    }
+
+    function getLimitForUser(user, dateStr) {
+        const key = resolveUserLimitKey(user);
+        const row = getLimitByJabatan(key.jabatan, key.typeJabatan);
+        if (!row) return null;
+        const ver = resolveLimitVersionOnDate(row, dateStr);
+        return ver ? { ...key, ...ver, headerId: row.id } : { ...key, headerId: row.id };
+    }
+
+    /** Target kunjungan (min harian) untuk user/tanggal — ditampilkan di dasbor mobile */
+    function getLimitTarget(_ignoredCode, dateStr) {
+        const lim = getLimitForUser(null, dateStr);
+        return lim ? (Number(lim.minimalHarian) || 0) : 0;
+    }
+
+    function getLimitByCode() {
+        // legacy no-op compatibility — identity sekarang jabatan+type
+        return getLimitForUser(null, todayStr());
+    }
+
+    function getVisitTargetForDate(dateStr) {
+        return getLimitTarget(null, dateStr || todayStr());
+    }
+
+    function getVisitTargetForRange(from, to) {
+        if (!from || !to) return getVisitTargetForDate(from || todayStr());
+        let sum = 0;
+        const cur = new Date(from + 'T12:00:00');
+        const end = new Date(to + 'T12:00:00');
+        if (Number.isNaN(cur.getTime()) || Number.isNaN(end.getTime())) return getVisitTargetForDate(from);
+        while (cur <= end) {
+            const y = cur.getFullYear();
+            const m = String(cur.getMonth() + 1).padStart(2, '0');
+            const d = String(cur.getDate()).padStart(2, '0');
+            sum += getVisitTargetForDate(`${y}-${m}-${d}`);
+            cur.setDate(cur.getDate() + 1);
+        }
+        return sum;
+    }
+
+    function getEcTarget(dateStr) {
+        const lim = getLimitForUser(null, dateStr);
+        return lim ? (Number(lim.targetHke) || 0) : 0;
+    }
+
+    const TODAY_ROUTE_IDS = ['OL-10492', 'OL-10511', 'OL-10283', 'OL-10772', 'OL-10819'];
+
+    const ROUTE_PLAN_WEEKDAY = {
+        1: ['OL-10492', 'OL-10511', 'OL-10283'],
+        2: ['OL-10772', 'OL-10819', 'OL-10902'],
+        3: ['OL-10283', 'OL-11002', 'OL-11145'],
+        4: ['OL-10492', 'OL-10819', 'OL-11239'],
+        5: ['OL-10511', 'OL-10772', 'OL-11340'],
+        6: ['OL-11673', 'OL-11784']
+    };
+
+    function getTodayRouteIds() {
+        return TODAY_ROUTE_IDS.slice();
+    }
+
+    function getPlannedRouteIdsForDate(dateStr) {
+        if (dateStr === todayStr()) return getTodayRouteIds();
+        const d = new Date(dateStr + 'T12:00:00');
+        const dow = d.getDay();
+        if (dow === 0) return [];
+        return (ROUTE_PLAN_WEEKDAY[dow] || []).slice();
+    }
+
+    function wasVisitedOnDate(customerId, dateStr) {
+        return getVisits().some(v =>
+            v.customerId === customerId &&
+            v.date === dateStr &&
+            (v.status === 'checked_out' || v.status === 'checked_in')
+        );
+    }
+
+    function getOverdueRouteCustomers() {
+        const today = new Date();
+        const bestByCustomer = {};
+
+        for (let day = 1; day < today.getDate(); day++) {
+            const dt = new Date(today.getFullYear(), today.getMonth(), day);
+            if (dt.getDay() === 0) continue;
+            const dateStr = dt.toISOString().slice(0, 10);
+            getPlannedRouteIdsForDate(dateStr).forEach(customerId => {
+                if (wasVisitedOnDate(customerId, dateStr)) return;
+                const daysOverdue = today.getDate() - day;
+                const prev = bestByCustomer[customerId];
+                if (!prev || daysOverdue > prev.daysOverdue) {
+                    bestByCustomer[customerId] = { customerId, scheduledDate: dateStr, daysOverdue };
+                }
+            });
+        }
+
+        return Object.values(bestByCustomer).sort((a, b) => b.daysOverdue - a.daysOverdue);
+    }
+
+    function isModernTradeUser() {
+        const role = String(getUser()?.role || 'motoris').toLowerCase().replace(/[\s-]+/g, '_');
+        return role === 'md' || role === 'modern_trade' || role === 'moderntrade';
+    }
+
+    function buildSeedSyncQueue() {
+        const now = Date.now();
+        return [
+            {
+                id: 'SQ-DEMO-1', type: 'Visit',
+                payload: { customerId: 'OL-10772', customerName: 'Klinik Bunda Mulia' },
+                status: 'pending',
+                createdAt: new Date(now - 7200000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-2', type: 'Invoice',
+                payload: { invoiceNo: 'FKT-2026-0188', customerId: 'OL-10819', amount: 2100000 },
+                status: 'pending',
+                createdAt: new Date(now - 5400000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-3', type: 'Collection',
+                payload: { customerId: 'OL-10511', amount: 750000 },
+                status: 'success',
+                createdAt: new Date(now - 86400000).toISOString(),
+                updatedAt: new Date(now - 86000000).toISOString()
+            },
+            {
+                id: 'SQ-DEMO-ERR', type: 'Invoice',
+                payload: { invoiceNo: 'FKT-2026-0099', customerId: 'OL-10511', amount: 1850000 },
+                status: 'failed',
+                createdAt: new Date(now - 10800000).toISOString(),
+                updatedAt: new Date(now - 3600000).toISOString(),
+                errorMessage: 'Timeout — server tidak merespons',
+                retryCount: 2
+            }
+        ];
+    }
+
+    function ensureDemoSyncQueue() {
+        if (read(KEYS.SYNC_QUEUE_CLEARED)) {
+            const q = read(KEYS.SYNC_QUEUE);
+            return Array.isArray(q) ? q : [];
+        }
+        let q = read(KEYS.SYNC_QUEUE);
+        if (!Array.isArray(q)) q = [];
+        if (!q.some(i => i.status === 'failed')) {
+            const demoErr = q.find(i => i.id === 'SQ-DEMO-ERR');
+            if (demoErr) {
+                demoErr.status = 'failed';
+                demoErr.updatedAt = new Date().toISOString();
+                demoErr.errorMessage = demoErr.errorMessage || 'Koneksi timeout — gagal unggah ke server';
+            } else {
+                q.push({
+                    id: 'SQ-DEMO-ERR',
+                    type: 'Invoice',
+                    payload: { invoiceNo: 'FKT-2026-0099', customerId: 'OL-10511', amount: 1850000 },
+                    status: 'failed',
+                    createdAt: new Date(Date.now() - 3600000).toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    errorMessage: 'Koneksi timeout — gagal unggah ke server',
+                    retryCount: 1
+                });
+            }
+            write(KEYS.SYNC_QUEUE, q);
+        }
+        return read(KEYS.SYNC_QUEUE) || [];
+    }
+
+    function shouldDemoFailUpload(item) {
+        if (!item) return false;
+        if (item.id === 'SQ-DEMO-ERR') return true;
+        const inv = item.payload && item.payload.invoiceNo;
+        return inv === 'FKT-2026-0099' || inv === 'FKT-DEMO-ERR';
+    }
+
+    function uploadQueueItemById(id) {
+        return new Promise(resolve => {
+            const all = getSyncQueue();
+            const idx = all.findIndex(item => item.id === id);
+            if (idx < 0) { resolve(null); return; }
+
+            all[idx].status = 'uploading';
+            all[idx].updatedAt = new Date().toISOString();
+            write(KEYS.SYNC_QUEUE, all);
+
+            setTimeout(() => {
+                const fresh = getSyncQueue();
+                const fi = fresh.findIndex(item => item.id === id);
+                if (fi < 0) { resolve(null); return; }
+
+                if (shouldDemoFailUpload(fresh[fi])) {
+                    fresh[fi].status = 'failed';
+                    fresh[fi].errorMessage = 'Koneksi timeout — gagal unggah ke server';
+                } else {
+                    fresh[fi].status = 'success';
+                    fresh[fi].errorMessage = null;
+                }
+                fresh[fi].updatedAt = new Date().toISOString();
+                write(KEYS.SYNC_QUEUE, fresh);
+                resolve(fresh[fi]);
+            }, 600);
+        });
+    }
+
+    // Generate realistic historical invoice + visit data
+    function buildSeedVisits() {
+        const visits = [];
+        const today = new Date();
+        const todayString = today.toISOString().slice(0, 10);
+        const customerIds = SEED_CUSTOMERS.map(c => c.id);
+        // ~5 visits per working day over 365 days
+        for (let d = 365; d >= 0; d--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - d);
+            const dow = date.getDay();
+            if (dow === 0) continue; // skip Sunday
+            const dateStr = date.toISOString().slice(0, 10);
+
+            if (dateStr === todayString) {
+                // Demo: 26 kunjungan hari ini (~74% dari target 35)
+                const todayVisitCount = 26;
+                for (let i = 0; i < todayVisitCount; i++) {
+                    const cid = customerIds[i % customerIds.length];
+                    const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                    const hasOrder = i < 20; // 20 efektif → ~77% dari kunjungan
+                    const orderAmount = hasOrder
+                        ? Math.round((800000 + (i % 7) * 120000) / 1000) * 1000
+                        : 0;
+                    const hhIn = 7 + Math.floor(i / 4);
+                    const mmIn = (i % 4) * 12;
+                    visits.push({
+                        id: 'VST-TODAY-' + i,
+                        customerId: cid,
+                        customerName: cust ? cust.name : cid,
+                        date: dateStr,
+                        createdAt: dateStr + 'T' + String(hhIn).padStart(2, '0') + ':' + String(mmIn).padStart(2, '0') + ':00.000Z',
+                        status: 'checked_out',
+                        hasOrder: hasOrder,
+                        hasCollection: false,
+                        hasNoOrderReason: !hasOrder,
+                        noOrderReason: hasOrder ? '' : 'Stok masih ada',
+                        orderAmount: orderAmount,
+                        collectionAmount: 0,
+                        stockistId: SEED_STOCKISTS[i % SEED_STOCKISTS.length].id,
+                        stockCheckDone: true,
+                        checkInTime: String(hhIn).padStart(2, '0') + ':' + String(mmIn).padStart(2, '0') + ' WIB',
+                        checkOutTime: String(hhIn).padStart(2, '0') + ':' + String(mmIn + 8).padStart(2, '0') + ' WIB'
+                    });
+                }
+                continue;
+            }
+
+            const count = dow === 6 ? 3 : 5;
+            for (let i = 0; i < count; i++) {
+                const cid = customerIds[(d * 7 + i) % customerIds.length];
+                const hasOrder = Math.random() > 0.25;
+                const vid = 'VST-SEED-' + d + '-' + i;
+                visits.push({
+                    id: vid,
+                    customerId: cid,
+                    customerName: SEED_CUSTOMERS.find(c => c.id === cid).name,
+                    date: dateStr,
+                    createdAt: dateStr + 'T08:00:00.000Z',
+                    status: 'checked_out',
+                    hasOrder: hasOrder,
+                    hasCollection: false,
+                    orderAmount: hasOrder ? Math.round((Math.random() * 2000000 + 300000) / 1000) * 1000 : 0,
+                    collectionAmount: 0
+                });
+            }
+        }
+        return visits;
+    }
+
+    function buildSeedInvoices() {
+        const invoices = [];
+        const today = new Date();
+        const productSeed = [
+            { code: 'KN-SF-001', name: 'Morinaga Chil*Kid Gold',        price: 265000 },
+            { code: 'KN-SF-002', name: 'Morinaga Chil*School Gold',     price: 235000 },
+            { code: 'KN-SF-003', name: 'Morinaga Chil*Kid Platinum',    price: 398000 },
+            { code: 'KN-SA-001', name: 'Zee Platinum',                  price: 215000 },
+            { code: 'KN-SA-002', name: 'Zee Reguler',                   price: 145000 },
+            { code: 'KN-MB-001', name: 'Milna Biskuit Bayi',            price: 28500  },
+            { code: 'KN-MB-002', name: 'Milna Bubur Bayi',              price: 24000  },
+            { code: 'KN-ND-001', name: 'Entrasol Gold',                 price: 65000  },
+            { code: 'KN-MB-004', name: 'PRENAGEN mommy',                price: 135000 }
+        ];
+        const customerIds = SEED_CUSTOMERS.map(c => c.id);
+        let seq = 1;
+        for (let d = 365; d >= 0; d--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - d);
+            const dow = date.getDay();
+            if (dow === 0) continue;
+            const dateStr = date.toISOString().slice(0, 10);
+            if (dateStr === today.toISOString().slice(0, 10)) {
+                // Samakan dengan visit efektif hari ini (20 faktur)
+                for (let i = 0; i < 20; i++) {
+                    const cid = customerIds[i % customerIds.length];
+                    const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                    const prod = productSeed[i % productSeed.length];
+                    const qty = (i % 4) + 1;
+                    const totalGross = prod.price * qty;
+                    const discount = Math.round(totalGross * 0.03);
+                    invoices.push({
+                        id: 'INV-TODAY-' + i,
+                        invoiceNo: 'FKT-' + String(seq++).padStart(4, '0'),
+                        customerId: cid,
+                        customerName: cust.name,
+                        date: dateStr,
+                        createdAt: dateStr + 'T09:00:00.000Z',
+                        status: 'confirmed',
+                        items: [{ code: prod.code, name: prod.name, qty, qtyPcs: qty, price: prod.price, subtotal: totalGross }],
+                        totalGross,
+                        discount,
+                        totalNet: totalGross - discount
+                    });
+                }
+                continue;
+            }
+            const invoiceCount = dow === 6 ? 2 : Math.floor(Math.random() * 3) + 2;
+            for (let i = 0; i < invoiceCount; i++) {
+                const cid = customerIds[(d * 5 + i) % customerIds.length];
+                const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                const numItems = Math.floor(Math.random() * 3) + 1;
+                const items = [];
+                let totalGross = 0;
+                for (let j = 0; j < numItems; j++) {
+                    const prod = productSeed[(d + i + j) % productSeed.length];
+                    const qty = Math.floor(Math.random() * 5) + 1;
+                    const subtotal = prod.price * qty;
+                    totalGross += subtotal;
+                    items.push({ code: prod.code, name: prod.name, qty, qtyPcs: qty, price: prod.price, subtotal });
+                }
+                const discount = Math.round(totalGross * 0.03);
+                const totalNet = totalGross - discount;
+                invoices.push({
+                    id: 'INV-SEED-' + d + '-' + i,
+                    invoiceNo: 'FKT-' + String(seq++).padStart(4, '0'),
+                    customerId: cid,
+                    customerName: cust.name,
+                    date: dateStr,
+                    createdAt: dateStr + 'T09:00:00.000Z',
+                    status: 'confirmed',
+                    items,
+                    totalGross,
+                    discount,
+                    totalNet
+                });
+            }
+        }
+        return invoices;
     }
 
     // =========================================================
     // AUTH
     // =========================================================
-    function getUser() { return read(KEYS.USER); }
+    function getUser() {
+        const u = read(KEYS.USER);
+        if (!u) return u;
+        const role = String(u.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+        // Prototype default: Motoris (migrate legacy canvasser)
+        if (!role || role === 'canvasser' || role === 'sales') {
+            u.role = 'motoris';
+            write(KEYS.USER, u);
+        }
+        return u;
+    }
     function saveUser(u) { write(KEYS.USER, u); }
     function clearUser() { localStorage.removeItem(KEYS.USER); }
 
@@ -241,6 +789,19 @@
     // =========================================================
     // PRODUCTS
     // =========================================================
+    function deriveBrand(name) {
+        if (!name) return 'Lainnya';
+        const n = name.toLowerCase();
+        if (n.startsWith('morinaga')) return 'Morinaga';
+        if (n.startsWith('zee')) return 'Zee';
+        if (n.startsWith('milna')) return 'Milna';
+        if (n.startsWith('prenagen')) return 'Prenagen';
+        if (n.startsWith('entrasol')) return 'Entrasol';
+        if (n.startsWith('nutrive')) return 'Nutrive Benecol';
+        if (n.startsWith('fitbar')) return 'Fitbar';
+        return 'Lainnya';
+    }
+
     function getProducts() {
         const list = read(KEYS.PRODUCTS) || [];
         return list.map(p => {
@@ -278,6 +839,7 @@
 
             return {
                 ...p,
+                brand: p.brand || deriveBrand(p.name),
                 boxPerCtn,
                 pcsPerBox,
                 pcsPerCtn: finalPcsPerCtn,
@@ -285,8 +847,8 @@
                 priceBox,
                 pricePcs,
                 stockKarton: p.stock || 0,
-                stockBox: 0,
-                stockPcs: 0
+                stockBox: p.stockBox || 0,
+                stockPcs: p.stockPcs || 0
             };
         });
     }
@@ -295,6 +857,22 @@
         const cats = [...new Set(getProducts().map(p => p.category))];
         return cats;
     }
+    function getProductBrands() {
+        const brands = [...new Set(getProducts().map(p => p.brand))];
+        return brands.sort((a, b) => a.localeCompare(b, 'id'));
+    }
+
+    function updateProductStock(code, stockKarton, stockPcs) {
+        const list = read(KEYS.PRODUCTS) || [];
+        const idx = list.findIndex(p => p.code === code);
+        if (idx >= 0) {
+            list[idx].stock = stockKarton;
+            if (stockPcs !== undefined) {
+                list[idx].stockPcs = stockPcs;
+            }
+            write(KEYS.PRODUCTS, list);
+        }
+    }
 
     // =========================================================
     // VISITS (DailyVisitService)
@@ -302,24 +880,41 @@
     function getVisits() { return read(KEYS.VISITS) || []; }
 
     function getTodayVisitByCustomerId(customerId) {
-        return getVisits().find(v => v.customerId === customerId && v.date === todayStr()) || null;
+        const today = getVisits().filter(v => v.customerId === customerId && v.date === todayStr());
+        if (!today.length) return null;
+        const active = today.find(v => v.status === 'checked_in');
+        if (active) return active;
+        // Prefer visit terakhir (re-visit boleh setelah selesai)
+        return today.slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
     }
 
     function getActiveVisitByCustomerId(customerId) {
         return getVisits().find(v => v.customerId === customerId && v.status === 'checked_in') || null;
     }
 
+    function getActiveVisit() {
+        return getVisits().find(v => v.date === todayStr() && v.status === 'checked_in') || null;
+    }
+
     function saveVisit(obj) {
+        const existing = getActiveVisit();
+        if (existing && existing.customerId !== obj.customerId) {
+            return { error: 'ACTIVE_VISIT_EXISTS', visit: existing };
+        }
+        const stockist = getActiveStockist();
         const list = getVisits();
         const id = genId('VST');
         const entry = {
             id, date: todayStr(), createdAt: new Date().toISOString(),
             status: 'checked_in', hasOrder: false, hasCollection: false,
-            hasNoOrderReason: false, orderAmount: 0, collectionAmount: 0, ...obj
+            hasNoOrderReason: false, orderAmount: 0, collectionAmount: 0,
+            stockistId: obj.stockistId || (stockist ? stockist.id : null),
+            stockCheckDone: false,
+            ...obj
         };
         list.push(entry);
         write(KEYS.VISITS, list);
-        return id;
+        return { id };
     }
 
     function updateVisit(id, patch) {
@@ -424,32 +1019,169 @@
     // =========================================================
     // SYNC QUEUE (SyncViewModel)
     // =========================================================
-    function getSyncQueue() { return read(KEYS.SYNC_QUEUE) || []; }
+    function getSyncQueue() {
+        ensureDemoSyncQueue();
+        return read(KEYS.SYNC_QUEUE) || [];
+    }
 
     function addToSyncQueue(type, payload) {
+        localStorage.removeItem(KEYS.SYNC_QUEUE_CLEARED);
         const q = getSyncQueue();
         q.push({ id: genId('SQ'), type, payload, status: 'pending', createdAt: new Date().toISOString() });
         write(KEYS.SYNC_QUEUE, q);
     }
 
-    function clearSyncQueue() { write(KEYS.SYNC_QUEUE, []); }
+    function clearSyncQueue() { return clearAllSyncQueue(); }
+
+    function clearAllSyncQueue() {
+        const raw = read(KEYS.SYNC_QUEUE);
+        const count = Array.isArray(raw) ? raw.length : 0;
+        write(KEYS.SYNC_QUEUE, []);
+        write(KEYS.SYNC_QUEUE_CLEARED, true);
+        return count;
+    }
+
+    // =========================================================
+    // DOWNLOAD FROM SERVER (master data ke perangkat)
+    // =========================================================
+    function buildDefaultDownloadStatus() {
+        const now = Date.now();
+        return {
+            lastDownload: null,
+            packages: [
+                { id: 'master', label: 'Data Master Produk', status: 'success', updatedAt: new Date(now - 86400000).toISOString() },
+                { id: 'customer', label: 'Data Pelanggan', status: 'success', updatedAt: new Date(now - 86400000).toISOString() },
+                { id: 'stokis', label: 'Data Stokis & Rute', status: 'pending', updatedAt: null },
+                { id: 'price', label: 'Harga & Promo', status: 'failed', errorMessage: 'Gagal mengunduh paket harga dari server', updatedAt: new Date(now - 1800000).toISOString() }
+            ]
+        };
+    }
+
+    function ensureDemoDownloadStatus() {
+        let data = read(KEYS.DOWNLOAD_STATUS);
+        if (!data || !Array.isArray(data.packages)) {
+            write(KEYS.DOWNLOAD_STATUS, buildDefaultDownloadStatus());
+            return read(KEYS.DOWNLOAD_STATUS);
+        }
+        if (!data.packages.some(p => p.status === 'failed')) {
+            const price = data.packages.find(p => p.id === 'price');
+            if (price) {
+                price.status = 'failed';
+                price.errorMessage = price.errorMessage || 'Gagal mengunduh paket harga dari server';
+                price.updatedAt = new Date().toISOString();
+            } else {
+                data.packages.push({
+                    id: 'price', label: 'Harga & Promo', status: 'failed',
+                    errorMessage: 'Gagal mengunduh paket harga dari server',
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            write(KEYS.DOWNLOAD_STATUS, data);
+        }
+        return data;
+    }
+
+    function getDownloadStatus() {
+        ensureDemoDownloadStatus();
+        return read(KEYS.DOWNLOAD_STATUS);
+    }
+
+    function setLastDownload(ts) {
+        const data = getDownloadStatus();
+        data.lastDownload = ts;
+        write(KEYS.DOWNLOAD_STATUS, data);
+    }
+
+    function runDownloadFromServer(onProgress) {
+        return new Promise(resolve => {
+            const data = getDownloadStatus();
+            const targets = data.packages.filter(p => p.status !== 'success' || p.id === 'price');
+            let i = 0;
+
+            function finish() {
+                ensureDemoDownloadStatus();
+                resolve(getDownloadStatus());
+            }
+
+            function step() {
+                if (i >= targets.length) {
+                    finish();
+                    return;
+                }
+                const pkg = targets[i];
+                pkg.status = 'downloading';
+                write(KEYS.DOWNLOAD_STATUS, data);
+                if (typeof onProgress === 'function') onProgress(pkg, i + 1, targets.length);
+
+                setTimeout(() => {
+                    if (pkg.id === 'price') {
+                        pkg.status = 'failed';
+                        pkg.errorMessage = 'Gagal mengunduh paket harga dari server';
+                    } else {
+                        pkg.status = 'success';
+                        pkg.errorMessage = null;
+                    }
+                    pkg.updatedAt = new Date().toISOString();
+                    write(KEYS.DOWNLOAD_STATUS, data);
+                    i++;
+                    step();
+                }, 450);
+            }
+
+            if (targets.length === 0) {
+                finish();
+            } else {
+                step();
+            }
+        });
+    }
 
     function processQueue(onProgress) {
         return new Promise(resolve => {
-            const q = getSyncQueue();
+            const pendingIds = getSyncQueue()
+                .filter(item => item.status === 'pending' || item.status === 'failed')
+                .map(item => item.id);
+            if (pendingIds.length === 0) { resolve({ success: 0, failed: 0 }); return; }
+
             let i = 0;
+            let successCount = 0;
+            let failedCount = 0;
+
             function step() {
-                if (i >= q.length) { clearSyncQueue(); resolve({ success: i, failed: 0 }); return; }
-                q[i].status = 'uploading';
-                write(KEYS.SYNC_QUEUE, q);
-                if (typeof onProgress === 'function') onProgress(i + 1, q.length, q[i]);
+                if (i >= pendingIds.length) {
+                    resolve({ success: successCount, failed: failedCount });
+                    return;
+                }
+                const id = pendingIds[i];
+                const all = getSyncQueue();
+                const idx = all.findIndex(item => item.id === id);
+                if (idx < 0) { i++; step(); return; }
+
+                all[idx].status = 'uploading';
+                all[idx].updatedAt = new Date().toISOString();
+                write(KEYS.SYNC_QUEUE, all);
+                if (typeof onProgress === 'function') onProgress(all[idx], i + 1, pendingIds.length);
+
                 setTimeout(() => {
-                    q[i].status = 'done';
-                    write(KEYS.SYNC_QUEUE, q);
-                    i++; step();
+                    const fresh = getSyncQueue();
+                    const fi = fresh.findIndex(item => item.id === id);
+                    if (fi >= 0) {
+                        if (shouldDemoFailUpload(fresh[fi])) {
+                            fresh[fi].status = 'failed';
+                            fresh[fi].errorMessage = 'Koneksi timeout — gagal unggah ke server';
+                            failedCount++;
+                        } else {
+                            fresh[fi].status = 'success';
+                            fresh[fi].errorMessage = null;
+                            successCount++;
+                        }
+                        fresh[fi].updatedAt = new Date().toISOString();
+                        write(KEYS.SYNC_QUEUE, fresh);
+                    }
+                    i++;
+                    step();
                 }, 350);
             }
-            if (q.length === 0) { resolve({ success: 0, failed: 0 }); return; }
             step();
         });
     }
@@ -457,28 +1189,147 @@
     // =========================================================
     // DASHBOARD & KPI AGGREGATES
     // =========================================================
-    function getTodayKpi() {
-        const visits   = getVisits().filter(v => v.date === todayStr());
-        const invoices = getTodayInvoices();
-        const doneVisits = visits.filter(v => v.status === 'checked_out');
-        const effective  = doneVisits.filter(v => v.hasOrder).length;
-        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+    function countUniqueByKey(items, key) {
+        const set = new Set();
+        (items || []).forEach(item => {
+            const val = item && item[key];
+            if (val != null && val !== '') set.add(String(val));
+        });
+        return set.size;
+    }
+
+    /**
+     * KPI rules:
+     * - pelanggan  = unique customerId dari transaksi (faktur) periode
+     * - kunjungan  = jumlah visit selesai; selalu >= pelanggan
+     * - efektif/EC = jumlah faktur (cap ≤ kunjungan); % EC = faktur / kunjungan
+     * - targetKunjungan dari Master Limit (minimalHarian) sesuai jabatan user
+     */
+    function buildKpi(doneVisits, invoices) {
+        const fakturCount = (invoices || []).length;
+        const totalRupiah = (invoices || []).reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+        const pelanggan = countUniqueByKey(invoices, 'customerId');
+        const visitCount = (doneVisits || []).length;
+        const kunjungan = Math.max(visitCount, pelanggan);
+        const efektif = Math.min(fakturCount, kunjungan);
         return {
-            kunjungan:        doneVisits.length,
-            kunjunganEfektif: effective,
-            fakturCount:      invoices.length,
-            totalFaktur:      totalRupiah,
+            kunjungan,
+            efektif,
+            kunjunganEfektif: efektif,
+            fakturCount,
+            totalFaktur: totalRupiah,
             totalRupiah,
-            pelanggan:        getCustomers().length
+            pelanggan,
+            targetKunjungan: 0
         };
+    }
+
+    function getTodayKpi() {
+        return getKpiByDate(todayStr());
+    }
+
+    function getKpiByDate(dateStr) {
+        const visits = getVisits().filter(v => v.date === dateStr);
+        const invoices = getInvoices().filter(i => i.date === dateStr);
+        const doneVisits = visits.filter(v => v.status === 'checked_out');
+        const kpi = buildKpi(doneVisits, invoices);
+        kpi.targetKunjungan = getVisitTargetForDate(dateStr);
+        return kpi;
+    }
+
+    function getKpiByRange(from, to) {
+        const invoices = getInvoices().filter(i => i.date && i.date >= from && i.date <= to);
+        const doneVisits = getVisits().filter(v =>
+            v.date && v.date >= from && v.date <= to && v.status === 'checked_out'
+        );
+        const kpi = buildKpi(doneVisits, invoices);
+        kpi.targetKunjungan = getVisitTargetForRange(from, to);
+        return kpi;
+    }
+
+    function getKpiByMonth(year, month) {
+        // month: 1-12
+        const from = year + '-' + String(month).padStart(2, '0') + '-01';
+        const lastDay = new Date(year, month, 0).getDate();
+        const to = year + '-' + String(month).padStart(2, '0') + '-' + String(lastDay).padStart(2, '0');
+        return getKpiByRange(from, to);
+    }
+
+    function getKpiByWeek(year, week) {
+        // Approximate ISO week range via date scan of year
+        const invoices = getInvoices().filter(i => {
+            if (!i.date) return false;
+            const d = new Date(i.date);
+            return getISOWeek(d) === week && d.getFullYear() === year;
+        });
+        const doneVisits = getVisits().filter(v => {
+            if (!v.date || v.status !== 'checked_out') return false;
+            const d = new Date(v.date);
+            return getISOWeek(d) === week && d.getFullYear() === year;
+        });
+        const kpi = buildKpi(doneVisits, invoices);
+        // Sum targets for days in that ISO week
+        let from = null, to = null;
+        for (let m = 0; m < 12; m++) {
+            for (let day = 1; day <= 31; day++) {
+                const d = new Date(year, m, day);
+                if (d.getMonth() !== m) continue;
+                if (getISOWeek(d) !== week || d.getFullYear() !== year) continue;
+                const ds = d.toISOString().slice(0, 10);
+                if (!from || ds < from) from = ds;
+                if (!to || ds > to) to = ds;
+            }
+        }
+        kpi.targetKunjungan = (from && to) ? getVisitTargetForRange(from, to) : 0;
+        return kpi;
+    }
+
+    function getISOWeek(d) {
+        const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        const dayNum = date.getUTCDay() || 7;
+        date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+        return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+    }
+
+    // Last N days chart data: returns {labels, data} arrays
+    function getDailyChartData(days) {
+        days = days || 14;
+        const labels = [], data = [];
+        const today = new Date();
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(today.getDate() - i);
+            const ds = d.toISOString().slice(0, 10);
+            const kpi = getKpiByDate(ds);
+            labels.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+            data.push(Math.round(kpi.totalRupiah / 1000)); // in thousands
+        }
+        return { labels, data };
+    }
+
+    // Last N months chart data
+    function getMonthlyChartData(months) {
+        months = months || 3;
+        const labels = [], data = [];
+        const today = new Date();
+        for (let i = months - 1; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const kpi = getKpiByMonth(d.getFullYear(), d.getMonth() + 1);
+            labels.push(d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }));
+            data.push(Math.round(kpi.totalRupiah / 1000));
+        }
+        return { labels, data };
     }
 
     // Alias for backward compat
     function getDashboardToday() { return getTodayKpi(); }
 
-    function getTopProducts(n) {
-        n = n || 3;
-        const invoices = getTodayInvoices();
+    function getTopProductsByPeriod(dateFrom, dateTo, n) {
+        n = n || 5;
+        const from = dateFrom || todayStr();
+        const to   = dateTo   || todayStr();
+        const invoices = getInvoices().filter(i => i.date >= from && i.date <= to);
         const map = {};
         invoices.forEach(inv => {
             if (!inv.items) return;
@@ -491,9 +1342,11 @@
         return Object.values(map).sort((a,b) => b.totalAmount - a.totalAmount).slice(0, n);
     }
 
-    function getTopCustomers(n) {
-        n = n || 3;
-        const invoices = getTodayInvoices();
+    function getTopCustomersByPeriod(dateFrom, dateTo, n) {
+        n = n || 5;
+        const from = dateFrom || todayStr();
+        const to   = dateTo   || todayStr();
+        const invoices = getInvoices().filter(i => i.date >= from && i.date <= to);
         const map = {};
         invoices.forEach(inv => {
             const id = inv.customerId;
@@ -503,6 +1356,9 @@
         });
         return Object.values(map).sort((a,b) => b.totalAmount - a.totalAmount).slice(0, n);
     }
+
+    function getTopProducts(n) { return getTopProductsByPeriod(todayStr(), todayStr(), n); }
+    function getTopCustomers(n) { return getTopCustomersByPeriod(todayStr(), todayStr(), n); }
 
     // =========================================================
     // CUSTOMERS — EXTRA METHODS
@@ -524,12 +1380,30 @@
     function retryQueueItem(id) {
         const q = getSyncQueue();
         const idx = q.findIndex(item => item.id === id);
-        if (idx >= 0) { q[idx].status = 'pending'; q[idx].updatedAt = new Date().toISOString(); write(KEYS.SYNC_QUEUE, q); }
+        if (idx < 0) return Promise.resolve(null);
+
+        q[idx].retryCount = (q[idx].retryCount || 0) + 1;
+        q[idx].status = 'pending';
+        q[idx].updatedAt = new Date().toISOString();
+        write(KEYS.SYNC_QUEUE, q);
+        return uploadQueueItemById(id);
+    }
+
+    function isQueueItemDone(item) {
+        const s = String(item && item.status || '').toLowerCase();
+        return s === 'success' || s === 'done' || s === 'selesai';
     }
 
     function clearSuccessfulQueue() {
-        const q = getSyncQueue().filter(item => item.status !== 'done' && item.status !== 'success');
-        write(KEYS.SYNC_QUEUE, q);
+        const raw = read(KEYS.SYNC_QUEUE);
+        if (!Array.isArray(raw)) {
+            write(KEYS.SYNC_QUEUE, []);
+            return 0;
+        }
+        const next = raw.filter(item => !isQueueItemDone(item));
+        const removed = raw.length - next.length;
+        write(KEYS.SYNC_QUEUE, next);
+        return removed;
     }
 
     // =========================================================
@@ -573,10 +1447,15 @@
         // Customers
         getCustomers, getCustomerById, saveCustomer, updateCustomerGps,
         // Products
-        getProducts, getProductById, getProductCategories,
+        getProducts, getProductById, getProductCategories, getProductBrands, updateProductStock,
         // Visits
-        getVisits, getTodayVisitByCustomerId, getActiveVisitByCustomerId,
+        getVisits, getTodayVisitByCustomerId, getActiveVisitByCustomerId, getActiveVisit,
         saveVisit, updateVisit, completeVisit,
+        getTodayRouteIds, getOverdueRouteCustomers, isModernTradeUser,
+        // Stockists & Sales Period
+        getStockists, getStockistById, getActiveStockist, setActiveStockist,
+        getNearestStockists, formatDistanceMeters, haversineMeters,
+        getActiveSalesPeriod,
         // Invoices
         getInvoices, getInvoicesByCustomerId, getTodayInvoices,
         saveInvoice, completeInvoice,
@@ -584,14 +1463,22 @@
         getCollections, getCollectionsByCustomerId,
         getOutstandingByCustomerId, saveCollection, completeCollection,
         // Sync Queue
-        getSyncQueue, addToSyncQueue, clearSyncQueue, processQueue,
-        retryQueueItem, clearSuccessfulQueue,
+        getSyncQueue, addToSyncQueue, clearSyncQueue, clearAllSyncQueue, processQueue, ensureDemoSyncQueue,
+        getDownloadStatus, runDownloadFromServer, setLastDownload, ensureDemoDownloadStatus,
+        isQueueItemDone, retryQueueItem, clearSuccessfulQueue,
         // KPI & Dashboard
-        getTodayKpi, getDashboardToday, getTopProducts, getTopCustomers,
+        getTodayKpi, getKpiByDate, getKpiByRange, getKpiByMonth, getKpiByWeek,
+        getTargetHarianVersions, getLimitTargets, getLimitByCode, getLimitByJabatan,
+        getLimitTarget, getLimitForUser, resolveUserLimitKey,
+        getVisitTargetForDate, getVisitTargetForRange, getEcTarget,
+        getDailyChartData, getMonthlyChartData,
+        getDashboardToday, getTopProducts, getTopCustomers,
+        getTopProductsByPeriod, getTopCustomersByPeriod,
+        getISOWeek,
         // Dev Tools
         resetAndReseed,
         // Utilities
-        formatRupiah, formatTime, formatDate
+        formatRupiah, formatTime, formatDate, todayStr
     };
 
     console.log('[SfaStore] Ready. Customers:', getCustomers().length, '| Products:', getProducts().length, '| Queue:', getSyncQueue().length);

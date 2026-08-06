@@ -4,386 +4,544 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>Rute Kunjungan - Falcon SFA Mobile</title>
-    <!-- CSS Dependencies -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
-        /* Specific Styles for Visit List Screen */
-        .visit-bg {
-            background-color: #f7f9fa;
+        :root {
+            --color-primary: #005D41;
+            --color-primary-dark: #004d35;
+            --color-accent: #78B500;
+            --color-black: #231F20;
+            --color-gray: #ADA4A5;
+            --color-gray-light: #F6F6F6;
+            --color-border: #E9EFEF;
+            --color-bg-light: #F1F7E5;
         }
 
-        /* Filter Tabs */
-        .filter-tab-container {
+        body { background: #f7f9fa; }
+
+        .mobile-header {
+            background: linear-gradient(135deg, #004d35, #005D41);
+            color: #fff;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
             display: flex;
-            background-color: #fff;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #fff;
             border-bottom: 1px solid var(--color-border);
-            position: sticky;
-            top: 56px;
-            z-index: 90;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
-
-        .filter-tab {
-            flex: 1;
-            text-align: center;
-            padding: 14px 0;
+        .filter-bar::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            padding: 6px 14px;
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
             color: var(--color-gray);
+            white-space: nowrap;
             cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
+            background: #fff;
+            display: flex; align-items: center; gap: 4px;
         }
-
-        .filter-tab.active {
-            color: var(--color-primary);
-        }
-
-        .filter-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 3px;
-            background-color: var(--color-primary);
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-        }
-
-        .filter-tab span {
-            font-size: 11px;
-            background-color: #f0f2f5;
-            color: var(--color-gray);
-            padding: 2px 6px;
+        .filter-chip i { font-size: 11px; }
+        .filter-chip.active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-bg-light); }
+        #chipOverdue.active { border-color: #C62828; color: #C62828; background: #FFEBEE; }
+        .route-tag-daily { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #E8F5E9; color: #2E7D32; }
+        .route-tag-overdue { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #FFEBEE; color: #C62828; }
+        .motoris-loc-banner {
+            margin: 10px 16px 0;
+            padding: 10px 12px;
+            background: #EBF8F4;
+            border: 1px solid #C2ECE0;
             border-radius: 10px;
-            margin-left: 4px;
-        }
-
-        .filter-tab.active span {
-            background-color: var(--color-bg-light);
-            color: var(--color-primary);
-        }
-
-        /* Search Bar */
-        .search-container {
-            padding: 12px 16px;
-            background-color: #fff;
-            border-bottom: 1px solid var(--color-border);
-        }
-
-        .search-box {
-            background-color: var(--color-gray-light);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            padding: 0 16px;
-        }
-
-        .search-box input {
-            border: none;
-            background: transparent;
-            padding: 10px 0;
-            width: 100%;
-            font-size: 14px;
-            outline: none;
-        }
-
-        .search-box i {
-            color: var(--color-gray);
-            margin-right: 8px;
-        }
-
-        /* Outlet Cards */
-        .outlet-list {
-            padding: 16px;
-        }
-
-        .outlet-card {
-            background-color: #fff;
-            border: 1px solid var(--color-border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.1s, border-color 0.2s;
-            display: block;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .outlet-card:active {
-            transform: scale(0.98);
-            background-color: #fafbfc;
-        }
-
-        .outlet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
-        }
-
-        .outlet-name {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--color-black);
-            padding-right: 8px;
-        }
-
-        .outlet-code-row {
+            font-size: 12px;
+            color: #005D41;
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 8px;
-            font-size: 11px;
+        }
+        .motoris-loc-banner.loading { background: #F7F9FA; border-color: #E0E0E0; color: #666; }
+
+        /* Count Label */
+        .count-label {
+            padding: 8px 16px 4px;
+            font-size: 13px;
             color: var(--color-gray);
-            font-weight: 500;
+            text-align: right;
         }
 
-        .outlet-meta-item {
+        /* Visit Card */
+        .visit-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin: 0 16px 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.1s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .visit-card:active { transform: scale(0.98); }
+
+        .card-header-row {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #6c757d;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 6px;
         }
-
-        .outlet-meta-item i {
-            color: var(--color-primary);
-            width: 14px;
-        }
-
-        .ar-warning {
-            color: #dc3545;
+        .customer-name {
+            font-size: 14px;
             font-weight: 700;
+            color: var(--color-black);
+            max-width: 70%;
+        }
+        
+        .card-body-row {
+            font-size: 13px;
+            color: var(--color-black);
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .visit-action-indicator {
-            position: absolute;
-            right: 16px;
-            bottom: 16px;
-            color: var(--color-primary);
-            font-size: 16px;
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 8px;
+            margin-top: 8px;
         }
+
+        /* FAB Speed Dial */
+        .fab-wrap {
+            position: fixed;
+            bottom: 24px; right: calc(50% - 225px + 16px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        @media (max-width: 480px) { .fab-wrap { right: 16px; } }
+        .fab-menu {
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .fab-menu.open { display: flex; }
+        .fab-option {
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: inherit;
+        }
+        .fab-option-label {
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 20px; padding: 6px 12px;
+            font-size: 12px; font-weight: 700; color: var(--color-black);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); white-space: nowrap;
+        }
+        .fab-option-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #fff; text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+        .fab-option-btn.visit { background: #78B500; }
+        .fab-option-btn.outlet { background: var(--color-accent); }
+        .fab {
+            position: static;
+            width: 56px; height: 56px;
+            background: #005D41;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,93,65,0.4);
+            cursor: pointer; border: none;
+            color: #fff; font-size: 24px;
+            transition: transform 0.2s;
+        }
+        .fab.open { transform: rotate(45deg); }
+        .fab-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 199;
+        }
+        .fab-backdrop.open { display: block; }
     </style>
 </head>
-<body class="visit-bg">
+<body data-prototype-doc="visit_list">
+<div class="mobile-wrapper">
+    <!-- Header -->
+    <div class="mobile-header">
+        <button class="header-action" onclick="window.location.href='home.html'"><i class="fas fa-chevron-left"></i></button>
+        <span class="header-title">Rute Kunjungan</span>
+        <button class="header-action" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
+    </div>
 
-    <div class="mobile-wrapper">
-        <!-- Header -->
-        <div class="mobile-header">
-            <button class="header-action" onclick="window.location.href='home.html'" aria-label="Kembali">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <span class="header-title">Rute Kunjungan</span>
-            <button class="header-action" aria-label="Filter">
-                <i class="fas fa-filter" style="font-size: 16px;"></i>
-            </button>
-        </div>
-
-        <!-- Filter Tabs -->
-        <div class="filter-tab-container">
-            <div class="filter-tab active" id="tabSemua" onclick="filterList('semua')">
-                Semua <span id="countSemua">15</span>
-            </div>
-            <div class="filter-tab" id="tabBelum" onclick="filterList('belum')">
-                Belum <span id="countBelum">6</span>
-            </div>
-            <div class="filter-tab" id="tabSelesai" onclick="filterList('selesai')">
-                Selesai <span id="countSelesai">9</span>
-            </div>
-        </div>
-
-        <!-- Search Container -->
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari nama atau kode outlet..." onkeyup="searchOutlets()"/>
-            </div>
-        </div>
-
-        <!-- Scrollable Content -->
-        <div class="mobile-content">
-            <div class="outlet-list" id="outletContainer">
-                <!-- Outlets will be rendered dynamically by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Bottom Navigation Bar -->
-        <div class="mobile-nav">
-            <a href="home.html" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span>Beranda</span>
-            </a>
-            <a href="visit_list.html" class="mobile-nav-item active">
-                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                <span>Rute</span>
-            </a>
-            <a href="javascript:void(0)" class="mobile-nav-item">
-                <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.55 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                <span>Riwayat</span>
-            </a>
-            <a href="javascript:void(0)" class="mobile-nav-item" onclick="logout()">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span>Profil</span>
-            </a>
+    <!-- Search (hidden by default) -->
+    <div class="search-container d-none" id="searchBar" style="padding:10px 16px; background:#fff; border-bottom:1px solid var(--color-border);">
+        <div style="background:var(--color-gray-light); border-radius:20px; display:flex; align-items:center; padding:0 14px;">
+            <i class="fas fa-search" style="color:var(--color-gray); margin-right:8px;"></i>
+            <input type="text" id="searchInput" placeholder="Cari nama outlet atau kode..." style="border:none; background:transparent; padding:10px 0; width:100%; font-size:13px; outline:none;" oninput="renderList()"/>
         </div>
     </div>
 
-    <!-- JS Dependencies -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        // Mock Outlet Database
-        const outlets = [
-            { id: "OL-10492", name: "Apotek Senen Medika", type: "Outlet Star", address: "Jl. Kramat Raya No.42, Senen, Jakarta Pusat", distance: "0.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-10511", name: "Kimia Farma Cikini", type: "Outlet Prime", address: "Jl. Cikini Raya No.78, Menteng, Jakarta Pusat", distance: "0.6 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)" },
-            { id: "OL-10283", name: "Apotek Roxy Salemba", type: "Outlet Regular", address: "Jl. Salemba Raya No.15, Jakarta Pusat", distance: "1.1 km", arBalance: 3750000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10772", name: "Guardian Plaza Indonesia", type: "Outlet Star", address: "Plaza Indonesia Lt. Basement, Menteng", distance: "2.4 km", arBalance: 12500000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10819", name: "Watsons Grand Indonesia", type: "Outlet Prime", address: "Grand Indonesia Lt. Lower Ground", distance: "2.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-10902", name: "Apotek K-24 Kenari", type: "Outlet Regular", address: "Jl. Kenari Mas No.12, Senen, Jakarta Pusat", distance: "0.8 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11002", name: "Century Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. LG, Jakarta Pusat", distance: "2.6 km", arBalance: 5000000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-11145", name: "Apotek Melawai Cikini", type: "Outlet Regular", address: "Jl. Cikini Raya No.14, Jakarta Pusat", distance: "0.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11239", name: "Apotek Rakyat Pasar Pramuka", type: "Outlet Regular", address: "Pasar Pramuka Lt. Dasar, Jakarta Timur", distance: "1.9 km", arBalance: 1450000, status: "belum", statusText: "Belum Dikunjungi" },
-            { id: "OL-11340", name: "Kimia Farma Matraman", type: "Outlet Prime", address: "Jl. Matraman Raya No.112, Jakarta Timur", distance: "2.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11451", name: "Apotek Salemba Medika", type: "Outlet Regular", address: "Jl. Salemba Tengah No.5, Jakarta Pusat", distance: "1.3 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11562", name: "Kimia Farma Salemba", type: "Outlet Prime", address: "Jl. Salemba Raya No.22, Jakarta Pusat", distance: "1.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11673", name: "Apotek Jaya Menteng", type: "Outlet Regular", address: "Jl. Menteng Raya No.9, Jakarta Pusat", distance: "1.5 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)" },
-            { id: "OL-11784", name: "Guardian Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. 3, Jakarta Pusat", distance: "2.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)" },
-            { id: "OL-11895", name: "Apotek Hidup Baru", type: "Outlet Regular", address: "Jl. Kramat Pulo No.18, Jakarta Pusat", distance: "0.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi" }
-        ];
+    <!-- Filter Bar (MD / Modern Trade only) -->
+    <div class="filter-bar" id="filterBar">
+        <div class="filter-chip active" id="chipDaily" onclick="setCategoryFilter('daily')">
+            <i class="fas fa-calendar-day"></i> Rute Harian
+        </div>
+        <div class="filter-chip" id="chipOverdue" onclick="setCategoryFilter('overdue')">
+            <i class="fas fa-exclamation-circle"></i> Overdue
+        </div>
+    </div>
 
-        let currentFilter = 'semua';
+    <!-- Banner Motoris: outlet terdekat -->
+    <div id="motorisLocBanner" class="motoris-loc-banner d-none">
+        <i class="fas fa-crosshairs"></i>
+        <span id="motorisLocBannerText">Menampilkan outlet terdekat dari lokasi Anda</span>
+    </div>
 
-        $(document).ready(function() {
-            // Check state from localStorage if a check-in occurred
-            updateListFromStorageStates();
+    <!-- Count -->
+    <div class="count-label">Jumlah Outlet: <strong id="visitCount">0</strong></div>
+
+    <!-- Visit List -->
+    <div class="mobile-content no-nav" style="padding-bottom:80px;">
+        <div id="visitListContainer"></div>
+    </div>
+
+    <!-- FAB Speed Dial -->
+    <div class="fab-backdrop" id="fabBackdrop" onclick="toggleFab(false)"></div>
+    <div class="fab-wrap">
+        <div class="fab-menu" id="fabMenu">
+            <a href="outlet_list.html?mode=pickVisit" class="fab-option">
+                <span class="fab-option-label">Tambah Kunjungan</span>
+                <span class="fab-option-btn visit"><i class="fas fa-route"></i></span>
+            </a>
+            <a href="outlet_add.html" class="fab-option">
+                <span class="fab-option-label">Tambah Outlet Baru</span>
+                <span class="fab-option-btn outlet"><i class="fas fa-store"></i></span>
+            </a>
+        </div>
+        <button type="button" class="fab" id="fabMain" onclick="toggleFab()" aria-label="Menu tambah">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script src="../../wwwroot/js/prototype-page-doc.js"></script>
+<script>
+    const MOCK_DISTANCES = { "OL-10492": 0.2, "OL-10511": 0.6, "OL-10283": 1.1, "OL-10772": 0.05, "OL-10819": 2.5, "OL-10902": 0.8, "OL-11002": 2.6, "OL-11145": 0.7, "OL-11239": 1.9, "OL-11340": 2.2, "OL-11451": 1.3, "OL-11562": 1.2, "OL-11673": 1.5, "OL-11784": 2.7, "OL-11895": 0.5 };
+
+    let visits = [];
+    let categoryFilter = 'daily';
+    let isMdUser = false;
+    let devicePos = null;
+    let devicePosLoading = false;
+
+    $(document).ready(function() {
+        isMdUser = SfaStore.isModernTradeUser();
+        setupRoleUI();
+        if (isMdUser) {
+            loadMdVisits();
             renderList();
-            updateCounts();
-        });
-
-        // Sync local storage dynamic visit states
-        function updateListFromStorageStates() {
-            outlets.forEach(o => {
-                const checkedInState = localStorage.getItem(`visit_state_${o.id}`);
-                if (checkedInState) {
-                    const parsed = JSON.parse(checkedInState);
-                    if (parsed.status === 'checked_out') {
-                        if (parsed.hasOrder) {
-                            o.status = "selesai_efektif";
-                            o.statusText = "Selesai (Efektif)";
-                        } else {
-                            o.status = "selesai_tidak_efektif";
-                            o.statusText = "Selesai (Tidak Efektif)";
-                        }
-                    } else if (parsed.status === 'checked_in') {
-                        o.status = "belum";
-                        o.statusText = "Sedang Check-In";
-                    }
-                }
+        } else {
+            devicePosLoading = true;
+            updateMotorisBanner();
+            renderList();
+            obtainGpsPosition().then(pos => {
+                devicePos = pos;
+                devicePosLoading = false;
+                loadMotorisVisits();
+                updateMotorisBanner();
+                renderList();
             });
         }
+    });
 
-        function updateCounts() {
-            const total = outlets.length;
-            const pending = outlets.filter(o => o.status === 'belum').length;
-            const completed = outlets.filter(o => o.status.startsWith('selesai')).length;
-
-            $('#countSemua').text(total);
-            $('#countBelum').text(pending);
-            $('#countSelesai').text(completed);
+    function setupRoleUI() {
+        if (isMdUser) {
+            $('#filterBar').removeClass('d-none');
+            $('#motorisLocBanner').addClass('d-none');
+        } else {
+            $('#filterBar').addClass('d-none');
+            $('#motorisLocBanner').removeClass('d-none');
         }
+    }
 
-        function filterList(filterType) {
-            currentFilter = filterType;
-            $('.filter-tab').removeClass('active');
-            if (filterType === 'semua') $('#tabSemua').addClass('active');
-            if (filterType === 'belum') $('#tabBelum').addClass('active');
-            if (filterType === 'selesai') $('#tabSelesai').addClass('active');
-            renderList();
+    function updateMotorisBanner() {
+        const $banner = $('#motorisLocBanner');
+        const $text = $('#motorisLocBannerText');
+        if (devicePosLoading) {
+            $banner.addClass('loading');
+            $text.html('<i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi lokasi perangkat...');
+        } else {
+            $banner.removeClass('loading');
+            $text.text('Outlet diurutkan dari yang terdekat dengan lokasi Anda');
         }
+    }
 
-        function renderList() {
-            const query = $('#searchInput').val().toLowerCase();
-            const container = $('#outletContainer');
-            container.empty();
-
-            const filtered = outlets.filter(o => {
-                // Apply search filter
-                const matchesSearch = o.name.toLowerCase().includes(query) || o.id.toLowerCase().includes(query);
-                if (!matchesSearch) return false;
-
-                // Apply status tab filter
-                if (currentFilter === 'semua') return true;
-                if (currentFilter === 'belum') return o.status === 'belum';
-                if (currentFilter === 'selesai') return o.status.startsWith('selesai');
-                return true;
+    function obtainGpsPosition() {
+        return new Promise(resolve => {
+            const fallback = () => resolve({
+                lat: -6.2088 + (Math.random() - 0.5) * 0.01,
+                lng: 106.8290 + (Math.random() - 0.5) * 0.01
             });
-
-            if (filtered.length === 0) {
-                container.append('<div class="text-center py-5 text-muted"><i class="fas fa-store-slash fs-2 mb-2 d-block"></i>Tidak ada outlet ditemukan.</div>');
+            if (!navigator.geolocation) {
+                setTimeout(fallback, 800);
                 return;
             }
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                () => setTimeout(fallback, 600),
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 30000 }
+            );
+        });
+    }
 
-            filtered.forEach(o => {
-                let badgeClass = 'badge-mobile-warning';
-                if (o.status === 'selesai_efektif') badgeClass = 'badge-mobile-success';
-                if (o.status === 'selesai_tidak_efektif') badgeClass = 'badge-mobile-danger'; // Orange/red for no purchase
-                if (o.statusText === 'Sedang Check-In') badgeClass = 'badge-mobile-info';
+    function pickTodayVisit(todayVisits, customerId) {
+        return todayVisits
+            .filter(v => v.customerId === customerId)
+            .sort((a, b) => {
+                if (a.status === 'checked_in' && b.status !== 'checked_in') return -1;
+                if (b.status === 'checked_in' && a.status !== 'checked_in') return 1;
+                return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+            })[0] || null;
+    }
 
-                let arWarningHtml = '';
-                if (o.arBalance > 0) {
-                    const formattedAR = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(o.arBalance);
-                    arWarningHtml = `<div class="outlet-meta-item ar-warning"><i class="fas fa-file-invoice-dollar"></i>AR: ${formattedAR}</div>`;
-                }
+    function loadMdVisits() {
+        const allCustomers = SfaStore.getCustomers();
+        const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
+        const list = [];
 
-                const cardHtml = `
-                    <a href="visit_detail.html?id=${o.id}" class="outlet-card">
-                        <div class="outlet-header">
-                            <span class="outlet-name">${o.name}</span>
-                            <span class="badge-mobile ${badgeClass}">${o.statusText}</span>
-                        </div>
-                        <div class="outlet-code-row">
-                            <span>${o.id}</span>
-                            <span>•</span>
-                            <span>${o.type}</span>
-                        </div>
-                        <div class="outlet-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${o.distance} • ${o.address}</span>
-                        </div>
-                        ${arWarningHtml}
-                        <i class="fas fa-chevron-right visit-action-indicator"></i>
-                    </a>
-                `;
-                container.append(cardHtml);
+        SfaStore.getTodayRouteIds().forEach(id => {
+            const cust = allCustomers.find(c => c.id === id);
+            if (!cust) return;
+            const visitRecord = pickTodayVisit(todayVisits, id);
+            list.push(buildVisitItem(cust, {
+                category: 'daily',
+                status: visitRecord ? visitRecord.status : 'unvisited',
+                visitId: visitRecord ? visitRecord.id : null,
+                visitRecord: visitRecord || null,
+                scheduledDate: SfaStore.todayStr()
+            }));
+        });
+
+        SfaStore.getOverdueRouteCustomers().forEach(od => {
+            const cust = allCustomers.find(c => c.id === od.customerId);
+            if (!cust) return;
+            const visitToday = pickTodayVisit(todayVisits, od.customerId);
+            list.push(buildVisitItem(cust, {
+                category: 'overdue',
+                status: visitToday ? visitToday.status : 'unvisited',
+                visitId: visitToday ? visitToday.id : null,
+                visitRecord: visitToday || null,
+                scheduledDate: od.scheduledDate,
+                daysOverdue: od.daysOverdue
+            }));
+        });
+
+        visits = list;
+    }
+
+    function loadMotorisVisits() {
+        const allCustomers = SfaStore.getCustomers();
+        const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
+        const list = allCustomers.map(cust => {
+            const visitRecord = pickTodayVisit(todayVisits, cust.id);
+            let distanceM = null;
+            const hasGps = cust.lat && cust.lng && cust.lat !== 0 && cust.lng !== 0;
+            if (devicePos && hasGps) {
+                distanceM = SfaStore.haversineMeters(devicePos.lat, devicePos.lng, cust.lat, cust.lng);
+            }
+            return buildVisitItem(cust, {
+                category: 'nearest',
+                status: visitRecord ? visitRecord.status : 'unvisited',
+                visitId: visitRecord ? visitRecord.id : null,
+                visitRecord: visitRecord || null,
+                distanceM,
+                distance: distanceM != null ? distanceM / 1000 : (MOCK_DISTANCES[cust.id] || 99)
             });
-        }
+        });
 
-        function searchOutlets() {
+        list.sort((a, b) => {
+            if (a.distanceM == null) return 1;
+            if (b.distanceM == null) return -1;
+            return a.distanceM - b.distanceM;
+        });
+
+        visits = list;
+    }
+
+    function buildVisitItem(cust, extra) {
+        return {
+            customerId: cust.id,
+            customerName: cust.name,
+            address: cust.address || '-',
+            distance: MOCK_DISTANCES[cust.id] || 1.0,
+            ...extra
+        };
+    }
+
+    function setCategoryFilter(filter) {
+        categoryFilter = filter;
+        $('.filter-chip').removeClass('active');
+        const chipMap = { daily: 'chipDaily', overdue: 'chipOverdue' };
+        $(`#${chipMap[filter]}`).addClass('active');
+        renderList();
+    }
+
+    function resetVisitFilter() {
+        $('#searchInput').val('');
+        if (isMdUser) {
+            setCategoryFilter('daily');
+        } else {
             renderList();
         }
+    }
 
-        function logout() {
-            Swal.fire({
-                title: 'Keluar Aplikasi?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#005D41',
-                cancelButtonColor: '#ADA4A5',
-                confirmButtonText: 'Ya, Keluar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    localStorage.removeItem('sfa_user');
-                    window.location.href = 'login.html';
-                }
-            });
+    function toggleSearch() {
+        $('#searchBar').toggleClass('d-none');
+        if (!$('#searchBar').hasClass('d-none')) {
+            $('#searchInput').focus();
         }
-    </script>
+    }
+
+    function toggleFab(forceOpen) {
+        const open = forceOpen === true ? true : forceOpen === false ? false : !$('#fabMenu').hasClass('open');
+        $('#fabMenu').toggleClass('open', open);
+        $('#fabBackdrop').toggleClass('open', open);
+        $('#fabMain').toggleClass('open', open);
+    }
+
+    function renderList() {
+        const query = ($('#searchInput').val() || '').toLowerCase();
+        const container = $('#visitListContainer');
+        container.empty();
+
+        let filtered = visits.filter(v => {
+            const matchSearch = v.customerName.toLowerCase().includes(query) ||
+                                v.customerId.toLowerCase().includes(query);
+            if (!matchSearch) return false;
+            if (isMdUser) return v.category === categoryFilter;
+            return true;
+        });
+
+        const statusOrder = { 'checked_in': 1, 'unvisited': 2, 'checked_out': 3 };
+        filtered.sort((a, b) => {
+            if (!isMdUser) {
+                if (a.distanceM == null) return 1;
+                if (b.distanceM == null) return -1;
+                return a.distanceM - b.distanceM;
+            }
+            if (categoryFilter === 'overdue') {
+                return (b.daysOverdue || 0) - (a.daysOverdue || 0);
+            }
+            return statusOrder[a.status] - statusOrder[b.status];
+        });
+
+        $('#visitCount').text(filtered.length);
+
+        if (filtered.length === 0) {
+            const isFiltered = query !== '';
+            const emptyHint = isMdUser
+                ? (categoryFilter === 'overdue'
+                    ? 'Tidak ada rute terlewat di bulan ini.'
+                    : 'Tidak ada outlet di jadwal rute hari ini.')
+                : 'Tidak ada outlet ditemukan di sekitar lokasi Anda.';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetVisitFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
+            container.html(`
+                <div class="empty-state">
+                    <i class="fas fa-route"></i>
+                    <div>Tidak ada rute kunjungan ditemukan.</div>
+                    <small>${isFiltered ? 'Coba ubah kata kunci pencarian.' : emptyHint}</small>
+                    ${resetBtn}
+                </div>
+            `);
+            return;
+        }
+
+        filtered.forEach(v => {
+            let statusText = 'Belum Dikunjungi';
+            let badgeClass = 'badge-mobile-warning';
+            if (v.status === 'checked_in') {
+                statusText = 'Sedang Visit';
+                badgeClass = 'badge-mobile-info';
+            } else if (v.status === 'checked_out') {
+                statusText = 'Selesai Kunjungan';
+                badgeClass = 'badge-mobile-success';
+            }
+
+            const routeTag = isMdUser
+                ? (v.category === 'overdue'
+                    ? `<span class="route-tag-overdue">Overdue · ${v.daysOverdue} hari</span>`
+                    : `<span class="route-tag-daily">Rute Harian</span>`)
+                : '';
+            const scheduleHint = isMdUser && v.category === 'overdue'
+                ? `<div style="font-size:11px; color:#C62828; margin-top:4px;"><i class="far fa-calendar-times me-1"></i> Jadwal: ${SfaStore.formatDate(v.scheduledDate)} · belum dikunjungi</div>`
+                : '';
+
+            // Outstanding AR from SfaStore
+            const ar = SfaStore.getOutstandingByCustomerId(v.customerId);
+            const arBadge = ar > 0 ? `
+                <span style="font-size:10px; font-weight:700; color:#dc3545; background:#FFF3E0; padding:2px 8px; border-radius:4px; margin-left: 6px; border: 1px solid rgba(220,53,69,0.15)">
+                    AR: ${SfaStore.formatRupiah(ar)}
+                </span>
+            ` : '';
+
+            // Distance layout
+            const distColor = (v.distanceM != null ? v.distanceM <= 100 : v.distance <= 0.1) ? '#00A76F' : '#FF8F00';
+            const distLabel = v.distanceM != null
+                ? `Jarak: ${SfaStore.formatDistanceMeters(v.distanceM)} dari Anda`
+                : `Jarak: ${v.distance.toFixed(2)} km`;
+
+            // Card HTML
+            container.append(`
+                <a href="visit_detail.html?id=${v.customerId}" class="visit-card" style="text-decoration:none; display:block;">
+                    <div class="card-header-row">
+                        <span class="customer-name">${v.customerName}</span>
+                        <span class="badge-mobile ${badgeClass}">${statusText}</span>
+                    </div>
+                    <div style="font-size:13px; color:var(--color-gray); margin-bottom:6px;">
+                        <i class="fas fa-store-alt me-1"></i> ${v.customerId}
+                        <span class="ms-2">${routeTag}</span>
+                        ${arBadge}
+                    </div>
+                    <div class="card-body-row">
+                        <i class="fas fa-map-marker-alt text-danger me-1"></i> ${v.address}
+                    </div>
+                    ${scheduleHint}
+                    <div class="card-footer-row">
+                        <div style="font-size:13px; font-weight:600; color:${distColor};">
+                            <i class="fas fa-street-view me-1"></i> ${distLabel}
+                        </div>
+                        ${v.status === 'checked_out' && v.visitRecord && v.visitRecord.hasOrder ? `
+                            <div style="font-size:13px; font-weight:700; color:#005D41;">
+                                <i class="fas fa-shopping-cart me-1"></i> Order: ${SfaStore.formatRupiah(v.visitRecord.orderAmount)}
+                            </div>
+                        ` : ''}
+                        ${v.status === 'checked_out' && v.visitRecord && v.visitRecord.hasNoOrderReason ? `
+                            <div style="font-size:13px; font-weight:700; color:#dc3545;">
+                                <i class="fas fa-times-circle me-1"></i> ${v.visitRecord.noOrderReason}
+                            </div>
+                        ` : ''}
+                    </div>
+                </a>
+            `);
+        });
+    }
+</script>
 </body>
 </html>

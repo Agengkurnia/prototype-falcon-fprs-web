@@ -1,18 +1,18 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
-## Modul: Mobile SFA Falcon FPRS (Field Partner Relation System)
-### Sistem: Falcon FPRS
-### Versi Dokumen: 1.0
+## Modul: Man Power GT — Mobile SFA
+### Sistem: Man Power GT
+### Versi Dokumen: 1.2
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
-| **Nama Dokumen** | FSD Mobile SFA Falcon FPRS |
-| **Versi** | 1.0 |
-| **Tanggal** | 7 Juli 2026 |
-| **Divisi** | ICT / Business – Falcon FPRS |
+| **Nama Dokumen** | FSD Mobile SFA — Man Power GT |
+| **Versi** | 1.2 |
+| **Tanggal** | 4 Agustus 2026 |
+| **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
-| **Dibuat oleh** | Tim ICT – Falcon FPRS |
+| **Dibuat oleh** | Tim IT – Man Power GT |
 | **Sumber Kebenaran** | `Views/Mobile/*.html`, `wwwroot/js/sfa-store.js`, `wwwroot/css/mobile.css` |
 
 ---
@@ -21,7 +21,21 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
+| **1.2** | **4 Agustus 2026** | **Tim IT** | Swimlane **PlantUML** kolom role; Document Approval; screenshot ulang; deliverable Project Log |
+| **1.1** | **4 Agustus 2026** | **Tim IT** | Rename sistem ke **Man Power GT**; screenshot ulang |
 | **1.0** | **7 Juli 2026** | **Tim ICT** | Initial draft – Mobile SFA prototipe (Views/Mobile, 20 halaman) |
+
+---
+
+## Persetujuan Dokumen (Document Approval)
+
+| Full Name | Job Title | Signature | Signature Date |
+|-----------|-----------|-----------|----------------|
+| Muhammad Rafi | SHP Channel & Customer Development |  |  |
+| Silvester Mario Nian Destrada | SHP Channel & Customer Development |  |  |
+| Aldira Rahmania | SHP Channel & Customer Development |  |  |
+| Ageng Kurniawan Sugianto | IT Product |  |  |
+| Albet | IT Product |  |  |
 
 ---
 
@@ -29,13 +43,13 @@
 
 ### 1.1 Latar Belakang
 
-**Falcon FPRS** (*Field Partner Relation System*) adalah sistem internal PT Kalbe Nutritionals untuk administrasi penjualan lapangan, kunjungan outlet, dan pelacakan kinerja sales. Prototipe **Mobile SFA** di `Views/Mobile/` mensimulasikan aplikasi Android sales lapangan berbasis web responsif dengan tema visual Falcon Mobile (Genoa Green `#005D41`, Atlantis Green `#78B500`).
+**Man Power GT** (*Man Power General Trade*) adalah sistem internal PT Kalbe Nutritionals untuk administrasi penjualan lapangan, kunjungan outlet, dan pelacakan kinerja sales General Trade. Prototipe **Mobile SFA** di `Views/Mobile/` mensimulasikan aplikasi Android sales lapangan berbasis web responsif dengan tema visual Falcon Mobile (Genoa Green `#005D41`, Atlantis Green `#78B500`).
 
 Alur bisnis utama mengacu pada dekompilasi aplikasi **SimpliDOTS SFA**, sedangkan identitas visual, logo, dan ikon SVG mengadopsi **Falcon Mobile**. Lapisan data menggunakan `SfaStore` (`wwwroot/js/sfa-store.js`) yang mensimulasikan database SQLite offline melalui `localStorage`.
 
 ### 1.2 Tujuan Dokumen
 
-1. Mendeskripsikan fungsionalitas **per halaman dan per komponen UI** Mobile SFA Falcon FPRS.
+1. Mendeskripsikan fungsionalitas **per halaman dan per komponen UI** Mobile SFA Man Power GT.
 2. Menjadi acuan pengembangan backend/API mobile dan UAT lapangan.
 3. Mendokumentasikan business rules (BR-Mxx), pola CRUD, swimlane alur kunjungan, dan ERD entitas data.
 4. Menyelaraskan format dokumentasi dengan standar **FSD Generator Engine** (Kalbe Nutritionals).
@@ -120,47 +134,60 @@ Prototype/
 
 ### 2.3 Swimlane — Alur Kunjungan Harian
 
-Tabel swimlane berikut mendefinisikan peran (*lane*) sebelum diagram Mermaid.
+**Lane (urutan kiri → kanan):**
 
-| Lane | Peran | Tanggung Jawab dalam Alur Visit |
-|------|-------|----------------------------------|
-| **L1** | Salesman (Canvasser) | Login, pilih rute, pilih stokis, mulai visit, cek stok, input order/AR/alasan tidak beli, selesai visit |
-| **L2** | Sistem (SfaStore) | Validasi GPS radius, single active visit, persistensi visit/invoice/collection, antrean sync |
-| **L3** | Outlet (Pelanggan) | Menerima kunjungan, transaksi order, pembayaran piutang, verifikasi stok fisik |
+| # | Lane ID | Label | Tipe | Sumber |
+|---|---------|-------|------|--------|
+| 1 | L1 | Salesman (Canvasser) | User | Login SFA, visit, order/AR |
+| 2 | L2 | Sistem (SfaStore) | System | GPS, persistensi, sync queue |
+| 3 | L3 | Outlet (Pelanggan) | External | Penerima kunjungan & transaksi |
 
-```mermaid
-sequenceDiagram
-    autonumber
-    participant S as Salesman
-    participant SYS as Sistem (SfaStore)
-    participant O as Outlet
-
-    S->>SYS: Login (sfa_user)
-    SYS-->>S: Session canvasser aktif
-    S->>SYS: Buka visit_list (rute hari ini)
-    SYS-->>S: Daftar outlet + status kunjungan
-    S->>O: Tiba di lokasi outlet
-    S->>SYS: Pilih Stokis/Grosir (stockistSelect)
-    SYS->>SYS: setActiveStockist()
-    S->>SYS: Mulai Visit (GPS check)
-    alt Dalam radius 100m
-        SYS-->>S: Visit aktif (checked_in)
-    else Luar radius
-        S->>SYS: Alasan + foto bukti
-        SYS-->>S: Visit aktif dengan flag luar radius
-    end
-    S->>O: Cek stok fisik produk
-    S->>SYS: stockCheckDone = true
-    alt Ada transaksi
-        S->>O: Sales Order / Penagihan AR
-        S->>SYS: saveInvoice / saveCollection
-    else Tidak beli
-        S->>SYS: noOrderReason
-    end
-    S->>SYS: Selesai Visit
-    SYS->>SYS: completeVisit + addToSyncQueue
-    SYS-->>S: Status checked_out
+```plantuml
+@startuml
+|Salesman|
+start
+:Login SFA;
+|Sistem SfaStore|
+:Buat session canvasser;
+:Tampilkan daftar outlet rute hari ini;
+|Salesman|
+:Tiba di lokasi outlet;
+:Pilih Stokis / Grosir;
+:Mulai Visit (cek GPS);
+|Sistem SfaStore|
+if (Dalam radius 100m?) then (ya)
+  :Visit aktif (checked_in);
+else (tidak)
+  |Salesman|
+  :Isi alasan + foto bukti;
+  |Sistem SfaStore|
+  :Visit aktif (flag luar radius);
+endif
+|Outlet|
+:Cek stok fisik produk;
+|Salesman|
+:Tandai stok check selesai;
+if (Ada transaksi?) then (ya)
+  |Outlet|
+  :Sales Order / Penagihan AR;
+  |Sistem SfaStore|
+  :Simpan invoice / collection;
+else (tidak)
+  |Salesman|
+  :Isi alasan tidak beli;
+  |Sistem SfaStore|
+  :Simpan no-order reason;
+endif
+|Salesman|
+:Selesai Visit;
+|Sistem SfaStore|
+:Complete visit + antrean sync;
+:Status checked_out;
+stop
+@enduml
 ```
+
+Hand-off Salesman → Sistem: login, visit, dan transaksi dipersistensi ke SfaStore. Hand-off Salesman ↔ Outlet: verifikasi stok fisik dan transaksi order/AR di lokasi.
 
 ### 2.4 Diagram Navigasi Utama
 
@@ -1538,4 +1565,4 @@ Copy-Item build\app\outputs\flutter-apk\app-release.apk ..\..\app-release.apk
 
 ---
 
-*— Akhir Dokumen FSD Mobile SFA Falcon FPRS v1.0 —*
+*— Akhir Dokumen FSD Mobile SFA Man Power GT v1.2 —*

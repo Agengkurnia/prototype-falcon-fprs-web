@@ -107,7 +107,24 @@ MAVEN_MAPPING = {
 | Latitude / Longitude | `mStokis` | `decLat`, `decLng` | | Unik per outlet |
 | Status | `mStokis` | `bitActive` | | Active/Inactive via CSV |
 ''',
-    'master-pajak': '''#### 3.6.6 Mapping Database MAVEN
+    'master-limit-target-harian': '''#### 3.6.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | MD / Motoris (*unik bersama Type) |
+| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | mis. MD Reguler / Motoris Reguler |
+| Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
+| Maximal Harian | `mLimitTargetHarianVer` | `intMaximalHarian` | | ≥ Minimal Harian |
+| Target HKE Mingguan | `mLimitTargetHarianVer` | `intTargetHkeMingguan` | | Hari kerja efektif / minggu |
+| Target HKE Bulanan | `mLimitTargetHarianVer` | `intTargetHkeBulanan` | | |
+| Tanggal Mulai | `mLimitTargetHarianVer` | `dtTanggalMulai` | | Tidak boleh backdate (BR) |
+| Tanggal Selesai | `mLimitTargetHarianVer` | `dtTanggalSelesai` | | ≥ Tanggal Mulai |
+| Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
+| Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
+
+> Update di UI = **append** baris baru ke `mLimitTargetHarianVer` (bukan overwrite). DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+''',
+    'master-pajak': '''#### 3.7.6 Mapping Database MAVEN
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
@@ -116,7 +133,7 @@ MAVEN_MAPPING = {
 | Persentase (%) | `mPajak` | `decPersentase` | | |
 | Nilai DPP | `mPajak` | `txtNilaiDpp` | | |
 ''',
-    'master-alasan': '''#### 3.7.6 Mapping Database MAVEN
+    'master-alasan': '''#### 3.8.6 Mapping Database MAVEN
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
@@ -132,13 +149,13 @@ def chapter_erd() -> str:
 
 Cara baca bab ini:
 
-1. **7.1** — ERD produksi (1 halaman): relasi + **kolom lengkap** sesuai skrip DDL `001`/`002`.
+1. **7.1** — ERD produksi (1 halaman): relasi + **kolom lengkap** sesuai skrip DDL `001`/`002`/`012`.
 2. **7.2** — tabel teks FK yang **1:1** dengan garis di diagram 7.1.
 3. **7.3–7.4** — catatan desain + DDL (query penuh).
 
 ### 7.1 ERD Produksi (1 halaman)
 
-Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql` dan `002_*.sql`.
+Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`, dan `012_mLimitTargetHarian.sql`.
 Kolom digambar **lengkap** (termasuk audit). Lookup tanpa FK constraint (`mKategoriProduk`, `mDivisi`, `mDaftarHarga`) **tidak** digambar — kolom cadangan dicatat di bawah.
 
 ```mermaid
@@ -152,6 +169,7 @@ erDiagram
     mPegawai ||--o{ mPegawaiStatusHist : intPegawaiID
     mStokis ||--o{ mStokisStatusHist : intStokisID
     mStokis ||--o{ mStokisStockHist : intStokisID
+    mLimitTargetHarian ||--o{ mLimitTargetHarianVer : intLimitID
 
     mProduk {
         int intProdukID PK
@@ -348,9 +366,38 @@ erDiagram
         varchar txtUpdatedBy
         timestamp dtNonActive
     }
+    mLimitTargetHarian {
+        int intLimitID PK
+        uuid txtGuid UK
+        varchar txtJabatan
+        varchar txtTypeJabatan
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mLimitTargetHarianVer {
+        int intLimitVerID PK
+        uuid txtGuid UK
+        int intLimitID FK
+        int intMinimalHarian
+        int intMaximalHarian
+        int intTargetHkeMingguan
+        int intTargetHkeBulanan
+        date dtTanggalMulai
+        date dtTanggalSelesai
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
 ```
 
-> `mAlasan` standalone (tanpa FK). `mBrand` reuse tabel existing MAVEN.
+> `mAlasan` standalone (tanpa FK). `mLimitTargetHarian` standalone (tanpa FK ke pegawai — jabatan teks). `mBrand` reuse tabel existing MAVEN.
 
 **Kolom cadangan v1 (belum ada FK di DDL):** `intKategoriID`, `intDivisiID`, `intDaftarHargaID` — nullable; tabel lookup belum digambar.
 
@@ -366,8 +413,9 @@ erDiagram
 | 6 | `mPegawaiStatusHist` | `intPegawaiID` | `mPegawai` | many-to-one | Ya (audit CSV) |
 | 7 | `mStokisStatusHist` | `intStokisID` | `mStokis` | many-to-one | Ya (audit CSV) |
 | 8 | `mStokisStockHist` | `intStokisID` | `mStokis` | many-to-one | Ya (riwayat stok) |
+| 9 | `mLimitTargetHarianVer` | `intLimitID` | `mLimitTargetHarian` | many-to-one | Ya (versi periode) |
 
-Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan** kolom tabel.
+Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan** kolom tabel. Versi Limit aktif pada tanggal = baris `mLimitTargetHarianVer` dengan `bitActive` dan `dtTanggalMulai` ≤ hari ini ≤ `dtTanggalSelesai`.
 
 ### 7.3 Catatan Desain Database
 
@@ -375,13 +423,14 @@ Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan
 - **ID prototype → PK + GUID:** `id` integer menjadi `intXxxID` serial + `txtGuid` uuid.
 - **Relasi by ID:** string nama di prototipe diganti FK `intXxxID` di MAVEN.
 - **Reuse `mBrand`:** tabel brand sudah ada di MAVEN — jangan buat duplikat.
+- **Limit append-only:** Update UI menambah baris `mLimitTargetHarianVer`; History menampilkan seluruh versi per header.
 - **Blok audit wajib:** `bitActive`, `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive`.
 
 ### 7.4 Query Pembuatan Tabel (DDL PostgreSQL)
 
-Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu master inti (7.4.2). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
+Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu master inti (7.4.2), lalu Limit (7.4.3). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
 
-> Implementasi MAVEN juga menyediakan file terpisah: `MAVEN.DAL/Scripts/001_mUnit_mPajak_mProduk.sql` dan `002_mChannel_mAlasan_mPegawai_mPelanggan_mStokis.sql` (termasuk tabel riwayat).
+> Implementasi MAVEN: `MAVEN.DAL/Scripts/001_mUnit_mPajak_mProduk.sql`, `002_mChannel_mAlasan_mPegawai_mPelanggan_mStokis.sql`, `012_mLimitTargetHarian.sql`.
 
 #### 7.4.1 Tabel Lookup
 
@@ -616,9 +665,50 @@ CREATE TABLE "mStokis" (
     "dtNonActive"   timestamp without time zone NULL,
     CONSTRAINT "mStokis_txtOutletId_uq" UNIQUE ("txtOutletId")
 );
+
+-- Limit Target Harian (header + versi) — juga di 012_mLimitTargetHarian.sql
+CREATE TABLE "mLimitTargetHarian" (
+    "intLimitID"      serial PRIMARY KEY,
+    "txtGuid"         uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtJabatan"      varchar(50)  NOT NULL,
+    "txtTypeJabatan"  varchar(100) NOT NULL,
+    "bitActive"       boolean NOT NULL DEFAULT true,
+    "dtInserted"      timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"   varchar(100) NULL,
+    "dtUpdated"       timestamp without time zone NULL,
+    "txtUpdatedBy"    varchar(100) NULL,
+    "dtNonActive"     timestamp without time zone NULL,
+    CONSTRAINT "mLimitTargetHarian_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarian_jabatan_type_uq" UNIQUE ("txtJabatan", "txtTypeJabatan")
+);
+
+CREATE TABLE "mLimitTargetHarianVer" (
+    "intLimitVerID"          serial PRIMARY KEY,
+    "txtGuid"                uuid NOT NULL DEFAULT gen_random_uuid(),
+    "intLimitID"             int NOT NULL,
+    "intMinimalHarian"       int NOT NULL DEFAULT 0,
+    "intMaximalHarian"       int NOT NULL DEFAULT 0,
+    "intTargetHkeMingguan"   int NOT NULL DEFAULT 0,
+    "intTargetHkeBulanan"    int NOT NULL DEFAULT 0,
+    "dtTanggalMulai"         date NOT NULL,
+    "dtTanggalSelesai"       date NOT NULL,
+    "bitActive"              boolean NOT NULL DEFAULT true,
+    "dtInserted"             timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"          varchar(100) NULL,
+    "dtUpdated"              timestamp without time zone NULL,
+    "txtUpdatedBy"           varchar(100) NULL,
+    "dtNonActive"            timestamp without time zone NULL,
+    CONSTRAINT "mLimitTargetHarianVer_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarianVer_limit_fk"
+        FOREIGN KEY ("intLimitID") REFERENCES "mLimitTargetHarian" ("intLimitID"),
+    CONSTRAINT "mLimitTargetHarianVer_min_max_chk"
+        CHECK ("intMaximalHarian" >= "intMinimalHarian"),
+    CONSTRAINT "mLimitTargetHarianVer_periode_chk"
+        CHECK ("dtTanggalSelesai" >= "dtTanggalMulai")
+);
 ```
 
-> `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join.
+> `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join. Skrip lengkap Limit (+ seed): `012_mLimitTargetHarian.sql`.
 
 ---
 '''

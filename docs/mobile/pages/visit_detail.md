@@ -1,6 +1,6 @@
 # visit_detail.html — Detail Kunjungan
 
-> **Bantuan in-app:** tombol <i class="fas fa-circle-info"></i> di header — `data-prototype-doc="visit_detail"`
+> **Bantuan in-app:** `data-prototype-doc="visit_detail"` (jika tersedia)
 
 ## Ringkasan
 Alur visit tunggal di satu outlet: mulai visit → aktivitas → selesai visit.
@@ -17,40 +17,40 @@ Alur visit tunggal di satu outlet: mulai visit → aktivitas → selesai visit.
 | Arah | Tujuan |
 |------|--------|
 | Masuk | `visit_list.html`, `outlet_list.html?mode=pickVisit` |
-| Keluar | `product_catalog.html?mode=stockcheck`, `order_input.html`, `visit_list.html` |
+| Keluar | `product_catalog.html?mode=stockcheck` (MD), `order_input.html`, `visit_list.html` |
 
 ## Komponen UI
+- Header: kembali + judul outlet (**tanpa** tombol telepon)
 - Peta / preview GPS
 - Kartu info outlet (kode, alamat, AR, TOP)
 - State **Belum Visit** → tombol Mulai Visit
-- State **Sedang Visit** → grid aktivitas
+- State **Sedang Visit** → grid aktivitas (bergantung role)
 - State **Selesai** → ringkasan visit
 - Modal: alasan luar radius + foto, alasan tidak beli
 
-## Aktivitas Visit
-| Aktivitas | Tujuan |
-|-----------|--------|
-| Cek Stok | `product_catalog.html?mode=stockcheck` |
-| Sales Order | `order_input.html` |
-| Penagihan AR | Input koleksi inline |
-| Tidak Beli | Pilih alasan (termasuk Lainnya) |
-| Selesai Visit | Checkout |
+## Aktivitas Visit (per role)
+
+| Aktivitas | Role | Keterangan |
+|-----------|------|------------|
+| **Cek Stok** | **MD saja** | Badge `for MD`; kartu disembunyikan untuk Motoris. Wajib sebelum selesai visit **hanya untuk MD**. |
+| Sales Order | Motoris (badge `for Motoris`) | Input order |
+| Tidak Beli | Semua | Pilih alasan (termasuk Lainnya) |
+| Selesai Visit | Semua | Checkout |
 
 ## Data & API
-`getCustomerById`, `saveVisit`, `updateVisit`, `completeVisit`, `getActiveVisit`, `getTodayVisitByCustomerId`, `getOutstandingByCustomerId`, `saveCollection`, `formatRupiah`, `formatTime`
+`getCustomerById`, `saveVisit`, `updateVisit`, `completeVisit`, `getActiveVisit`, `getTodayVisitByCustomerId`, `isModernTradeUser`, `formatRupiah`, `formatTime`
 
 ## Aturan Bisnis
 - **Radius 100 m:** dalam radius = check-in langsung; luar radius = alasan + foto wajib
 - **Single active visit:** tidak bisa mulai visit lain jika masih ada visit aktif
-- **Selesai visit wajib:** cek stok selesai **DAN** (ada order **ATAU** alasan tidak beli)
-- Visit efektif jika ada order
-- Penagihan diblok jika tidak ada AR
-- **Selector stokis dihapus** (Juli 2026) — stokis dipilih di `product_catalog.html`
-
-## Perubahan Juli 2026
-- Dihapus: dropdown Stokis/Grosir Aktif & validasi wajib stokis sebelum visit
+- **Selesai visit wajib:**
+  - Semua role: ada Sales Order **ATAU** alasan Tidak Beli
+  - **MD saja:** juga wajib `stockCheckDone` (Cek Stok)
+  - Motoris: **tidak** diblok oleh Cek Stok
+- Visit efektif jika ada order / faktur (KPI EC di dasbor = faktur ÷ kunjungan)
+- **Selector stokis dihapus** — stokis dipilih di `product_catalog.html`
 
 ## Cara Uji
-1. Mulai visit dalam radius → langsung checked-in
-2. Coba selesai tanpa cek stok → diblok
-3. Cek stok → order atau tidak beli → selesai visit
+1. Login `md` → mulai visit → coba selesai tanpa cek stok → diblok → Cek Stok → order/tidak beli → selesai
+2. Login motoris (`sales01`) → kartu Cek Stok tidak tampil → selesai cukup dengan order atau tidak beli
+3. Header tidak menampilkan tombol telepon

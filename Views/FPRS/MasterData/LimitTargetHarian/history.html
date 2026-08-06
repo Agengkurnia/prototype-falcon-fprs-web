@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>History Limit – Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+.badge-status{display:inline-block;padding:.25rem .6rem;border-radius:12px;font-size:.75rem;font-weight:600}
+.badge-active{background:#e6f4ea;color:#1e7e34}
+.badge-inactive{background:#f8d7da;color:#842029}
+.version-panel{max-height:420px;overflow:auto}
+.version-row-active{background:#e8f5e9}
+</style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1">Limit</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Data Master</li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Limit</a></li>
+                        <li class="breadcrumb-item active">History</li>
+                    </ol>
+                </nav>
+                <div class="text-muted small">LIMIT VISIT — view only</div>
+            </div>
+            <a href="index.html" class="btn btn-danger"><i class="fa fa-arrow-left me-1"></i> Back</a>
+        </div>
+
+        <div class="row g-3">
+            <!-- LEFT: readonly form -->
+            <div class="col-lg-7">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="border-bottom pb-2 text-success mb-3">Header</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Jabatan</label>
+                                <input type="text" class="form-control" id="viewJabatan" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Type Jabatan</label>
+                                <input type="text" class="form-control" id="viewTypeJabatan" readonly disabled />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="border-bottom pb-2 text-success mb-3">Periode Version (selected)</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Minimal Harian</label>
+                                <input type="text" class="form-control" id="viewMin" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Maximal Harian</label>
+                                <input type="text" class="form-control" id="viewMax" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Target HKE Mingguan</label>
+                                <input type="text" class="form-control" id="viewHke" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Target HKE Bulanan</label>
+                                <input type="text" class="form-control" id="viewHkeBulanan" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Mulai</label>
+                                <input type="text" class="form-control" id="viewMulai" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="text" class="form-control" id="viewSelesai" readonly disabled />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <div id="viewActive"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: version list -->
+            <div class="col-lg-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="border-bottom pb-2 text-success mb-3">Version</h5>
+                        <div class="table-responsive version-panel">
+                            <table class="table table-bordered table-hover mb-0" id="tblVer">
+                                <thead>
+                                    <tr>
+                                        <th style="width:80px;"></th>
+                                        <th>VERSION</th>
+                                        <th class="text-center">ACTIVE</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblVerBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script src="../../../../wwwroot/js/master-data-param.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+
+const KEY = 'md_limit_target';
+let recordId = null;
+let record = null;
+let selectedId = null;
+
+function getData(){ return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+function todayStr(){ return new Date().toISOString().slice(0, 10); }
+function fmtDate(iso){
+    if (!iso) return '-';
+    const p = String(iso).split('-');
+    return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+}
+
+function ensureVersions(item){
+    if (!item) return [];
+    return Array.isArray(item.versions) ? item.versions : [];
+}
+
+function currentVersion(item){
+    const today = todayStr();
+    const versions = ensureVersions(item).filter(v => v && v.active !== false);
+    return versions.find(v => v.tanggalMulai && v.tanggalSelesai && today >= v.tanggalMulai && today <= v.tanggalSelesai)
+        || versions.slice().sort((a,b) => String(b.tanggalMulai||'').localeCompare(String(a.tanggalMulai||'')))[0]
+        || null;
+}
+
+function fillForm(ver){
+    document.getElementById('viewJabatan').value = record.jabatan || '-';
+    document.getElementById('viewTypeJabatan').value = record.typeJabatan || '-';
+    document.getElementById('viewMin').value = ver ? ver.minimalHarian : '-';
+    document.getElementById('viewMax').value = ver ? ver.maximalHarian : '-';
+    document.getElementById('viewHke').value = ver ? ver.targetHke : '-';
+    document.getElementById('viewHkeBulanan').value = ver ? ver.targetHkeBulanan : '-';
+    document.getElementById('viewMulai').value = ver ? fmtDate(ver.tanggalMulai) : '-';
+    document.getElementById('viewSelesai').value = ver ? fmtDate(ver.tanggalSelesai) : '-';
+    const active = ver && ver.active !== false;
+    document.getElementById('viewActive').innerHTML = active
+        ? '<span class="badge-status badge-active">Active</span>'
+        : '<span class="badge-status badge-inactive">Inactive</span>';
+}
+
+function renderVersions(){
+    const body = $('#tblVerBody');
+    body.empty();
+    const today = todayStr();
+    const rows = ensureVersions(record).slice().sort((a,b) =>
+        String(b.tanggalMulai||'').localeCompare(String(a.tanggalMulai||''))
+    );
+    if (!rows.length) {
+        body.html('<tr><td colspan="3" class="text-center text-muted py-3">Belum ada versi</td></tr>');
+        return;
+    }
+    rows.forEach((v) => {
+        const isCurrent = v.active !== false && v.tanggalMulai && v.tanggalSelesai && today >= v.tanggalMulai && today <= v.tanggalSelesai;
+        const isSelected = String(v.id) === String(selectedId);
+        const activeIcon = (v.active !== false)
+            ? '<span class="badge-status badge-active">✔</span>'
+            : '<span class="badge-status badge-inactive">✖</span>';
+        const label = `${fmtDate(v.tanggalMulai)} – ${fmtDate(v.tanggalSelesai)}${isCurrent ? ' (berlaku)' : ''}`;
+        body.append(`<tr class="${isSelected || isCurrent ? 'version-row-active' : ''}">
+            <td><button type="button" class="btn btn-primary btn-sm" onclick="selectVersion('${v.id}')">Select</button></td>
+            <td>${label}</td>
+            <td class="text-center">${activeIcon}</td>
+        </tr>`);
+    });
+}
+
+function selectVersion(id){
+    selectedId = id;
+    const ver = ensureVersions(record).find(v => String(v.id) === String(id));
+    fillForm(ver || null);
+    renderVersions();
+}
+
+function load(){
+    recordId = MasterDataParam.parseRecordId();
+    if (!recordId) {
+        Swal.fire('Error', 'ID limit tidak ditemukan.', 'error').then(() => location.href = 'index.html');
+        return;
+    }
+    record = getData().find(d => String(d.id) === String(recordId));
+    if (!record) {
+        Swal.fire('Error', 'Data limit tidak ditemukan.', 'error').then(() => location.href = 'index.html');
+        return;
+    }
+    const cur = currentVersion(record);
+    selectedId = cur ? cur.id : (ensureVersions(record)[0] && ensureVersions(record)[0].id);
+    fillForm(cur || ensureVersions(record)[0] || null);
+    renderVersions();
+}
+
+$(document).ready(load);
+window.selectVersion = selectVersion;
+        });
+    </script>
+</body>
+</html>

@@ -25,7 +25,7 @@ PROJECT_LOG_NAME = 'Man Power GT'
 sys.path.insert(0, os.path.join(WORKSPACE_DIR, 'lib'))
 
 from fsd_deliver import DeliverableConfig  # noqa: E402
-from fsd_module_runner import build_fsd_module, ModuleBuildConfig, MermaidHandler  # noqa: E402
+from fsd_module_runner import build_fsd_module, ModuleBuildConfig, MermaidHandler, PlantumlHandler  # noqa: E402
 
 
 def build() -> str:
@@ -41,23 +41,24 @@ def build() -> str:
                 'brd_no': '2026.SHP-FSD.0102',
                 'pid_no': '2026.SHP-PID.0101',
                 'prepared_by': 'Tim IT – Man Power GT',
-                'date': '21/07/2026',
-                'revision_date': '21 Juli 2026',
-                'revision_desc': 'v1.2 – Man Power GT; Filter & Pop-up dashboard (+screenshot); tanpa cuplikan SQL; wording Database',
+                'date': '04/08/2026',
+                'revision_date': '4 Agustus 2026',
+                'revision_desc': 'v1.4 – Swimlane PlantUML standar (kolom role)',
             },
-            mermaid_handlers=[
-                MermaidHandler(
-                    lambda c: 'subgraph L1' in c and 'Sales Lapangan' in c,
+            plantuml_handlers=[
+                PlantumlHandler(
+                    lambda c: '|Sales Lapangan Mobile|' in c and '|Web Admin|' in c,
                     os.path.join(SCREENSHOTS_DIR, 'ss_pj_swimlane.png'),
                     'Swimlane', 'Business Flow',
                 ),
+            ],
+            mermaid_handlers=[
                 MermaidHandler(
                     lambda c: 'erDiagram' in c and 'tFaktur' in c,
                     os.path.join(SCREENSHOTS_DIR, 'ss_pj_erd.png'),
                     'ERD', 'ERD – Modul Penjualan',
                 ),
             ],
-            plantuml_handlers=[],
             default_image_width_cm=17.0,
             swimlane_image_width_cm=17.0,
             erd_image_width_cm=17.0,

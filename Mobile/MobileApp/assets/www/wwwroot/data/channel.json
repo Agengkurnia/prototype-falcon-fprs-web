@@ -1,0 +1,23 @@
+[
+  { "id": 1, "nama": "MT-HPM-NKA", "totalPelanggan": 84 },
+  { "id": 2, "nama": "MT-MM-NKA", "totalPelanggan": 152 },
+  { "id": 3, "nama": "MT-MM-MTI", "totalPelanggan": 97 },
+  { "id": 4, "nama": "MT-SPM-NKA", "totalPelanggan": 210 },
+  { "id": 5, "nama": "MT-SPM-RKA", "totalPelanggan": 63 },
+  { "id": 6, "nama": "MT-SPM-MTI", "totalPelanggan": 45 },
+  { "id": 7, "nama": "SPC-BABY SHOP", "totalPelanggan": 38 },
+  { "id": 8, "nama": "SPC-TOKO BUAH", "totalPelanggan": 27 },
+  { "id": 9, "nama": "SPC-TOKO SUSU", "totalPelanggan": 56 },
+  { "id": 10, "nama": "SPC-TOKO SUSU TRADITIONAL", "totalPelanggan": 41 },
+  { "id": 11, "nama": "GT-GROSIR", "totalPelanggan": 320 },
+  { "id": 12, "nama": "GT-KELONTONG", "totalPelanggan": 540 },
+  { "id": 13, "nama": "GI HORECA", "totalPelanggan": 72 },
+  { "id": 14, "nama": "MED-APOTIK", "totalPelanggan": 188 },
+  { "id": 15, "nama": "MED-BIDAN", "totalPelanggan": 95 },
+  { "id": 16, "nama": "MED-DHB", "totalPelanggan": 33 },
+  { "id": 17, "nama": "MED-HCP", "totalPelanggan": 61 },
+  { "id": 18, "nama": "MED-RS KLINIK", "totalPelanggan": 47 },
+  { "id": 19, "nama": "MED-TOKO OBAT", "totalPelanggan": 129 },
+  { "id": 20, "nama": "ECOM", "totalPelanggan": 24 },
+  { "id": 21, "nama": "MED-PBF", "totalPelanggan": 18 }
+]

@@ -25,40 +25,7 @@
       "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
     }
   ],
-  "master-pajak": [
-    {
-      "file": "ss_btn_pajak_tambah-pajak.png",
-      "label": "Tambah Pajak",
-      "id": "openModal()",
-      "style": "btn-success",
-      "function": "openModal()",
-      "narrative": "Membuka modal form untuk menambah data baru."
-    },
-    {
-      "file": "ss_btn_pajak_edit.png",
-      "label": "Edit",
-      "id": "editItem('1')",
-      "style": "btn-outline-secondary",
-      "function": "editItem('1')",
-      "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
-    },
-    {
-      "file": "ss_btn_pajak_hapus.png",
-      "label": "Hapus",
-      "id": "del('1','PPN')",
-      "style": "btn-outline-secondary",
-      "function": "del('1','PPN')",
-      "narrative": "Menghapus data terpilih setelah konfirmasi pengguna."
-    },
-    {
-      "file": "ss_btn_pajak_simpan.png",
-      "label": "Simpan",
-      "id": "saveItem()",
-      "style": "btn-success",
-      "function": "saveItem()",
-      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
-    }
-  ],
+  "master-pajak": [],
   "master-alasan": [
     {
       "file": "ss_btn_alasan_tambah-alasan.png",
@@ -237,22 +204,6 @@
       "style": "btn-outline-secondary",
       "function": "—",
       "narrative": "Menjalankan aksi terkait tombol Ekspor."
-    },
-    {
-      "file": "ss_btn_common_lihat-detail.png",
-      "label": "Lihat Detail",
-      "id": "—",
-      "style": "btn-outline-secondary",
-      "function": "—",
-      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
-    },
-    {
-      "file": "",
-      "label": "Cetak Faktur",
-      "id": "cetakFaktur('SI-2606146101')",
-      "style": "btn-outline-secondary",
-      "function": "cetakFaktur('SI-2606146101')",
-      "narrative": "Menjalankan aksi terkait tombol Cetak Faktur."
     }
   ],
   "penjualan-stok-motoris": [
@@ -271,6 +222,48 @@
       "style": "btn-success",
       "function": "refreshDashboard()",
       "narrative": "Menjalankan aksi terkait tombol Refresh."
+    }
+  ],
+  "master-limit-target-harian": [
+    {
+      "file": "ss_btn_limit-target-harian_create.png",
+      "label": "Create",
+      "id": "—",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menjalankan aksi Create."
+    },
+    {
+      "file": "ss_btn_common_detail.png",
+      "label": "Detail",
+      "id": "—",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_limit-target-harian_history.png",
+      "label": "History",
+      "id": "—",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Menjalankan aksi History."
+    },
+    {
+      "file": "ss_btn_limit-target-harian_update.png",
+      "label": "Update",
+      "id": "btnUpdate",
+      "style": "btn-success",
+      "function": "saveForm()",
+      "narrative": "Menjalankan aksi terkait tombol Update."
+    },
+    {
+      "file": "ss_btn_limit-target-harian_back.png",
+      "label": "Back",
+      "id": "—",
+      "style": "btn-danger",
+      "function": "—",
+      "narrative": "Menjalankan aksi Back."
     }
   ]
 }

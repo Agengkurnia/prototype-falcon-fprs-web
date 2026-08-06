@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Detail Limit – Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+</style>
+</head>
+<body>
+    <div id="app-content">
+        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+            <div>
+                <h2 class="title-page mb-1">Limit</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                        <li class="breadcrumb-item">Data Master</li>
+                        <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Limit</a></li>
+                        <li class="breadcrumb-item active" id="crumbMode">Detail</li>
+                    </ol>
+                </nav>
+                <div class="text-muted small">LIMIT VISIT</div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-success" id="btnUpdate" onclick="saveForm()">
+                    <i class="fa fa-check me-1"></i> <span id="btnUpdateLabel">Update</span>
+                </button>
+                <a href="index.html" class="btn btn-danger"><i class="fa fa-arrow-left me-1"></i> Back</a>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="border-bottom pb-2 text-success mb-3">Header</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Jabatan <span class="required-mark">*</span></label>
+                        <select class="form-select" id="inputJabatan" onchange="onJabatanChange()">
+                            <option value="">-- Pilih --</option>
+                            <option value="MD">MD</option>
+                            <option value="Motoris">Motoris</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Type Jabatan <span class="required-mark">*</span></label>
+                        <select class="form-select" id="inputTypeJabatan">
+                            <option value="">-- Pilih jabatan dulu --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="border-bottom pb-2 text-success mb-3">Periode Version</h5>
+                <p class="text-muted small" id="versionHint">
+                    Update akan menambahkan versi baru (append-only). Tanggal mulai tidak boleh backdate.
+                </p>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Minimal Harian <span class="required-mark">*</span></label>
+                        <input type="number" class="form-control" id="inputMin" min="0" step="1" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Maximal Harian <span class="required-mark">*</span></label>
+                        <input type="number" class="form-control" id="inputMax" min="0" step="1" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Target HKE Mingguan <span class="required-mark">*</span></label>
+                        <input type="number" class="form-control" id="inputHke" min="0" step="1" />
+                        <div class="form-text">Jumlah hari kerja efektif</div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Target HKE Bulanan <span class="required-mark">*</span></label>
+                        <input type="number" class="form-control" id="inputHkeBulanan" min="0" step="1" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Mulai <span class="required-mark">*</span></label>
+                        <input type="date" class="form-control" id="inputMulai" />
+                        <div class="form-text">Tidak boleh backdate (min. hari ini).</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Selesai <span class="required-mark">*</span></label>
+                        <input type="date" class="form-control" id="inputSelesai" />
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="inputActive" checked />
+                            <label class="form-check-label" for="inputActive">Active</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script src="../../../../wwwroot/js/master-data-param.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+
+const KEY = 'md_limit_target';
+const TYPE_MAP = {
+    MD: ['MD Reguler'],
+    Motoris: ['Motoris Reguler']
+};
+
+let isCreate = false;
+let recordId = null;
+let record = null;
+
+function getData(){ return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+function saveData(d){ localStorage.setItem(KEY, JSON.stringify(d)); }
+function todayStr(){ return new Date().toISOString().slice(0, 10); }
+function fmtDate(iso){
+    if (!iso) return '-';
+    const p = String(iso).split('-');
+    return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+}
+function addDays(iso, n){
+    const d = new Date(String(iso) + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return iso;
+    d.setDate(d.getDate() + n);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+function rangesOverlap(aStart, aEnd, bStart, bEnd){ return aStart <= bEnd && bStart <= aEnd; }
+
+function ensureVersions(item){
+    if (!item) return [];
+    if (!Array.isArray(item.versions)) item.versions = [];
+    return item.versions;
+}
+
+function currentVersion(item){
+    const today = todayStr();
+    const versions = ensureVersions(item).filter(v => v && v.active !== false);
+    return versions.find(v => v.tanggalMulai && v.tanggalSelesai && today >= v.tanggalMulai && today <= v.tanggalSelesai)
+        || versions.slice().sort((a,b) => String(b.tanggalMulai||'').localeCompare(String(a.tanggalMulai||'')))[0]
+        || null;
+}
+
+function onJabatanChange(){
+    const jab = document.getElementById('inputJabatan').value;
+    const sel = document.getElementById('inputTypeJabatan');
+    const types = TYPE_MAP[jab] || [];
+    const prev = sel.value;
+    sel.innerHTML = types.length
+        ? types.map(t => `<option value="${t}">${t}</option>`).join('')
+        : '<option value="">-- Pilih jabatan dulu --</option>';
+    if (types.includes(prev)) sel.value = prev;
+}
+
+function setIdentityEditable(editable){
+    document.getElementById('inputJabatan').disabled = !editable;
+    document.getElementById('inputTypeJabatan').disabled = !editable;
+}
+
+function fillVersionForm(ver, forNewVersion){
+    const today = todayStr();
+    const mulaiEl = document.getElementById('inputMulai');
+    const selesaiEl = document.getElementById('inputSelesai');
+    mulaiEl.min = today;
+    selesaiEl.min = today;
+
+    if (forNewVersion) {
+        document.getElementById('inputMin').value = ver ? ver.minimalHarian : '';
+        document.getElementById('inputMax').value = ver ? ver.maximalHarian : '';
+        document.getElementById('inputHke').value = ver ? ver.targetHke : 6;
+        document.getElementById('inputHkeBulanan').value = ver ? ver.targetHkeBulanan : '';
+        mulaiEl.value = today;
+        selesaiEl.value = '2099-12-31';
+        document.getElementById('inputActive').checked = true;
+        return;
+    }
+
+    document.getElementById('inputMin').value = ver ? ver.minimalHarian : '';
+    document.getElementById('inputMax').value = ver ? ver.maximalHarian : '';
+    document.getElementById('inputHke').value = ver ? ver.targetHke : 6;
+    document.getElementById('inputHkeBulanan').value = ver ? ver.targetHkeBulanan : '';
+    mulaiEl.value = ver && ver.tanggalMulai && ver.tanggalMulai >= today ? ver.tanggalMulai : today;
+    selesaiEl.value = ver ? (ver.tanggalSelesai || '2099-12-31') : '2099-12-31';
+    document.getElementById('inputActive').checked = ver ? ver.active !== false : true;
+}
+
+function load(){
+    const params = new URLSearchParams(location.search);
+    isCreate = params.get('mode') === 'create';
+
+    if (isCreate) {
+        document.getElementById('crumbMode').textContent = 'Create';
+        document.getElementById('btnUpdateLabel').textContent = 'Save';
+        document.getElementById('versionHint').textContent = 'Membuat header baru beserta versi pertama.';
+        recordId = null;
+        record = { jabatan: '', typeJabatan: '', versions: [] };
+        setIdentityEditable(true);
+        onJabatanChange();
+        fillVersionForm(null, true);
+        return;
+    }
+
+    document.getElementById('crumbMode').textContent = 'Detail';
+    document.getElementById('btnUpdateLabel').textContent = 'Update';
+    recordId = MasterDataParam.parseRecordId();
+    if (!recordId) {
+        Swal.fire('Error', 'ID limit tidak ditemukan.', 'error').then(() => location.href = 'index.html');
+        return;
+    }
+    record = getData().find(d => String(d.id) === String(recordId));
+    if (!record) {
+        Swal.fire('Error', 'Data limit tidak ditemukan.', 'error').then(() => location.href = 'index.html');
+        return;
+    }
+    setIdentityEditable(false);
+    document.getElementById('inputJabatan').value = record.jabatan || '';
+    onJabatanChange();
+    document.getElementById('inputTypeJabatan').value = record.typeJabatan || '';
+    // Prefill from current version as draft for next version
+    fillVersionForm(currentVersion(record), true);
+}
+
+function findActiveOverlap(mulai, selesai, versions){
+    return (versions || []).find(v => {
+        if (v.active === false) return false;
+        if (!v.tanggalMulai || !v.tanggalSelesai) return false;
+        return rangesOverlap(mulai, selesai, v.tanggalMulai, v.tanggalSelesai);
+    }) || null;
+}
+
+function persistCreate(header, version){
+    const data = getData();
+    const dup = data.find(d => d.jabatan === header.jabatan && d.typeJabatan === header.typeJabatan);
+    if (dup) {
+        Swal.fire('Duplikat', `Limit untuk ${header.jabatan} / ${header.typeJabatan} sudah ada.`, 'warning');
+        return false;
+    }
+    const id = Date.now();
+    data.push({
+        id,
+        jabatan: header.jabatan,
+        typeJabatan: header.typeJabatan,
+        versions: [{ id: 'v-' + Date.now(), ...version }]
+    });
+    saveData(data);
+    Swal.fire({ icon:'success', title:'Tersimpan', timer:1200, showConfirmButton:false })
+        .then(() => { location.href = MasterDataParam.editUrl('detail.html', id); });
+    return true;
+}
+
+function persistAppend(version, closePrev){
+    const data = getData();
+    const idx = data.findIndex(d => String(d.id) === String(recordId));
+    if (idx < 0) return false;
+    const versions = Array.isArray(data[idx].versions) ? data[idx].versions.slice() : [];
+
+    if (closePrev) {
+        const prevEnd = addDays(version.tanggalMulai, -1);
+        if (prevEnd < closePrev.tanggalMulai) {
+            Swal.fire('Tidak bisa', 'Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja.', 'warning');
+            return false;
+        }
+        const pIdx = versions.findIndex(v => String(v.id) === String(closePrev.id));
+        if (pIdx > -1) versions[pIdx] = { ...versions[pIdx], tanggalSelesai: prevEnd };
+    }
+
+    versions.push({ id: 'v-' + Date.now(), ...version });
+    data[idx] = { ...data[idx], versions };
+    saveData(data);
+    record = data[idx];
+    Swal.fire({ icon:'success', title:'Versi ditambahkan', text:'Perubahan masuk History.', timer:1400, showConfirmButton:false })
+        .then(() => { fillVersionForm(currentVersion(record), true); });
+    return true;
+}
+
+async function saveForm(){
+    const jabatan = document.getElementById('inputJabatan').value;
+    const typeJabatan = document.getElementById('inputTypeJabatan').value;
+    const minimalHarian = parseInt(document.getElementById('inputMin').value, 10);
+    const maximalHarian = parseInt(document.getElementById('inputMax').value, 10);
+    const targetHke = parseInt(document.getElementById('inputHke').value, 10);
+    const targetHkeBulanan = parseInt(document.getElementById('inputHkeBulanan').value, 10);
+    let mulai = document.getElementById('inputMulai').value;
+    const selesai = document.getElementById('inputSelesai').value;
+    const active = document.getElementById('inputActive').checked;
+    const today = todayStr();
+
+    if (!jabatan || !typeJabatan) {
+        Swal.fire('Peringatan', 'Jabatan dan Type Jabatan wajib diisi.', 'warning');
+        return;
+    }
+    if ([minimalHarian, maximalHarian, targetHke, targetHkeBulanan].some(n => Number.isNaN(n) || n < 0) || !mulai || !selesai) {
+        Swal.fire('Peringatan', 'Semua field angka dan periode wajib diisi (≥0).', 'warning');
+        return;
+    }
+    if (maximalHarian < minimalHarian) {
+        Swal.fire('Peringatan', 'Maximal Harian tidak boleh lebih kecil dari Minimal Harian.', 'warning');
+        return;
+    }
+    if (mulai < today) {
+        Swal.fire('Peringatan', 'Tanggal mulai tidak boleh backdate. Minimal hari ini.', 'warning');
+        document.getElementById('inputMulai').value = today;
+        return;
+    }
+    if (selesai < mulai) {
+        Swal.fire('Peringatan', 'Tanggal selesai tidak boleh sebelum tanggal mulai.', 'warning');
+        return;
+    }
+
+    const version = {
+        minimalHarian, maximalHarian, targetHke, targetHkeBulanan,
+        tanggalMulai: mulai, tanggalSelesai: selesai, active
+    };
+
+    if (isCreate) {
+        persistCreate({ jabatan, typeJabatan }, version);
+        return;
+    }
+
+    const versions = ensureVersions(record);
+    if (!active) {
+        persistAppend(version, null);
+        return;
+    }
+
+    const overlap = findActiveOverlap(mulai, selesai, versions);
+    if (!overlap) {
+        persistAppend(version, null);
+        return;
+    }
+
+    const suggestedMulai = addDays(overlap.tanggalSelesai, 1);
+    const result = await Swal.fire({
+        icon: 'warning',
+        title: 'Periode bentrok',
+        html: `
+            Tanggal mulai versi baru (<b>${fmtDate(mulai)}</b>) bentrok dengan versi aktif
+            <b>${fmtDate(overlap.tanggalMulai)} – ${fmtDate(overlap.tanggalSelesai)}</b>
+            (Min ${overlap.minimalHarian} / Max ${overlap.maximalHarian}).
+            <br><br>Pilih penyelesaian:`,
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: 'Tutup versi aktif lebih awal',
+        denyButtonText: 'Geser mulai versi baru',
+        cancelButtonText: 'Batal',
+        confirmButtonColor: '#005d41',
+        denyButtonColor: '#0d6efd',
+        reverseButtons: true
+    });
+
+    if (result.isDismissed) return;
+
+    if (result.isConfirmed) {
+        persistAppend(version, overlap);
+        return;
+    }
+
+    if (result.isDenied) {
+        if (suggestedMulai < today) {
+            Swal.fire('Tidak bisa', `Versi aktif berakhir ${fmtDate(overlap.tanggalSelesai)}. Tidak ada slot mulai ≥ hari ini tanpa menutup versi aktif lebih awal.`, 'warning');
+            return;
+        }
+        if (suggestedMulai > selesai) {
+            Swal.fire('Tidak bisa', `Tanggal mulai yang digeser (${fmtDate(suggestedMulai)}) melebihi tanggal selesai. Perpanjang tanggal selesai dulu.`, 'warning');
+            return;
+        }
+        document.getElementById('inputMulai').value = suggestedMulai;
+        version.tanggalMulai = suggestedMulai;
+        const still = findActiveOverlap(suggestedMulai, selesai, versions);
+        if (still) {
+            Swal.fire('Masih bentrok', `Setelah digeser ke ${fmtDate(suggestedMulai)} masih bentrok. Tutup versi aktif lebih awal.`, 'warning');
+            return;
+        }
+        await Swal.fire({
+            icon: 'info',
+            title: 'Tanggal mulai digeser',
+            text: `Menjadi ${fmtDate(suggestedMulai)}.`,
+            timer: 1400,
+            showConfirmButton: false
+        });
+        persistAppend(version, null);
+    }
+}
+
+$(document).ready(load);
+window.onJabatanChange = onJabatanChange;
+window.saveForm = saveForm;
+        });
+    </script>
+</body>
+</html>

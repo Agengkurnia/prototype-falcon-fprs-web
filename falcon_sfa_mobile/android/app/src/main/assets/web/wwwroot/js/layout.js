@@ -288,6 +288,7 @@ class Layout {
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/LimitTargetHarian/index.html" class="menu-link"><div data-i18n="Limit">Limit</div></a></li>
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Stokis/index.html" class="menu-link"><div data-i18n="Stokis">Stokis / Grosir</div></a></li>
                                 </ul>
                             </li>

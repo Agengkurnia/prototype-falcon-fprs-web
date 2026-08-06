@@ -158,6 +158,28 @@
             margin-top: 2px;
         }
 
+        .role-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            line-height: 1.3;
+            text-transform: none;
+        }
+        .role-badge-md {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+        }
+        .role-badge-motoris {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+        }
+
         /* Camera box */
         .camera-box {
             width: 100%;
@@ -226,9 +248,9 @@
                 <i class="fas fa-arrow-left"></i>
             </button>
             <span class="header-title" id="headerTitle">Detail Outlet</span>
-            <button class="header-action" aria-label="Telepon">
-                <i class="fas fa-phone-alt" style="font-size: 16px;"></i>
-            </button>
+            <span class="header-action" aria-hidden="true" style="visibility:hidden;pointer-events:none;">
+                <i class="fas fa-arrow-left"></i>
+            </span>
         </div>
 
         <!-- Scrollable Content -->
@@ -314,25 +336,20 @@
                     </div>
 
                     <div class="activity-grid">
-                        <!-- Cek Stok (wajib) -->
+                        <!-- Cek Stok (wajib) — for MD -->
                         <a href="javascript:void(0)" class="activity-card" id="stockCheckCard" onclick="goToStockCheck()">
                             <i class="fas fa-clipboard-check text-primary fs-3 mb-2"></i>
                             <span class="activity-title">Cek Stok</span>
                             <span class="activity-desc" id="stockCheckDesc">Belum dilakukan *</span>
+                            <span class="role-badge role-badge-md">for MD</span>
                         </a>
 
-                        <!-- Input Order -->
+                        <!-- Input Order — for Motoris -->
                         <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('order')">
                             <img src="../../wwwroot/assets/images/icons/ic_clipboard_list.svg" class="activity-icon" alt="Order"/>
                             <span class="activity-title">Sales Order</span>
                             <span class="activity-desc" id="orderDesc">Belum diinput</span>
-                        </a>
-
-                        <!-- Penagihan / Collection -->
-                        <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('collection')">
-                            <img src="../../wwwroot/assets/images/icons/ic_payment.svg" class="activity-icon" alt="Payment"/>
-                            <span class="activity-title">Penagihan AR</span>
-                            <span class="activity-desc" id="collectionDesc">Belum diinput</span>
+                            <span class="role-badge role-badge-motoris">for Motoris</span>
                         </a>
 
                         <!-- Tidak ada order (No Order Reason) -->
@@ -372,6 +389,9 @@
                             <span class="info-value" id="summaryActivity">Sales Order (Rp 2.450.000)</span>
                         </div>
                     </div>
+                    <button class="btn-mobile-primary mb-2" onclick="triggerCheckInWorkflow()">
+                        <i class="fas fa-redo me-2"></i>Kunjungi Lagi
+                    </button>
                     <button class="btn-mobile-secondary" onclick="window.location.href='visit_list.html'">
                         <i class="fas fa-chevron-left me-2"></i>Kembali ke Daftar Rute
                     </button>
@@ -472,8 +492,25 @@
         let photoTaken = false;
         let selectedNoOrderReason = "";
         let salesOrderAmount = 0;
-        let collectionAmount = 0;
         let activeVisitId = null;
+
+        function isMdUser() {
+            if (typeof SfaStore !== 'undefined' && typeof SfaStore.isModernTradeUser === 'function') {
+                return SfaStore.isModernTradeUser();
+            }
+            const role = String((SfaStore.getUser && SfaStore.getUser() || {}).role || '').toLowerCase().replace(/[\s-]+/g, '_');
+            return role === 'md' || role === 'modern_trade' || role === 'moderntrade';
+        }
+
+        function applyRoleVisibility() {
+            const md = isMdUser();
+            // Cek Stok hanya untuk MD
+            if (md) {
+                $('#stockCheckCard').removeClass('d-none');
+            } else {
+                $('#stockCheckCard').addClass('d-none');
+            }
+        }
 
         // Bootstrap Modals
         let checkInReasonModal = null;
@@ -498,6 +535,8 @@
 
             checkInReasonModal = new bootstrap.Modal(document.getElementById('checkInReasonModal'));
             noOrderReasonModal = new bootstrap.Modal(document.getElementById('noOrderReasonModal'));
+
+            applyRoleVisibility();
 
             $('#checkInReasonSelect').change(function() {
                 if ($(this).val() === 'Lainnya') {
@@ -578,9 +617,19 @@
             window.location.href = `product_catalog.html?mode=stockcheck&visitId=${activeVisitId}&outletId=${currentOutletId}`;
         }
 
+        function resetActivityCards() {
+            salesOrderAmount = 0;
+            selectedNoOrderReason = null;
+            $('#orderDesc').text('Belum diinput').css('color', '');
+            $('#noOrderDesc').text('Pilih alasan').css('color', '');
+            updateStockCheckUI(false);
+            $('#stockCheckCard').css('border-color', '');
+        }
+
         function loadState() {
-            // Cek visit hari ini dari SfaStore
-            const visit = SfaStore.getTodayVisitByCustomerId(currentOutletId);
+            // Prefer visit aktif (checked_in); jika tidak ada, ambil visit terakhir hari ini
+            const visit = SfaStore.getActiveVisitByCustomerId(currentOutletId)
+                || SfaStore.getTodayVisitByCustomerId(currentOutletId);
 
             if (visit) {
                 activeVisitId = visit.id;
@@ -592,17 +641,20 @@
                     if (visit.hasOrder && visit.orderAmount > 0) {
                         salesOrderAmount = visit.orderAmount;
                         $('#orderDesc').text(SfaStore.formatRupiah(salesOrderAmount)).css('color', '#78B500');
-                    }
-                    if (visit.hasCollection && visit.collectionAmount > 0) {
-                        collectionAmount = visit.collectionAmount;
-                        $('#collectionDesc').text(SfaStore.formatRupiah(collectionAmount)).css('color', '#78B500');
+                    } else {
+                        $('#orderDesc').text('Belum diinput').css('color', '');
+                        salesOrderAmount = 0;
                     }
                     if (visit.hasNoOrderReason) {
                         selectedNoOrderReason = visit.noOrderReason;
                         $('#noOrderDesc').text(selectedNoOrderReason).css('color', '#dc3545');
+                    } else {
+                        selectedNoOrderReason = null;
+                        $('#noOrderDesc').text('Pilih alasan').css('color', '');
                     }
                     updateStockCheckUI(visit.stockCheckDone);
                 } else if (visit.status === 'checked_out') {
+                    activeVisitId = null;
                     showCompletedUI(
                         visit.checkInTime || SfaStore.formatTime(visit.createdAt),
                         visit.checkOutTime || '-',
@@ -614,6 +666,7 @@
                 }
             } else {
                 // Default unvisited view
+                activeVisitId = null;
                 $('#outletStatusBadge').text('Belum Dikunjungi').attr('class', 'badge-mobile badge-mobile-warning');
                 $('#unvisitedStateContainer').removeClass('d-none');
                 $('#checkedInStateContainer').addClass('d-none');
@@ -691,6 +744,7 @@
                 return;
             }
             activeVisitId = result.id;
+            resetActivityCards();
             showCheckedInUI(timeStr, reason);
         }
 
@@ -755,49 +809,10 @@
             $('#completedStateContainer').addClass('d-none');
         }
 
-        // Simulate activity SO / Collection
         function simulateActivity(type) {
             if (type === 'order') {
                 const currentUrl = window.location.pathname + window.location.search;
                 window.location.href = `order_input.html?outletId=${currentOutletId}&backUrl=${encodeURIComponent(currentUrl)}`;
-            } else if (type === 'collection') {
-                // Redirect ke collection_input jika sudah dibuat, fallback ke modal
-                const arTotal = SfaStore.getOutstandingByCustomerId(currentOutletId);
-                if (arTotal <= 0) {
-                    Swal.fire('Tidak Ada Piutang', 'Outlet ini tidak memiliki faktur piutang outstanding.', 'info');
-                    return;
-                }
-                Swal.fire({
-                    title: 'Input Penagihan AR',
-                    text: `Total outstanding: ${SfaStore.formatRupiah(arTotal)}. Masukkan nominal yang dibayar:`,
-                    input: 'number',
-                    inputPlaceholder: 'Nominal...',
-                    showCancelButton: true,
-                    confirmButtonColor: '#005D41',
-                    confirmButtonText: 'Simpan Pembayaran',
-                    cancelButtonText: 'Batal',
-                    inputValidator: (value) => {
-                        if (!value || isNaN(value) || value <= 0) return 'Masukkan nominal yang valid!';
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        collectionAmount = parseFloat(result.value);
-                        const arEntries = SfaStore.getCollectionsByCustomerId(currentOutletId).filter(c => c.balance > 0);
-                        SfaStore.saveCollection({
-                            customerId: currentOutletId,
-                            invoiceIds: arEntries.map(e => e.id),
-                            paidAmount: collectionAmount,
-                            method: 'Tunai'
-                        });
-
-                        if (activeVisitId) {
-                            SfaStore.updateVisit(activeVisitId, { hasCollection: true, collectionAmount });
-                        }
-
-                        $('#collectionDesc').text(SfaStore.formatRupiah(collectionAmount)).css('color', '#78B500');
-                        Swal.fire({ icon: 'success', title: 'Pembayaran Disimpan', timer: 1500, showConfirmButton: false });
-                    }
-                });
             }
         }
 
@@ -847,7 +862,7 @@
                 return;
             }
 
-            if (!visit.stockCheckDone) {
+            if (!visit.stockCheckDone && isMdUser()) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Cek Stok Belum Dilakukan',

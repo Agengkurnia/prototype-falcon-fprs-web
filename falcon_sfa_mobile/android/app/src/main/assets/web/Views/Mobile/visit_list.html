@@ -3,10 +3,11 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Faktur Penjualan - Falcon SFA Mobile</title>
+    <title>Rute Kunjungan - Falcon SFA Mobile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         :root {
             --color-primary: #005D41;
@@ -41,7 +42,7 @@
             padding: 6px 14px;
             border: 1px solid var(--color-border);
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--color-gray);
             white-space: nowrap;
@@ -51,17 +52,33 @@
         }
         .filter-chip i { font-size: 11px; }
         .filter-chip.active { border-color: var(--color-primary); color: var(--color-primary); background: var(--color-bg-light); }
+        #chipOverdue.active { border-color: #C62828; color: #C62828; background: #FFEBEE; }
+        .route-tag-daily { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #E8F5E9; color: #2E7D32; }
+        .route-tag-overdue { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #FFEBEE; color: #C62828; }
+        .motoris-loc-banner {
+            margin: 10px 16px 0;
+            padding: 10px 12px;
+            background: #EBF8F4;
+            border: 1px solid #C2ECE0;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #005D41;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .motoris-loc-banner.loading { background: #F7F9FA; border-color: #E0E0E0; color: #666; }
 
         /* Count Label */
         .count-label {
             padding: 8px 16px 4px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--color-gray);
             text-align: right;
         }
 
-        /* Invoice Card */
-        .invoice-card {
+        /* Visit Card */
+        .visit-card {
             background: #fff;
             border: 1px solid var(--color-border);
             border-radius: 12px;
@@ -74,111 +91,97 @@
             transition: transform 0.1s;
             box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
-        .invoice-card:active { transform: scale(0.98); }
+        .visit-card:active { transform: scale(0.98); }
 
-        .inv-header {
+        .card-header-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 6px;
         }
-        .inv-number {
+        .customer-name {
             font-size: 14px;
-            font-weight: 800;
-            color: var(--color-black);
-        }
-        .inv-badge {
-            padding: 3px 10px;
-            border-radius: 4px;
-            font-size: 11px;
             font-weight: 700;
+            color: var(--color-black);
+            max-width: 70%;
         }
-        .inv-badge-paid { background: #E0F7F0; color: #00A76F; }
-        .inv-badge-unpaid { background: #FFF3E0; color: #FF8F00; }
-        .inv-badge-pending { background: #FFF8E1; color: #F57F17; }
-
-        .inv-customer {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        
+        .card-body-row {
             font-size: 13px;
             color: var(--color-black);
-            margin-bottom: 2px;
-        }
-        .inv-customer i { color: #dc3545; font-size: 12px; }
-        .inv-customer-code {
-            font-size: 12px;
-            color: var(--color-gray);
-            margin-left: 18px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .inv-footer {
+        .card-footer-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            border-top: 1px solid #f0f2f5;
-            padding-top: 10px;
-        }
-        .inv-date-label {
-            font-size: 11px;
-            color: var(--color-gray);
-        }
-        .inv-date-value {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--color-black);
-        }
-        .inv-amount {
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--color-black);
-            background: var(--color-gray-light);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        /* Sync Banner */
-        .sync-banner {
-            background: #FFF8E1;
-            border-top: 1px solid #FFE082;
-            padding: 8px 16px;
-            display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #F57F17;
-            margin-top: 6px;
-            border-radius: 0 0 12px 12px;
-            margin: -2px 16px 12px;
-            border: 1px solid #FFE082;
-            border-top: none;
+            border-top: 1px solid #f0f2f5;
+            padding-top: 8px;
+            margin-top: 8px;
         }
-        .sync-banner i { font-size: 14px; }
 
-        /* FAB */
-        .fab {
+        /* FAB Speed Dial */
+        .fab-wrap {
             position: fixed;
             bottom: 24px; right: calc(50% - 225px + 16px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        @media (max-width: 480px) { .fab-wrap { right: 16px; } }
+        .fab-menu {
+            display: none;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .fab-menu.open { display: flex; }
+        .fab-option {
+            display: flex; align-items: center; gap: 8px;
+            text-decoration: none; color: inherit;
+        }
+        .fab-option-label {
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 20px; padding: 6px 12px;
+            font-size: 12px; font-weight: 700; color: var(--color-black);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); white-space: nowrap;
+        }
+        .fab-option-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: #fff; text-decoration: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+        .fab-option-btn.visit { background: #78B500; }
+        .fab-option-btn.outlet { background: var(--color-accent); }
+        .fab {
+            position: static;
             width: 56px; height: 56px;
             background: #005D41;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 16px rgba(0,93,65,0.4);
-            cursor: pointer; z-index: 200;
-            text-decoration: none; color: #fff;
-            font-size: 24px;
+            cursor: pointer; border: none;
+            color: #fff; font-size: 24px;
+            transition: transform 0.2s;
         }
-        @media (max-width: 480px) { .fab { right: 16px; } }
+        .fab.open { transform: rotate(45deg); }
+        .fab-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 199;
+        }
+        .fab-backdrop.open { display: block; }
     </style>
 </head>
-<body>
+<body data-prototype-doc="visit_list">
 <div class="mobile-wrapper">
     <!-- Header -->
     <div class="mobile-header">
         <button class="header-action" onclick="window.location.href='home.html'"><i class="fas fa-chevron-left"></i></button>
-        <span class="header-title">Faktur penjualan</span>
+        <span class="header-title">Rute Kunjungan</span>
         <button class="header-action" onclick="toggleSearch()"><i class="fas fa-search"></i></button>
     </div>
 
@@ -186,68 +189,225 @@
     <div class="search-container d-none" id="searchBar" style="padding:10px 16px; background:#fff; border-bottom:1px solid var(--color-border);">
         <div style="background:var(--color-gray-light); border-radius:20px; display:flex; align-items:center; padding:0 14px;">
             <i class="fas fa-search" style="color:var(--color-gray); margin-right:8px;"></i>
-            <input type="text" id="searchInput" placeholder="Cari no. faktur atau pelanggan..." style="border:none; background:transparent; padding:10px 0; width:100%; font-size:13px; outline:none;" oninput="renderList()"/>
+            <input type="text" id="searchInput" placeholder="Cari nama outlet atau kode..." style="border:none; background:transparent; padding:10px 0; width:100%; font-size:13px; outline:none;" oninput="renderList()"/>
         </div>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-        <div class="filter-chip" onclick="openFilterPanel()"><i class="fas fa-sliders-h"></i> Filter</div>
-        <div class="filter-chip active" id="chipAll" onclick="setStatusFilter('all')">Semua</div>
-        <div class="filter-chip" id="chipPaid" onclick="setStatusFilter('paid')">Paid</div>
-        <div class="filter-chip" id="chipUnpaid" onclick="setStatusFilter('unpaid')">Unpaid</div>
+    <!-- Filter Bar (MD / Modern Trade only) -->
+    <div class="filter-bar" id="filterBar">
+        <div class="filter-chip active" id="chipDaily" onclick="setCategoryFilter('daily')">
+            <i class="fas fa-calendar-day"></i> Rute Harian
+        </div>
+        <div class="filter-chip" id="chipOverdue" onclick="setCategoryFilter('overdue')">
+            <i class="fas fa-exclamation-circle"></i> Overdue
+        </div>
+    </div>
+
+    <!-- Banner Motoris: outlet terdekat -->
+    <div id="motorisLocBanner" class="motoris-loc-banner d-none">
+        <i class="fas fa-crosshairs"></i>
+        <span id="motorisLocBannerText">Menampilkan outlet terdekat dari lokasi Anda</span>
     </div>
 
     <!-- Count -->
-    <div class="count-label">Jumlah: <strong id="invoiceCount">0</strong></div>
+    <div class="count-label">Jumlah Outlet: <strong id="visitCount">0</strong></div>
 
-    <!-- Invoice List -->
+    <!-- Visit List -->
     <div class="mobile-content no-nav" style="padding-bottom:80px;">
-        <div id="invoiceListContainer"></div>
+        <div id="visitListContainer"></div>
     </div>
 
-    <!-- FAB -->
-    <a href="order_add.html" class="fab"><i class="fas fa-plus"></i></a>
+    <!-- FAB Speed Dial -->
+    <div class="fab-backdrop" id="fabBackdrop" onclick="toggleFab(false)"></div>
+    <div class="fab-wrap">
+        <div class="fab-menu" id="fabMenu">
+            <a href="outlet_list.html?mode=pickVisit" class="fab-option">
+                <span class="fab-option-label">Tambah Kunjungan</span>
+                <span class="fab-option-btn visit"><i class="fas fa-route"></i></span>
+            </a>
+            <a href="outlet_add.html" class="fab-option">
+                <span class="fab-option-label">Tambah Outlet Baru</span>
+                <span class="fab-option-btn outlet"><i class="fas fa-store"></i></span>
+            </a>
+        </div>
+        <button type="button" class="fab" id="fabMain" onclick="toggleFab()" aria-label="Menu tambah">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
+<script src="../../wwwroot/js/prototype-page-doc.js"></script>
 <script>
-    let invoices = [];
-    let statusFilter = 'all';
+    const MOCK_DISTANCES = { "OL-10492": 0.2, "OL-10511": 0.6, "OL-10283": 1.1, "OL-10772": 0.05, "OL-10819": 2.5, "OL-10902": 0.8, "OL-11002": 2.6, "OL-11145": 0.7, "OL-11239": 1.9, "OL-11340": 2.2, "OL-11451": 1.3, "OL-11562": 1.2, "OL-11673": 1.5, "OL-11784": 2.7, "OL-11895": 0.5 };
+
+    let visits = [];
+    let categoryFilter = 'daily';
+    let isMdUser = false;
+    let devicePos = null;
+    let devicePosLoading = false;
 
     $(document).ready(function() {
-        loadInvoices();
-        renderList();
+        isMdUser = SfaStore.isModernTradeUser();
+        setupRoleUI();
+        if (isMdUser) {
+            loadMdVisits();
+            renderList();
+        } else {
+            devicePosLoading = true;
+            updateMotorisBanner();
+            renderList();
+            obtainGpsPosition().then(pos => {
+                devicePos = pos;
+                devicePosLoading = false;
+                loadMotorisVisits();
+                updateMotorisBanner();
+                renderList();
+            });
+        }
     });
 
-    function loadInvoices() {
-        // Get invoices from SfaStore (completed ones)
-        const stored = JSON.parse(localStorage.getItem('sfa_invoices') || '[]');
-        invoices = stored.map(inv => {
-            const cust = SfaStore.getCustomerById(inv.customerId);
-            return {
-                id: inv.id,
-                invoiceNo: 'INV-' + inv.id,
-                customerName: inv.customerName || (cust ? cust.name : inv.customerId),
-                customerId: inv.customerId,
-                date: inv.date || new Date().toISOString().slice(0,10),
-                createdAt: inv.createdAt || inv.date || new Date().toISOString(),
-                totalNet: inv.totalNet || inv.totalGross || 0,
-                status: inv.paymentStatus || 'paid',
-                synced: inv.synced || false,
-                items: inv.items || []
-            };
+    function setupRoleUI() {
+        if (isMdUser) {
+            $('#filterBar').removeClass('d-none');
+            $('#motorisLocBanner').addClass('d-none');
+        } else {
+            $('#filterBar').addClass('d-none');
+            $('#motorisLocBanner').removeClass('d-none');
+        }
+    }
+
+    function updateMotorisBanner() {
+        const $banner = $('#motorisLocBanner');
+        const $text = $('#motorisLocBannerText');
+        if (devicePosLoading) {
+            $banner.addClass('loading');
+            $text.html('<i class="fas fa-spinner fa-spin me-1"></i> Mendeteksi lokasi perangkat...');
+        } else {
+            $banner.removeClass('loading');
+            $text.text('Outlet diurutkan dari yang terdekat dengan lokasi Anda');
+        }
+    }
+
+    function obtainGpsPosition() {
+        return new Promise(resolve => {
+            const fallback = () => resolve({
+                lat: -6.2088 + (Math.random() - 0.5) * 0.01,
+                lng: 106.8290 + (Math.random() - 0.5) * 0.01
+            });
+            if (!navigator.geolocation) {
+                setTimeout(fallback, 800);
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                () => setTimeout(fallback, 600),
+                { enableHighAccuracy: true, timeout: 6000, maximumAge: 30000 }
+            );
         });
     }
 
-    function setStatusFilter(filter) {
-        statusFilter = filter;
+    function pickTodayVisit(todayVisits, customerId) {
+        return todayVisits
+            .filter(v => v.customerId === customerId)
+            .sort((a, b) => {
+                if (a.status === 'checked_in' && b.status !== 'checked_in') return -1;
+                if (b.status === 'checked_in' && a.status !== 'checked_in') return 1;
+                return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+            })[0] || null;
+    }
+
+    function loadMdVisits() {
+        const allCustomers = SfaStore.getCustomers();
+        const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
+        const list = [];
+
+        SfaStore.getTodayRouteIds().forEach(id => {
+            const cust = allCustomers.find(c => c.id === id);
+            if (!cust) return;
+            const visitRecord = pickTodayVisit(todayVisits, id);
+            list.push(buildVisitItem(cust, {
+                category: 'daily',
+                status: visitRecord ? visitRecord.status : 'unvisited',
+                visitId: visitRecord ? visitRecord.id : null,
+                visitRecord: visitRecord || null,
+                scheduledDate: SfaStore.todayStr()
+            }));
+        });
+
+        SfaStore.getOverdueRouteCustomers().forEach(od => {
+            const cust = allCustomers.find(c => c.id === od.customerId);
+            if (!cust) return;
+            const visitToday = pickTodayVisit(todayVisits, od.customerId);
+            list.push(buildVisitItem(cust, {
+                category: 'overdue',
+                status: visitToday ? visitToday.status : 'unvisited',
+                visitId: visitToday ? visitToday.id : null,
+                visitRecord: visitToday || null,
+                scheduledDate: od.scheduledDate,
+                daysOverdue: od.daysOverdue
+            }));
+        });
+
+        visits = list;
+    }
+
+    function loadMotorisVisits() {
+        const allCustomers = SfaStore.getCustomers();
+        const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
+        const list = allCustomers.map(cust => {
+            const visitRecord = pickTodayVisit(todayVisits, cust.id);
+            let distanceM = null;
+            const hasGps = cust.lat && cust.lng && cust.lat !== 0 && cust.lng !== 0;
+            if (devicePos && hasGps) {
+                distanceM = SfaStore.haversineMeters(devicePos.lat, devicePos.lng, cust.lat, cust.lng);
+            }
+            return buildVisitItem(cust, {
+                category: 'nearest',
+                status: visitRecord ? visitRecord.status : 'unvisited',
+                visitId: visitRecord ? visitRecord.id : null,
+                visitRecord: visitRecord || null,
+                distanceM,
+                distance: distanceM != null ? distanceM / 1000 : (MOCK_DISTANCES[cust.id] || 99)
+            });
+        });
+
+        list.sort((a, b) => {
+            if (a.distanceM == null) return 1;
+            if (b.distanceM == null) return -1;
+            return a.distanceM - b.distanceM;
+        });
+
+        visits = list;
+    }
+
+    function buildVisitItem(cust, extra) {
+        return {
+            customerId: cust.id,
+            customerName: cust.name,
+            address: cust.address || '-',
+            distance: MOCK_DISTANCES[cust.id] || 1.0,
+            ...extra
+        };
+    }
+
+    function setCategoryFilter(filter) {
+        categoryFilter = filter;
         $('.filter-chip').removeClass('active');
-        $(`#chip${filter.charAt(0).toUpperCase() + filter.slice(1)}`).addClass('active');
-        if (filter === 'all') $('#chipAll').addClass('active');
+        const chipMap = { daily: 'chipDaily', overdue: 'chipOverdue' };
+        $(`#${chipMap[filter]}`).addClass('active');
         renderList();
+    }
+
+    function resetVisitFilter() {
+        $('#searchInput').val('');
+        if (isMdUser) {
+            setCategoryFilter('daily');
+        } else {
+            renderList();
+        }
     }
 
     function toggleSearch() {
@@ -257,81 +417,128 @@
         }
     }
 
-    function openFilterPanel() {
-        Swal.fire({
-            title: 'Filter',
-            html: '<p style="font-size:13px; color:#666;">Filter lanjutan (tanggal, pelanggan) akan tersedia di versi berikutnya.</p>',
-            confirmButtonColor: '#005D41',
-            confirmButtonText: 'Tutup'
-        });
+    function toggleFab(forceOpen) {
+        const open = forceOpen === true ? true : forceOpen === false ? false : !$('#fabMenu').hasClass('open');
+        $('#fabMenu').toggleClass('open', open);
+        $('#fabBackdrop').toggleClass('open', open);
+        $('#fabMain').toggleClass('open', open);
     }
 
     function renderList() {
         const query = ($('#searchInput').val() || '').toLowerCase();
-        const container = $('#invoiceListContainer');
+        const container = $('#visitListContainer');
         container.empty();
 
-        let filtered = invoices.filter(inv => {
-            const matchSearch = inv.invoiceNo.toLowerCase().includes(query) ||
-                                inv.customerName.toLowerCase().includes(query) ||
-                                inv.customerId.toLowerCase().includes(query);
+        let filtered = visits.filter(v => {
+            const matchSearch = v.customerName.toLowerCase().includes(query) ||
+                                v.customerId.toLowerCase().includes(query);
             if (!matchSearch) return false;
-            if (statusFilter === 'all') return true;
-            return inv.status === statusFilter;
+            if (isMdUser) return v.category === categoryFilter;
+            return true;
         });
 
-        // Sort by created date descending (newest first)
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const statusOrder = { 'checked_in': 1, 'unvisited': 2, 'checked_out': 3 };
+        filtered.sort((a, b) => {
+            if (!isMdUser) {
+                if (a.distanceM == null) return 1;
+                if (b.distanceM == null) return -1;
+                return a.distanceM - b.distanceM;
+            }
+            if (categoryFilter === 'overdue') {
+                return (b.daysOverdue || 0) - (a.daysOverdue || 0);
+            }
+            return statusOrder[a.status] - statusOrder[b.status];
+        });
 
-        $('#invoiceCount').text(filtered.length);
+        $('#visitCount').text(filtered.length);
 
         if (filtered.length === 0) {
+            const isFiltered = query !== '';
+            const emptyHint = isMdUser
+                ? (categoryFilter === 'overdue'
+                    ? 'Tidak ada rute terlewat di bulan ini.'
+                    : 'Tidak ada outlet di jadwal rute hari ini.')
+                : 'Tidak ada outlet ditemukan di sekitar lokasi Anda.';
+            const resetBtn = isFiltered
+                ? `<button class="empty-state-action" onclick="resetVisitFilter()"><i class="fas fa-rotate-left me-1"></i>Reset Filter</button>`
+                : '';
             container.html(`
-                <div class="text-center py-5 text-muted">
-                    <i class="fas fa-file-invoice fs-2 mb-2 d-block"></i>
-                    Belum ada faktur penjualan.<br>
-                    <small>Klik tombol + untuk membuat faktur baru.</small>
+                <div class="empty-state">
+                    <i class="fas fa-route"></i>
+                    <div>Tidak ada rute kunjungan ditemukan.</div>
+                    <small>${isFiltered ? 'Coba ubah kata kunci pencarian.' : emptyHint}</small>
+                    ${resetBtn}
                 </div>
             `);
             return;
         }
 
-        filtered.forEach(inv => {
-            const badgeClass = inv.status === 'paid' ? 'inv-badge-paid' : 'inv-badge-unpaid';
-            const badgeText = inv.status === 'paid' ? 'Paid' : 'Unpaid';
+        filtered.forEach(v => {
+            let statusText = 'Belum Dikunjungi';
+            let badgeClass = 'badge-mobile-warning';
+            if (v.status === 'checked_in') {
+                statusText = 'Sedang Visit';
+                badgeClass = 'badge-mobile-info';
+            } else if (v.status === 'checked_out') {
+                statusText = 'Selesai Kunjungan';
+                badgeClass = 'badge-mobile-success';
+            }
 
-            // Format date
-            const dateObj = new Date(inv.date);
-            const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-            const dateStr = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+            const routeTag = isMdUser
+                ? (v.category === 'overdue'
+                    ? `<span class="route-tag-overdue">Overdue · ${v.daysOverdue} hari</span>`
+                    : `<span class="route-tag-daily">Rute Harian</span>`)
+                : '';
+            const scheduleHint = isMdUser && v.category === 'overdue'
+                ? `<div style="font-size:11px; color:#C62828; margin-top:4px;"><i class="far fa-calendar-times me-1"></i> Jadwal: ${SfaStore.formatDate(v.scheduledDate)} · belum dikunjungi</div>`
+                : '';
 
-            // Format amount
-            const amountStr = new Intl.NumberFormat('id-ID').format(inv.totalNet);
-
-            const syncBanner = !inv.synced ? `
-                <div class="sync-banner" style="margin:-2px 0 0; border-radius:0 0 10px 10px; border:none; background:#FFF8E1; padding:8px 12px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Menunggu untuk dikirim ke back office</span>
-                </div>
+            // Outstanding AR from SfaStore
+            const ar = SfaStore.getOutstandingByCustomerId(v.customerId);
+            const arBadge = ar > 0 ? `
+                <span style="font-size:10px; font-weight:700; color:#dc3545; background:#FFF3E0; padding:2px 8px; border-radius:4px; margin-left: 6px; border: 1px solid rgba(220,53,69,0.15)">
+                    AR: ${SfaStore.formatRupiah(ar)}
+                </span>
             ` : '';
 
+            // Distance layout
+            const distColor = (v.distanceM != null ? v.distanceM <= 100 : v.distance <= 0.1) ? '#00A76F' : '#FF8F00';
+            const distLabel = v.distanceM != null
+                ? `Jarak: ${SfaStore.formatDistanceMeters(v.distanceM)} dari Anda`
+                : `Jarak: ${v.distance.toFixed(2)} km`;
+
+            // Card HTML
             container.append(`
-                <a href="invoice_detail.html?id=${inv.id}" class="invoice-card" style="${!inv.synced ? 'padding-bottom:0; border-radius:12px 12px 0 0; margin-bottom:0;' : ''}">
-                    <div class="inv-header">
-                        <span class="inv-number">${inv.invoiceNo}</span>
-                        <span class="inv-badge ${badgeClass}">${badgeText}</span>
+                <a href="visit_detail.html?id=${v.customerId}" class="visit-card" style="text-decoration:none; display:block;">
+                    <div class="card-header-row">
+                        <span class="customer-name">${v.customerName}</span>
+                        <span class="badge-mobile ${badgeClass}">${statusText}</span>
                     </div>
-                    <div class="inv-customer"><i class="fas fa-times-circle"></i> ${inv.customerName}</div>
-                    <div class="inv-customer-code">${inv.customerId}</div>
-                    <div class="inv-footer">
-                        <div>
-                            <div class="inv-date-label">Tanggal faktur</div>
-                            <div class="inv-date-value">${dateStr}</div>
+                    <div style="font-size:13px; color:var(--color-gray); margin-bottom:6px;">
+                        <i class="fas fa-store-alt me-1"></i> ${v.customerId}
+                        <span class="ms-2">${routeTag}</span>
+                        ${arBadge}
+                    </div>
+                    <div class="card-body-row">
+                        <i class="fas fa-map-marker-alt text-danger me-1"></i> ${v.address}
+                    </div>
+                    ${scheduleHint}
+                    <div class="card-footer-row">
+                        <div style="font-size:13px; font-weight:600; color:${distColor};">
+                            <i class="fas fa-street-view me-1"></i> ${distLabel}
                         </div>
-                        <div class="inv-amount">${amountStr}</div>
+                        ${v.status === 'checked_out' && v.visitRecord && v.visitRecord.hasOrder ? `
+                            <div style="font-size:13px; font-weight:700; color:#005D41;">
+                                <i class="fas fa-shopping-cart me-1"></i> Order: ${SfaStore.formatRupiah(v.visitRecord.orderAmount)}
+                            </div>
+                        ` : ''}
+                        ${v.status === 'checked_out' && v.visitRecord && v.visitRecord.hasNoOrderReason ? `
+                            <div style="font-size:13px; font-weight:700; color:#dc3545;">
+                                <i class="fas fa-times-circle me-1"></i> ${v.visitRecord.noOrderReason}
+                            </div>
+                        ` : ''}
                     </div>
                 </a>
-                ${!inv.synced ? '<div style="margin:0 16px 12px;background:#FFF8E1;border:1px solid #FFE082;border-top:none;border-radius:0 0 12px 12px;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#F57F17;"><i class="fas fa-exclamation-triangle"></i> Menunggu untuk dikirim ke back office</div>' : ''}
             `);
         });
     }

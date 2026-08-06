@@ -28,7 +28,7 @@ Views/FPRS/
 │   ├── Channel/
 │   ├── Pegawai/         # view-only, upload CSV + riwayat status
 │   ├── Stokis/          # Stokis / Grosir — upload CSV + riwayat
-│   └── ... (Pajak, Alasan)
+│   └── ... (Pajak, Alasan, LimitTargetHarian)
 ├── Penjualan/
 │   ├── Faktur/          # Daftar & form faktur penjualan
 │   └── StokMotoris/     # Stok motoris / canvasser
@@ -51,7 +51,7 @@ Menu dirender oleh `layout.js` ke dalam struktur bertingkat:
 |------|---------|
 | **Data Master** *(item langsung)* | Master Produk, Master Pegawai, Pajak |
 | **Data Master → Pelanggan** | Master Pelanggan, Channel |
-| **Data Master → Lainnya** | Alasan, **Stokis / Grosir** |
+| **Data Master → Lainnya** | Alasan, **Limit**, **Stokis / Grosir** |
 | **Penjualan** | Faktur, Canvassing, Stok Motoris |
 
 > Subgroup ber-child tunggal (Produk, Pegawai, Keuangan) dinaikkan menjadi item langsung di bawah **Data Master**; hanya subgroup ber-child ≥ 2 (Pelanggan, Lainnya) yang tetap bertingkat.
@@ -123,6 +123,7 @@ Modul **Canvassing** dan **Kunjungan** menggunakan kartu interaktif, filter, Swe
 | [FSD_Falcon_Web_Portal.md](FSD_Falcon_Web_Portal.md) | *(Legacy)* FSD full-portal auto-generate lama — sebagian usang |
 | [pages/penjualan_stok_motoris.md](pages/penjualan_stok_motoris.md) | Penjualan — Stok Motoris (dashboard) |
 | [pages/penjualan_stok_motoris_scalability.md](pages/penjualan_stok_motoris_scalability.md) | **Skalabilitas Fase A** — seed 6 bulan, agregasi SQL, batas export |
+| [pages/master_limit_target_harian.md](pages/master_limit_target_harian.md) | Limit (jabatan + type jabatan; min/max harian, HKE) |
 | [pages/master_stokis.md](pages/master_stokis.md) | Master Stokis — CRUD, validasi form, CSV, integrasi mobile |
 | [master_stokis.md](master_stokis.md) | Ringkasan Master Stokis |
 | [master_data_integration.md](master_data_integration.md) | Analisis integrasi portal Master Data Kalbe |

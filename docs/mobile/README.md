@@ -88,7 +88,7 @@ flowchart TB
 | `home.html` | Beranda: KPI, unduh data server, 3 menu, Rute Kunjungan |
 | `dasbor.html` | Grafik performa & filter periode |
 | `visit_list.html` | Rute kunjungan: Rute Harian + Overdue (MD) / nearest GPS (motoris) |
-| `visit_detail.html` | Visit outlet: cek stok, order, checkout (tanpa selector stokis) |
+| `visit_detail.html` | Visit outlet: Cek Stok (MD only), order, checkout; tanpa tombol telepon |
 | `product_catalog.html` | Beli stok / cek stok stokis + picker GPS terdekat |
 | `order_input.html` | Input sales order dari visit |
 | `invoice_list.html` | Daftar faktur penjualan |

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Limit – Master Data | Falcon FPRS</title>
+    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+.badge-status{display:inline-block;padding:.25rem .6rem;border-radius:12px;font-size:.75rem;font-weight:600}
+.badge-active{background:#e6f4ea;color:#1e7e34}
+.badge-inactive{background:#f8d7da;color:#842029}
+.row-actions{display:flex;flex-direction:row;align-items:center;gap:6px;justify-content:center;flex-wrap:nowrap;white-space:nowrap}
+</style>
+</head>
+<body>
+    <div id="app-content">
+
+            <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+                <div>
+                    <h2 class="title-page mb-1">Limit</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                            <li class="breadcrumb-item">Data Master</li>
+                            <li class="breadcrumb-item active">Limit</li>
+                        </ol>
+                    </nav>
+                    <div class="text-muted small">LIMIT VISIT</div>
+                </div>
+                <a href="detail.html?mode=create" class="btn btn-success"><i class="fa fa-plus me-1"></i> Create</a>
+            </div>
+
+            <div class="card"><div class="card-body"><div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tbl">
+                    <thead>
+                        <tr>
+                            <th>JABATAN</th>
+                            <th>TYPE JABATAN</th>
+                            <th class="text-end">MIN HARIAN</th>
+                            <th class="text-end">MAX HARIAN</th>
+                            <th class="text-center">ACTIVE</th>
+                            <th style="width:200px;text-align:center;">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblBody"></tbody>
+                </table>
+            </div></div></div>
+
+    </div>
+    <script src="../../../../wwwroot/js/layout.js"></script>
+    <script src="../../../../wwwroot/js/master-data-param.js"></script>
+    <script>
+        document.addEventListener('layoutReady', () => {
+
+const KEY = 'md_limit_target';
+const SEED_VER_KEY = 'md_limit_target_seed_ver';
+const SEED_VER = '4';
+
+function getData(){ return JSON.parse(localStorage.getItem(KEY) || '[]'); }
+function saveData(d){ localStorage.setItem(KEY, JSON.stringify(d)); }
+function todayStr(){ return new Date().toISOString().slice(0, 10); }
+
+function ensureVersions(item){
+    if (Array.isArray(item.versions) && item.versions.length) return item.versions;
+    return [];
+}
+
+function currentVersion(item){
+    const today = todayStr();
+    const versions = ensureVersions(item).filter(v => v && v.active !== false);
+    return versions.find(v => v.tanggalMulai && v.tanggalSelesai && today >= v.tanggalMulai && today <= v.tanggalSelesai)
+        || versions.slice().sort((a,b) => String(b.tanggalMulai||'').localeCompare(String(a.tanggalMulai||'')))[0]
+        || null;
+}
+
+function isActiveToday(item){
+    const today = todayStr();
+    return ensureVersions(item).some(v =>
+        v && v.active !== false && v.tanggalMulai && v.tanggalSelesai &&
+        today >= v.tanggalMulai && today <= v.tanggalSelesai
+    );
+}
+
+function loadData(){
+    const ver = localStorage.getItem(SEED_VER_KEY);
+    const existing = getData();
+    if (ver === SEED_VER && existing.length) { render(); return; }
+    fetch('../../../../wwwroot/data/limit-target.json')
+        .then(r => r.json())
+        .then(d => {
+            saveData(Array.isArray(d) ? d : []);
+            localStorage.setItem(SEED_VER_KEY, SEED_VER);
+            localStorage.removeItem('md_target_harian');
+            localStorage.removeItem('md_target_harian_seed_ver');
+            render();
+        })
+        .catch(() => { if (!existing.length) { saveData([]); localStorage.setItem(SEED_VER_KEY, SEED_VER); } render(); });
+}
+
+function render(){
+    if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
+    $('#tblBody').empty();
+    const rows = getData().slice().sort((a,b) =>
+        String(a.jabatan||'').localeCompare(String(b.jabatan||''))
+        || String(a.typeJabatan||'').localeCompare(String(b.typeJabatan||''))
+    );
+    rows.forEach((item) => {
+        const ver = currentVersion(item);
+        const active = isActiveToday(item);
+        const detailHref = MasterDataParam.editUrl('detail.html', item.id);
+        const historyHref = MasterDataParam.editUrl('history.html', item.id);
+        $('#tblBody').append(`<tr>
+            <td><strong>${item.jabatan || '-'}</strong></td>
+            <td>${item.typeJabatan || '-'}</td>
+            <td class="text-end">${ver ? ver.minimalHarian : '-'}</td>
+            <td class="text-end">${ver ? ver.maximalHarian : '-'}</td>
+            <td class="text-center">${active
+                ? '<span class="badge-status badge-active">Active</span>'
+                : '<span class="badge-status badge-inactive">Inactive</span>'}</td>
+            <td><div class="row-actions">
+                <a href="${detailHref}" class="btn btn-success btn-sm" title="Detail"><i class="fa fa-eye me-1"></i>Detail</a>
+                <a href="${historyHref}" class="btn btn-secondary btn-sm" title="History"><i class="fa fa-history me-1"></i>History</a>
+            </div></td>
+        </tr>`);
+    });
+    $('#tbl').DataTable({
+        language:{ search:'', searchPlaceholder:'Search...', lengthMenu:'_MENU_ entries', info:'_START_-_END_ of _TOTAL_', paginate:{ previous:'‹', next:'›' }, zeroRecords:'Tidak ada data' },
+        pageLength:10,
+        columnDefs:[{ orderable:false, targets:[5] }],
+        dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
+    });
+}
+
+$(document).ready(loadData);
+        });
+    </script>
+</body>
+</html>

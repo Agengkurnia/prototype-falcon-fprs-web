@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "jabatan": "MD",
+    "typeJabatan": "MD Reguler",
+    "versions": [
+      {
+        "id": "md-h1",
+        "minimalHarian": 20,
+        "maximalHarian": 30,
+        "targetHke": 6,
+        "targetHkeBulanan": 20,
+        "tanggalMulai": "2026-01-01",
+        "tanggalSelesai": "2026-06-30",
+        "active": true
+      },
+      {
+        "id": "md-h2",
+        "minimalHarian": 22,
+        "maximalHarian": 32,
+        "targetHke": 6,
+        "targetHkeBulanan": 22,
+        "tanggalMulai": "2026-07-01",
+        "tanggalSelesai": "2026-12-31",
+        "active": true
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "jabatan": "Motoris",
+    "typeJabatan": "Motoris Reguler",
+    "versions": [
+      {
+        "id": "mot-h1",
+        "minimalHarian": 28,
+        "maximalHarian": 35,
+        "targetHke": 6,
+        "targetHkeBulanan": 24,
+        "tanggalMulai": "2026-01-01",
+        "tanggalSelesai": "2026-06-30",
+        "active": true
+      },
+      {
+        "id": "mot-h2",
+        "minimalHarian": 30,
+        "maximalHarian": 35,
+        "targetHke": 6,
+        "targetHkeBulanan": 26,
+        "tanggalMulai": "2026-07-01",
+        "tanggalSelesai": "2026-12-31",
+        "active": true
+      }
+    ]
+  }
+]

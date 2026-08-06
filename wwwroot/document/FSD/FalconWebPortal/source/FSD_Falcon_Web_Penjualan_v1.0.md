@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Penjualan (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.2
+### Versi Dokumen: 1.4
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Penjualan — Web Admin Man Power GT |
-| **Versi** | 1.2 |
-| **Tanggal** | 21 Juli 2026 |
+| **Versi** | 1.4 |
+| **Tanggal** | 4 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -22,7 +22,9 @@
 |-------|---------|-------------|------------|
 | 1.0 | 17 Juli 2026 | Tim IT | Initial draft – Faktur + Stok Motoris; RBAC; spesifikasi kolom report Excel |
 | 1.1 | 17 Juli 2026 | Tim IT | Tambah bab **Skalabilitas & Tuning** (Fase A): agregasi SQL, batas filter/export, seed UAT 6 bulan Cash/Lunas, script `008`–`010` |
-| **1.2** | **21 Juli 2026** | **Tim IT** | Rename sistem ke **Man Power GT**; tambah business rule Filter & Pop-up dashboard **(+screenshot & narasi)**; hapus cuplikan SQL; wording **Produksi → Database** |
+| 1.2 | 21 Juli 2026 | Tim IT | Rename sistem ke **Man Power GT**; tambah business rule Filter & Pop-up dashboard **(+screenshot & narasi)**; hapus cuplikan SQL; wording **Produksi → Database** |
+| 1.3 | 4 Agustus 2026 | Tim IT | Screenshot ulang Faktur + Stok Motoris (dashboard, filter, popup, tombol aksi) |
+| **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
 
 ---
 
@@ -110,38 +112,36 @@ database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 
 Alur konseptual database: order dari Mobile → faktur terbaca di Web; stok motoris diagregasi untuk monitoring.
 
-**Lane:** Sales lapangan (Mobile) · Web Admin (Sales Manager / RSM) · Sistem Man Power GT
+**Lane (urutan kiri → kanan):**
 
-```mermaid
-flowchart LR
-  subgraph L1[Sales Lapangan Mobile]
-    direction TB
-    A1[Buat order / canvassing]
-    A2[Submit faktur]
-  end
-  subgraph L2[Sistem Man Power GT]
-    direction TB
-    B1[Simpan transaksi]
-    B2[Tampilkan list faktur]
-    B3[Agregasi stok motoris]
-    B4[Export Excel]
-  end
-  subgraph L3[Web Admin]
-    direction TB
-    C1[Buka Faktur / Stok Motoris]
-    C2[Filter region bila perlu]
-    C3[Lihat detail / cetak]
-    C4[Unduh report]
-  end
-  A1 --> A2 --> B1
-  B1 --> B2
-  B1 --> B3
-  C1 --> C2 --> B2
-  B2 --> C3
-  C1 --> B3
-  B3 --> C4
-  C4 --> B4
+| # | Lane ID | Label | Tipe | Sumber |
+|---|---------|-------|------|--------|
+| 1 | L1 | Sales Lapangan (Mobile) | User | Mobile SFA canvassing |
+| 2 | L2 | Sistem Man Power GT | System | Transaksi Sales Order / stok |
+| 3 | L3 | Web Admin | User | Sales Manager / RSM |
+
+```plantuml
+@startuml
+|Sales Lapangan Mobile|
+start
+:Buat order / canvassing;
+:Submit faktur;
+|Sistem Man Power GT|
+:Simpan transaksi ke database;
+:Tampilkan list faktur;
+:Agregasi stok motoris;
+|Web Admin|
+:Buka Faktur / Stok Motoris;
+:Filter region bila perlu;
+:Lihat detail / cetak;
+:Unduh report;
+|Sistem Man Power GT|
+:Export Excel;
+stop
+@enduml
 ```
+
+Hand-off Mobile → Sistem: submit faktur menulis transaksi ke database. Hand-off Web Admin → Sistem: monitoring list/agregasi dan export Excel.
 
 **Gambar 2.1 — Business Flow Penjualan (Web Admin)**
 

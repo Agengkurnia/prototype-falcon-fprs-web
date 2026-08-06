@@ -513,7 +513,7 @@
                 </div>
                 <div class="header-username" id="userName">SINGARAJA</div>
                 <div class="header-role-text">
-                    Anda bekerja sebagai <strong id="userRole">canvasser</strong>
+                    Anda bekerja sebagai <strong id="userRole">motoris</strong>
                 </div>
 
                 <a href="javascript:void(0)"
@@ -544,7 +544,7 @@
                 <div class="kpi-grid">
                     <div class="kpi-column">
                         <span class="kpi-val" id="kpiEfektif" aria-live="polite">0</span>
-                        <span class="kpi-lbl">K. Efektif</span>
+                        <span class="kpi-lbl">Faktur (EC)</span>
                     </div>
                     <div class="kpi-column">
                         <span class="kpi-val" id="kpiKunjungan" aria-live="polite">0</span>
@@ -697,9 +697,9 @@
         }
 
         function renderUserSession() {
-            const user = SfaStore.getUser() || { name: 'Pengguna', role: 'canvasser' };
+            const user = SfaStore.getUser() || { name: 'Pengguna', role: 'motoris' };
             $('#userName').text((user.name || 'Pengguna').toUpperCase());
-            $('#userRole').text(user.role || 'canvasser');
+            $('#userRole').text(user.role || 'motoris');
         }
 
         function renderDateAndGreeting() {
@@ -716,13 +716,13 @@
         }
 
         function updateKPIFromStorage() {
-            const kpi = SfaStore.getTodayKpi() || { efektif: 0, kunjungan: 0, totalRupiah: 0, pelanggan: 0 };
+            const kpi = SfaStore.getTodayKpi() || { efektif: 0, fakturCount: 0, kunjungan: 0, totalRupiah: 0, pelanggan: 0 };
 
-            $('#kpiEfektif').text(kpi.efektif);
+            $('#kpiEfektif').text(kpi.fakturCount != null ? kpi.fakturCount : kpi.efektif);
             $('#kpiKunjungan').text(kpi.kunjungan);
             $('#kpiTotalFaktur').text(SfaStore.formatRupiah(kpi.totalRupiah));
 
-            const target = kpi.pelanggan || 0;
+            const target = kpi.targetKunjungan || 0;
             const done = kpi.kunjungan || 0;
             const pct = target > 0 ? Math.min(Math.round((done / target) * 100), 100) : 0;
 
@@ -888,9 +888,9 @@
         }
 
         function showCanvasPeriodDetails() {
-            const user = SfaStore.getUser() || { name: 'SINGARAJA', role: 'canvasser' };
+            const user = SfaStore.getUser() || { name: 'SINGARAJA', role: 'motoris' };
             const userName = (user.name || 'SINGARAJA').toUpperCase();
-            const userRole = (user.role || 'canvasser').toUpperCase();
+            const userRole = (user.role || 'motoris').toUpperCase();
             const period = SfaStore.getActiveSalesPeriod();
             const stockistList = SfaStore.getStockists()
                 .map(s => `<li class="mb-1">${s.name}</li>`)

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         .detail-bg {
             background-color: #f7f9fa;
@@ -152,9 +153,31 @@
         }
 
         .activity-desc {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--color-gray);
             margin-top: 2px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            line-height: 1.3;
+            text-transform: none;
+        }
+        .role-badge-md {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+        }
+        .role-badge-motoris {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
         }
 
         /* Camera box */
@@ -174,7 +197,7 @@
         .camera-overlay {
             position: absolute;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
             padding: 10px;
             pointer-events: none;
@@ -216,7 +239,7 @@
         }
     </style>
 </head>
-<body class="detail-bg">
+<body class="detail-bg" data-prototype-doc="visit_detail">
 
     <div class="mobile-wrapper">
         <!-- Header -->
@@ -225,9 +248,9 @@
                 <i class="fas fa-arrow-left"></i>
             </button>
             <span class="header-title" id="headerTitle">Detail Outlet</span>
-            <button class="header-action" aria-label="Telepon">
-                <i class="fas fa-phone-alt" style="font-size: 16px;"></i>
-            </button>
+            <span class="header-action" aria-hidden="true" style="visibility:hidden;pointer-events:none;">
+                <i class="fas fa-arrow-left"></i>
+            </span>
         </div>
 
         <!-- Scrollable Content -->
@@ -279,12 +302,12 @@
 
                 <!-- STATE 1: UNVISITED ACTIONS -->
                 <div id="unvisitedStateContainer">
-                    <div class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
+                    <div id="checkInHintBanner" class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        Anda berada di luar radius outlet (100 meter). Check-in akan memerlukan verifikasi alasan.
+                        <span id="checkInHintText">Anda berada di luar radius outlet (100 meter). Visit memerlukan alasan & foto bukti.</span>
                     </div>
                     <button class="btn-mobile-primary" onclick="triggerCheckInWorkflow()">
-                        <i class="fas fa-sign-in-alt me-2"></i>Check-In Kunjungan
+                        <i class="fas fa-map-marker-alt me-2"></i>Mulai Visit
                     </button>
                 </div>
 
@@ -292,7 +315,7 @@
                 <div id="checkedInStateContainer" class="d-none">
                     <!-- Check-in Time Banner -->
                     <div class="checkin-time-banner">
-                        <span class="checkin-time-lbl"><i class="far fa-clock me-2"></i>Waktu Check-In</span>
+                        <span class="checkin-time-lbl"><i class="far fa-clock me-2"></i>Waktu Visit</span>
                         <span class="checkin-time-val" id="checkInTimeText">11:36 WIB</span>
                     </div>
 
@@ -301,7 +324,7 @@
                         <div class="d-flex align-items-center gap-3 fs-7 mb-2">
                             <i class="fas fa-check-circle text-success fs-5"></i>
                             <div>
-                                <span class="d-block fw-bold text-success">Check-In Berhasil</span>
+                                <span class="d-block fw-bold text-success">Visit Berhasil</span>
                                 <span class="text-muted" id="checkInReasonText">Alasan: Kunjungan Tele-sales/Call</span>
                             </div>
                         </div>
@@ -313,18 +336,20 @@
                     </div>
 
                     <div class="activity-grid">
-                        <!-- Input Order -->
+                        <!-- Cek Stok (wajib) — for MD -->
+                        <a href="javascript:void(0)" class="activity-card" id="stockCheckCard" onclick="goToStockCheck()">
+                            <i class="fas fa-clipboard-check text-primary fs-3 mb-2"></i>
+                            <span class="activity-title">Cek Stok</span>
+                            <span class="activity-desc" id="stockCheckDesc">Belum dilakukan *</span>
+                            <span class="role-badge role-badge-md">for MD</span>
+                        </a>
+
+                        <!-- Input Order — for Motoris -->
                         <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('order')">
                             <img src="../../wwwroot/assets/images/icons/ic_clipboard_list.svg" class="activity-icon" alt="Order"/>
                             <span class="activity-title">Sales Order</span>
                             <span class="activity-desc" id="orderDesc">Belum diinput</span>
-                        </a>
-
-                        <!-- Penagihan / Collection -->
-                        <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('collection')">
-                            <img src="../../wwwroot/assets/images/icons/ic_payment.svg" class="activity-icon" alt="Payment"/>
-                            <span class="activity-title">Penagihan AR</span>
-                            <span class="activity-desc" id="collectionDesc">Belum diinput</span>
+                            <span class="role-badge role-badge-motoris">for Motoris</span>
                         </a>
 
                         <!-- Tidak ada order (No Order Reason) -->
@@ -334,11 +359,11 @@
                             <span class="activity-desc" id="noOrderDesc">Pilih alasan</span>
                         </div>
 
-                        <!-- Check-out -->
+                        <!-- Selesai Visit -->
                         <div class="activity-card" onclick="triggerCheckOutWorkflow()" style="border-color: #fce4d6; background-color: #fff8f5;">
                             <i class="fas fa-sign-out-alt text-danger fs-3 mb-2"></i>
-                            <span class="activity-title text-danger">Check-Out</span>
-                            <span class="activity-desc text-danger">Selesaikan rute</span>
+                            <span class="activity-title text-danger">Selesai Visit</span>
+                            <span class="activity-desc text-danger">Akhiri kunjungan</span>
                         </div>
                     </div>
                 </div>
@@ -348,11 +373,11 @@
                     <div class="mobile-card" style="background-color: #f4f5f7;">
                         <h4 class="fs-6 fw-bold mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Ringkasan Kunjungan</h4>
                         <div class="info-row">
-                            <span class="info-label">Check-In</span>
+                            <span class="info-label">Visit Masuk</span>
                             <span class="info-value" id="summaryInTime">11:36 WIB</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Check-Out</span>
+                            <span class="info-label">Visit Selesai</span>
                             <span class="info-value" id="summaryOutTime">11:45 WIB</span>
                         </div>
                         <div class="info-row">
@@ -364,6 +389,9 @@
                             <span class="info-value" id="summaryActivity">Sales Order (Rp 2.450.000)</span>
                         </div>
                     </div>
+                    <button class="btn-mobile-primary mb-2" onclick="triggerCheckInWorkflow()">
+                        <i class="fas fa-redo me-2"></i>Kunjungi Lagi
+                    </button>
                     <button class="btn-mobile-secondary" onclick="window.location.href='visit_list.html'">
                         <i class="fas fa-chevron-left me-2"></i>Kembali ke Daftar Rute
                     </button>
@@ -378,7 +406,7 @@
         <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px; padding: 16px;">
             <div class="modal-content border-0" style="border-radius: 16px;">
                 <div class="modal-header border-0 bg-light" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                    <h5 class="modal-title fw-bold text-warning fs-6"><i class="fas fa-exclamation-triangle me-2"></i>Check-In di Luar Radius</h5>
+                    <h5 class="modal-title fw-bold text-warning fs-6"><i class="fas fa-exclamation-triangle me-2"></i>Visit di Luar Radius</h5>
                 </div>
                 <div class="modal-body pb-0">
                     <p class="fs-7 text-muted">Jarak Anda (1.1 km) melampaui batas toleransi 100 meter. Berikan alasan remote check-in Anda:</p>
@@ -410,7 +438,7 @@
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-secondary fs-7 rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn fs-7 rounded-pill px-4 text-white" onclick="confirmCheckInWithReason()" style="background-color: var(--color-primary);">Check-In</button>
+                    <button type="button" class="btn fs-7 rounded-pill px-4 text-white" onclick="confirmCheckInWithReason()" style="background-color: var(--color-primary);">Mulai Visit</button>
                 </div>
             </div>
         </div>
@@ -436,6 +464,9 @@
                             <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
+                    <div class="mb-3 d-none" id="noOrderCustomDiv">
+                        <textarea class="form-control fs-7" id="noOrderCustomText" rows="2" placeholder="Tulis alasan detail..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-secondary fs-7 rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
@@ -450,6 +481,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="../../wwwroot/js/sfa-store.js"></script>
+    <script src="../../wwwroot/js/prototype-page-doc.js"></script>
     <script>
         // Jarak simulasi per outlet (km) — konsisten dengan visit_list
         const MOCK_DISTANCES = { "OL-10492": 0.2, "OL-10511": 0.6, "OL-10283": 1.1, "OL-10772": 0.05, "OL-10819": 2.5, "OL-10902": 0.8, "OL-11002": 2.6, "OL-11145": 0.7, "OL-11239": 1.9, "OL-11340": 2.2, "OL-11451": 1.3, "OL-11562": 1.2, "OL-11673": 1.5, "OL-11784": 2.7, "OL-11895": 0.5 };
@@ -460,8 +492,25 @@
         let photoTaken = false;
         let selectedNoOrderReason = "";
         let salesOrderAmount = 0;
-        let collectionAmount = 0;
         let activeVisitId = null;
+
+        function isMdUser() {
+            if (typeof SfaStore !== 'undefined' && typeof SfaStore.isModernTradeUser === 'function') {
+                return SfaStore.isModernTradeUser();
+            }
+            const role = String((SfaStore.getUser && SfaStore.getUser() || {}).role || '').toLowerCase().replace(/[\s-]+/g, '_');
+            return role === 'md' || role === 'modern_trade' || role === 'moderntrade';
+        }
+
+        function applyRoleVisibility() {
+            const md = isMdUser();
+            // Cek Stok hanya untuk MD
+            if (md) {
+                $('#stockCheckCard').removeClass('d-none');
+            } else {
+                $('#stockCheckCard').addClass('d-none');
+            }
+        }
 
         // Bootstrap Modals
         let checkInReasonModal = null;
@@ -487,12 +536,21 @@
             checkInReasonModal = new bootstrap.Modal(document.getElementById('checkInReasonModal'));
             noOrderReasonModal = new bootstrap.Modal(document.getElementById('noOrderReasonModal'));
 
-            // Show custom input if Lainnya is selected
+            applyRoleVisibility();
+
             $('#checkInReasonSelect').change(function() {
                 if ($(this).val() === 'Lainnya') {
                     $('#customReasonDiv').removeClass('d-none');
                 } else {
                     $('#customReasonDiv').addClass('d-none');
+                }
+            });
+
+            $('#noOrderReasonSelect').change(function() {
+                if ($(this).val() === 'Lainnya') {
+                    $('#noOrderCustomDiv').removeClass('d-none');
+                } else {
+                    $('#noOrderCustomDiv').addClass('d-none');
                 }
             });
 
@@ -520,15 +578,58 @@
                 $('#mapOutlet').css({ 'top': '48%', 'left': '52%' });
                 $('#mapSales').css({ 'top': '52%', 'left': '48%' });
                 $('.map-radius-circle').css({ 'top': '48%', 'left': '52%', 'width': '120px', 'height': '120px' });
+                // Pre-check-in hint: dalam radius → siap check-in
+                $('#checkInHintBanner').removeClass('alert-warning').addClass('alert-success');
+                $('#checkInHintText').html(`Anda dalam radius outlet (${outlet.distance}). Siap mulai visit.`);
             } else {
                 $('#mapDistance').text(`Jarak: ${outlet.distance} (Di Luar Radius 100m)`);
                 $('.distance-info-badge').css('background-color', 'rgba(220, 53, 69, 0.85)');
+                $('#checkInHintBanner').removeClass('alert-success').addClass('alert-warning');
+                $('#checkInHintText').html(`Anda di luar radius outlet (${outlet.distance} &gt; 100m). Visit memerlukan alasan & foto bukti.`);
             }
         }
 
+        function ensureNoOtherActiveVisit() {
+            const active = SfaStore.getActiveVisit();
+            if (active && active.customerId !== currentOutletId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Visit Aktif di Outlet Lain',
+                    text: `Selesaikan visit di ${active.customerName} terlebih dahulu (penjualan atau alasan tidak beli).`,
+                    confirmButtonColor: '#005D41'
+                });
+                return false;
+            }
+            return true;
+        }
+
+        function updateStockCheckUI(done) {
+            if (done) {
+                $('#stockCheckDesc').text('Selesai ✓').css('color', '#78B500');
+                $('#stockCheckCard').css('border-color', '#C6E2D6');
+            } else {
+                $('#stockCheckDesc').text('Belum dilakukan *').css('color', '#dc3545');
+            }
+        }
+
+        function goToStockCheck() {
+            if (!activeVisitId) return;
+            window.location.href = `product_catalog.html?mode=stockcheck&visitId=${activeVisitId}&outletId=${currentOutletId}`;
+        }
+
+        function resetActivityCards() {
+            salesOrderAmount = 0;
+            selectedNoOrderReason = null;
+            $('#orderDesc').text('Belum diinput').css('color', '');
+            $('#noOrderDesc').text('Pilih alasan').css('color', '');
+            updateStockCheckUI(false);
+            $('#stockCheckCard').css('border-color', '');
+        }
+
         function loadState() {
-            // Cek visit hari ini dari SfaStore
-            const visit = SfaStore.getTodayVisitByCustomerId(currentOutletId);
+            // Prefer visit aktif (checked_in); jika tidak ada, ambil visit terakhir hari ini
+            const visit = SfaStore.getActiveVisitByCustomerId(currentOutletId)
+                || SfaStore.getTodayVisitByCustomerId(currentOutletId);
 
             if (visit) {
                 activeVisitId = visit.id;
@@ -540,16 +641,20 @@
                     if (visit.hasOrder && visit.orderAmount > 0) {
                         salesOrderAmount = visit.orderAmount;
                         $('#orderDesc').text(SfaStore.formatRupiah(salesOrderAmount)).css('color', '#78B500');
-                    }
-                    if (visit.hasCollection && visit.collectionAmount > 0) {
-                        collectionAmount = visit.collectionAmount;
-                        $('#collectionDesc').text(SfaStore.formatRupiah(collectionAmount)).css('color', '#78B500');
+                    } else {
+                        $('#orderDesc').text('Belum diinput').css('color', '');
+                        salesOrderAmount = 0;
                     }
                     if (visit.hasNoOrderReason) {
                         selectedNoOrderReason = visit.noOrderReason;
                         $('#noOrderDesc').text(selectedNoOrderReason).css('color', '#dc3545');
+                    } else {
+                        selectedNoOrderReason = null;
+                        $('#noOrderDesc').text('Pilih alasan').css('color', '');
                     }
+                    updateStockCheckUI(visit.stockCheckDone);
                 } else if (visit.status === 'checked_out') {
+                    activeVisitId = null;
                     showCompletedUI(
                         visit.checkInTime || SfaStore.formatTime(visit.createdAt),
                         visit.checkOutTime || '-',
@@ -561,6 +666,7 @@
                 }
             } else {
                 // Default unvisited view
+                activeVisitId = null;
                 $('#outletStatusBadge').text('Belum Dikunjungi').attr('class', 'badge-mobile badge-mobile-warning');
                 $('#unvisitedStateContainer').removeClass('d-none');
                 $('#checkedInStateContainer').addClass('d-none');
@@ -570,9 +676,11 @@
 
         // Action Trigger Check-In
         function triggerCheckInWorkflow() {
+            if (!ensureNoOtherActiveVisit()) return;
+
             if (outlet.inRadius) {
                 Swal.fire({
-                    title: 'Check-In GPS...',
+                    title: 'Verifikasi GPS...',
                     text: 'Mencocokkan koordinat lokasi Anda',
                     timer: 1000,
                     showConfirmButton: false,
@@ -584,24 +692,59 @@
                     doCheckIn(timeStr, 'Dalam Radius Outlet');
                 });
             } else {
+                showCheckInPreWarning();
+            }
+        }
+
+        function showCheckInPreWarning() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Visit di Luar Radius',
+                html: `<div style="text-align:left; font-size:13px; line-height:1.5;">
+                        <p style="margin:0 0 8px;">Jarak Anda <strong>${outlet.distance}</strong> melampaui batas toleransi <strong>100 meter</strong>.</p>
+                        <p style="margin:0 0 4px;">Untuk melanjutkan, Anda perlu:</p>
+                        <ul style="margin:0; padding-left:18px;">
+                            <li>Memilih <strong>alasan</strong> remote visit</li>
+                            <li>Mengambil <strong>foto bukti</strong> toko (wajib)</li>
+                        </ul>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Lanjutkan Visit',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#005D41',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
                 photoTaken = false;
                 $('#cameraPreview').addClass('d-none');
                 $('#cameraOverlay').removeClass('d-none');
                 checkInReasonModal.show();
-            }
+            });
         }
 
         function doCheckIn(timeStr, reason) {
-            // Simpan ke SfaStore
-            activeVisitId = SfaStore.saveVisit({
+            const result = SfaStore.saveVisit({
                 customerId: currentOutletId,
                 customerName: outlet.name,
                 checkInTime: timeStr,
                 reason: reason,
                 status: 'checked_in',
+                stockistId: SfaStore.getActiveStockist()?.id || null,
                 lat: outlet.lat || null,
                 lng: outlet.lng || null
             });
+            if (result.error === 'ACTIVE_VISIT_EXISTS') {
+                const v = result.visit;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Visit Aktif di Outlet Lain',
+                    text: `Selesaikan visit di ${v.customerName} terlebih dahulu.`,
+                    confirmButtonColor: '#005D41'
+                });
+                return;
+            }
+            activeVisitId = result.id;
+            resetActivityCards();
             showCheckedInUI(timeStr, reason);
         }
 
@@ -644,7 +787,7 @@
             checkInReasonModal.hide();
 
             Swal.fire({
-                title: 'Menyimpan check-in...',
+                title: 'Menyimpan visit...',
                 timer: 1000,
                 showConfirmButton: false,
                 allowOutsideClick: false,
@@ -657,7 +800,7 @@
         }
 
         function showCheckedInUI(time, reason) {
-            $('#outletStatusBadge').text('Sedang Check-In').attr('class', 'badge-mobile badge-mobile-info');
+            $('#outletStatusBadge').text('Sedang Visit').attr('class', 'badge-mobile badge-mobile-info');
             $('#checkInTimeText').text(time);
             $('#checkInReasonText').text(`Alasan: ${reason}`);
 
@@ -666,48 +809,10 @@
             $('#completedStateContainer').addClass('d-none');
         }
 
-        // Simulate activity SO / Collection
         function simulateActivity(type) {
             if (type === 'order') {
-                window.location.href = `order_input.html?outletId=${currentOutletId}`;
-            } else if (type === 'collection') {
-                // Redirect ke collection_input jika sudah dibuat, fallback ke modal
-                const arTotal = SfaStore.getOutstandingByCustomerId(currentOutletId);
-                if (arTotal <= 0) {
-                    Swal.fire('Tidak Ada Piutang', 'Outlet ini tidak memiliki faktur piutang outstanding.', 'info');
-                    return;
-                }
-                Swal.fire({
-                    title: 'Input Penagihan AR',
-                    text: `Total outstanding: ${SfaStore.formatRupiah(arTotal)}. Masukkan nominal yang dibayar:`,
-                    input: 'number',
-                    inputPlaceholder: 'Nominal...',
-                    showCancelButton: true,
-                    confirmButtonColor: '#005D41',
-                    confirmButtonText: 'Simpan Pembayaran',
-                    cancelButtonText: 'Batal',
-                    inputValidator: (value) => {
-                        if (!value || isNaN(value) || value <= 0) return 'Masukkan nominal yang valid!';
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        collectionAmount = parseFloat(result.value);
-                        const arEntries = SfaStore.getCollectionsByCustomerId(currentOutletId).filter(c => c.balance > 0);
-                        SfaStore.saveCollection({
-                            customerId: currentOutletId,
-                            invoiceIds: arEntries.map(e => e.id),
-                            paidAmount: collectionAmount,
-                            method: 'Tunai'
-                        });
-
-                        if (activeVisitId) {
-                            SfaStore.updateVisit(activeVisitId, { hasCollection: true, collectionAmount });
-                        }
-
-                        $('#collectionDesc').text(SfaStore.formatRupiah(collectionAmount)).css('color', '#78B500');
-                        Swal.fire({ icon: 'success', title: 'Pembayaran Disimpan', timer: 1500, showConfirmButton: false });
-                    }
-                });
+                const currentUrl = window.location.pathname + window.location.search;
+                window.location.href = `order_input.html?outletId=${currentOutletId}&backUrl=${encodeURIComponent(currentUrl)}`;
             }
         }
 
@@ -717,7 +822,15 @@
         }
 
         function confirmNoOrderReason() {
-            selectedNoOrderReason = $('#noOrderReasonSelect').val();
+            let reason = $('#noOrderReasonSelect').val();
+            if (reason === 'Lainnya') {
+                reason = $('#noOrderCustomText').val().trim();
+                if (!reason) {
+                    Swal.fire('Error', 'Detail alasan harus ditulis!', 'error');
+                    return;
+                }
+            }
+            selectedNoOrderReason = reason;
             noOrderReasonModal.hide();
 
             $('#noOrderDesc').text(selectedNoOrderReason).css('color', '#dc3545');
@@ -744,23 +857,36 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aktivitas Belum Lengkap',
-                    text: 'Untuk menyelesaikan kunjungan, Anda harus menginput Sales Order atau memberikan alasan "Tidak Beli" terlebih dahulu!'
+                    text: 'Untuk menyelesaikan visit, Anda harus menginput Sales Order atau memberikan alasan "Tidak Beli" terlebih dahulu!'
                 });
                 return;
             }
 
+            if (!visit.stockCheckDone && isMdUser()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cek Stok Belum Dilakukan',
+                    text: 'Anda harus menyelesaikan cek stok outlet sebelum menyelesaikan visit.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ke Cek Stok',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#005D41'
+                }).then((r) => { if (r.isConfirmed) goToStockCheck(); });
+                return;
+            }
+
             Swal.fire({
-                title: 'Selesaikan Kunjungan?',
-                text: 'Lakukan check-out koordinat GPS dan akhiri rute di outlet ini.',
+                title: 'Selesaikan Visit?',
+                text: 'Lakukan verifikasi GPS dan akhiri kunjungan di outlet ini.',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#005D41',
-                confirmButtonText: 'Ya, Check-Out',
+                confirmButtonText: 'Ya, Selesai Visit',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Mencatat GPS check-out...',
+                        title: 'Mencatat GPS visit selesai...',
                         timer: 1200,
                         showConfirmButton: false,
                         didOpen: () => { Swal.showLoading(); }

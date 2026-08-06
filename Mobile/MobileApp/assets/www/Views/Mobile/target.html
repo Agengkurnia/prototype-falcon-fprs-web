@@ -123,8 +123,8 @@
             <div class="progress-card">
                 <div class="progress-header">
                     <div>
-                        <div class="progress-label"><i class="fas fa-filter me-2" style="color:#43A047;"></i>Kunjungan Efektif</div>
-                        <div class="progress-values">Efektif: <b id="efektifActual">0</b> / Kunjungan: <b id="efektifBase">0</b></div>
+                        <div class="progress-label"><i class="fas fa-filter me-2" style="color:#43A047;"></i>EC (Faktur / Kunjungan)</div>
+                        <div class="progress-values">Faktur: <b id="efektifActual">0</b> / Kunjungan: <b id="efektifBase">0</b></div>
                     </div>
                     <div class="progress-pct" id="efektifPct" style="color:#43A047;">0%</div>
                 </div>
@@ -197,7 +197,6 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    const TARGET_KUNJUNGAN = 15;  // target per hari
     const TARGET_SALES = 5000000; // Rp 5 juta target harian
 
     $(document).ready(function() {
@@ -212,16 +211,18 @@
     });
 
     function renderProgress(kpi) {
-        // Kunjungan
-        const visitPct = Math.min(Math.round((kpi.kunjungan / TARGET_KUNJUNGAN) * 100), 100);
+        const targetKunjungan = kpi.targetKunjungan || (SfaStore.getVisitTargetForDate ? SfaStore.getVisitTargetForDate() : 35);
+        // Kunjungan vs Master Limit Motoris (minimalHarian)
+        const visitPct = targetKunjungan > 0 ? Math.min(Math.round((kpi.kunjungan / targetKunjungan) * 100), 100) : 0;
         $('#visitActual').text(kpi.kunjungan);
-        $('#visitTarget').text(TARGET_KUNJUNGAN);
+        $('#visitTarget').text(targetKunjungan);
         $('#visitPct').text(visitPct + '%');
         setTimeout(() => $('#visitBar').css('width', visitPct + '%'), 100);
 
-        // Efektif
-        const efektifPct = kpi.kunjungan > 0 ? Math.min(Math.round((kpi.efektif / kpi.kunjungan) * 100), 100) : 0;
-        $('#efektifActual').text(kpi.efektif);
+        // EC% = faktur / kunjungan
+        const faktur = kpi.fakturCount != null ? kpi.fakturCount : (kpi.efektif || 0);
+        const efektifPct = kpi.kunjungan > 0 ? Math.min(Math.round((faktur / kpi.kunjungan) * 100), 100) : 0;
+        $('#efektifActual').text(faktur);
         $('#efektifBase').text(kpi.kunjungan);
         $('#efektifPct').text(efektifPct + '%');
         setTimeout(() => $('#efektifBar').css('width', efektifPct + '%'), 200);

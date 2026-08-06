@@ -6,7 +6,7 @@ Menghasilkan source/FSD_Falcon_Web_MasterData_v1.0.md dari preamble (cover +
 Document Approval standar FSD Generator Engine) + fragmen per-modul yang
 di-extract langsung dari HTML (extract_module_spec.module_section).
 
-Modul dalam lingkup: Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan.
+Modul dalam lingkup: Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan.
 """
 from __future__ import annotations
 
@@ -29,9 +29,9 @@ from maven_spec import (  # noqa: E402
     chapter_erd,
 )
 
-TANGGAL = '10 Juli 2026'
+TANGGAL = '6 Agustus 2026'
 
-# Document Approval — standar Falcon FPRS / SHP (lihat fsd_cover_merge.DEFAULT_DOCUMENT_APPROVAL)
+# Document Approval — standar Man Power GT / SHP
 DOCUMENT_APPROVAL = [
     ('Muhammad Rafi', 'SHP Channel & Customer Development'),
     ('Silvester Mario Nian Destrada', 'SHP Channel & Customer Development'),
@@ -46,20 +46,20 @@ def preamble() -> str:
         f'| {name} | {title} |  |  |' for name, title in DOCUMENT_APPROVAL
     )
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
-## Modul: Falcon FPRS — Data Master (Web Admin)
-### Sistem: Falcon FPRS
-### Versi Dokumen: 1.2
+## Modul: Man Power GT — Data Master (Web Admin)
+### Sistem: Man Power GT
+### Versi Dokumen: 1.5
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
-| **Nama Dokumen** | FSD Modul Data Master — Web Admin Falcon FPRS |
-| **Versi** | 1.2 |
+| **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
+| **Versi** | 1.5 |
 | **Tanggal** | {TANGGAL} |
-| **Divisi** | IT / Business – Falcon FPRS |
+| **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
-| **Dibuat oleh** | Tim IT – Falcon FPRS |
+| **Dibuat oleh** | Tim IT – Man Power GT |
 
 ---
 
@@ -67,9 +67,12 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.2** | **{TANGGAL}** | **Tim IT** | Perkaya business flow produksi, RBAC/approval, sumber data & API; rapikan ERD (diagram relasi vs teks FK) |
-| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur produksi MAVEN, mapping UI→database, ERD lengkap, DDL PostgreSQL, tooltip prototipe |
-| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin FPRS |
+| **1.5** | **{TANGGAL}** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
+| **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
+| **1.3** | **4 Agustus 2026** | **Tim IT** | Rename **Man Power GT**; tambah modul **Limit**; screenshot ulang 8 modul |
+| **1.2** | **10 Juli 2026** | **Tim IT** | Perkaya business flow, RBAC/approval, sumber data & API; rapikan ERD |
+| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur MAVEN, mapping UI→database, ERD lengkap |
+| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin |
 
 ---
 
@@ -85,11 +88,11 @@ def preamble() -> str:
 
 ### 1.1 Latar Belakang
 
-**Falcon FPRS** (*Field Partner Relation System*) adalah sistem internal PT Kalbe
-Nutritionals untuk administrasi data master, penjualan lapangan, dan pelacakan
-kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** pada
-Web Admin (`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi
-fondasi seluruh transaksi FPRS.
+**Man Power GT** (*Man Power General Trade*) adalah sistem internal PT Kalbe
+Nutritionals untuk mengelola tenaga lapangan General Trade (motoris / canvasser),
+administrasi data master terkait, monitoring penjualan lapangan, dan pelacakan
+kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** Web Admin
+(`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi fondasi transaksi.
 
 Prototipe Web Portal berupa *high-fidelity interactive prototype* berbasis HTML
 statis (MPA) bertema Vuexy/Bootstrap yang menggunakan **localStorage** dan file
@@ -108,7 +111,7 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MA
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
-| Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
+| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
 | Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
 | Desain database produksi MAVEN (PostgreSQL + EF Core) | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
 | Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
@@ -155,40 +158,39 @@ Modul Data Master memakai **empat pola** pengelolaan data:
 
 Alur berikut menggambarkan pengelolaan Data Master **saat menggunakan database produksi** (MAVEN / PostgreSQL), bukan localStorage prototipe.
 
-**Lane:**
+**Lane (urutan kiri → kanan):**
 
-| # | Lane ID | Label | Tipe |
-|---|---------|-------|------|
-| 1 | L1 | Admin Master Data | User |
-| 2 | L2 | Sistem Falcon Web | System |
-| 3 | L3 | Master Data API / Mobile SFA | External |
+| # | Lane ID | Label | Tipe | Sumber |
+|---|---------|-------|------|--------|
+| 1 | L1 | Admin Master Data | User | RBAC Web Admin |
+| 2 | L2 | Sistem Man Power GT | System | Controllers PowerGT Master Data |
+| 3 | L3 | Master Data API / Mobile SFA | External | LOV Produk + sync outlet |
 
-```mermaid
-flowchart LR
-  subgraph L1[Admin Master Data]
-    direction TB
-    A1[Buka modul Data Master]
-    A2[Isi form / modal / upload]
-    A3[Tinjau data]
-  end
-  subgraph L2[Sistem Falcon Web]
-    direction TB
-    B1[Baca data dari database]
-    B2[Tampilkan daftar]
-    B3[Validasi via Client Side]
-    B4[Simpan ke database]
-  end
-  subgraph L3[Master Data API / Mobile SFA]
-    direction TB
-    C1[Sumber LOV Produk]
-    C2[Data outlet dari mobile]
-    C3[Sinkronisasi API]
-  end
-  A1 --> B1 --> B2 --> A2 --> B3 --> B4 --> A3
-  C1 -.-> A2
-  C2 -.-> B1
-  B4 -.-> C3
+```plantuml
+@startuml
+|Admin Master Data|
+start
+:Buka modul Data Master;
+|Sistem Man Power GT|
+:Baca data dari database;
+:Tampilkan daftar;
+|Master Data API / Mobile SFA|
+:Sumber LOV Produk;
+:Data outlet dari mobile;
+|Admin Master Data|
+:Isi form / modal / upload;
+|Sistem Man Power GT|
+:Validasi via Client Side;
+:Simpan ke database;
+|Master Data API / Mobile SFA|
+:Sinkronisasi API;
+|Admin Master Data|
+:Tinjau data;
+stop
+@enduml
 ```
+
+Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan ke database. Hand-off Sistem ↔ API/Mobile: LOV Produk dan data outlet mensuplai form; hasil simpan dapat disinkronkan ke API.
 
 ### 2.4 Ringkasan Alur per Pola (Produksi)
 
@@ -270,6 +272,7 @@ def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
         '| BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |',
         '| BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |',
         '| BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |',
+        '| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; tanggal mulai tidak backdate. |',
         '',
         '---',
         '',
@@ -357,7 +360,7 @@ def chapter_integration(reg: dict) -> str:
 | Identitas record di URL | `txtGuid` (UUID) |
 | Menu / RBAC | SQL Server `KNGlobalDB` (`mMenu`, `mRoleAccess`) |
 
-Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`. Seed UAT opsional: `003_seed_masterdata_uat.sql`.
+Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`, `012_mLimitTargetHarian.sql`. Seed UAT opsional: `003_seed_masterdata_uat.sql`.
 
 ---
 '''

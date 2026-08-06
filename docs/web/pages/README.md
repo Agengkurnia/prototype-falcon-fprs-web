@@ -17,6 +17,7 @@ Dokumentasi fungsional halaman panel admin di `Views/FPRS/`. Modul Master Data m
 | Channel | `MasterData/Channel/` | [master_channel.md](master_channel.md) |
 | Pajak | `MasterData/Pajak/` | [master_pajak.md](master_pajak.md) |
 | Alasan | `MasterData/Alasan/` | [master_alasan.md](master_alasan.md) |
+| **Limit** | `MasterData/LimitTargetHarian/` | [master_limit_target_harian.md](master_limit_target_harian.md) — list/detail/history ala PRM |
 
 Pola umum Master Data: [master_data_pola.md](master_data_pola.md)
 

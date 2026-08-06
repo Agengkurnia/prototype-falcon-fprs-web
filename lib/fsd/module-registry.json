@@ -160,6 +160,45 @@
       }
     },
     {
+      "id": "master-limit-target-harian",
+      "label": "Master Data — Limit",
+      "group": "masterData",
+      "enabled": true,
+      "type": "page",
+      "htmlPath": "Views/FPRS/MasterData/LimitTargetHarian/index.html",
+      "formPath": "Views/FPRS/MasterData/LimitTargetHarian/detail.html",
+      "apiEndpoint": null,
+      "paramCode": null,
+      "note": "Menu Limit; list/detail/history ala PRM; identity jabatan+typeJabatan; versions min/max/HKE; target mobile = minimalHarian",
+      "storageKey": "md_limit_target",
+      "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
+      "screenshots": [
+        "ss_49_master_limit_index.png",
+        "ss_50_master_limit_detail.png"
+      ],
+      "sections": {
+        "overview": {
+          "default": true
+        },
+        "columns": {
+          "default": true,
+          "source": "html"
+        },
+        "fields": {
+          "default": true,
+          "source": "html"
+        },
+        "validation": {
+          "default": true,
+          "source": "html"
+        },
+        "businessRules": {
+          "default": true,
+          "source": "ai"
+        }
+      }
+    },
+    {
       "id": "master-pegawai",
       "label": "Master Data — Pegawai",
       "group": "masterData",

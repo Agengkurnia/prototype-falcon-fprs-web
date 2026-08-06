@@ -33,11 +33,73 @@ BUTTON_TABLE_COL_WIDTHS_CM = (5.0, 3.5, 3.5, 2.5, 5.5)  # Tampilan, Tombol, ID, 
 
 
 def render_kroki(mermaid_code: str, output_path: str, label: str) -> bool:
-    return _render_kroki(mermaid_code, output_path, label, 'mermaid')
+    """Render Mermaid → PNG. ERD prefers local mermaid-cli (high scale); else Kroki + CLI fallback."""
+    code = mermaid_code.strip()
+    is_erd = 'erDiagram' in code
+    if is_erd and _render_mermaid_cli(code, output_path, label, scale=5.0):
+        return True
+    if _render_kroki(code, output_path, label, 'mermaid'):
+        return True
+    # Kroki gagal (timeout/500) — coba CLI
+    return _render_mermaid_cli(code, output_path, label, scale=5.0 if is_erd else 3.0)
 
 
 def render_kroki_plantuml(plantuml_code: str, output_path: str, label: str) -> bool:
     return _render_kroki(plantuml_code, output_path, label, 'plantuml')
+
+
+def _render_mermaid_cli(
+    code: str,
+    output_path: str,
+    label: str,
+    *,
+    scale: float = 3.0,
+) -> bool:
+    """Render via npx @mermaid-js/mermaid-cli — native high-res (tidak blur saat zoom)."""
+    import tempfile
+
+    os.makedirs(os.path.dirname(output_path) or '.', exist_ok=True)
+    tmp_mmd = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.mmd', delete=False, encoding='utf-8'
+        ) as f:
+            f.write(code.strip())
+            tmp_mmd = f.name
+        cmd = [
+            'npx', '--yes', '@mermaid-js/mermaid-cli@11.4.0',
+            '-i', tmp_mmd,
+            '-o', output_path,
+            '-b', 'white',
+            '-s', str(scale),
+        ]
+        # Windows: npx.cmd
+        if os.name == 'nt':
+            cmd = ['npx.cmd', '--yes', '@mermaid-js/mermaid-cli@11.4.0',
+                   '-i', tmp_mmd, '-o', output_path, '-b', 'white', '-s', str(scale)]
+        r = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=180,
+            shell=False,
+        )
+        if r.returncode != 0 or not os.path.exists(output_path):
+            err = (r.stderr or r.stdout or '').strip()[:300]
+            print(f'   [{label}] mmdc FAIL: {err or f"exit {r.returncode}"}')
+            return False
+        size = os.path.getsize(output_path)
+        print(f'   [{label}] OK (mmdc s={scale}) {size:,} bytes -> {os.path.basename(output_path)}')
+        return True
+    except Exception as e:
+        print(f'   [{label}] mmdc FAIL: {e}')
+        return False
+    finally:
+        if tmp_mmd and os.path.exists(tmp_mmd):
+            try:
+                os.remove(tmp_mmd)
+            except OSError:
+                pass
 
 
 def _render_kroki(code: str, output_path: str, label: str, engine: str) -> bool:
@@ -54,12 +116,12 @@ def _render_kroki(code: str, output_path: str, label: str, engine: str) -> bool:
         print(f'   [{label}] OK {len(data):,} bytes -> {os.path.basename(output_path)}')
         return True
     except Exception as e:
-        print(f'   [{label}] FAIL: {e}')
+        print(f'   [{label}] Kroki FAIL: {e}')
         return False
 
 
 def ensure_png_min_width(path: str, min_width: int = 2400) -> None:
-    """Upscale PNG so it fills a full print page when embedded (ERD, etc.)."""
+    """Upscale PNG only if still below min_width. Prefer native hi-res render over upscale."""
     if not path or not os.path.exists(path):
         return
     try:
@@ -67,6 +129,7 @@ def ensure_png_min_width(path: str, min_width: int = 2400) -> None:
         with Image.open(path) as img:
             w, h = img.size
             if w >= min_width:
+                print(f'   [PNG] {os.path.basename(path)} native {w}x{h} (no upscale)')
                 return
             scale = min_width / float(w)
             new_size = (min_width, max(1, int(h * scale)))

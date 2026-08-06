@@ -193,9 +193,33 @@
         SYNC_QUEUE:  'sfa_sync_queue',
         SYNC_QUEUE_CLEARED: 'sfa_sync_queue_cleared',
         DOWNLOAD_STATUS: 'sfa_download_status',
-        SEEDED:      'sfa_seeded_v9_today',
-        ACTIVE_STOCKIST: 'sfa_active_stockist'
+        SEEDED:      'sfa_seeded_v10_target35',
+        ACTIVE_STOCKIST: 'sfa_active_stockist',
+        TARGET_HARIAN: 'md_limit_target',
+        TARGET_HARIAN_SEED_VER: 'md_limit_target_seed_ver'
     };
+
+    const TARGET_HARIAN_SEED_VER_VAL = '4';
+    const SEED_TARGET_HARIAN = [
+        {
+            id: 1,
+            jabatan: 'MD',
+            typeJabatan: 'MD Reguler',
+            versions: [
+                { id: 'md-h1', minimalHarian: 20, maximalHarian: 30, targetHke: 6, targetHkeBulanan: 20, tanggalMulai: '2026-01-01', tanggalSelesai: '2026-06-30', active: true },
+                { id: 'md-h2', minimalHarian: 22, maximalHarian: 32, targetHke: 6, targetHkeBulanan: 22, tanggalMulai: '2026-07-01', tanggalSelesai: '2026-12-31', active: true }
+            ]
+        },
+        {
+            id: 2,
+            jabatan: 'Motoris',
+            typeJabatan: 'Motoris Reguler',
+            versions: [
+                { id: 'mot-h1', minimalHarian: 28, maximalHarian: 35, targetHke: 6, targetHkeBulanan: 24, tanggalMulai: '2026-01-01', tanggalSelesai: '2026-06-30', active: true },
+                { id: 'mot-h2', minimalHarian: 30, maximalHarian: 35, targetHke: 6, targetHkeBulanan: 26, tanggalMulai: '2026-07-01', tanggalSelesai: '2026-12-31', active: true }
+            ]
+        }
+    ];
 
     // =========================================================
     // HELPERS
@@ -315,8 +339,111 @@
             localStorage.removeItem(KEYS.SYNC_QUEUE_CLEARED);
         }
         write(KEYS.DOWNLOAD_STATUS, buildDefaultDownloadStatus());
+        ensureTargetHarianSeed(false);
         write(KEYS.SEEDED,      todayString);
         console.log('[SfaStore] Seed data v9 (Today route demo) loaded/refreshed for ' + todayString);
+    }
+
+    function ensureTargetHarianSeed(force) {
+        const ver = localStorage.getItem(KEYS.TARGET_HARIAN_SEED_VER);
+        const existing = read(KEYS.TARGET_HARIAN);
+        if (!force && ver === TARGET_HARIAN_SEED_VER_VAL && Array.isArray(existing) && existing.length) return;
+        write(KEYS.TARGET_HARIAN, SEED_TARGET_HARIAN);
+        localStorage.setItem(KEYS.TARGET_HARIAN_SEED_VER, TARGET_HARIAN_SEED_VER_VAL);
+        // bersihkan model lama (versi tanggal)
+        localStorage.removeItem('md_target_harian');
+        localStorage.removeItem('md_target_harian_seed_ver');
+    }
+
+    function getLimitTargets() {
+        ensureTargetHarianSeed(false);
+        return read(KEYS.TARGET_HARIAN) || [];
+    }
+
+    /** @deprecated gunakan getLimitTargets */
+    function getTargetHarianVersions() {
+        return getLimitTargets();
+    }
+
+    function getLimitVersions(item) {
+        if (!item) return [];
+        if (Array.isArray(item.versions)) return item.versions;
+        return [];
+    }
+
+    function resolveLimitVersionOnDate(item, dateStr) {
+        const ds = dateStr || todayStr();
+        const versions = getLimitVersions(item).filter(v => v && v.active !== false);
+        const hit = versions.find(v =>
+            v.tanggalMulai && v.tanggalSelesai &&
+            ds >= v.tanggalMulai && ds <= v.tanggalSelesai
+        );
+        if (hit) return hit;
+        if (versions.length) {
+            return versions.slice().sort((a, b) => String(b.tanggalMulai || '').localeCompare(String(a.tanggalMulai || '')))[0];
+        }
+        return null;
+    }
+
+    /** Map role login mobile → header Master Limit */
+    function resolveUserLimitKey(user) {
+        const role = String((user || getUser() || {}).role || 'motoris').toLowerCase().replace(/[\s-]+/g, '_');
+        if (role === 'md' || role === 'modern_trade' || role === 'moderntrade') {
+            return { jabatan: 'MD', typeJabatan: 'MD Reguler' };
+        }
+        // motoris / canvasser / default → Motoris Reguler
+        return { jabatan: 'Motoris', typeJabatan: 'Motoris Reguler' };
+    }
+
+    function getLimitByJabatan(jabatan, typeJabatan) {
+        return getLimitTargets().find(v =>
+            String(v.jabatan || '') === String(jabatan || '') &&
+            String(v.typeJabatan || '') === String(typeJabatan || '')
+        ) || null;
+    }
+
+    function getLimitForUser(user, dateStr) {
+        const key = resolveUserLimitKey(user);
+        const row = getLimitByJabatan(key.jabatan, key.typeJabatan);
+        if (!row) return null;
+        const ver = resolveLimitVersionOnDate(row, dateStr);
+        return ver ? { ...key, ...ver, headerId: row.id } : { ...key, headerId: row.id };
+    }
+
+    /** Target kunjungan (min harian) untuk user/tanggal — ditampilkan di dasbor mobile */
+    function getLimitTarget(_ignoredCode, dateStr) {
+        const lim = getLimitForUser(null, dateStr);
+        return lim ? (Number(lim.minimalHarian) || 0) : 0;
+    }
+
+    function getLimitByCode() {
+        // legacy no-op compatibility — identity sekarang jabatan+type
+        return getLimitForUser(null, todayStr());
+    }
+
+    function getVisitTargetForDate(dateStr) {
+        return getLimitTarget(null, dateStr || todayStr());
+    }
+
+    function getVisitTargetForRange(from, to) {
+        if (!from || !to) return getVisitTargetForDate(from || todayStr());
+        let sum = 0;
+        const cur = new Date(from + 'T12:00:00');
+        const end = new Date(to + 'T12:00:00');
+        if (Number.isNaN(cur.getTime()) || Number.isNaN(end.getTime())) return getVisitTargetForDate(from);
+        while (cur <= end) {
+            const y = cur.getFullYear();
+            const m = String(cur.getMonth() + 1).padStart(2, '0');
+            const d = String(cur.getDate()).padStart(2, '0');
+            sum += getVisitTargetForDate(`${y}-${m}-${d}`);
+            cur.setDate(cur.getDate() + 1);
+        }
+        return sum;
+    }
+
+    function getEcTarget(dateStr) {
+        const lim = getLimitForUser(null, dateStr);
+        return lim ? (Number(lim.targetHke) || 0) : 0;
     }
 
     const TODAY_ROUTE_IDS = ['OL-10492', 'OL-10511', 'OL-10283', 'OL-10772', 'OL-10819'];
@@ -372,7 +499,7 @@
     }
 
     function isModernTradeUser() {
-        const role = String(getUser()?.role || 'canvasser').toLowerCase().replace(/[\s-]+/g, '_');
+        const role = String(getUser()?.role || 'motoris').toLowerCase().replace(/[\s-]+/g, '_');
         return role === 'md' || role === 'modern_trade' || role === 'moderntrade';
     }
 
@@ -491,27 +618,36 @@
             const dateStr = date.toISOString().slice(0, 10);
 
             if (dateStr === todayString) {
-                TODAY_ROUTE_IDS.slice(0, 2).forEach((cid, i) => {
+                // Demo: 26 kunjungan hari ini (~74% dari target 35)
+                const todayVisitCount = 26;
+                for (let i = 0; i < todayVisitCount; i++) {
+                    const cid = customerIds[i % customerIds.length];
                     const cust = SEED_CUSTOMERS.find(c => c.id === cid);
-                    const orderAmount = Math.round((Math.random() * 1500000 + 500000) / 1000) * 1000;
+                    const hasOrder = i < 20; // 20 efektif → ~77% dari kunjungan
+                    const orderAmount = hasOrder
+                        ? Math.round((800000 + (i % 7) * 120000) / 1000) * 1000
+                        : 0;
+                    const hhIn = 7 + Math.floor(i / 4);
+                    const mmIn = (i % 4) * 12;
                     visits.push({
                         id: 'VST-TODAY-' + i,
                         customerId: cid,
                         customerName: cust ? cust.name : cid,
                         date: dateStr,
-                        createdAt: dateStr + 'T08:00:00.000Z',
+                        createdAt: dateStr + 'T' + String(hhIn).padStart(2, '0') + ':' + String(mmIn).padStart(2, '0') + ':00.000Z',
                         status: 'checked_out',
-                        hasOrder: true,
+                        hasOrder: hasOrder,
                         hasCollection: false,
-                        hasNoOrderReason: false,
+                        hasNoOrderReason: !hasOrder,
+                        noOrderReason: hasOrder ? '' : 'Stok masih ada',
                         orderAmount: orderAmount,
                         collectionAmount: 0,
                         stockistId: SEED_STOCKISTS[i % SEED_STOCKISTS.length].id,
                         stockCheckDone: true,
-                        checkInTime: '08:' + String(30 + i * 15).padStart(2, '0') + ' WIB',
-                        checkOutTime: '09:' + String(15 + i * 10).padStart(2, '0') + ' WIB'
+                        checkInTime: String(hhIn).padStart(2, '0') + ':' + String(mmIn).padStart(2, '0') + ' WIB',
+                        checkOutTime: String(hhIn).padStart(2, '0') + ':' + String(mmIn + 8).padStart(2, '0') + ' WIB'
                     });
-                });
+                }
                 continue;
             }
 
@@ -559,6 +695,31 @@
             const dow = date.getDay();
             if (dow === 0) continue;
             const dateStr = date.toISOString().slice(0, 10);
+            if (dateStr === today.toISOString().slice(0, 10)) {
+                // Samakan dengan visit efektif hari ini (20 faktur)
+                for (let i = 0; i < 20; i++) {
+                    const cid = customerIds[i % customerIds.length];
+                    const cust = SEED_CUSTOMERS.find(c => c.id === cid);
+                    const prod = productSeed[i % productSeed.length];
+                    const qty = (i % 4) + 1;
+                    const totalGross = prod.price * qty;
+                    const discount = Math.round(totalGross * 0.03);
+                    invoices.push({
+                        id: 'INV-TODAY-' + i,
+                        invoiceNo: 'FKT-' + String(seq++).padStart(4, '0'),
+                        customerId: cid,
+                        customerName: cust.name,
+                        date: dateStr,
+                        createdAt: dateStr + 'T09:00:00.000Z',
+                        status: 'confirmed',
+                        items: [{ code: prod.code, name: prod.name, qty, qtyPcs: qty, price: prod.price, subtotal: totalGross }],
+                        totalGross,
+                        discount,
+                        totalNet: totalGross - discount
+                    });
+                }
+                continue;
+            }
             const invoiceCount = dow === 6 ? 2 : Math.floor(Math.random() * 3) + 2;
             for (let i = 0; i < invoiceCount; i++) {
                 const cid = customerIds[(d * 5 + i) % customerIds.length];
@@ -596,7 +757,17 @@
     // =========================================================
     // AUTH
     // =========================================================
-    function getUser() { return read(KEYS.USER); }
+    function getUser() {
+        const u = read(KEYS.USER);
+        if (!u) return u;
+        const role = String(u.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+        // Prototype default: Motoris (migrate legacy canvasser)
+        if (!role || role === 'canvasser' || role === 'sales') {
+            u.role = 'motoris';
+            write(KEYS.USER, u);
+        }
+        return u;
+    }
     function saveUser(u) { write(KEYS.USER, u); }
     function clearUser() { localStorage.removeItem(KEYS.USER); }
 
@@ -709,7 +880,12 @@
     function getVisits() { return read(KEYS.VISITS) || []; }
 
     function getTodayVisitByCustomerId(customerId) {
-        return getVisits().find(v => v.customerId === customerId && v.date === todayStr()) || null;
+        const today = getVisits().filter(v => v.customerId === customerId && v.date === todayStr());
+        if (!today.length) return null;
+        const active = today.find(v => v.status === 'checked_in');
+        if (active) return active;
+        // Prefer visit terakhir (re-visit boleh setelah selesai)
+        return today.slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))[0];
     }
 
     function getActiveVisitByCustomerId(customerId) {
@@ -1013,65 +1189,99 @@
     // =========================================================
     // DASHBOARD & KPI AGGREGATES
     // =========================================================
+    function countUniqueByKey(items, key) {
+        const set = new Set();
+        (items || []).forEach(item => {
+            const val = item && item[key];
+            if (val != null && val !== '') set.add(String(val));
+        });
+        return set.size;
+    }
+
+    /**
+     * KPI rules:
+     * - pelanggan  = unique customerId dari transaksi (faktur) periode
+     * - kunjungan  = jumlah visit selesai; selalu >= pelanggan
+     * - efektif/EC = jumlah faktur (cap ≤ kunjungan); % EC = faktur / kunjungan
+     * - targetKunjungan dari Master Limit (minimalHarian) sesuai jabatan user
+     */
+    function buildKpi(doneVisits, invoices) {
+        const fakturCount = (invoices || []).length;
+        const totalRupiah = (invoices || []).reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
+        const pelanggan = countUniqueByKey(invoices, 'customerId');
+        const visitCount = (doneVisits || []).length;
+        const kunjungan = Math.max(visitCount, pelanggan);
+        const efektif = Math.min(fakturCount, kunjungan);
+        return {
+            kunjungan,
+            efektif,
+            kunjunganEfektif: efektif,
+            fakturCount,
+            totalFaktur: totalRupiah,
+            totalRupiah,
+            pelanggan,
+            targetKunjungan: 0
+        };
+    }
+
     function getTodayKpi() {
         return getKpiByDate(todayStr());
     }
 
     function getKpiByDate(dateStr) {
-        const visits   = getVisits().filter(v => v.date === dateStr);
+        const visits = getVisits().filter(v => v.date === dateStr);
         const invoices = getInvoices().filter(i => i.date === dateStr);
         const doneVisits = visits.filter(v => v.status === 'checked_out');
-        const effective  = doneVisits.filter(v => v.hasOrder).length;
-        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
-        return {
-            kunjungan:        doneVisits.length,
-            efektif:          effective,
-            kunjunganEfektif: effective,
-            fakturCount:      invoices.length,
-            totalFaktur:      totalRupiah,
-            totalRupiah,
-            pelanggan:        getCustomers().length
-        };
+        const kpi = buildKpi(doneVisits, invoices);
+        kpi.targetKunjungan = getVisitTargetForDate(dateStr);
+        return kpi;
+    }
+
+    function getKpiByRange(from, to) {
+        const invoices = getInvoices().filter(i => i.date && i.date >= from && i.date <= to);
+        const doneVisits = getVisits().filter(v =>
+            v.date && v.date >= from && v.date <= to && v.status === 'checked_out'
+        );
+        const kpi = buildKpi(doneVisits, invoices);
+        kpi.targetKunjungan = getVisitTargetForRange(from, to);
+        return kpi;
     }
 
     function getKpiByMonth(year, month) {
         // month: 1-12
-        const prefix = year + '-' + String(month).padStart(2, '0');
-        const invoices = getInvoices().filter(i => i.date && i.date.startsWith(prefix));
-        const visits   = getVisits().filter(v => v.date && v.date.startsWith(prefix));
-        const doneVisits = visits.filter(v => v.status === 'checked_out');
-        const effective  = doneVisits.filter(v => v.hasOrder).length;
-        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
-        return {
-            kunjungan:   doneVisits.length,
-            efektif:     effective,
-            fakturCount: invoices.length,
-            totalRupiah,
-            pelanggan:   getCustomers().length
-        };
+        const from = year + '-' + String(month).padStart(2, '0') + '-01';
+        const lastDay = new Date(year, month, 0).getDate();
+        const to = year + '-' + String(month).padStart(2, '0') + '-' + String(lastDay).padStart(2, '0');
+        return getKpiByRange(from, to);
     }
 
     function getKpiByWeek(year, week) {
-        // week: ISO week number
+        // Approximate ISO week range via date scan of year
         const invoices = getInvoices().filter(i => {
             if (!i.date) return false;
             const d = new Date(i.date);
             return getISOWeek(d) === week && d.getFullYear() === year;
         });
-        const visits = getVisits().filter(v => {
-            if (!v.date) return false;
+        const doneVisits = getVisits().filter(v => {
+            if (!v.date || v.status !== 'checked_out') return false;
             const d = new Date(v.date);
             return getISOWeek(d) === week && d.getFullYear() === year;
         });
-        const doneVisits = visits.filter(v => v.status === 'checked_out');
-        const totalRupiah = invoices.reduce((s, i) => s + (i.totalNet || i.totalGross || 0), 0);
-        return {
-            kunjungan:   doneVisits.length,
-            efektif:     doneVisits.filter(v => v.hasOrder).length,
-            fakturCount: invoices.length,
-            totalRupiah,
-            pelanggan:   getCustomers().length
-        };
+        const kpi = buildKpi(doneVisits, invoices);
+        // Sum targets for days in that ISO week
+        let from = null, to = null;
+        for (let m = 0; m < 12; m++) {
+            for (let day = 1; day <= 31; day++) {
+                const d = new Date(year, m, day);
+                if (d.getMonth() !== m) continue;
+                if (getISOWeek(d) !== week || d.getFullYear() !== year) continue;
+                const ds = d.toISOString().slice(0, 10);
+                if (!from || ds < from) from = ds;
+                if (!to || ds > to) to = ds;
+            }
+        }
+        kpi.targetKunjungan = (from && to) ? getVisitTargetForRange(from, to) : 0;
+        return kpi;
     }
 
     function getISOWeek(d) {
@@ -1257,7 +1467,10 @@
         getDownloadStatus, runDownloadFromServer, setLastDownload, ensureDemoDownloadStatus,
         isQueueItemDone, retryQueueItem, clearSuccessfulQueue,
         // KPI & Dashboard
-        getTodayKpi, getKpiByDate, getKpiByMonth, getKpiByWeek,
+        getTodayKpi, getKpiByDate, getKpiByRange, getKpiByMonth, getKpiByWeek,
+        getTargetHarianVersions, getLimitTargets, getLimitByCode, getLimitByJabatan,
+        getLimitTarget, getLimitForUser, resolveUserLimitKey,
+        getVisitTargetForDate, getVisitTargetForRange, getEcTarget,
         getDailyChartData, getMonthlyChartData,
         getDashboardToday, getTopProducts, getTopCustomers,
         getTopProductsByPeriod, getTopCustomersByPeriod,

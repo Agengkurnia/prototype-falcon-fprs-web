@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/prototype-page-doc.css"/>
     <style>
         .detail-bg {
             background-color: #f7f9fa;
@@ -40,7 +41,7 @@
             top: 40%;
             left: 55%;
             transform: translate(-50%, -50%);
-            color: #dc3545;
+            color: var(--color-primary);
             font-size: 30px;
             z-index: 2;
             animation: bounce 2s infinite;
@@ -51,7 +52,7 @@
             top: 65%;
             left: 35%;
             transform: translate(-50%, -50%);
-            color: #007bff;
+            color: var(--color-accent);
             font-size: 24px;
             z-index: 2;
         }
@@ -63,8 +64,8 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 1px dashed #dc3545;
+            background-color: rgba(120, 181, 0, 0.1);
+            border: 1px dashed var(--color-accent);
             transform: translate(-50%, -50%);
             z-index: 1;
         }
@@ -152,9 +153,31 @@
         }
 
         .activity-desc {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--color-gray);
             margin-top: 2px;
+        }
+
+        .role-badge {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            line-height: 1.3;
+            text-transform: none;
+        }
+        .role-badge-md {
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+        }
+        .role-badge-motoris {
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
         }
 
         /* Camera box */
@@ -174,7 +197,7 @@
         .camera-overlay {
             position: absolute;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
             padding: 10px;
             pointer-events: none;
@@ -216,7 +239,7 @@
         }
     </style>
 </head>
-<body class="detail-bg">
+<body class="detail-bg" data-prototype-doc="visit_detail">
 
     <div class="mobile-wrapper">
         <!-- Header -->
@@ -279,12 +302,12 @@
 
                 <!-- STATE 1: UNVISITED ACTIONS -->
                 <div id="unvisitedStateContainer">
-                    <div class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
+                    <div id="checkInHintBanner" class="alert alert-warning text-center p-3 fs-7 border-0 mb-3" style="border-radius: 8px;">
                         <i class="fas fa-exclamation-triangle me-2"></i>
-                        Anda berada di luar radius outlet (100 meter). Check-in akan memerlukan verifikasi alasan.
+                        <span id="checkInHintText">Anda berada di luar radius outlet (100 meter). Visit memerlukan alasan & foto bukti.</span>
                     </div>
                     <button class="btn-mobile-primary" onclick="triggerCheckInWorkflow()">
-                        <i class="fas fa-sign-in-alt me-2"></i>Check-In Kunjungan
+                        <i class="fas fa-map-marker-alt me-2"></i>Mulai Visit
                     </button>
                 </div>
 
@@ -292,7 +315,7 @@
                 <div id="checkedInStateContainer" class="d-none">
                     <!-- Check-in Time Banner -->
                     <div class="checkin-time-banner">
-                        <span class="checkin-time-lbl"><i class="far fa-clock me-2"></i>Waktu Check-In</span>
+                        <span class="checkin-time-lbl"><i class="far fa-clock me-2"></i>Waktu Visit</span>
                         <span class="checkin-time-val" id="checkInTimeText">11:36 WIB</span>
                     </div>
 
@@ -301,7 +324,7 @@
                         <div class="d-flex align-items-center gap-3 fs-7 mb-2">
                             <i class="fas fa-check-circle text-success fs-5"></i>
                             <div>
-                                <span class="d-block fw-bold text-success">Check-In Berhasil</span>
+                                <span class="d-block fw-bold text-success">Visit Berhasil</span>
                                 <span class="text-muted" id="checkInReasonText">Alasan: Kunjungan Tele-sales/Call</span>
                             </div>
                         </div>
@@ -313,18 +336,20 @@
                     </div>
 
                     <div class="activity-grid">
-                        <!-- Input Order -->
+                        <!-- Cek Stok (wajib) — for MD -->
+                        <a href="javascript:void(0)" class="activity-card" id="stockCheckCard" onclick="goToStockCheck()">
+                            <i class="fas fa-clipboard-check text-primary fs-3 mb-2"></i>
+                            <span class="activity-title">Cek Stok</span>
+                            <span class="activity-desc" id="stockCheckDesc">Belum dilakukan *</span>
+                            <span class="role-badge role-badge-md">for MD</span>
+                        </a>
+
+                        <!-- Input Order — for Motoris -->
                         <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('order')">
                             <img src="../../wwwroot/assets/images/icons/ic_clipboard_list.svg" class="activity-icon" alt="Order"/>
                             <span class="activity-title">Sales Order</span>
                             <span class="activity-desc" id="orderDesc">Belum diinput</span>
-                        </a>
-
-                        <!-- Penagihan / Collection -->
-                        <a href="javascript:void(0)" class="activity-card" onclick="simulateActivity('collection')">
-                            <img src="../../wwwroot/assets/images/icons/ic_payment.svg" class="activity-icon" alt="Payment"/>
-                            <span class="activity-title">Penagihan AR</span>
-                            <span class="activity-desc" id="collectionDesc">Belum diinput</span>
+                            <span class="role-badge role-badge-motoris">for Motoris</span>
                         </a>
 
                         <!-- Tidak ada order (No Order Reason) -->
@@ -334,11 +359,11 @@
                             <span class="activity-desc" id="noOrderDesc">Pilih alasan</span>
                         </div>
 
-                        <!-- Check-out -->
+                        <!-- Selesai Visit -->
                         <div class="activity-card" onclick="triggerCheckOutWorkflow()" style="border-color: #fce4d6; background-color: #fff8f5;">
                             <i class="fas fa-sign-out-alt text-danger fs-3 mb-2"></i>
-                            <span class="activity-title text-danger">Check-Out</span>
-                            <span class="activity-desc text-danger">Selesaikan rute</span>
+                            <span class="activity-title text-danger">Selesai Visit</span>
+                            <span class="activity-desc text-danger">Akhiri kunjungan</span>
                         </div>
                     </div>
                 </div>
@@ -348,11 +373,11 @@
                     <div class="mobile-card" style="background-color: #f4f5f7;">
                         <h4 class="fs-6 fw-bold mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Ringkasan Kunjungan</h4>
                         <div class="info-row">
-                            <span class="info-label">Check-In</span>
+                            <span class="info-label">Visit Masuk</span>
                             <span class="info-value" id="summaryInTime">11:36 WIB</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-label">Check-Out</span>
+                            <span class="info-label">Visit Selesai</span>
                             <span class="info-value" id="summaryOutTime">11:45 WIB</span>
                         </div>
                         <div class="info-row">
@@ -364,6 +389,9 @@
                             <span class="info-value" id="summaryActivity">Sales Order (Rp 2.450.000)</span>
                         </div>
                     </div>
+                    <button class="btn-mobile-primary mb-2" onclick="triggerCheckInWorkflow()">
+                        <i class="fas fa-redo me-2"></i>Kunjungi Lagi
+                    </button>
                     <button class="btn-mobile-secondary" onclick="window.location.href='visit_list.html'">
                         <i class="fas fa-chevron-left me-2"></i>Kembali ke Daftar Rute
                     </button>
@@ -378,7 +406,7 @@
         <div class="modal-dialog modal-dialog-centered mx-auto" style="max-width: 400px; padding: 16px;">
             <div class="modal-content border-0" style="border-radius: 16px;">
                 <div class="modal-header border-0 bg-light" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                    <h5 class="modal-title fw-bold text-danger fs-6"><i class="fas fa-exclamation-triangle me-2"></i>Check-In di Luar Radius</h5>
+                    <h5 class="modal-title fw-bold text-warning fs-6"><i class="fas fa-exclamation-triangle me-2"></i>Visit di Luar Radius</h5>
                 </div>
                 <div class="modal-body pb-0">
                     <p class="fs-7 text-muted">Jarak Anda (1.1 km) melampaui batas toleransi 100 meter. Berikan alasan remote check-in Anda:</p>
@@ -410,7 +438,7 @@
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-secondary fs-7 rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-danger fs-7 rounded-pill px-4" onclick="confirmCheckInWithReason()">Check-In</button>
+                    <button type="button" class="btn fs-7 rounded-pill px-4 text-white" onclick="confirmCheckInWithReason()" style="background-color: var(--color-primary);">Mulai Visit</button>
                 </div>
             </div>
         </div>
@@ -436,6 +464,9 @@
                             <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>
+                    <div class="mb-3 d-none" id="noOrderCustomDiv">
+                        <textarea class="form-control fs-7" id="noOrderCustomText" rows="2" placeholder="Tulis alasan detail..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-secondary fs-7 rounded-pill px-4" data-bs-dismiss="modal">Batal</button>
@@ -449,32 +480,19 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
+    <script src="../../wwwroot/js/prototype-page-doc.js"></script>
     <script>
-        // Mock Outlet database for detail view lookup
-        const outletDb = {
-            "OL-10492": { name: "Apotek Senen Medika", type: "Outlet Star", address: "Jl. Kramat Raya No.42, Senen, Jakarta Pusat", distance: "0.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 0.2, inRadius: false },
-            "OL-10511": { name: "Kimia Farma Cikini", type: "Outlet Prime", address: "Jl. Cikini Raya No.78, Menteng, Jakarta Pusat", distance: "0.6 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)", initialDistance: 0.6, inRadius: false },
-            "OL-10283": { name: "Apotek Roxy Salemba", type: "Outlet Regular", address: "Jl. Salemba Raya No.15, Jakarta Pusat", distance: "1.1 km", arBalance: 3750000, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 1.1, inRadius: false },
-            "OL-10772": { name: "Guardian Plaza Indonesia", type: "Outlet Star", address: "Plaza Indonesia Lt. Basement, Menteng", distance: "0.05 km", arBalance: 12500000, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 0.05, inRadius: true },
-            "OL-10819": { name: "Watsons Grand Indonesia", type: "Outlet Prime", address: "Grand Indonesia Lt. Lower Ground", distance: "2.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 2.5, inRadius: false },
-            "OL-10902": { name: "Apotek K-24 Kenari", type: "Outlet Regular", address: "Jl. Kenari Mas No.12, Senen, Jakarta Pusat", distance: "0.8 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 0.8, inRadius: false },
-            "OL-11002": { name: "Century Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. LG, Jakarta Pusat", distance: "2.6 km", arBalance: 5000000, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 2.6, inRadius: false },
-            "OL-11145": { name: "Apotek Melawai Cikini", type: "Outlet Regular", address: "Jl. Cikini Raya No.14, Jakarta Pusat", distance: "0.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 0.7, inRadius: false },
-            "OL-11239": { name: "Apotek Rakyat Pasar Pramuka", type: "Outlet Regular", address: "Pasar Pramuka Lt. Dasar, Jakarta Timur", distance: "1.9 km", arBalance: 1450000, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 1.9, inRadius: false },
-            "OL-11340": { name: "Kimia Farma Matraman", type: "Outlet Prime", address: "Jl. Matraman Raya No.112, Jakarta Timur", distance: "2.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 2.2, inRadius: false },
-            "OL-11451": { name: "Apotek Salemba Medika", type: "Outlet Regular", address: "Jl. Salemba Tengah No.5, Jakarta Pusat", distance: "1.3 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 1.3, inRadius: false },
-            "OL-11562": { name: "Kimia Farma Salemba", type: "Outlet Prime", address: "Jl. Salemba Raya No.22, Jakarta Pusat", distance: "1.2 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 1.2, inRadius: false },
-            "OL-11673": { name: "Apotek Jaya Menteng", type: "Outlet Regular", address: "Jl. Menteng Raya No.9, Jakarta Pusat", distance: "1.5 km", arBalance: 0, status: "selesai_tidak_efektif", statusText: "Selesai (Tidak Efektif)", initialDistance: 1.5, inRadius: false },
-            "OL-11784": { name: "Guardian Grand Indonesia", type: "Outlet Star", address: "Grand Indonesia Lt. 3, Jakarta Pusat", distance: "2.7 km", arBalance: 0, status: "selesai_efektif", statusText: "Selesai (Efektif)", initialDistance: 2.7, inRadius: false },
-            "OL-11895": { name: "Apotek Hidup Baru", type: "Outlet Regular", address: "Jl. Kramat Pulo No.18, Jakarta Pusat", distance: "0.5 km", arBalance: 0, status: "belum", statusText: "Belum Dikunjungi", initialDistance: 0.5, inRadius: false }
-        };
+        // Jarak simulasi per outlet (km) — konsisten dengan visit_list
+        const MOCK_DISTANCES = { "OL-10492": 0.2, "OL-10511": 0.6, "OL-10283": 1.1, "OL-10772": 0.05, "OL-10819": 2.5, "OL-10902": 0.8, "OL-11002": 2.6, "OL-11145": 0.7, "OL-11239": 1.9, "OL-11340": 2.2, "OL-11451": 1.3, "OL-11562": 1.2, "OL-11673": 1.5, "OL-11784": 2.7, "OL-11895": 0.5 };
+        const IN_RADIUS_IDS = ["OL-10772"]; // Outlet yang dianggap "dalam radius" untuk simulasi
 
         let currentOutletId = "OL-10283"; // fallback
         let outlet = null;
         let photoTaken = false;
         let selectedNoOrderReason = "";
         let salesOrderAmount = 0;
-        let collectionAmount = 0;
+        let activeVisitId = null;
 
         // Bootstrap Modals
         let checkInReasonModal = null;
@@ -484,20 +502,35 @@
             // Get ID from URL
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
-            if (id && outletDb[id]) {
+            if (id) {
                 currentOutletId = id;
             }
 
-            outlet = outletDb[currentOutletId];
+            // Load dari SfaStore
+            outlet = SfaStore.getCustomerById(currentOutletId);
+            if (!outlet) {
+                // fallback agar tidak crash jika ID tidak dikenali
+                outlet = { id: currentOutletId, name: currentOutletId, outletType: 'Outlet Regular', address: '-', arBalance: 0 };
+            }
+            outlet.distance = (MOCK_DISTANCES[currentOutletId] || 1.0).toFixed(1) + ' km';
+            outlet.inRadius = IN_RADIUS_IDS.includes(currentOutletId);
+
             checkInReasonModal = new bootstrap.Modal(document.getElementById('checkInReasonModal'));
             noOrderReasonModal = new bootstrap.Modal(document.getElementById('noOrderReasonModal'));
 
-            // Show custom input if Lainnya is selected
             $('#checkInReasonSelect').change(function() {
                 if ($(this).val() === 'Lainnya') {
                     $('#customReasonDiv').removeClass('d-none');
                 } else {
                     $('#customReasonDiv').addClass('d-none');
+                }
+            });
+
+            $('#noOrderReasonSelect').change(function() {
+                if ($(this).val() === 'Lainnya') {
+                    $('#noOrderCustomDiv').removeClass('d-none');
+                } else {
+                    $('#noOrderCustomDiv').addClass('d-none');
                 }
             });
 
@@ -510,51 +543,111 @@
             $('#headerTitle').text(outlet.name);
             $('#outletName').text(outlet.name);
             $('#outletCode').text(outlet.id);
-            $('#outletType').text(outlet.type);
+            $('#outletType').text(outlet.outletType || 'Outlet Regular');
             $('#outletAddress').text(outlet.address);
 
-            // Format AR
-            const formattedAR = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(outlet.arBalance);
-            $('#outletAR').text(formattedAR);
+            // Format AR dari SfaStore
+            const ar = SfaStore.getOutstandingByCustomerId(currentOutletId);
+            $('#outletAR').text(ar > 0 ? SfaStore.formatRupiah(ar) : 'Tidak Ada Piutang');
+            if (ar > 0) $('#outletAR').addClass('text-danger');
 
             // Map Settings
             if (outlet.inRadius) {
                 $('#mapDistance').text(`Jarak: ${outlet.distance} (Dalam Radius Kunjungan)`);
                 $('.distance-info-badge').css('background-color', 'rgba(0, 93, 65, 0.85)');
-                // Put pins closer together
                 $('#mapOutlet').css({ 'top': '48%', 'left': '52%' });
                 $('#mapSales').css({ 'top': '52%', 'left': '48%' });
                 $('.map-radius-circle').css({ 'top': '48%', 'left': '52%', 'width': '120px', 'height': '120px' });
+                // Pre-check-in hint: dalam radius → siap check-in
+                $('#checkInHintBanner').removeClass('alert-warning').addClass('alert-success');
+                $('#checkInHintText').html(`Anda dalam radius outlet (${outlet.distance}). Siap mulai visit.`);
             } else {
                 $('#mapDistance').text(`Jarak: ${outlet.distance} (Di Luar Radius 100m)`);
                 $('.distance-info-badge').css('background-color', 'rgba(220, 53, 69, 0.85)');
+                $('#checkInHintBanner').removeClass('alert-success').addClass('alert-warning');
+                $('#checkInHintText').html(`Anda di luar radius outlet (${outlet.distance} &gt; 100m). Visit memerlukan alasan & foto bukti.`);
             }
         }
 
+        function ensureNoOtherActiveVisit() {
+            const active = SfaStore.getActiveVisit();
+            if (active && active.customerId !== currentOutletId) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Visit Aktif di Outlet Lain',
+                    text: `Selesaikan visit di ${active.customerName} terlebih dahulu (penjualan atau alasan tidak beli).`,
+                    confirmButtonColor: '#005D41'
+                });
+                return false;
+            }
+            return true;
+        }
+
+        function updateStockCheckUI(done) {
+            if (done) {
+                $('#stockCheckDesc').text('Selesai ✓').css('color', '#78B500');
+                $('#stockCheckCard').css('border-color', '#C6E2D6');
+            } else {
+                $('#stockCheckDesc').text('Belum dilakukan *').css('color', '#dc3545');
+            }
+        }
+
+        function goToStockCheck() {
+            if (!activeVisitId) return;
+            window.location.href = `product_catalog.html?mode=stockcheck&visitId=${activeVisitId}&outletId=${currentOutletId}`;
+        }
+
+        function resetActivityCards() {
+            salesOrderAmount = 0;
+            selectedNoOrderReason = null;
+            $('#orderDesc').text('Belum diinput').css('color', '');
+            $('#noOrderDesc').text('Pilih alasan').css('color', '');
+            updateStockCheckUI(false);
+            $('#stockCheckCard').css('border-color', '');
+        }
+
         function loadState() {
-            const savedState = localStorage.getItem(`visit_state_${currentOutletId}`);
-            if (savedState) {
-                const state = JSON.parse(savedState);
-                if (state.status === 'checked_in') {
-                    showCheckedInUI(state.time, state.reason);
-                    if (state.hasOrder) {
-                        salesOrderAmount = state.orderAmount;
-                        $('#orderDesc').text(`Rp ${new Intl.NumberFormat('id-ID').format(salesOrderAmount)}`).css('color', '#78B500');
+            // Prefer visit aktif (checked_in); jika tidak ada, ambil visit terakhir hari ini
+            const visit = SfaStore.getActiveVisitByCustomerId(currentOutletId)
+                || SfaStore.getTodayVisitByCustomerId(currentOutletId);
+
+            if (visit) {
+                activeVisitId = visit.id;
+                if (visit.status === 'checked_in') {
+                    showCheckedInUI(
+                        visit.checkInTime || SfaStore.formatTime(visit.createdAt),
+                        visit.reason || 'Dalam Radius Outlet'
+                    );
+                    if (visit.hasOrder && visit.orderAmount > 0) {
+                        salesOrderAmount = visit.orderAmount;
+                        $('#orderDesc').text(SfaStore.formatRupiah(salesOrderAmount)).css('color', '#78B500');
+                    } else {
+                        $('#orderDesc').text('Belum diinput').css('color', '');
+                        salesOrderAmount = 0;
                     }
-                    if (state.hasCollection) {
-                        collectionAmount = state.collectionAmount;
-                        $('#collectionDesc').text(`Rp ${new Intl.NumberFormat('id-ID').format(collectionAmount)}`).css('color', '#78B500');
-                    }
-                    if (state.hasNoOrderReason) {
-                        selectedNoOrderReason = state.noOrderReason;
+                    if (visit.hasNoOrderReason) {
+                        selectedNoOrderReason = visit.noOrderReason;
                         $('#noOrderDesc').text(selectedNoOrderReason).css('color', '#dc3545');
+                    } else {
+                        selectedNoOrderReason = null;
+                        $('#noOrderDesc').text('Pilih alasan').css('color', '');
                     }
-                } else if (state.status === 'checked_out') {
-                    showCompletedUI(state.time, state.checkOutTime, state.hasOrder, state.orderAmount, state.hasNoOrderReason, state.noOrderReason);
+                    updateStockCheckUI(visit.stockCheckDone);
+                } else if (visit.status === 'checked_out') {
+                    activeVisitId = null;
+                    showCompletedUI(
+                        visit.checkInTime || SfaStore.formatTime(visit.createdAt),
+                        visit.checkOutTime || '-',
+                        visit.hasOrder,
+                        visit.orderAmount || 0,
+                        visit.hasNoOrderReason,
+                        visit.noOrderReason || ''
+                    );
                 }
             } else {
                 // Default unvisited view
-                $('#outletStatusBadge').text('Belum Dikunjungi').className = 'badge-mobile badge-mobile-warning';
+                activeVisitId = null;
+                $('#outletStatusBadge').text('Belum Dikunjungi').attr('class', 'badge-mobile badge-mobile-warning');
                 $('#unvisitedStateContainer').removeClass('d-none');
                 $('#checkedInStateContainer').addClass('d-none');
                 $('#completedStateContainer').addClass('d-none');
@@ -563,50 +656,92 @@
 
         // Action Trigger Check-In
         function triggerCheckInWorkflow() {
+            if (!ensureNoOtherActiveVisit()) return;
+
             if (outlet.inRadius) {
-                // If in radius, directly check in without modal prompt
                 Swal.fire({
-                    title: 'Check-In GPS...',
+                    title: 'Verifikasi GPS...',
                     text: 'Mencocokkan koordinat lokasi Anda',
                     timer: 1000,
                     showConfirmButton: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
+                    didOpen: () => { Swal.showLoading(); }
                 }).then(() => {
                     const now = new Date();
                     const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                    saveCheckInState(timeStr, 'Dalam Radius Outlet');
-                    showCheckedInUI(timeStr, 'Dalam Radius Outlet');
+                    doCheckIn(timeStr, 'Dalam Radius Outlet');
                 });
             } else {
-                // If out of radius, prompt remote check-in reason modal
+                showCheckInPreWarning();
+            }
+        }
+
+        function showCheckInPreWarning() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Visit di Luar Radius',
+                html: `<div style="text-align:left; font-size:13px; line-height:1.5;">
+                        <p style="margin:0 0 8px;">Jarak Anda <strong>${outlet.distance}</strong> melampaui batas toleransi <strong>100 meter</strong>.</p>
+                        <p style="margin:0 0 4px;">Untuk melanjutkan, Anda perlu:</p>
+                        <ul style="margin:0; padding-left:18px;">
+                            <li>Memilih <strong>alasan</strong> remote visit</li>
+                            <li>Mengambil <strong>foto bukti</strong> toko (wajib)</li>
+                        </ul>
+                    </div>`,
+                showCancelButton: true,
+                confirmButtonText: 'Lanjutkan Visit',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#005D41',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
                 photoTaken = false;
                 $('#cameraPreview').addClass('d-none');
                 $('#cameraOverlay').removeClass('d-none');
                 checkInReasonModal.show();
+            });
+        }
+
+        function doCheckIn(timeStr, reason) {
+            const result = SfaStore.saveVisit({
+                customerId: currentOutletId,
+                customerName: outlet.name,
+                checkInTime: timeStr,
+                reason: reason,
+                status: 'checked_in',
+                stockistId: SfaStore.getActiveStockist()?.id || null,
+                lat: outlet.lat || null,
+                lng: outlet.lng || null
+            });
+            if (result.error === 'ACTIVE_VISIT_EXISTS') {
+                const v = result.visit;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Visit Aktif di Outlet Lain',
+                    text: `Selesaikan visit di ${v.customerName} terlebih dahulu.`,
+                    confirmButtonColor: '#005D41'
+                });
+                return;
             }
+            activeVisitId = result.id;
+            resetActivityCards();
+            showCheckedInUI(timeStr, reason);
         }
 
         function simulateCameraCapture() {
-            // Simulator storefront picture
             const storeImages = [
-                'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=500&auto=format&fit=crop&q=60', // pharmacy storefront
+                'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=500&auto=format&fit=crop&q=60',
                 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=500&auto=format&fit=crop&q=60',
                 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=500&auto=format&fit=crop&q=60'
             ];
-            // pick random storefront
             const imgUrl = storeImages[Math.floor(Math.random() * storeImages.length)];
-            
+
             Swal.fire({
                 title: 'Kamera...',
                 text: 'Memotret tampak depan outlet',
                 timer: 800,
                 showConfirmButton: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => { Swal.showLoading(); }
             }).then(() => {
                 $('#cameraPreview').attr('src', imgUrl).removeClass('d-none');
                 $('#cameraOverlay').addClass('d-none');
@@ -632,38 +767,20 @@
             checkInReasonModal.hide();
 
             Swal.fire({
-                title: 'Menyimpan check-in...',
+                title: 'Menyimpan visit...',
                 timer: 1000,
                 showConfirmButton: false,
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => { Swal.showLoading(); }
             }).then(() => {
                 const now = new Date();
                 const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                saveCheckInState(timeStr, reason);
-                showCheckedInUI(timeStr, reason);
+                doCheckIn(timeStr, reason);
             });
         }
 
-        function saveCheckInState(time, reason) {
-            const state = {
-                status: 'checked_in',
-                time: time,
-                reason: reason,
-                hasOrder: false,
-                orderAmount: 0,
-                hasCollection: false,
-                collectionAmount: 0,
-                hasNoOrderReason: false,
-                noOrderReason: ""
-            };
-            localStorage.setItem(`visit_state_${currentOutletId}`, JSON.stringify(state));
-        }
-
         function showCheckedInUI(time, reason) {
-            $('#outletStatusBadge').text('Sedang Check-In').attr('class', 'badge-mobile badge-mobile-info');
+            $('#outletStatusBadge').text('Sedang Visit').attr('class', 'badge-mobile badge-mobile-info');
             $('#checkInTimeText').text(time);
             $('#checkInReasonText').text(`Alasan: ${reason}`);
 
@@ -672,45 +789,10 @@
             $('#completedStateContainer').addClass('d-none');
         }
 
-        // Simulate activity SO / Collection
         function simulateActivity(type) {
             if (type === 'order') {
-                window.location.href = `order_input.html?outletId=${currentOutletId}`;
-            } else if (type === 'collection') {
-                Swal.fire({
-                    title: 'Input Penagihan AR',
-                    text: 'Masukkan nilai nominal penagihan piutang (AR) yang tertagih:',
-                    input: 'number',
-                    inputPlaceholder: 'Rp...',
-                    showCancelButton: true,
-                    confirmButtonColor: '#005D41',
-                    confirmButtonText: 'Simpan Pembayaran',
-                    cancelButtonText: 'Batal',
-                    inputValidator: (value) => {
-                        if (!value || isNaN(value) || value <= 0) {
-                            return 'Harap masukkan nilai nominal pembayaran yang valid!';
-                        }
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        collectionAmount = parseFloat(result.value);
-                        $('#collectionDesc').text(`Rp ${new Intl.NumberFormat('id-ID').format(collectionAmount)}`).css('color', '#78B500');
-
-                        // Save in state
-                        const state = JSON.parse(localStorage.getItem(`visit_state_${currentOutletId}`));
-                        state.hasCollection = true;
-                        state.collectionAmount = collectionAmount;
-                        localStorage.setItem(`visit_state_${currentOutletId}`, JSON.stringify(state));
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Pembayaran Disimpan',
-                            text: `Penagihan sebesar Rp ${new Intl.NumberFormat('id-ID').format(collectionAmount)} berhasil dicatat.`,
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                    }
-                });
+                const currentUrl = window.location.pathname + window.location.search;
+                window.location.href = `order_input.html?outletId=${currentOutletId}&backUrl=${encodeURIComponent(currentUrl)}`;
             }
         }
 
@@ -720,70 +802,86 @@
         }
 
         function confirmNoOrderReason() {
-            selectedNoOrderReason = $('#noOrderReasonSelect').val();
+            let reason = $('#noOrderReasonSelect').val();
+            if (reason === 'Lainnya') {
+                reason = $('#noOrderCustomText').val().trim();
+                if (!reason) {
+                    Swal.fire('Error', 'Detail alasan harus ditulis!', 'error');
+                    return;
+                }
+            }
+            selectedNoOrderReason = reason;
             noOrderReasonModal.hide();
 
             $('#noOrderDesc').text(selectedNoOrderReason).css('color', '#dc3545');
-
-            // Save in state
-            const state = JSON.parse(localStorage.getItem(`visit_state_${currentOutletId}`));
-            state.hasNoOrderReason = true;
-            state.noOrderReason = selectedNoOrderReason;
-            // Clear order if user sets no-order reason
-            state.hasOrder = false;
-            state.orderAmount = 0;
             salesOrderAmount = 0;
             $('#orderDesc').text('Belum diinput').css('color', 'var(--color-gray)');
 
-            localStorage.setItem(`visit_state_${currentOutletId}`, JSON.stringify(state));
+            if (activeVisitId) {
+                SfaStore.updateVisit(activeVisitId, {
+                    hasNoOrderReason: true,
+                    noOrderReason: selectedNoOrderReason,
+                    hasOrder: false,
+                    orderAmount: 0
+                });
+            }
 
-            Swal.fire({
-                icon: 'info',
-                title: 'Alasan Disimpan',
-                text: `Alasan tidak beli dicatat: ${selectedNoOrderReason}`,
-                timer: 1200,
-                showConfirmButton: false
-            });
+            Swal.fire({ icon: 'info', title: 'Alasan Disimpan', text: `Alasan tidak beli dicatat: ${selectedNoOrderReason}`, timer: 1200, showConfirmButton: false });
         }
 
         // Check Out Workflow
         function triggerCheckOutWorkflow() {
-            const state = JSON.parse(localStorage.getItem(`visit_state_${currentOutletId}`));
-            
-            // Validation: Salesman must either have placed an order OR provided a No-Order Reason!
-            if (!state.hasOrder && !state.hasNoOrderReason) {
+            const visit = SfaStore.getTodayVisitByCustomerId(currentOutletId);
+
+            if (!visit || (!visit.hasOrder && !visit.hasNoOrderReason)) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Aktivitas Belum Lengkap',
-                    text: 'Untuk menyelesaikan kunjungan, Anda harus menginput Sales Order atau memberikan alasan "Tidak Beli" terlebih dahulu!'
+                    text: 'Untuk menyelesaikan visit, Anda harus menginput Sales Order atau memberikan alasan "Tidak Beli" terlebih dahulu!'
                 });
                 return;
             }
 
+            if (!visit.stockCheckDone) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Cek Stok Belum Dilakukan',
+                    text: 'Anda harus menyelesaikan cek stok outlet sebelum menyelesaikan visit.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ke Cek Stok',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#005D41'
+                }).then((r) => { if (r.isConfirmed) goToStockCheck(); });
+                return;
+            }
+
             Swal.fire({
-                title: 'Selesaikan Kunjungan?',
-                text: 'Lakukan check-out koordinat GPS dan akhiri rute di outlet ini.',
+                title: 'Selesaikan Visit?',
+                text: 'Lakukan verifikasi GPS dan akhiri kunjungan di outlet ini.',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#005D41',
-                confirmButtonText: 'Ya, Check-Out',
+                confirmButtonText: 'Ya, Selesai Visit',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Mencatat GPS check-out...',
+                        title: 'Mencatat GPS visit selesai...',
                         timer: 1200,
                         showConfirmButton: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
+                        didOpen: () => { Swal.showLoading(); }
                     }).then(() => {
                         const now = new Date();
                         const checkOutTimeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                        
-                        state.status = 'checked_out';
-                        state.checkOutTime = checkOutTimeStr;
-                        localStorage.setItem(`visit_state_${currentOutletId}`, JSON.stringify(state));
+
+                        // Simpan check-out ke SfaStore
+                        SfaStore.completeVisit(activeVisitId, {
+                            checkOutTime: checkOutTimeStr,
+                            hasOrder: visit.hasOrder || false,
+                            orderAmount: visit.orderAmount || 0,
+                            hasNoOrderReason: visit.hasNoOrderReason || false,
+                            noOrderReason: visit.noOrderReason || ''
+                        });
 
                         Swal.fire({
                             icon: 'success',
@@ -800,15 +898,11 @@
         }
 
         function showCompletedUI(checkInTime, checkOutTime, hasOrder, orderAmt, hasNoOrder, noOrderReasonText) {
-            let statusText = "Selesai (Tidak Efektif)";
-            let badgeClass = "badge-mobile badge-mobile-danger";
-            let actText = `Tidak Beli: ${noOrderReasonText}`;
-
-            if (hasOrder) {
-                statusText = "Selesai (Efektif)";
-                badgeClass = "badge-mobile badge-mobile-success";
-                actText = `Sales Order (Rp ${new Intl.NumberFormat('id-ID').format(orderAmt)})`;
-            }
+            const statusText = hasOrder ? "Selesai (Efektif)" : "Selesai (Tidak Efektif)";
+            const badgeClass = hasOrder ? "badge-mobile badge-mobile-success" : "badge-mobile badge-mobile-danger";
+            const actText = hasOrder
+                ? `Sales Order (${SfaStore.formatRupiah(orderAmt)})`
+                : `Tidak Beli: ${noOrderReasonText}`;
 
             $('#outletStatusBadge').text(statusText).attr('class', badgeClass);
             $('#summaryInTime').text(checkInTime);

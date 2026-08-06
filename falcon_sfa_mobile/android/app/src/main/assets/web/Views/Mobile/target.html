@@ -123,8 +123,8 @@
             <div class="progress-card">
                 <div class="progress-header">
                     <div>
-                        <div class="progress-label"><i class="fas fa-filter me-2" style="color:#43A047;"></i>Kunjungan Efektif</div>
-                        <div class="progress-values">Efektif: <b id="efektifActual">0</b> / Kunjungan: <b id="efektifBase">0</b></div>
+                        <div class="progress-label"><i class="fas fa-filter me-2" style="color:#43A047;"></i>EC (Faktur / Kunjungan)</div>
+                        <div class="progress-values">Faktur: <b id="efektifActual">0</b> / Kunjungan: <b id="efektifBase">0</b></div>
                     </div>
                     <div class="progress-pct" id="efektifPct" style="color:#43A047;">0%</div>
                 </div>
@@ -178,26 +178,25 @@
         </div>
     </div>
 
-    <div class="mobile-nav">
-        <a href="dasbor.html" class="mobile-nav-item active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    <nav class="mobile-nav" aria-label="Navigasi utama">
+        <a href="dasbor.html" class="mobile-nav-item">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
             <span>Dasbor</span>
         </a>
         <a href="home.html" class="mobile-nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             <span>Beranda</span>
         </a>
         <a href="profil.html" class="mobile-nav-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span>Profil</span>
         </a>
-    </div>
+    </nav>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    const TARGET_KUNJUNGAN = 15;  // target per hari
     const TARGET_SALES = 5000000; // Rp 5 juta target harian
 
     $(document).ready(function() {
@@ -212,16 +211,18 @@
     });
 
     function renderProgress(kpi) {
-        // Kunjungan
-        const visitPct = Math.min(Math.round((kpi.kunjungan / TARGET_KUNJUNGAN) * 100), 100);
+        const targetKunjungan = kpi.targetKunjungan || (SfaStore.getVisitTargetForDate ? SfaStore.getVisitTargetForDate() : 35);
+        // Kunjungan vs Master Limit Motoris (minimalHarian)
+        const visitPct = targetKunjungan > 0 ? Math.min(Math.round((kpi.kunjungan / targetKunjungan) * 100), 100) : 0;
         $('#visitActual').text(kpi.kunjungan);
-        $('#visitTarget').text(TARGET_KUNJUNGAN);
+        $('#visitTarget').text(targetKunjungan);
         $('#visitPct').text(visitPct + '%');
         setTimeout(() => $('#visitBar').css('width', visitPct + '%'), 100);
 
-        // Efektif
-        const efektifPct = kpi.kunjungan > 0 ? Math.min(Math.round((kpi.efektif / kpi.kunjungan) * 100), 100) : 0;
-        $('#efektifActual').text(kpi.efektif);
+        // EC% = faktur / kunjungan
+        const faktur = kpi.fakturCount != null ? kpi.fakturCount : (kpi.efektif || 0);
+        const efektifPct = kpi.kunjungan > 0 ? Math.min(Math.round((faktur / kpi.kunjungan) * 100), 100) : 0;
+        $('#efektifActual').text(faktur);
         $('#efektifBase').text(kpi.kunjungan);
         $('#efektifPct').text(efektifPct + '%');
         setTimeout(() => $('#efektifBar').css('width', efektifPct + '%'), 200);

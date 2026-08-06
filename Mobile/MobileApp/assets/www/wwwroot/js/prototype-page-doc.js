@@ -125,17 +125,19 @@
             doc: 'docs/web/pages/master_stokis.md',
             sections: [
                 { heading: 'Fungsi', items: [
-                    'CRUD stokis/grosir untuk kulakan mobile',
-                    'Download CSV / Upload CSV massal'
+                    'Daftar stokis/grosir untuk kulakan mobile',
+                    'View-only — input & edit hanya via Upload CSV',
+                    'Aksi tabel hanya View (ikon mata) → detail.html'
                 ]},
-                { heading: 'Aturan form (add.html)', items: [
-                    'Kode readonly — auto-generate STK-001, STK-002, …',
-                    'Telepon opsional; format Indonesia (08xx… / 021…)',
-                    'Lat/lng wajib; koordinat sama dengan stokis lain ditolak'
+                { heading: 'Halaman detail (detail.html)', items: [
+                    'Semua field disabled (hanya lihat)',
+                    'Island Informasi Stok Saat Ini + Riwayat Input Motoris'
                 ]},
-                { heading: 'Aturan upload', items: [
-                    'Duplikat dicek lat/lng saja — koordinat sama dilewati',
-                    'Kode stokis tidak ada di Excel — selalu digenerate sistem (STK-xxx)'
+                { heading: 'Aturan upload (Outlet ID)', items: [
+                    'Kolom outlet_id wajib sebagai identitas',
+                    'Outlet ID ada di file → status Active',
+                    'Outlet ID lama tak ada di file → otomatis Inactive',
+                    'Koordinat dipakai Outlet ID lain → baris dilewati'
                 ]},
                 { heading: 'Integrasi mobile', items: [
                     'Storage: localStorage md_stokis',

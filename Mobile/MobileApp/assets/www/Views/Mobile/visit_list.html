@@ -309,6 +309,16 @@
         });
     }
 
+    function pickTodayVisit(todayVisits, customerId) {
+        return todayVisits
+            .filter(v => v.customerId === customerId)
+            .sort((a, b) => {
+                if (a.status === 'checked_in' && b.status !== 'checked_in') return -1;
+                if (b.status === 'checked_in' && a.status !== 'checked_in') return 1;
+                return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+            })[0] || null;
+    }
+
     function loadMdVisits() {
         const allCustomers = SfaStore.getCustomers();
         const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
@@ -317,7 +327,7 @@
         SfaStore.getTodayRouteIds().forEach(id => {
             const cust = allCustomers.find(c => c.id === id);
             if (!cust) return;
-            const visitRecord = todayVisits.find(v => v.customerId === id);
+            const visitRecord = pickTodayVisit(todayVisits, id);
             list.push(buildVisitItem(cust, {
                 category: 'daily',
                 status: visitRecord ? visitRecord.status : 'unvisited',
@@ -330,7 +340,7 @@
         SfaStore.getOverdueRouteCustomers().forEach(od => {
             const cust = allCustomers.find(c => c.id === od.customerId);
             if (!cust) return;
-            const visitToday = todayVisits.find(v => v.customerId === od.customerId);
+            const visitToday = pickTodayVisit(todayVisits, od.customerId);
             list.push(buildVisitItem(cust, {
                 category: 'overdue',
                 status: visitToday ? visitToday.status : 'unvisited',
@@ -348,7 +358,7 @@
         const allCustomers = SfaStore.getCustomers();
         const todayVisits = SfaStore.getVisits().filter(v => v.date === SfaStore.todayStr());
         const list = allCustomers.map(cust => {
-            const visitRecord = todayVisits.find(v => v.customerId === cust.id);
+            const visitRecord = pickTodayVisit(todayVisits, cust.id);
             let distanceM = null;
             const hasGps = cust.lat && cust.lng && cust.lat !== 0 && cust.lng !== 0;
             if (devicePos && hasGps) {

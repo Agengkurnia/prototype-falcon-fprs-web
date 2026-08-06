@@ -258,38 +258,36 @@ produksi berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 
 Alur konseptual produksi: order dari Mobile → faktur terbaca di Web; stok motoris diagregasi untuk monitoring.
 
-**Lane:** Sales lapangan (Mobile) · Web Admin (Sales Manager / RSM) · Sistem Falcon Web
+**Lane (urutan kiri → kanan):**
 
-```mermaid
-flowchart LR
-  subgraph L1[Sales Lapangan Mobile]
-    direction TB
-    A1[Buat order / canvassing]
-    A2[Submit faktur]
-  end
-  subgraph L2[Sistem Falcon Web]
-    direction TB
-    B1[Simpan transaksi]
-    B2[Tampilkan list faktur]
-    B3[Agregasi stok motoris]
-    B4[Export Excel]
-  end
-  subgraph L3[Web Admin]
-    direction TB
-    C1[Buka Faktur / Stok Motoris]
-    C2[Filter region bila perlu]
-    C3[Lihat detail / cetak]
-    C4[Unduh report]
-  end
-  A1 --> A2 --> B1
-  B1 --> B2
-  B1 --> B3
-  C1 --> C2 --> B2
-  B2 --> C3
-  C1 --> B3
-  B3 --> C4
-  C4 --> B4
+| # | Lane ID | Label | Tipe | Sumber |
+|---|---------|-------|------|--------|
+| 1 | L1 | Sales Lapangan (Mobile) | User | Mobile SFA canvassing |
+| 2 | L2 | Sistem Man Power GT | System | Transaksi Sales Order / stok |
+| 3 | L3 | Web Admin | User | Sales Manager / RSM |
+
+```plantuml
+@startuml
+|Sales Lapangan Mobile|
+start
+:Buat order / canvassing;
+:Submit faktur;
+|Sistem Man Power GT|
+:Simpan transaksi ke database;
+:Tampilkan list faktur;
+:Agregasi stok motoris;
+|Web Admin|
+:Buka Faktur / Stok Motoris;
+:Filter region bila perlu;
+:Lihat detail / cetak;
+:Unduh report;
+|Sistem Man Power GT|
+:Export Excel;
+stop
+@enduml
 ```
+
+Hand-off Mobile → Sistem: submit faktur menulis transaksi ke database. Hand-off Web Admin → Sistem: monitoring list/agregasi dan export Excel.
 
 **Gambar 2.1 — Business Flow Penjualan (Web Admin)**
 

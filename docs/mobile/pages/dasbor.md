@@ -7,20 +7,24 @@ Dashboard analitik performa sales dengan filter periode harian/mingguan/bulanan.
 `Views/Mobile/dasbor.html`
 
 ## Komponen UI
-- Banner profil + logout
+- Banner profil + role (default prototype: **motoris**)
 - Selector periode + pager tanggal
-- Grid statistik 2×2
-- Chart faktur & pembayaran
+- Kartu **Pelanggan** + **Kunjungan** (aktual / target / EC)
+- Total Faktur Penjualan
+- Chart faktur & EC% 14 hari
 - Tabel top customer & produk
-- Link target; FAB tambah faktur
-- Bottom nav
+- Link target; bottom nav
 
 ## Data & API
-`getUser`, `getTodayKpi`, `getInvoices`, `getVisits`, `getTopCustomersByPeriod`, `getTopProductsByPeriod`, `formatRupiah`, `clearUser`
+`getUser`, `getKpiByRange` / `getTodayKpi`, `getVisitTargetForDate` / `getVisitTargetForRange`, `getInvoices`, `getVisits`, `getTopCustomersByPeriod`, `getTopProductsByPeriod`, `formatRupiah`
 
 ## Aturan Bisnis
 - Redirect ke login jika tidak ada session
-- KPI pembayaran disimulasikan ~72% dari faktur
+- **Target kunjungan** = `minimalHarian` dari master **Limit** (jabatan user + versi aktif tanggal)
+  - Motoris → Motoris Reguler
+  - MD → MD Reguler
+- **EC%** = jumlah faktur ÷ kunjungan (bukan target HKE master)
+- Progress bar: aktual / target min harian
 
 ## Navigasi
-`target.html`, `invoice_list.html?from=&to=&backTo=dasbor`, `order_input.html`, `login.html`
+`target.html`, `invoice_list.html?from=&to=&backTo=dasbor`, `home.html`, `login.html`

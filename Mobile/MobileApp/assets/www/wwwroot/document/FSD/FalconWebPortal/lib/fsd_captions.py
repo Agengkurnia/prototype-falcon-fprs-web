@@ -7,6 +7,7 @@ FIG_CAPTION_RE = re.compile(r'^\*?Gambar\s+(\d+(?:\.\d+)*)\s*[—–-]\s*(.+?)\*
 TBL_CAPTION_RE = re.compile(r'^\*?Tabel\s+(\d+(?:\.\d+)*)\s*[—–-]\s*(.+?)\*?$')
 CHAPTER_RE = re.compile(r'^##\s+(\d+)\.\s+')
 SUBSECTION_RE = re.compile(r'^###\s+(\d+)\.(\d+)\s+')
+SUBSUBSECTION_RE = re.compile(r'^####\s+\d+(?:\.\d+)+\s+(.+)$')
 IMAGE_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)\s*$')
 TABLE_ROW_RE = re.compile(r'^\|.+\|$')
 TABLE_SEP_RE = re.compile(r'^\|[\s|:\-]+\|$')
@@ -39,6 +40,9 @@ def _table_title(lines: list[str], table_start: int) -> str:
             continue
         if TBL_CAPTION_RE.match(line):
             return ''
+        hm = SUBSUBSECTION_RE.match(line)
+        if hm:
+            return hm.group(1).strip()
         m = BOLD_LINE_RE.match(line)
         if m:
             return m.group(1).strip()
@@ -56,6 +60,17 @@ def _table_title(lines: list[str], table_start: int) -> str:
 def _format_caption(kind: str, number: str, title: str) -> str:
     label = 'Gambar' if kind == 'fig' else 'Tabel'
     return f'*{label} {number} — {title}*'
+
+
+_DIAGRAM_N_RE = re.compile(r'^Diagram\s+\d+$', re.I)
+
+
+def sanitize_figure_title(alt: str, fallback: str = '') -> str:
+    """Strip redundant 'Diagram N' alt text — penomoran sudah di prefix Gambar."""
+    title = (alt or '').strip()
+    if not title or _DIAGRAM_N_RE.match(title):
+        return fallback or 'Alur'
+    return title
 
 
 def preprocess_captions(md_text: str) -> str:
@@ -112,7 +127,7 @@ def preprocess_captions(md_text: str) -> str:
             if not FIG_CAPTION_RE.match(next_stripped):
                 fig_counter += 1
                 number = f'{chapter}.{fig_counter}'
-                title = alt or f'Gambar {number}'
+                title = sanitize_figure_title(alt, fallback=f'Gambar {number}')
                 out.append(line)
                 out.append('')
                 out.append(_format_caption('fig', number, title))

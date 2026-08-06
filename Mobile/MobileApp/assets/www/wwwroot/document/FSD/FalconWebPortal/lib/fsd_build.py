@@ -21,6 +21,15 @@ BORDER_COLOR = '000000'
 FONT_NAME = 'Calibri'
 FONT_SIZE_BODY = 11
 FONT_SIZE_TABLE = 9
+HEADING_FONT_SIZES = {
+    'Heading 1': 20,
+    'Heading 2': 18,
+    'Heading 3': 15,
+    'Heading 4': 13,
+}
+BUTTON_IMAGE_MAX_CM = 4.0
+TABLE_CELL_MARGIN_DXA = 140
+BUTTON_TABLE_COL_WIDTHS_CM = (5.0, 3.5, 3.5, 2.5, 5.5)  # Tampilan, Tombol, ID, Style, Fungsi
 
 
 def render_kroki(mermaid_code: str, output_path: str, label: str) -> bool:
@@ -47,6 +56,25 @@ def _render_kroki(code: str, output_path: str, label: str, engine: str) -> bool:
     except Exception as e:
         print(f'   [{label}] FAIL: {e}')
         return False
+
+
+def ensure_png_min_width(path: str, min_width: int = 2400) -> None:
+    """Upscale PNG so it fills a full print page when embedded (ERD, etc.)."""
+    if not path or not os.path.exists(path):
+        return
+    try:
+        from PIL import Image
+        with Image.open(path) as img:
+            w, h = img.size
+            if w >= min_width:
+                return
+            scale = min_width / float(w)
+            new_size = (min_width, max(1, int(h * scale)))
+            resized = img.resize(new_size, Image.Resampling.LANCZOS)
+            resized.save(path)
+            print(f'   [PNG upscale] {os.path.basename(path)} {w}x{h} -> {new_size[0]}x{new_size[1]}')
+    except Exception as e:
+        print(f'   [PNG upscale] skip {os.path.basename(path)}: {e}')
 
 
 def is_swimlane_mermaid(code: str) -> bool:
@@ -144,6 +172,94 @@ def _apply_font(run, size_pt: int, bold=None):
         run.bold = bold
 
 
+def _set_cell_margins(cell, margin_dxa: int = TABLE_CELL_MARGIN_DXA):
+    tcPr = cell._tc.get_or_add_tcPr()
+    existing = tcPr.find(qn('w:tcMar'))
+    if existing is not None:
+        tcPr.remove(existing)
+    tcMar = OxmlElement('w:tcMar')
+    for side in ('top', 'left', 'bottom', 'right'):
+        el = OxmlElement(f'w:{side}')
+        el.set(qn('w:w'), str(margin_dxa))
+        el.set(qn('w:type'), 'dxa')
+        tcMar.append(el)
+    tcPr.append(tcMar)
+
+
+def _is_button_action_table(table) -> bool:
+    if not table.rows:
+        return False
+    header = ' '.join(c.text for c in table.rows[0].cells)
+    return 'Tampilan' in header and 'Tombol' in header
+
+
+def _scale_inline_drawing(drawing, max_w, min_w=None, force_w=None):
+    ns = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}'
+    extent = drawing.find(f'{ns}extent')
+    if extent is None:
+        return
+    cx = int(extent.get('cx', 0))
+    cy = int(extent.get('cy', 0))
+    if cx <= 0:
+        return
+    target = None
+    if force_w is not None:
+        target = force_w.emu
+    elif cx > max_w.emu:
+        target = max_w.emu
+    elif min_w is not None and cx < min_w.emu:
+        target = min_w.emu
+    if target is None:
+        return
+    ratio = target / cx
+    extent.set('cx', str(int(target)))
+    extent.set('cy', str(max(1, int(cy * ratio))))
+
+
+def _insert_page_break_before(para):
+    """Sisipkan page break tepat sebelum paragraf."""
+    new_p = OxmlElement('w:p')
+    new_r = OxmlElement('w:r')
+    new_br = OxmlElement('w:br')
+    new_br.set(qn('w:type'), 'page')
+    new_r.append(new_br)
+    new_p.append(new_r)
+    para._element.addprevious(new_p)
+
+
+_CHAPTER_HEADING_RE = re.compile(r'^(\d+)\.\s+')
+
+
+def postprocess_page_breaks(doc, content_start: int):
+    """Page break setelah Daftar Isi (sebelum bab 1) dan sebelum setiap bab utama (## 2., ## 3., …)."""
+    for i, para in enumerate(doc.paragraphs):
+        style = (para.style.name if para.style else '') or ''
+        if not style.startswith('Heading'):
+            continue
+        text = (para.text or '').strip()
+        m = _CHAPTER_HEADING_RE.match(text)
+        if not m:
+            continue
+        if i < content_start:
+            continue
+        chapter = int(m.group(1))
+        if i == content_start or chapter >= 2:
+            _insert_page_break_before(para)
+
+
+def postprocess_headings(doc, content_start: int):
+    """Perbesar font heading bab/section agar lebih mudah dibaca."""
+    for i, para in enumerate(doc.paragraphs):
+        if i < content_start:
+            continue
+        style = (para.style.name if para.style else '') or ''
+        size = HEADING_FONT_SIZES.get(style)
+        if not size:
+            continue
+        for run in para.runs:
+            _apply_font(run, size, bold=True)
+
+
 def postprocess_captions(doc, content_start: int):
     for i, para in enumerate(doc.paragraphs):
         if i < content_start:
@@ -157,7 +273,11 @@ def postprocess_captions(doc, content_start: int):
             _apply_font(run, FONT_SIZE_BODY)
 
 
-def postprocess_docx(docx_path: str, max_width_cm: float = 15.0):
+def postprocess_docx(
+    docx_path: str,
+    max_width_cm: float = 15.0,
+    erd_width_cm: float | None = None,
+):
     doc = Document(docx_path)
     content_start = content_start_index(doc)
     try:
@@ -168,6 +288,9 @@ def postprocess_docx(docx_path: str, max_width_cm: float = 15.0):
     for i, para in enumerate(doc.paragraphs):
         if i < content_start:
             continue
+        style = (para.style.name if para.style else '') or ''
+        if style.startswith('Heading'):
+            continue
         for run in para.runs:
             _apply_font(run, FONT_SIZE_BODY)
     border_spec = {"sz": "8", "val": "single", "color": BORDER_COLOR}
@@ -176,6 +299,7 @@ def postprocess_docx(docx_path: str, max_width_cm: float = 15.0):
     for ti, table in enumerate(doc.tables):
         if ti < COVER_TABLE_COUNT:
             continue
+        is_btn_table = _is_button_action_table(table)
         try:
             table.style = 'Table Grid'
         except Exception:
@@ -184,23 +308,49 @@ def postprocess_docx(docx_path: str, max_width_cm: float = 15.0):
             is_header = row_idx == 0
             for cell in row.cells:
                 _set_cell_border(cell, **bdr_all)
+                _set_cell_margins(cell)
                 if is_header:
                     _set_cell_bg(cell, HEADER_BG)
                 for para in cell.paragraphs:
                     for run in para.runs:
                         _apply_font(run, FONT_SIZE_TABLE, bold=True if is_header else None)
+                    if is_btn_table:
+                        para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    btn_max = Cm(BUTTON_IMAGE_MAX_CM)
+                    ns = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}'
+                    for run in para.runs:
+                        for drawing in run._r.findall(f'.//{ns}inline'):
+                            _scale_inline_drawing(drawing, btn_max)
+        if is_btn_table and len(BUTTON_TABLE_COL_WIDTHS_CM) == len(table.columns):
+            for ci, w in enumerate(BUTTON_TABLE_COL_WIDTHS_CM):
+                table.columns[ci].width = Cm(w)
     max_w = Cm(max_width_cm)
+    erd_w = Cm(erd_width_cm) if erd_width_cm else None
     ns = '{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}'
-    for para in doc.paragraphs:
+    paras = list(doc.paragraphs)
+    for i, para in enumerate(paras):
+        next_text = (paras[i + 1].text or '').upper() if i + 1 < len(paras) else ''
+        para_text = (para.text or '').upper()
+        is_erd = 'ERD' in para_text or 'ERD' in next_text
         for run in para.runs:
             for drawing in run._r.findall(f'.//{ns}inline'):
-                extent = drawing.find(f'{ns}extent')
-                if extent is not None:
-                    cx = int(extent.get('cx', 0))
-                    if cx > max_w.emu:
-                        ratio = max_w.emu / cx
-                        cy = int(int(extent.get('cy', 0)) * ratio)
-                        extent.set('cx', str(max_w.emu))
-                        extent.set('cy', str(cy))
+                # Also detect via drawing name/descr if present
+                doc_pr = drawing.find('.//{http://schemas.openxmlformats.org/drawingml/2006/main}docPr')
+                if doc_pr is None:
+                    # a:docPr lives under wp:docPr in some exports
+                    for el in drawing.iter():
+                        if el.tag.endswith('docPr'):
+                            doc_pr = el
+                            break
+                if doc_pr is not None:
+                    name = (doc_pr.get('name') or '') + ' ' + (doc_pr.get('descr') or '')
+                    if 'ERD' in name.upper():
+                        is_erd = True
+                if is_erd and erd_w is not None:
+                    _scale_inline_drawing(drawing, max_w, force_w=erd_w)
+                else:
+                    _scale_inline_drawing(drawing, max_w)
+    postprocess_page_breaks(doc, content_start)
+    postprocess_headings(doc, content_start)
     postprocess_captions(doc, content_start)
     doc.save(docx_path)

@@ -1,18 +1,18 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
-## Modul: Falcon FPRS — Data Master (Web Admin)
-### Sistem: Falcon FPRS
-### Versi Dokumen: 1.2
+## Modul: Man Power GT — Data Master (Web Admin)
+### Sistem: Man Power GT
+### Versi Dokumen: 1.5
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
-| **Nama Dokumen** | FSD Modul Data Master — Web Admin Falcon FPRS |
-| **Versi** | 1.2 |
-| **Tanggal** | 10 Juli 2026 |
-| **Divisi** | IT / Business – Falcon FPRS |
+| **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
+| **Versi** | 1.5 |
+| **Tanggal** | 6 Agustus 2026 |
+| **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
-| **Dibuat oleh** | Tim IT – Falcon FPRS |
+| **Dibuat oleh** | Tim IT – Man Power GT |
 
 ---
 
@@ -20,9 +20,12 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.2** | **10 Juli 2026** | **Tim IT** | Perkaya business flow produksi, RBAC/approval, sumber data & API; rapikan ERD (diagram relasi vs teks FK) |
-| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur produksi MAVEN, mapping UI→database, ERD lengkap, DDL PostgreSQL, tooltip prototipe |
-| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin FPRS |
+| **1.5** | **6 Agustus 2026** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
+| **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
+| **1.3** | **4 Agustus 2026** | **Tim IT** | Rename **Man Power GT**; tambah modul **Limit**; screenshot ulang 8 modul |
+| **1.2** | **10 Juli 2026** | **Tim IT** | Perkaya business flow, RBAC/approval, sumber data & API; rapikan ERD |
+| **1.1** | **9 Juli 2026** | **Tim IT** | Tambah arsitektur MAVEN, mapping UI→database, ERD lengkap |
+| **1.0** | **8 Juli 2026** | **Tim IT** | Initial draft – modul Data Master Web Admin |
 
 ---
 
@@ -42,11 +45,11 @@
 
 ### 1.1 Latar Belakang
 
-**Falcon FPRS** (*Field Partner Relation System*) adalah sistem internal PT Kalbe
-Nutritionals untuk administrasi data master, penjualan lapangan, dan pelacakan
-kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** pada
-Web Admin (`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi
-fondasi seluruh transaksi FPRS.
+**Man Power GT** (*Man Power General Trade*) adalah sistem internal PT Kalbe
+Nutritionals untuk mengelola tenaga lapangan General Trade (motoris / canvasser),
+administrasi data master terkait, monitoring penjualan lapangan, dan pelacakan
+kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** Web Admin
+(`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi fondasi transaksi.
 
 Prototipe Web Portal berupa *high-fidelity interactive prototype* berbasis HTML
 statis (MPA) bertema Vuexy/Bootstrap yang menggunakan **localStorage** dan file
@@ -65,7 +68,7 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MA
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
-| Produk, Pelanggan, Channel, Pegawai, Stokis, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
+| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
 | Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
 | Desain database produksi MAVEN (PostgreSQL + EF Core) | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
 | Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
@@ -112,40 +115,39 @@ Modul Data Master memakai **empat pola** pengelolaan data:
 
 Alur berikut menggambarkan pengelolaan Data Master **saat menggunakan database produksi** (MAVEN / PostgreSQL), bukan localStorage prototipe.
 
-**Lane:**
+**Lane (urutan kiri → kanan):**
 
-| # | Lane ID | Label | Tipe |
-|---|---------|-------|------|
-| 1 | L1 | Admin Master Data | User |
-| 2 | L2 | Sistem Falcon Web | System |
-| 3 | L3 | Master Data API / Mobile SFA | External |
+| # | Lane ID | Label | Tipe | Sumber |
+|---|---------|-------|------|--------|
+| 1 | L1 | Admin Master Data | User | RBAC Web Admin |
+| 2 | L2 | Sistem Man Power GT | System | Controllers PowerGT Master Data |
+| 3 | L3 | Master Data API / Mobile SFA | External | LOV Produk + sync outlet |
 
-```mermaid
-flowchart LR
-  subgraph L1[Admin Master Data]
-    direction TB
-    A1[Buka modul Data Master]
-    A2[Isi form / modal / upload]
-    A3[Tinjau data]
-  end
-  subgraph L2[Sistem Falcon Web]
-    direction TB
-    B1[Baca data dari database]
-    B2[Tampilkan daftar]
-    B3[Validasi via Client Side]
-    B4[Simpan ke database]
-  end
-  subgraph L3[Master Data API / Mobile SFA]
-    direction TB
-    C1[Sumber LOV Produk]
-    C2[Data outlet dari mobile]
-    C3[Sinkronisasi API]
-  end
-  A1 --> B1 --> B2 --> A2 --> B3 --> B4 --> A3
-  C1 -.-> A2
-  C2 -.-> B1
-  B4 -.-> C3
+```plantuml
+@startuml
+|Admin Master Data|
+start
+:Buka modul Data Master;
+|Sistem Man Power GT|
+:Baca data dari database;
+:Tampilkan daftar;
+|Master Data API / Mobile SFA|
+:Sumber LOV Produk;
+:Data outlet dari mobile;
+|Admin Master Data|
+:Isi form / modal / upload;
+|Sistem Man Power GT|
+:Validasi via Client Side;
+:Simpan ke database;
+|Master Data API / Mobile SFA|
+:Sinkronisasi API;
+|Admin Master Data|
+:Tinjau data;
+stop
+@enduml
 ```
+
+Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan ke database. Hand-off Sistem ↔ API/Mobile: LOV Produk dan data outlet mensuplai form; hasil simpan dapat disinkronkan ke API.
 
 ### 2.4 Ringkasan Alur per Pola (Produksi)
 
@@ -347,6 +349,8 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 | **Tujuan Form** | Mengelola daftar channel pelanggan (MT/GT/SPC/MED/GI/ECOM, dll.) untuk segmentasi dan kebijakan penjualan. Setiap pelanggan tergabung pada tepat satu channel. |
 | **Pengguna** | Admin Master Data, Sales Operations. |
 
+
+> **Integrasi API (rencana):** `/api/v1/Channel`
 
 > **localStorage key:** `md_channel`
 
@@ -588,9 +592,90 @@ Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat
 | Latitude / Longitude | `mStokis` | `decLat`, `decLng` | | Unik per outlet |
 | Status | `mStokis` | `bitActive` | | Active/Inactive via CSV |
 
-### 3.6 Pajak
+### 3.6 Limit
 
-Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**. Sumber: `Views/FPRS/MasterData/Pajak/index.html`.
+Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**. Sumber: `Views/FPRS/MasterData/LimitTargetHarian/index.html`.
+
+> **localStorage key:** `md_limit_target`
+
+![Master Data — Limit — Dashboard List](screenshots/ss_49_master_limit_index.png)
+
+
+#### 3.6.1 Kolom DataTable Dashboard List
+
+| Kolom | Field Key | Render | Sortable | Keterangan |
+|-------|-----------|--------|----------|------------|
+| JABATAN | `Jabatan` | Text | Ya | Kolom grid dashboard list |
+| TYPE JABATAN | `TypeJabatan` | Text | Ya | Kolom grid dashboard list |
+| MIN HARIAN | `MinHarian` | Text | Ya | Kolom grid dashboard list |
+| MAX HARIAN | `MaxHarian` | Text | Ya | Kolom grid dashboard list |
+| ACTIVE | `Active` | Text | Ya | Kolom grid dashboard list |
+
+#### 3.6.2 Tombol Aksi — Dashboard List
+
+| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
+|----------|--------|--------------|-------------|--------|
+| ![](screenshots/ss_btn_limit-target-harian_create.png) | Create | `—` | btn-success | Menjalankan aksi Create. |
+| ![](screenshots/ss_btn_common_detail.png) | Detail | `—` | btn-success | Menampilkan halaman detail record terpilih (parameter URL terenkripsi). |
+| ![](screenshots/ss_btn_limit-target-harian_history.png) | History | `—` | btn-secondary | Menjalankan aksi History. |
+| ![](screenshots/ss_btn_limit-target-harian_update.png) | Update | `btnUpdate` | btn-success | Menjalankan aksi terkait tombol Update. |
+| ![](screenshots/ss_btn_limit-target-harian_back.png) | Back | `—` | btn-danger | Menjalankan aksi Back. |
+
+![Master Data — Limit — Halaman Detail](screenshots/ss_50_master_limit_detail.png)
+
+
+#### 3.6.3 Form Detail (read-only)
+
+| Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
+|------------|-----------|------|-----------|---------|----------|------------|
+| Jabatan | `inputJabatan` | Dropdown | Ya | (kosong) | Wajib | — |
+| Type Jabatan | `inputTypeJabatan` | Dropdown | Ya | (kosong) | Wajib | — |
+| Minimal Harian | `inputMin` | Number | Ya | (kosong) | Wajib; min=0 | — |
+| Maximal Harian | `inputMax` | Number | Ya | (kosong) | Wajib; min=0 | — |
+| Target HKE Mingguan | `inputHke` | Number | Ya | (kosong) | Wajib; min=0 | — |
+| Target HKE Bulanan | `inputHkeBulanan` | Number | Ya | (kosong) | Wajib; min=0 | — |
+| Tanggal Mulai | `inputMulai` | Text | Ya | (kosong) | Wajib | — |
+| Tanggal Selesai | `inputSelesai` | Text | Ya | (kosong) | Wajib | — |
+
+#### 3.6.4 Business Rules
+
+| Rule ID | Aturan |
+|---------|--------|
+| BR-MD10 | Jabatan dan Type Jabatan wajib diisi. |
+| BR-MD11 | Semua field angka dan periode wajib diisi (≥0). |
+| BR-MD12 | Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
+| BR-MD13 | Tanggal mulai tidak boleh backdate. Minimal hari ini. |
+| BR-MD14 | Tanggal selesai tidak boleh sebelum tanggal mulai. |
+
+#### 3.6.5 CRUD
+
+| Operasi | Cara | Role | Keterangan |
+|---------|------|------|------------|
+| **Create** | Klik Tambah → `add.html` | Admin | — |
+| **Read** | dashboard list + `detail.html` | Semua role | — |
+| **Update** | Edit via `add.html?id=` | Admin | — |
+| **Delete** | Konfirmasi Swal pada dashboard list | Admin | — |
+
+#### 3.6.6 Mapping Database MAVEN
+
+| Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
+|-----------------------|-------------|-------------|-------|------------|
+| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | MD / Motoris (*unik bersama Type) |
+| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | mis. MD Reguler / Motoris Reguler |
+| Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
+| Maximal Harian | `mLimitTargetHarianVer` | `intMaximalHarian` | | ≥ Minimal Harian |
+| Target HKE Mingguan | `mLimitTargetHarianVer` | `intTargetHkeMingguan` | | Hari kerja efektif / minggu |
+| Target HKE Bulanan | `mLimitTargetHarianVer` | `intTargetHkeBulanan` | | |
+| Tanggal Mulai | `mLimitTargetHarianVer` | `dtTanggalMulai` | | Tidak boleh backdate (BR) |
+| Tanggal Selesai | `mLimitTargetHarianVer` | `dtTanggalSelesai` | | ≥ Tanggal Mulai |
+| Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
+| Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
+
+> Update di UI = **append** baris baru ke `mLimitTargetHarianVer` (bukan overwrite). DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+
+### 3.7 Pajak
+
+Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**. Sumber: `Views/FPRS/MasterData/Pajak/index.html`.
 
 | Aspek | Keterangan |
 |-------|------------|
@@ -598,14 +683,12 @@ Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**
 | **Pengguna** | Admin Finance, Tax/Accounting. |
 
 
-> **Integrasi API (rencana):** `/api/v1/Tax`
-
 > **localStorage key:** `md_pajak`
 
 ![Master Data — Pajak — Dashboard List](screenshots/ss_32_master_pajak_index.png)
 
 
-#### 3.6.1 Kolom DataTable Dashboard List
+#### 3.7.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
@@ -615,51 +698,19 @@ Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**
 | PERSENTASE (%) | `Persentase` | Text | Ya | `mPajak` \| `decPersentase` |
 | NILAI DPP | `NilaiDpp` | Text | Ya | `mPajak` \| `txtNilaiDpp` |
 
-#### 3.6.2 Tombol Aksi — Dashboard List
-
-| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
-|----------|--------|--------------|-------------|--------|
-| ![](screenshots/ss_btn_pajak_tambah-pajak.png) | Tambah Pajak | `openModal()` | btn-success | Membuka modal form untuk menambah data baru. |
-| ![](screenshots/ss_btn_pajak_edit.png) | Edit | `editItem('1')` | btn-outline-secondary | Membuka modal form dalam mode ubah untuk baris yang dipilih. |
-| ![](screenshots/ss_btn_pajak_hapus.png) | Hapus | `del('1','PPN')` | btn-outline-secondary | Menghapus data terpilih setelah konfirmasi pengguna. |
-
 ![Master Data — Pajak — Form Modal (full page)](screenshots/ss_33_master_pajak_modal.png)
 
 
-**Dashboard list** menampilkan daftar skema pajak. **Form modal** untuk Tambah/Ubah berisi Kode Pajak, Nama Pajak, Persentase (%), dan Nilai DPP. Data disimpan ke `localStorage` setelah validasi.
-
-
-#### 3.6.3 Form Modal (Tambah / Ubah)
-
-| Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
-|------------|-----------|------|-----------|---------|----------|------------|
-| Kode Pajak | `inputKode` | Text | Ya | (kosong) | Wajib; maks. 20 karakter | `mPajak` \| `txtKodePajak` |
-| Nama Pajak | `inputNama` | Text | Ya | (kosong) | Wajib; maks. 95 karakter | `mPajak` \| `txtNamaPajak` |
-| Persentase (%) | `inputPersen` | Number | Ya | (kosong) | Wajib; min=0; max=100 | `mPajak` \| `decPersentase` |
-| Nilai DPP | `inputDpp` | Text | Tidak | (kosong) | — | `mPajak` \| `txtNilaiDpp` |
-
-#### 3.6.4 Tombol Aksi — Form Modal
-
-| Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
-|----------|--------|--------------|-------------|--------|
-| ![](screenshots/ss_btn_pajak_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
-
-#### 3.6.5 Business Rules
-
-| Rule ID | Aturan |
-|---------|--------|
-| BR-MD10 | Kode dan Nama pajak wajib diisi. |
-
-#### 3.6.6 CRUD
+#### 3.7.2 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
-| **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |
-| **Read** | dashboard list (DataTable) | Semua role | — |
-| **Update** | Klik Edit → ubah modal → Simpan | Admin | — |
-| **Delete** | Klik Hapus → konfirmasi Swal | Admin | Hapus dari localStorage |
+| **Create** | Klik Tambah → `add.html` | Admin | — |
+| **Read** | dashboard list + `detail.html` | Semua role | — |
+| **Update** | Edit via `add.html?id=` | Admin | — |
+| **Delete** | Konfirmasi Swal pada dashboard list | Admin | — |
 
-#### 3.6.6 Mapping Database MAVEN
+#### 3.7.6 Mapping Database MAVEN
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
@@ -668,7 +719,7 @@ Modul **Pajak** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**
 | Persentase (%) | `mPajak` | `decPersentase` | | |
 | Nilai DPP | `mPajak` | `txtNilaiDpp` | | |
 
-### 3.7 Alasan
+### 3.8 Alasan
 
 Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**. Sumber: `Views/FPRS/MasterData/Alasan/index.html`.
 
@@ -685,7 +736,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 ![Master Data — Alasan — Dashboard List](screenshots/ss_34_master_alasan_index.png)
 
 
-#### 3.7.1 Kolom DataTable Dashboard List
+#### 3.8.1 Kolom DataTable Dashboard List
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
@@ -694,7 +745,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 | DESKRIPSI | `Deskripsi` | Text | Ya | `mAlasan` \| `txtDeskripsi` |
 | TIPE | `Tipe` | Text | Ya | `mAlasan` \| `txtTipe` |
 
-#### 3.7.2 Tombol Aksi — Dashboard List
+#### 3.8.2 Tombol Aksi — Dashboard List
 
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
@@ -708,7 +759,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 **Dashboard list** menampilkan master alasan operasional. **Form modal** Tambah/Ubah berisi Nama Alasan, Deskripsi, dan Tipe (Return/Kunjungan/Order/Lainnya). Terintegrasi rencana API `/api/v1/Param`.
 
 
-#### 3.7.3 Form Modal (Tambah / Ubah)
+#### 3.8.3 Form Modal (Tambah / Ubah)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
@@ -716,19 +767,19 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 | Deskripsi | `inputDeskripsi` | Text | Ya | (kosong) | Wajib | `mAlasan` \| `txtDeskripsi` |
 | Tipe | `inputTipe` | Dropdown | Ya | (kosong) | Wajib | `mAlasan` \| `txtTipe` |
 
-#### 3.7.4 Tombol Aksi — Form Modal
+#### 3.8.4 Tombol Aksi — Form Modal
 
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
 | ![](screenshots/ss_btn_alasan_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
 
-#### 3.7.5 Business Rules
+#### 3.8.5 Business Rules
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD11 | Nama dan Tipe wajib diisi. |
+| BR-MD15 | Nama dan Tipe wajib diisi. |
 
-#### 3.7.6 CRUD
+#### 3.8.6 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
@@ -737,7 +788,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 | **Update** | Klik Edit → ubah modal → Simpan | Admin | — |
 | **Delete** | Klik Hapus → konfirmasi Swal | Admin | Hapus dari localStorage |
 
-#### 3.7.6 Mapping Database MAVEN
+#### 3.8.6 Mapping Database MAVEN
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
@@ -764,8 +815,12 @@ Rule ID memakai prefix `BR-MD`. Sumber: pesan validasi / SweetAlert di HTML.
 | BR-MD07 | [Master Data — Pegawai] Tidak ada baris data yang dapat diproses. |
 | BR-MD08 | [Master Data — Stokis] File kosong atau format header tidak dikenali. |
 | BR-MD09 | [Master Data — Stokis] Tidak ada baris data yang dapat diproses. |
-| BR-MD10 | [Master Data — Pajak] Kode dan Nama pajak wajib diisi. |
-| BR-MD11 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
+| BR-MD10 | [Master Data — Limit] Jabatan dan Type Jabatan wajib diisi. |
+| BR-MD11 | [Master Data — Limit] Semua field angka dan periode wajib diisi (≥0). |
+| BR-MD12 | [Master Data — Limit] Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
+| BR-MD13 | [Master Data — Limit] Tanggal mulai tidak boleh backdate. Minimal hari ini. |
+| BR-MD14 | [Master Data — Limit] Tanggal selesai tidak boleh sebelum tanggal mulai. |
+| BR-MD15 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
 
 ### 4.2 Aturan Produksi (di luar prototipe)
 
@@ -784,6 +839,7 @@ Aturan berikut **wajib** di backend MAVEN / kebijakan operasional, meskipun prot
 | BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |
 | BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |
 | BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |
+| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; tanggal mulai tidak backdate. |
 
 ---
 
@@ -863,7 +919,7 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 | Identitas record di URL | `txtGuid` (UUID) |
 | Menu / RBAC | SQL Server `KNGlobalDB` (`mMenu`, `mRoleAccess`) |
 
-Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`. Seed UAT opsional: `003_seed_masterdata_uat.sql`.
+Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`, `012_mLimitTargetHarian.sql`. Seed UAT opsional: `003_seed_masterdata_uat.sql`.
 
 ---
 
@@ -871,13 +927,13 @@ Skrip DDL: `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`. Seed UAT opsional: `003_s
 
 Cara baca bab ini:
 
-1. **7.1** — ERD produksi (1 halaman): relasi + **kolom lengkap** sesuai skrip DDL `001`/`002`.
+1. **7.1** — ERD produksi (1 halaman): relasi + **kolom lengkap** sesuai skrip DDL `001`/`002`/`012`.
 2. **7.2** — tabel teks FK yang **1:1** dengan garis di diagram 7.1.
 3. **7.3–7.4** — catatan desain + DDL (query penuh).
 
 ### 7.1 ERD Produksi (1 halaman)
 
-Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql` dan `002_*.sql`.
+Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`, dan `012_mLimitTargetHarian.sql`.
 Kolom digambar **lengkap** (termasuk audit). Lookup tanpa FK constraint (`mKategoriProduk`, `mDivisi`, `mDaftarHarga`) **tidak** digambar — kolom cadangan dicatat di bawah.
 
 ```mermaid
@@ -891,6 +947,7 @@ erDiagram
     mPegawai ||--o{ mPegawaiStatusHist : intPegawaiID
     mStokis ||--o{ mStokisStatusHist : intStokisID
     mStokis ||--o{ mStokisStockHist : intStokisID
+    mLimitTargetHarian ||--o{ mLimitTargetHarianVer : intLimitID
 
     mProduk {
         int intProdukID PK
@@ -1087,9 +1144,38 @@ erDiagram
         varchar txtUpdatedBy
         timestamp dtNonActive
     }
+    mLimitTargetHarian {
+        int intLimitID PK
+        uuid txtGuid UK
+        varchar txtJabatan
+        varchar txtTypeJabatan
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
+    mLimitTargetHarianVer {
+        int intLimitVerID PK
+        uuid txtGuid UK
+        int intLimitID FK
+        int intMinimalHarian
+        int intMaximalHarian
+        int intTargetHkeMingguan
+        int intTargetHkeBulanan
+        date dtTanggalMulai
+        date dtTanggalSelesai
+        boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
+    }
 ```
 
-> `mAlasan` standalone (tanpa FK). `mBrand` reuse tabel existing MAVEN.
+> `mAlasan` standalone (tanpa FK). `mLimitTargetHarian` standalone (tanpa FK ke pegawai — jabatan teks). `mBrand` reuse tabel existing MAVEN.
 
 **Kolom cadangan v1 (belum ada FK di DDL):** `intKategoriID`, `intDivisiID`, `intDaftarHargaID` — nullable; tabel lookup belum digambar.
 
@@ -1105,8 +1191,9 @@ erDiagram
 | 6 | `mPegawaiStatusHist` | `intPegawaiID` | `mPegawai` | many-to-one | Ya (audit CSV) |
 | 7 | `mStokisStatusHist` | `intStokisID` | `mStokis` | many-to-one | Ya (audit CSV) |
 | 8 | `mStokisStockHist` | `intStokisID` | `mStokis` | many-to-one | Ya (riwayat stok) |
+| 9 | `mLimitTargetHarianVer` | `intLimitID` | `mLimitTargetHarian` | many-to-one | Ya (versi periode) |
 
-Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan** kolom tabel.
+Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan** kolom tabel. Versi Limit aktif pada tanggal = baris `mLimitTargetHarianVer` dengan `bitActive` dan `dtTanggalMulai` ≤ hari ini ≤ `dtTanggalSelesai`.
 
 ### 7.3 Catatan Desain Database
 
@@ -1114,13 +1201,14 @@ Agregasi non-fisik: `totalPelanggan` (channel) = `COUNT(mPelanggan)` — **bukan
 - **ID prototype → PK + GUID:** `id` integer menjadi `intXxxID` serial + `txtGuid` uuid.
 - **Relasi by ID:** string nama di prototipe diganti FK `intXxxID` di MAVEN.
 - **Reuse `mBrand`:** tabel brand sudah ada di MAVEN — jangan buat duplikat.
+- **Limit append-only:** Update UI menambah baris `mLimitTargetHarianVer`; History menampilkan seluruh versi per header.
 - **Blok audit wajib:** `bitActive`, `dtInserted`, `txtInsertedBy`, `dtUpdated`, `txtUpdatedBy`, `dtNonActive`.
 
 ### 7.4 Query Pembuatan Tabel (DDL PostgreSQL)
 
-Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu master inti (7.4.2). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
+Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu master inti (7.4.2), lalu Limit (7.4.3). Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
 
-> Implementasi MAVEN juga menyediakan file terpisah: `MAVEN.DAL/Scripts/001_mUnit_mPajak_mProduk.sql` dan `002_mChannel_mAlasan_mPegawai_mPelanggan_mStokis.sql` (termasuk tabel riwayat).
+> Implementasi MAVEN: `MAVEN.DAL/Scripts/001_mUnit_mPajak_mProduk.sql`, `002_mChannel_mAlasan_mPegawai_mPelanggan_mStokis.sql`, `012_mLimitTargetHarian.sql`.
 
 #### 7.4.1 Tabel Lookup
 
@@ -1355,8 +1443,49 @@ CREATE TABLE "mStokis" (
     "dtNonActive"   timestamp without time zone NULL,
     CONSTRAINT "mStokis_txtOutletId_uq" UNIQUE ("txtOutletId")
 );
+
+-- Limit Target Harian (header + versi) — juga di 012_mLimitTargetHarian.sql
+CREATE TABLE "mLimitTargetHarian" (
+    "intLimitID"      serial PRIMARY KEY,
+    "txtGuid"         uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtJabatan"      varchar(50)  NOT NULL,
+    "txtTypeJabatan"  varchar(100) NOT NULL,
+    "bitActive"       boolean NOT NULL DEFAULT true,
+    "dtInserted"      timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"   varchar(100) NULL,
+    "dtUpdated"       timestamp without time zone NULL,
+    "txtUpdatedBy"    varchar(100) NULL,
+    "dtNonActive"     timestamp without time zone NULL,
+    CONSTRAINT "mLimitTargetHarian_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarian_jabatan_type_uq" UNIQUE ("txtJabatan", "txtTypeJabatan")
+);
+
+CREATE TABLE "mLimitTargetHarianVer" (
+    "intLimitVerID"          serial PRIMARY KEY,
+    "txtGuid"                uuid NOT NULL DEFAULT gen_random_uuid(),
+    "intLimitID"             int NOT NULL,
+    "intMinimalHarian"       int NOT NULL DEFAULT 0,
+    "intMaximalHarian"       int NOT NULL DEFAULT 0,
+    "intTargetHkeMingguan"   int NOT NULL DEFAULT 0,
+    "intTargetHkeBulanan"    int NOT NULL DEFAULT 0,
+    "dtTanggalMulai"         date NOT NULL,
+    "dtTanggalSelesai"       date NOT NULL,
+    "bitActive"              boolean NOT NULL DEFAULT true,
+    "dtInserted"             timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"          varchar(100) NULL,
+    "dtUpdated"              timestamp without time zone NULL,
+    "txtUpdatedBy"           varchar(100) NULL,
+    "dtNonActive"            timestamp without time zone NULL,
+    CONSTRAINT "mLimitTargetHarianVer_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarianVer_limit_fk"
+        FOREIGN KEY ("intLimitID") REFERENCES "mLimitTargetHarian" ("intLimitID"),
+    CONSTRAINT "mLimitTargetHarianVer_min_max_chk"
+        CHECK ("intMaximalHarian" >= "intMinimalHarian"),
+    CONSTRAINT "mLimitTargetHarianVer_periode_chk"
+        CHECK ("dtTanggalSelesai" >= "dtTanggalMulai")
+);
 ```
 
-> `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join.
+> `mBrand` tidak dibuat ulang — sudah ada di MAVEN (PK `"IntId"`). Indeks tambahan pada kolom FK disarankan untuk performa join. Skrip lengkap Limit (+ seed): `012_mLimitTargetHarian.sql`.
 
 ---

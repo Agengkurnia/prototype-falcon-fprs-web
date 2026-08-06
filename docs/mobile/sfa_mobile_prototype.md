@@ -121,17 +121,17 @@ Menu **Visit** dihapus (redundan dengan tombol Rute Kunjungan).
 
 ### D. Detail Outlet & Visit (`visit_detail.html`)
 * **Tanpa selector stokis**: Pemilihan stokis di level visit dihapus (stokis dipilih di `product_catalog.html` saat kulakan/cek stok).
+* **Tanpa tombol telepon** di header.
 * **Single active visit**: Tidak bisa mulai visit di outlet lain jika masih ada visit aktif (`getActiveVisit()`).
 * **Mulai Visit** (bukan Check-In): validasi GPS radius 100m; luar radius wajib alasan + foto.
 * **Aktivitas visit**:
-  * **Cek Stok** (wajib sebelum selesai visit) → `product_catalog.html?mode=stockcheck`
-  * Sales Order → `order_input.html`
-  * Penagihan AR → `collection_input.html`
+  * **Cek Stok** — **hanya MD** (badge `for MD`); wajib sebelum selesai visit untuk MD → `product_catalog.html?mode=stockcheck`
+  * **Sales Order** — badge `for Motoris` → `order_input.html`
   * Tidak Beli → alasan termasuk **Lainnya** + teks custom
-  * **Selesai Visit** → wajib sudah cek stok + (order atau alasan tidak beli)
+  * **Selesai Visit** → wajib (order atau alasan tidak beli); **MD** juga wajib cek stok; Motoris tidak diblok cek stok
 
 ### E. Aktivitas Kunjungan & Sales Order (`order_input.html` & `order_add.html`)
-* **Aktivitas Check-In**: Terdiri atas tombol *Sales Order*, *Penagihan AR*, *Tidak Beli (No Order Reason)*, dan *Check-Out*.
+* **Aktivitas Check-In**: Terdiri atas tombol *Sales Order*, *Tidak Beli (No Order Reason)*, dan *Selesai Visit* (Cek Stok hanya MD di `visit_detail`).
 * **Sales Order Catalog**:
   * Filter kategori produk cepat (Minuman, Susu Formula, Susu Anak, Makanan Bayi).
   * Pencarian produk secara instan.
@@ -142,7 +142,8 @@ Menu **Visit** dihapus (redundan dengan tombol Rute Kunjungan).
   * **Diskon Otomatis**: Potongan harga 5% terhitung otomatis di ringkasan pembayaran jika total order melebihi Rp 200.000.
   * Input tanggal pengiriman (**read-only**, hari transaksi) dan catatan untuk tim ekspedisi.
 * **Aturan Bisnis Selesai Visit**:
-  * Wajib **cek stok outlet** (`stockCheckDone`) sebelum selesai visit.
+  * **MD**: wajib **cek stok outlet** (`stockCheckDone`) sebelum selesai visit.
+  * **Motoris**: tidak wajib cek stok.
   * Salesman tidak dapat menyelesaikan visit jika belum ada transaksi atau alasan "Tidak Beli".
   * Hanya **1 visit aktif** pada satu waktu.
 

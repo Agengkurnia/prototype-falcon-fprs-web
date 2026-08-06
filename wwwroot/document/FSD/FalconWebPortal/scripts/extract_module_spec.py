@@ -32,7 +32,8 @@ FRAGMENTS_DIR = os.path.join(WORKSPACE_DIR, 'source', '_fragments')
 
 MASTER_DATA_ORDER = [
     'master-produk', 'master-pelanggan', 'master-channel',
-    'master-pegawai', 'master-stokis', 'master-pajak', 'master-alasan',
+    'master-pegawai', 'master-stokis', 'master-limit-target-harian',
+    'master-pajak', 'master-alasan',
 ]
 PENJUALAN_ORDER = ['penjualan-faktur', 'penjualan-stok-motoris']
 KUNJUNGAN_ORDER = ['kunjungan-informasi', 'kunjungan-geografis', 'kunjungan-rute']
@@ -70,6 +71,7 @@ SS_BY_MODULE = {
     'master-alasan': ['ss_34_master_alasan_index.png', 'ss_35_master_alasan_modal.png'],
     'master-supplier': ['ss_36_master_supplier_index.png', 'ss_37_master_supplier_add.png'],
     'master-stokis': ['ss_45_master_stokis_index.png', 'ss_46_master_stokis_detail.png'],
+    'master-limit-target-harian': ['ss_49_master_limit_index.png', 'ss_50_master_limit_detail.png'],
     'penjualan-faktur': ['ss_38_faktur_index.png', 'ss_39_faktur_detail.png'],
     'penjualan-stok-motoris': ['ss_40_stok_motoris_index.png'],
     'canvassing': ['ss_41_canvassing_index.png'],

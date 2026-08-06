@@ -110,6 +110,7 @@ flutter:
     - assets/www/wwwroot/document/FSD/FalconWebPortal/_cache/
     - assets/www/wwwroot/document/FSD/FalconWebPortal/_jobs/
     - assets/www/wwwroot/document/FSD/FalconWebPortal/_job_ai/
+    - assets/www/wwwroot/document/FSD/FalconWebPortal/_tmp/
     - assets/www/wwwroot/document/FSD/FalconWebPortal/
     - assets/www/wwwroot/document/FSD/
     - assets/www/wwwroot/fonts/KalbeGeometric/
@@ -118,6 +119,7 @@ flutter:
     - assets/www/wwwroot/fonts/_KalbeHelix/
     - assets/www/wwwroot/fonts/
     - assets/www/wwwroot/img/
+    - assets/www/wwwroot/js/vendor/
     - assets/www/wwwroot/js/
     - assets/www/wwwroot/lib/bootstrap/dist/css/
     - assets/www/wwwroot/lib/bootstrap/dist/js/
