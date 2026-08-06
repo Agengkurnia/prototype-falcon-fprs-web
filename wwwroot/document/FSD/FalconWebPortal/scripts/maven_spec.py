@@ -111,8 +111,8 @@ MAVEN_MAPPING = {
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | MD / Motoris (*unik bersama Type) |
-| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | mis. MD Reguler / Motoris Reguler |
+| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | LOV dari Master Data API `/api/v1/Position` (`mJabatan.txtJabatanName`); *unik bersama Type |
+| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | LOV tipe jabatan dari API Position (ikut jabatan terpilih) |
 | Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
 | Maximal Harian | `mLimitTargetHarianVer` | `intMaximalHarian` | | ≥ Minimal Harian |
 | Target HKE Mingguan | `mLimitTargetHarianVer` | `intTargetHkeMingguan` | | Hari kerja efektif / minggu |
@@ -122,7 +122,7 @@ MAVEN_MAPPING = {
 | Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
 | Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
 
-> Update di UI = **append** baris baru ke `mLimitTargetHarianVer` (bukan overwrite). DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position` (tooltip UI: `Source : Master Data API /api/v1/Position | …`). Nilai yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
 ''',
     'master-pajak': '''#### 3.7.6 Mapping Database MAVEN
 

@@ -31,15 +31,24 @@
                 <a href="detail.html?mode=create" class="btn btn-success"><i class="fa fa-plus me-1"></i> Create</a>
             </div>
 
+            <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+                <i class="fa fa-link me-2 text-info"></i>
+                <strong>Integrasi Master Data API:</strong>
+                LOV <strong>Jabatan</strong> / <strong>Type Jabatan</strong> pada form Create/Detail bersumber
+                <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Position</code></a>.
+                Hover kolom grid / label form untuk tooltip <code>Source : …</code>.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
             <div class="card"><div class="card-body"><div class="table-responsive">
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
                         <tr>
-                            <th>JABATAN</th>
-                            <th>TYPE JABATAN</th>
-                            <th class="text-end">MIN HARIAN</th>
-                            <th class="text-end">MAX HARIAN</th>
-                            <th class="text-center">ACTIVE</th>
+                            <th title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName → mLimitTargetHarian.txtJabatan">JABATAN</th>
+                            <th title="Source : Master Data API /api/v1/Position | tipe jabatan → mLimitTargetHarian.txtTypeJabatan">TYPE JABATAN</th>
+                            <th class="text-end" title="Source : mLimitTargetHarianVer | intMinimalHarian">MIN HARIAN</th>
+                            <th class="text-end" title="Source : mLimitTargetHarianVer | intMaximalHarian">MAX HARIAN</th>
+                            <th class="text-center" title="Source : mLimitTargetHarianVer | bitActive (versi berlaku hari ini)">ACTIVE</th>
                             <th style="width:200px;text-align:center;">AKSI</th>
                         </tr>
                     </thead>

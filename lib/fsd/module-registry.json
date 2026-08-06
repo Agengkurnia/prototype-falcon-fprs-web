@@ -167,9 +167,9 @@
       "type": "page",
       "htmlPath": "Views/FPRS/MasterData/LimitTargetHarian/index.html",
       "formPath": "Views/FPRS/MasterData/LimitTargetHarian/detail.html",
-      "apiEndpoint": null,
+      "apiEndpoint": "/api/v1/Position",
       "paramCode": null,
-      "note": "Menu Limit; list/detail/history ala PRM; identity jabatan+typeJabatan; versions min/max/HKE; target mobile = minimalHarian",
+      "note": "Menu Limit; LOV Jabatan/Type dari Master Data API /api/v1/Position; identity jabatan+typeJabatan; versions min/max/HKE; target mobile = minimalHarian",
       "storageKey": "md_limit_target",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [

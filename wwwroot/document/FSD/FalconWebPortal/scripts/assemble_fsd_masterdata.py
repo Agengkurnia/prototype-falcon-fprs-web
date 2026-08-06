@@ -31,6 +31,60 @@ from maven_spec import (  # noqa: E402
 
 TANGGAL = '6 Agustus 2026'
 
+LIMIT_VALIDATION_SECTION = '''
+#### 3.6.7 Sumber Data Jabatan & Type Jabatan (Master Data API)
+
+Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type Jabatan** bersumber dari **Master Data API** endpoint **`/api/v1/Position`** (master jabatan / posisi).
+
+| Field UI | Sumber API (rencana produksi) | Persistensi lokal Limit |
+|----------|-------------------------------|-------------------------|
+| Jabatan | `/api/v1/Position` → `mJabatan.txtJabatanName` (mis. MD, Motoris) | Disimpan di `mLimitTargetHarian.txtJabatan` |
+| Type Jabatan | `/api/v1/Position` → tipe jabatan terkait (mis. MD Reguler, Motoris Reguler) | Disimpan di `mLimitTargetHarian.txtTypeJabatan` |
+
+**UI prototipe:**
+
+- Banner info di atas form Header menjelaskan sumber API.
+- Tooltip (`title`) pada label & kontrol: `Source : Master Data API /api/v1/Position | …` — pola sama seperti modul Produk/Alasan.
+- Placeholder opsi: `-- Pilih (Master Data API) --`. Di prototipe opsi masih seed lokal; produksi wajib LOV live dari API.
+
+**Catatan desain:** LOV selalu dari API agar selaras master organisasi; header Limit menyimpan **snapshot teks** jabatan/type agar histori versi tetap terbaca meskipun master Position berubah kemudian.
+
+#### 3.6.8 Narasi Validasi & Alur Versi
+
+Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
+
+**Alur singkat:** isi header (Create) / form versi → klik Save/Update → validasi field → (Update) cek overlap periode versi aktif → simpan atau tampilkan dialog penyelesaian bentrok.
+
+**Validasi field (SweetAlert Peringatan):**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD13 | Jabatan / Type Jabatan kosong | ![Validasi jabatan wajib](screenshots/ss_51_limit_val_jabatan_wajib.png) |
+| BR-MD14 | Angka atau periode kosong / &lt; 0 | ![Validasi field wajib](screenshots/ss_52_limit_val_field_wajib.png) |
+| BR-MD15 | Maximal Harian &lt; Minimal Harian | ![Validasi max &lt; min](screenshots/ss_53_limit_val_max_lt_min.png) |
+| BR-MD16 | Tanggal mulai &lt; hari ini (backdate) | ![Validasi backdate](screenshots/ss_54_limit_val_backdate.png) |
+| BR-MD17 | Tanggal selesai &lt; tanggal mulai | ![Validasi selesai &lt; mulai](screenshots/ss_55_limit_val_selesai_lt_mulai.png) |
+
+**Validasi unik & periode:**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD18 | Create: pasangan Jabatan + Type sudah ada | ![Validasi duplikat](screenshots/ss_56_limit_val_duplikat.png) |
+| BR-MD22 | Update: periode versi baru bentrok dengan versi aktif | ![Validasi periode bentrok](screenshots/ss_57_limit_val_periode_bentrok.png) |
+
+Pada dialog **Periode bentrok**, pengguna memilih:
+
+1. **Tutup versi aktif lebih awal** — `tanggalSelesai` versi lama digeser ke sehari sebelum mulai versi baru, lalu versi baru di-append.
+2. **Geser mulai versi baru** — sistem mengusulkan tanggal mulai = sehari setelah selesai versi aktif (jika masih valid vs hari ini & tanggal selesai).
+3. **Batal** — tidak menyimpan.
+
+**History (view-only):** menampilkan form readonly + panel daftar versi untuk header terpilih.
+
+![Master Data — Limit — History](screenshots/ss_58_master_limit_history.png)
+
+**Pemakaian di dashboard Mobile:** target kunjungan = `minimalHarian` dari versi Limit yang **aktif pada tanggal** filter, untuk jabatan yang dipetakan dari role user (MD → MD/MD Reguler; selain itu → Motoris/Motoris Reguler). Transaksi visit **tidak** menyimpan FK Limit; nilai target di-resolve saat baca KPI.
+'''
+
 # Document Approval — standar Man Power GT / SHP
 DOCUMENT_APPROVAL = [
     ('Muhammad Rafi', 'SHP Channel & Customer Development'),
@@ -48,14 +102,14 @@ def preamble() -> str:
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.5
+### Versi Dokumen: 1.7
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.5 |
+| **Versi** | 1.7 |
 | **Tanggal** | {TANGGAL} |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -67,7 +121,9 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.5** | **{TANGGAL}** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
+| **1.7** | **{TANGGAL}** | **Tim IT** | Limit: sumber LOV Jabatan/Type dari API `/api/v1/Position` (tooltip + narasi FSD) |
+| **1.6** | **{TANGGAL}** | **Tim IT** | Limit: screenshot + narasi validasi (field, duplikat, periode bentrok) + History |
+| **1.5** | **6 Agustus 2026** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
 | **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
 | **1.3** | **4 Agustus 2026** | **Tim IT** | Rename **Man Power GT**; tambah modul **Limit**; screenshot ulang 8 modul |
 | **1.2** | **10 Juli 2026** | **Tim IT** | Perkaya business flow, RBAC/approval, sumber data & API; rapikan ERD |
@@ -228,6 +284,8 @@ def chapter_master_data(reg: dict, all_rules: list) -> str:
         mapping = MAVEN_MAPPING.get(mid)
         if mapping:
             lines.append(mapping)
+        if mid == 'master-limit-target-harian':
+            lines.append(LIMIT_VALIDATION_SECTION)
     return '\n'.join(lines)
 
 
@@ -272,7 +330,7 @@ def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
         '| BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |',
         '| BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |',
         '| BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |',
-        '| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; tanggal mulai tidak backdate. |',
+        '| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |',
         '',
         '---',
         '',
@@ -346,6 +404,7 @@ def chapter_integration(reg: dict) -> str:
 | Endpoint | Modul FPRS | Arah | Digunakan untuk |
 |----------|------------|------|-----------------|
 | `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
+| `GET /api/v1/Position` | Limit | Inbound LOV | Dropdown **Jabatan** & **Type Jabatan** pada form Create/Detail |
 | `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
 | `/api/v1/Tax` | Pajak | Opsional sync | Referensi skema pajak; v1 boleh fully lokal di `mPajak` |
 | `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |

@@ -32,23 +32,38 @@
             </div>
         </div>
 
+        <div class="alert alert-info border-0 shadow-sm mb-3" role="alert" id="alertApiSource">
+            <i class="fa fa-link me-2 text-info"></i>
+            <strong>Sumber data Header:</strong>
+            <strong>Jabatan</strong> dan <strong>Type Jabatan</strong> diambil dari
+            <strong>Master Data API</strong>
+            <code>/api/v1/Position</code>
+            (<em>mJabatan.txtJabatanName</em> / tipe jabatan terkait).
+            Hover label field untuk tooltip <code>Source : …</code>.
+            Nilai tersimpan di header Limit lokal; LOV diisi dari API (prototipe: opsi seed).
+        </div>
+
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="border-bottom pb-2 text-success mb-3">Header</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Jabatan <span class="required-mark">*</span></label>
-                        <select class="form-select" id="inputJabatan" onchange="onJabatanChange()">
-                            <option value="">-- Pilih --</option>
+                        <label class="form-label" title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName">Jabatan <span class="required-mark">*</span></label>
+                        <select class="form-select" id="inputJabatan" onchange="onJabatanChange()"
+                            title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName">
+                            <option value="">-- Pilih (Master Data API) --</option>
                             <option value="MD">MD</option>
                             <option value="Motoris">Motoris</option>
                         </select>
+                        <div class="form-text">LOV dari Master Data API — Position / Jabatan.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Type Jabatan <span class="required-mark">*</span></label>
-                        <select class="form-select" id="inputTypeJabatan">
+                        <label class="form-label" title="Source : Master Data API /api/v1/Position | tipe jabatan (mTipeJabatan / intTipeJabatanId)">Type Jabatan <span class="required-mark">*</span></label>
+                        <select class="form-select" id="inputTypeJabatan"
+                            title="Source : Master Data API /api/v1/Position | tipe jabatan (mTipeJabatan / intTipeJabatanId)">
                             <option value="">-- Pilih jabatan dulu --</option>
                         </select>
+                        <div class="form-text">LOV tipe mengikuti jabatan terpilih (API Position).</div>
                     </div>
                 </div>
             </div>

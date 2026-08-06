@@ -632,8 +632,37 @@ def extract_modal_fields(html: str) -> list[dict]:
 
 def extract_validations(html: str) -> list[str]:
     vals = []
-    for m in re.finditer(r"Swal\.fire\(['\"]Peringatan['\"],\s*['\"]([^'\"]+)['\"]", html):
+    for m in re.finditer(
+        r"Swal\.fire\(['\"](?:Peringatan|Duplikat|Tidak bisa|Error|Masih bentrok)['\"],\s*['\"]([^'\"]+)['\"]",
+        html,
+    ):
         vals.append(m.group(1))
+    for m in re.finditer(
+        r"Swal\.fire\(['\"](?:Peringatan|Duplikat|Tidak bisa|Error|Masih bentrok)['\"],\s*`([^`]+)`",
+        html,
+    ):
+        msg = m.group(1)
+        msg = re.sub(r'\$\{[^}]+\}', '…', msg)
+        if 'sudah ada' in msg.lower():
+            vals.append('Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header).')
+        elif 'tidak ada slot' in msg.lower():
+            vals.append(
+                'Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal.'
+            )
+        elif 'melebihi tanggal selesai' in msg.lower():
+            vals.append(
+                'Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu.'
+            )
+        elif 'masih bentrok' in msg.lower():
+            vals.append('Setelah digeser masih bentrok. Tutup versi aktif lebih awal.')
+        else:
+            vals.append(msg)
+    for m in re.finditer(r"title:\s*['\"]Periode bentrok['\"]", html):
+        vals.append(
+            'Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — '
+            'pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal.'
+        )
+        break
     for m in re.finditer(r"showFieldError\([^,]+,\s*['\"]([^'\"]+)['\"]", html):
         vals.append(m.group(1))
     for m in re.finditer(r"showFieldError\([^,]+,\s*`([^`]+)`", html):

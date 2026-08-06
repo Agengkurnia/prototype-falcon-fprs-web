@@ -1,14 +1,14 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.5
+### Versi Dokumen: 1.7
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.5 |
+| **Versi** | 1.7 |
 | **Tanggal** | 6 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -20,6 +20,8 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
+| **1.7** | **6 Agustus 2026** | **Tim IT** | Limit: sumber LOV Jabatan/Type dari API `/api/v1/Position` (tooltip + narasi FSD) |
+| **1.6** | **6 Agustus 2026** | **Tim IT** | Limit: screenshot + narasi validasi (field, duplikat, periode bentrok) + History |
 | **1.5** | **6 Agustus 2026** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
 | **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
 | **1.3** | **4 Agustus 2026** | **Tim IT** | Rename **Man Power GT**; tambah modul **Limit**; screenshot ulang 8 modul |
@@ -596,6 +598,8 @@ Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat
 
 Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**. Sumber: `Views/FPRS/MasterData/LimitTargetHarian/index.html`.
 
+> **Integrasi API (rencana):** `/api/v1/Position`
+
 > **localStorage key:** `md_limit_target`
 
 ![Master Data — Limit — Dashboard List](screenshots/ss_49_master_limit_index.png)
@@ -605,11 +609,11 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
-| JABATAN | `Jabatan` | Text | Ya | Kolom grid dashboard list |
-| TYPE JABATAN | `TypeJabatan` | Text | Ya | Kolom grid dashboard list |
-| MIN HARIAN | `MinHarian` | Text | Ya | Kolom grid dashboard list |
-| MAX HARIAN | `MaxHarian` | Text | Ya | Kolom grid dashboard list |
-| ACTIVE | `Active` | Text | Ya | Kolom grid dashboard list |
+| JABATAN | `Jabatan` | Text | Ya | `Master Data API /api/v1/Position` \| `mJabatan.txtJabatanName → mLimitTargetHarian.txtJabatan` |
+| TYPE JABATAN | `TypeJabatan` | Text | Ya | `Master Data API /api/v1/Position` \| `tipe jabatan → mLimitTargetHarian.txtTypeJabatan` |
+| MIN HARIAN | `MinHarian` | Text | Ya | `mLimitTargetHarianVer` \| `intMinimalHarian` |
+| MAX HARIAN | `MaxHarian` | Text | Ya | `mLimitTargetHarianVer` \| `intMaximalHarian` |
+| ACTIVE | `Active` | Text | Ya | `mLimitTargetHarianVer` \| `bitActive (versi berlaku hari ini)` |
 
 #### 3.6.2 Tombol Aksi — Dashboard List
 
@@ -628,8 +632,8 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
-| Jabatan | `inputJabatan` | Dropdown | Ya | (kosong) | Wajib | — |
-| Type Jabatan | `inputTypeJabatan` | Dropdown | Ya | (kosong) | Wajib | — |
+| Jabatan | `inputJabatan` | Dropdown | Ya | (kosong) | Wajib | `Master Data API /api/v1/Position` \| `mJabatan.txtJabatanName` |
+| Type Jabatan | `inputTypeJabatan` | Dropdown | Ya | (kosong) | Wajib | `Master Data API /api/v1/Position` \| `tipe jabatan (mTipeJabatan / intTipeJabatanId)` |
 | Minimal Harian | `inputMin` | Number | Ya | (kosong) | Wajib; min=0 | — |
 | Maximal Harian | `inputMax` | Number | Ya | (kosong) | Wajib; min=0 | — |
 | Target HKE Mingguan | `inputHke` | Number | Ya | (kosong) | Wajib; min=0 | — |
@@ -641,11 +645,19 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD10 | Jabatan dan Type Jabatan wajib diisi. |
-| BR-MD11 | Semua field angka dan periode wajib diisi (≥0). |
-| BR-MD12 | Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
-| BR-MD13 | Tanggal mulai tidak boleh backdate. Minimal hari ini. |
-| BR-MD14 | Tanggal selesai tidak boleh sebelum tanggal mulai. |
+| BR-MD10 | ID limit tidak ditemukan. |
+| BR-MD11 | Data limit tidak ditemukan. |
+| BR-MD12 | Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD13 | Jabatan dan Type Jabatan wajib diisi. |
+| BR-MD14 | Semua field angka dan periode wajib diisi (≥0). |
+| BR-MD15 | Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
+| BR-MD16 | Tanggal mulai tidak boleh backdate. Minimal hari ini. |
+| BR-MD17 | Tanggal selesai tidak boleh sebelum tanggal mulai. |
+| BR-MD18 | Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
+| BR-MD19 | Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
+| BR-MD20 | Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
+| BR-MD21 | Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
+| BR-MD22 | Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
 
 #### 3.6.5 CRUD
 
@@ -660,8 +672,8 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | MD / Motoris (*unik bersama Type) |
-| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | mis. MD Reguler / Motoris Reguler |
+| Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | LOV dari Master Data API `/api/v1/Position` (`mJabatan.txtJabatanName`); *unik bersama Type |
+| Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | LOV tipe jabatan dari API Position (ikut jabatan terpilih) |
 | Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
 | Maximal Harian | `mLimitTargetHarianVer` | `intMaximalHarian` | | ≥ Minimal Harian |
 | Target HKE Mingguan | `mLimitTargetHarianVer` | `intTargetHkeMingguan` | | Hari kerja efektif / minggu |
@@ -671,7 +683,60 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 | Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
 | Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
 
-> Update di UI = **append** baris baru ke `mLimitTargetHarianVer` (bukan overwrite). DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position` (tooltip UI: `Source : Master Data API /api/v1/Position | …`). Nilai yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+
+
+#### 3.6.7 Sumber Data Jabatan & Type Jabatan (Master Data API)
+
+Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type Jabatan** bersumber dari **Master Data API** endpoint **`/api/v1/Position`** (master jabatan / posisi).
+
+| Field UI | Sumber API (rencana produksi) | Persistensi lokal Limit |
+|----------|-------------------------------|-------------------------|
+| Jabatan | `/api/v1/Position` → `mJabatan.txtJabatanName` (mis. MD, Motoris) | Disimpan di `mLimitTargetHarian.txtJabatan` |
+| Type Jabatan | `/api/v1/Position` → tipe jabatan terkait (mis. MD Reguler, Motoris Reguler) | Disimpan di `mLimitTargetHarian.txtTypeJabatan` |
+
+**UI prototipe:**
+
+- Banner info di atas form Header menjelaskan sumber API.
+- Tooltip (`title`) pada label & kontrol: `Source : Master Data API /api/v1/Position | …` — pola sama seperti modul Produk/Alasan.
+- Placeholder opsi: `-- Pilih (Master Data API) --`. Di prototipe opsi masih seed lokal; produksi wajib LOV live dari API.
+
+**Catatan desain:** LOV selalu dari API agar selaras master organisasi; header Limit menyimpan **snapshot teks** jabatan/type agar histori versi tetap terbaca meskipun master Position berubah kemudian.
+
+#### 3.6.8 Narasi Validasi & Alur Versi
+
+Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
+
+**Alur singkat:** isi header (Create) / form versi → klik Save/Update → validasi field → (Update) cek overlap periode versi aktif → simpan atau tampilkan dialog penyelesaian bentrok.
+
+**Validasi field (SweetAlert Peringatan):**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD13 | Jabatan / Type Jabatan kosong | ![Validasi jabatan wajib](screenshots/ss_51_limit_val_jabatan_wajib.png) |
+| BR-MD14 | Angka atau periode kosong / &lt; 0 | ![Validasi field wajib](screenshots/ss_52_limit_val_field_wajib.png) |
+| BR-MD15 | Maximal Harian &lt; Minimal Harian | ![Validasi max &lt; min](screenshots/ss_53_limit_val_max_lt_min.png) |
+| BR-MD16 | Tanggal mulai &lt; hari ini (backdate) | ![Validasi backdate](screenshots/ss_54_limit_val_backdate.png) |
+| BR-MD17 | Tanggal selesai &lt; tanggal mulai | ![Validasi selesai &lt; mulai](screenshots/ss_55_limit_val_selesai_lt_mulai.png) |
+
+**Validasi unik & periode:**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD18 | Create: pasangan Jabatan + Type sudah ada | ![Validasi duplikat](screenshots/ss_56_limit_val_duplikat.png) |
+| BR-MD22 | Update: periode versi baru bentrok dengan versi aktif | ![Validasi periode bentrok](screenshots/ss_57_limit_val_periode_bentrok.png) |
+
+Pada dialog **Periode bentrok**, pengguna memilih:
+
+1. **Tutup versi aktif lebih awal** — `tanggalSelesai` versi lama digeser ke sehari sebelum mulai versi baru, lalu versi baru di-append.
+2. **Geser mulai versi baru** — sistem mengusulkan tanggal mulai = sehari setelah selesai versi aktif (jika masih valid vs hari ini & tanggal selesai).
+3. **Batal** — tidak menyimpan.
+
+**History (view-only):** menampilkan form readonly + panel daftar versi untuk header terpilih.
+
+![Master Data — Limit — History](screenshots/ss_58_master_limit_history.png)
+
+**Pemakaian di dashboard Mobile:** target kunjungan = `minimalHarian` dari versi Limit yang **aktif pada tanggal** filter, untuk jabatan yang dipetakan dari role user (MD → MD/MD Reguler; selain itu → Motoris/Motoris Reguler). Transaksi visit **tidak** menyimpan FK Limit; nilai target di-resolve saat baca KPI.
 
 ### 3.7 Pajak
 
@@ -777,7 +842,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD15 | Nama dan Tipe wajib diisi. |
+| BR-MD23 | Nama dan Tipe wajib diisi. |
 
 #### 3.8.6 CRUD
 
@@ -815,12 +880,20 @@ Rule ID memakai prefix `BR-MD`. Sumber: pesan validasi / SweetAlert di HTML.
 | BR-MD07 | [Master Data — Pegawai] Tidak ada baris data yang dapat diproses. |
 | BR-MD08 | [Master Data — Stokis] File kosong atau format header tidak dikenali. |
 | BR-MD09 | [Master Data — Stokis] Tidak ada baris data yang dapat diproses. |
-| BR-MD10 | [Master Data — Limit] Jabatan dan Type Jabatan wajib diisi. |
-| BR-MD11 | [Master Data — Limit] Semua field angka dan periode wajib diisi (≥0). |
-| BR-MD12 | [Master Data — Limit] Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
-| BR-MD13 | [Master Data — Limit] Tanggal mulai tidak boleh backdate. Minimal hari ini. |
-| BR-MD14 | [Master Data — Limit] Tanggal selesai tidak boleh sebelum tanggal mulai. |
-| BR-MD15 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
+| BR-MD10 | [Master Data — Limit] ID limit tidak ditemukan. |
+| BR-MD11 | [Master Data — Limit] Data limit tidak ditemukan. |
+| BR-MD12 | [Master Data — Limit] Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD13 | [Master Data — Limit] Jabatan dan Type Jabatan wajib diisi. |
+| BR-MD14 | [Master Data — Limit] Semua field angka dan periode wajib diisi (≥0). |
+| BR-MD15 | [Master Data — Limit] Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
+| BR-MD16 | [Master Data — Limit] Tanggal mulai tidak boleh backdate. Minimal hari ini. |
+| BR-MD17 | [Master Data — Limit] Tanggal selesai tidak boleh sebelum tanggal mulai. |
+| BR-MD18 | [Master Data — Limit] Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
+| BR-MD19 | [Master Data — Limit] Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
+| BR-MD20 | [Master Data — Limit] Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
+| BR-MD21 | [Master Data — Limit] Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
+| BR-MD22 | [Master Data — Limit] Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
+| BR-MD23 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
 
 ### 4.2 Aturan Produksi (di luar prototipe)
 
@@ -839,7 +912,7 @@ Aturan berikut **wajib** di backend MAVEN / kebijakan operasional, meskipun prot
 | BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |
 | BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |
 | BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |
-| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; tanggal mulai tidak backdate. |
+| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |
 
 ---
 
@@ -905,6 +978,7 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 | Endpoint | Modul FPRS | Arah | Digunakan untuk |
 |----------|------------|------|-----------------|
 | `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
+| `GET /api/v1/Position` | Limit | Inbound LOV | Dropdown **Jabatan** & **Type Jabatan** pada form Create/Detail |
 | `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
 | `/api/v1/Tax` | Pajak | Opsional sync | Referensi skema pajak; v1 boleh fully lokal di `mPajak` |
 | `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |
