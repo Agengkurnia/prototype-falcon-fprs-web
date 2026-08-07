@@ -116,10 +116,10 @@ MODULE_ENRICHMENT = {
         'menggunakan **NIK**. Halaman `detail.html` menampilkan data pegawai secara read-only beserta riwayat status.'
     ),
     'master-channel': (
-        'Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK). '
-        'Tidak terintegrasi Master Data API. Modal edit menampilkan bit **Active** dan daftar pelanggan '
-        'ter-paginasi yang tergabung pada channel tersebut (relasi 1 pelanggan → 1 channel, 1 channel → banyak '
-        'pelanggan) berdasarkan data `md_pelanggan`.'
+        'Modul **Channel** menampilkan klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK) '
+        'yang bersumber dari **Master Data API** (`/api/v1/Channel`). Web Admin bersifat **view-only** — '
+        'tidak ada Tambah/Ubah/Hapus. Aksi baris hanya **Detail** (modal read-only) yang menampilkan bit **Active** '
+        'dan daftar pelanggan ter-paginasi pada channel tersebut (relasi 1 pelanggan → 1 channel) dari `md_pelanggan`.'
     ),
     'master-stokis': (
         'Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat stok). Menampilkan '
@@ -190,10 +190,10 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'master-channel': {
         'purpose': (
-            'Mengelola daftar channel pelanggan (MT/GT/SPC/MED/GI/ECOM, dll.) untuk segmentasi dan kebijakan '
-            'penjualan. Setiap pelanggan tergabung pada tepat satu channel.'
+            'Menampilkan master channel pelanggan dari Master Data API untuk segmentasi penjualan. '
+            'Web Admin view-only (list + detail pelanggan per channel); create/update hanya di Master Data.'
         ),
-        'users': 'Admin Master Data, Sales Operations.',
+        'users': 'Admin Master Data, Sales Operations (read).',
     },
     'master-pegawai': {
         'purpose': (
@@ -294,10 +294,9 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
 
 MODAL_FORM_INTRO = {
     'master-channel': (
-        '**Dashboard list** menampilkan DataTable channel. **Form modal** muncul di atas halaman yang sama '
-        '(bukan halaman terpisah). Mode **Tambah**: pengguna mengisi Nama Channel dan Status Active/Inactive. '
-        'Mode **Ubah**: field yang sama ditampilkan terisi, ditambah panel **Pelanggan pada Channel Ini** '
-        '(read-only, paginasi) yang menampilkan outlet dengan `channel` yang cocok.'
+        '**Dashboard list** menampilkan DataTable channel (sumber API). **Modal Detail** (view-only) muncul di atas '
+        'halaman yang sama: Nama Channel & Status read-only, plus panel **Pelanggan pada Channel Ini** '
+        '(paginasi) untuk outlet dengan `channel` yang cocok. Tidak ada tombol Tambah/Simpan.'
     ),
     'master-pajak': (
         '**Dashboard list** menampilkan daftar skema pajak. **Form modal** untuk Tambah/Ubah berisi '
@@ -330,6 +329,8 @@ def apply_fsd_terms(text: str) -> str:
 
 
 def form_section_label(mod: dict, form_html: str, ui_type: str) -> str:
+    if mod.get('id') == 'master-channel':
+        return 'Modal Detail (view-only)'
     if ui_type == 'modal':
         return 'Form Modal (Tambah / Ubah)'
     if form_html and (' disabled' in form_html or 'readonly' in form_html):
@@ -912,10 +913,10 @@ def crud_table(mod: dict) -> str:
         ]
     elif mid == 'master-channel':
         rows = [
-            ('Create', 'Klik Tambah → isi modal → Simpan', 'Admin', 'Persist ke localStorage'),
-            ('Read', 'dashboard list (DataTable); modal edit menampilkan pelanggan ter-paginasi', 'Semua role', '—'),
-            ('Update', 'Klik Edit → ubah nama/bit Active → Simpan', 'Admin', '—'),
-            ('Delete', '—', '—', 'Tombol hapus dihilangkan; gunakan bit Active'),
+            ('Create', '—', '—', 'Dikelola di Master Data API `/api/v1/Channel`; tidak tersedia di Web Admin'),
+            ('Read', 'dashboard list (DataTable) + modal Detail (pelanggan ter-paginasi)', 'Semua role dengan bitView', 'View-only'),
+            ('Update', '—', '—', 'Tidak tersedia di Web Admin'),
+            ('Delete', '—', '—', 'Tidak tersedia di Web Admin'),
         ]
     elif mid == 'penjualan-faktur':
         rows = [
@@ -1045,7 +1046,7 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
 
     if ui_type == 'modal':
         fields = extract_modal_fields(index_html)
-        form_label = 'Form Modal (Tambah / Ubah)'
+        form_label = form_section_label(mod, index_html, ui_type)
         ctx_buttons = filter_buttons_by_context(all_buttons, 'modal')
     elif has_detail_view:
         fields = extract_fields(detail_html)

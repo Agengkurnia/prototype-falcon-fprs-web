@@ -106,7 +106,7 @@ def append_unique_buttons(target: list, extras: list) -> None:
 
 
 MODAL_SHOT_MODE = {
-    'master-channel': 'edit',
+    'master-channel': 'view',  # view-only — Detail (eye), bukan Edit/Tambah
 }
 
 
@@ -210,17 +210,26 @@ def open_modal_for_shot(page, mod_id: str):
     mode = MODAL_SHOT_MODE.get(mod_id, 'add')
     wait_ready(page)
 
-    if mode == 'edit':
+    if mode == 'view':
+        view = page.locator(
+            '#tblBody tr .btn-action-view, #tblBody tr button.btn-action-view, '
+            '#tbl tbody tr .btn-action-view'
+        ).first
+        if view.count() and view.is_visible():
+            view.click(timeout=8000)
+        else:
+            raise RuntimeError('Tombol Detail (view) tidak ditemukan untuk shot modal')
+        if mod_id == 'master-channel':
+            try:
+                page.wait_for_selector('#custSection', timeout=10000)
+            except Exception:
+                pass
+    elif mode == 'edit':
         edit = page.locator('#tblBody tr .btn-action-edit, #tblBody tr button.btn-action-edit').first
         if edit.count() and edit.is_visible():
             edit.click(timeout=8000)
         else:
             raise RuntimeError('Tombol Edit tidak ditemukan untuk shot modal')
-        if mod_id == 'master-channel':
-            try:
-                page.wait_for_selector('#custSection:not(.d-none)', timeout=10000)
-            except Exception:
-                pass
     else:
         tambah = page.locator('button.btn-success, a.btn-success').filter(
             has_text=re.compile(r'Tambah', re.I)

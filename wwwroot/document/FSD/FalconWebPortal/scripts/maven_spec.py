@@ -77,9 +77,11 @@ MAVEN_MAPPING = {
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Nama Channel | `mChannel` | `txtNama` | UQ | |
+| Nama Channel | `mChannel` | `txtNama` | UQ | Sumber Master Data API `/api/v1/Channel` (sync/read) |
 | Total Pelanggan | — | — | | Kolom turunan COUNT(`mPelanggan`) |
-| Status | `mChannel` | `bitActive` | | |
+| Status | `mChannel` | `bitActive` | | Dari API; tidak diubah di Web Admin |
+
+> Web Admin **view-only**. Create/Update Channel dilakukan di Master Data; MAVEN sync/cache ke `mChannel` untuk FK `mPelanggan.intChannelID`.
 ''',
     'master-pegawai': '''#### 3.4.6 Mapping Database MAVEN
 

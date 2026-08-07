@@ -16,30 +16,57 @@
     <div id="app-content">
 
 <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-<div><h2 class="title-page mb-1">Channel</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Channel</li></ol></nav></div>
-<button class="btn btn-success" onclick="openModal()"><i class="fa fa-plus me-1"></i> Tambah Channel</button>
+<div>
+    <h2 class="title-page mb-1">Channel</h2>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+            <li class="breadcrumb-item">Data Master</li>
+            <li class="breadcrumb-item active">Channel</li>
+        </ol>
+    </nav>
+</div>
+<span class="badge bg-label-info align-self-center"><i class="fa fa-link me-1"></i> View-only — sumber Master Data API</span>
+</div>
+
+<div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
+    <i class="fa fa-link me-2 text-info"></i>
+    <strong>Sumber data:</strong> Master Channel diambil dari
+    <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Channel</code></a>.
+    Web Admin <strong>tidak</strong> menambah/mengubah/menghapus channel — hanya menampilkan daftar &amp; detail (termasuk pelanggan terkait).
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 
 <div class="card"><div class="card-body"><div class="table-responsive">
 <table class="table table-bordered table-hover" id="tbl">
-<thead><tr><th style="width:50px;">NO</th><th title="Source : mChannel | txtNama">NAMA CHANNEL</th><th style="text-align:center;" title="Source : mPelanggan | COUNT(*) (derived)">TOTAL PELANGGAN</th><th style="width:100px;" title="Source : mChannel | bitActive">STATUS</th><th style="width:80px;text-align:center;">AKSI</th></tr></thead>
+<thead><tr>
+    <th style="width:50px;">NO</th>
+    <th title="Source : Master Data API /api/v1/Channel | mChannel.txtNama">NAMA CHANNEL</th>
+    <th style="text-align:center;" title="Source : mPelanggan | COUNT(*) (derived)">TOTAL PELANGGAN</th>
+    <th style="width:100px;" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive">STATUS</th>
+    <th style="width:80px;text-align:center;">AKSI</th>
+</tr></thead>
 <tbody id="tblBody"></tbody>
 </table></div></div></div>
 
 <div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
-<div class="modal-header"><h5 class="modal-title" id="modalTitle">Tambah Channel</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-header"><h5 class="modal-title" id="modalTitle">Detail Channel</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
 <div class="modal-body">
 <input type="hidden" id="editId"/>
-<div class="mb-3"><label class="form-label" title="Source : mChannel | txtNama">Nama Channel <span class="required-mark">*</span></label><input type="text" class="form-control" id="inputNama" placeholder="Nama channel..." title="Source : mChannel | txtNama"/></div>
 <div class="mb-3">
-    <label class="form-label d-block" title="Source : mChannel | bitActive">Status</label>
+    <label class="form-label" title="Source : Master Data API /api/v1/Channel | mChannel.txtNama">Nama Channel</label>
+    <input type="text" class="form-control bg-light" id="inputNama" readonly disabled title="Source : Master Data API /api/v1/Channel | mChannel.txtNama"/>
+</div>
+<div class="mb-3">
+    <label class="form-label d-block" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive">Status</label>
     <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="inputActive" checked onchange="updateActiveLabel()" style="cursor:pointer;" title="Source : mChannel | bitActive"/>
+        <input class="form-check-input" type="checkbox" role="switch" id="inputActive" disabled style="cursor:not-allowed;" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive"/>
         <label class="form-check-label" for="inputActive" id="activeLabel">Active</label>
     </div>
+    <div class="form-text">Data channel dikelola di Master Data (API) — tidak dapat diubah di Web Admin.</div>
 </div>
 
-<div id="custSection" class="d-none">
+<div id="custSection">
     <hr/>
     <div class="d-flex align-items-center justify-content-between mb-2">
         <h6 class="mb-0 text-success fw-bold"><i class="fa fa-users me-1"></i> Pelanggan pada Channel Ini</h6>
@@ -60,7 +87,7 @@
     </div>
 </div>
 </div>
-<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button><button class="btn btn-success" onclick="saveItem()"><i class="fa fa-save me-1"></i> Simpan</button></div>
+<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button></div>
 </div></div></div>
     </div>
     <script src="../../../../wwwroot/js/layout.js"></script>
@@ -106,7 +133,7 @@ function render(){
     getData().forEach((item,i)=>{
         const total=(item.totalPelanggan!=null)?item.totalPelanggan:pelangganOf(item.nama).length;
         const badge=(item.active!==false)?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';
-        $('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td class="text-center">${total}</td><td>${badge}</td><td><div class="row-actions"><button class="btn-action btn-action-edit" onclick="editItem('${item.id}')" title="Edit"><i class="fa fa-pen"></i></button></div></td></tr>`);
+        $('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td class="text-center">${total}</td><td>${badge}</td><td><div class="row-actions"><button type="button" class="btn-action btn-action-view" onclick="viewItem('${item.id}')" title="Detail"><i class="fa fa-eye"></i></button></div></td></tr>`);
     });
     $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[4]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
 }
@@ -133,25 +160,23 @@ function custGoto(dir){custPage+=dir;renderCustomers();}
 
 function updateActiveLabel(){document.getElementById('activeLabel').textContent=document.getElementById('inputActive').checked?'Active':'Inactive';}
 
-function openModal(item=null){
-    document.getElementById('editId').value=item?item.id:'';
-    document.getElementById('inputNama').value=item?item.nama:'';
-    document.getElementById('inputActive').checked=item?(item.active!==false):true;
+/** View-only detail (sumber Master Data API — tidak ada Tambah/Ubah). */
+function viewItem(id){
+    const item=getData().find(d=>String(d.id)===String(id));
+    if(!item)return;
+    document.getElementById('editId').value=item.id;
+    document.getElementById('inputNama').value=item.nama||'';
+    document.getElementById('inputActive').checked=item.active!==false;
     updateActiveLabel();
-    document.getElementById('modalTitle').textContent=item?'Ubah Channel':'Tambah Channel';
-    if(item){
-        custCurrentChannel=item.nama;custPage=1;
-        document.getElementById('custSection').classList.remove('d-none');
-        renderCustomers();
-    }else{
-        document.getElementById('custSection').classList.add('d-none');
-    }
+    document.getElementById('modalTitle').textContent='Detail Channel';
+    custCurrentChannel=item.nama;custPage=1;
+    renderCustomers();
     bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
 }
-function editItem(id){const item=getData().find(d=>String(d.id)===String(id));if(item)openModal(item);}
-function saveItem(){const nama=document.getElementById('inputNama').value.trim();if(!nama){Swal.fire('Peringatan','Nama channel wajib diisi.','warning');return;}const data=getData();const id=document.getElementById('editId').value;const obj={id:id?(isNaN(id)?id:parseInt(id)):Date.now(),nama,active:document.getElementById('inputActive').checked};if(id){const idx=data.findIndex(d=>String(d.id)===String(id));if(idx>-1)data[idx]={...data[idx],...obj};}else{data.push(obj);}saveData(data);bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).hide();render();Swal.fire({icon:'success',title:'Berhasil!',timer:1500,showConfirmButton:false});}
+
 $(document).ready(loadData);
-window.openModal = openModal; window.editItem = editItem; window.saveItem = saveItem; window.custGoto = custGoto; window.updateActiveLabel = updateActiveLabel;
+window.viewItem = viewItem;
+window.custGoto = custGoto;
         });
     </script>
 </body>

@@ -97,6 +97,7 @@
       "type": "modal",
       "htmlPath": "Views/FPRS/MasterData/Channel/index.html",
       "apiEndpoint": "/api/v1/Channel",
+      "note": "View-only; sumber Master Data API /api/v1/Channel; Detail modal + daftar pelanggan terkait; tanpa Tambah/Edit/Hapus",
       "storageKey": "md_channel",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [

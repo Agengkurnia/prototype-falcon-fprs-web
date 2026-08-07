@@ -48,9 +48,9 @@ def build() -> str:
                 'brd_no': '2026.SHP-FSD.0101',
                 'pid_no': '2026.SHP-PID.0101',
                 'prepared_by': 'Tim IT – Man Power GT',
-                'date': '06/08/2026',
-                'revision_date': '6 Agustus 2026',
-                'revision_desc': 'v1.7 – Limit: LOV Jabatan/Type dari API /api/v1/Position (tooltip + narasi)',
+                'date': '07/08/2026',
+                'revision_date': '7 Agustus 2026',
+                'revision_desc': 'v1.8 – Channel view-only (API /api/v1/Channel); hapus Tambah/Edit',
             },
             plantuml_handlers=[
                 PlantumlHandler(
