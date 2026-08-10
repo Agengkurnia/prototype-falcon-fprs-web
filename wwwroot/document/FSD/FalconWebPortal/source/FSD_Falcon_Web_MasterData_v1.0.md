@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.7
+### Versi Dokumen: 1.9
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.7 |
-| **Tanggal** | 6 Agustus 2026 |
+| **Versi** | 1.9 |
+| **Tanggal** | 10 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -20,6 +20,8 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
+| **1.9** | **10 Agustus 2026** | **Tim IT** | Limit: field **Nama** wajib & unik global (`txtNama`); kolom list + input Header |
+| **1.8** | **7 Agustus 2026** | **Tim IT** | Channel: **view-only** (sumber API `/api/v1/Channel`); hapus Tambah/Edit di UI + FSD |
 | **1.7** | **6 Agustus 2026** | **Tim IT** | Limit: sumber LOV Jabatan/Type dari API `/api/v1/Position` (tooltip + narasi FSD) |
 | **1.6** | **6 Agustus 2026** | **Tim IT** | Limit: screenshot + narasi validasi (field, duplikat, periode bentrok) + History |
 | **1.5** | **6 Agustus 2026** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
@@ -70,7 +72,7 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MA
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
-| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
+| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan & Channel (API) |
 | Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
 | Desain database produksi MAVEN (PostgreSQL + EF Core) | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
 | Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
@@ -109,9 +111,10 @@ Modul Data Master memakai **empat pola** pengelolaan data:
 | Pola | Modul | Cara Kelola | Sumber kebenaran (produksi) |
 |------|-------|-------------|------------------------------|
 | Form (add/edit) | Produk | Halaman detail fleksibel + LOV SKU | Katalog SKU dari Master Data API; harga/pajak/status di DB FPRS |
-| Modal CRUD | Channel, Pajak, Alasan | Modal di dalam Index | Tabel lokal MAVEN (`mChannel`, `mPajak`, `mAlasan`) |
+| Modal CRUD | Pajak, Alasan | Modal di dalam Index | Tabel lokal MAVEN (`mPajak`, `mAlasan`) |
 | Upload-only (CSV + history) | Pegawai, Stokis | Download/Upload CSV, status disinkronkan | File CSV sebagai input; hasil di `mPegawai` / `mStokis` + tabel riwayat |
-| View-only (sumber mobile) | Pelanggan | Detail read-only | Mobile SFA → sync ke `mPelanggan` (v1: seed/import manual) |
+| View-only (sumber API / mobile) | Channel, Pelanggan | List + detail read-only | Channel: Master Data API `/api/v1/Channel`; Pelanggan: Mobile SFA → `mPelanggan` |
+| Form + versi (append-only) | Limit | Header + versi periode | LOV jabatan dari API Position; persist `mLimitTargetHarian` / Ver |
 
 ### 2.3 Business Flow (Swimlane)
 
@@ -156,9 +159,11 @@ Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan 
 | Pola | Trigger | Validasi utama | Hasil | Approval |
 |------|---------|----------------|-------|----------|
 | Form Produk | Create / Edit | Kode dari LOV API; harga beli > 0; kode unik | Insert/update `mProduk` | Tidak ada — langsung simpan |
-| Modal Channel/Pajak/Alasan | Tambah / Ubah (/ Hapus) | Field wajib; unik nama/kode; Pajak cek FK produk sebelum hapus | Persist ke tabel terkait | Tidak ada |
+| Modal Pajak/Alasan | Tambah / Ubah (/ Hapus) | Field wajib; unik nama/kode; Pajak cek FK produk sebelum hapus | Persist ke tabel terkait | Tidak ada |
 | CSV Pegawai/Stokis | Upload file | Header dikenali; baris wajib; Stokis: GPS unik | Upsert Active; absen di file → Inactive + hist | Tidak ada |
+| Channel | Buka list/detail | — (read-only; sumber API) | Tampil / sync dari `/api/v1/Channel` → `mChannel` | N/A |
 | Pelanggan | Buka list/detail | — (read-only) | Tampil dari `mPelanggan` | N/A |
+| Limit | Create header / append versi | Nama wajib+unik global; Jabatan+type unik; Max≥Min; no backdate; overlap dialog | `mLimitTargetHarian` + Ver | Tidak ada |
 
 **Catatan approval:** modul Data Master **tidak** memakai workflow approval multi-level. Perubahan langsung tersimpan jika user punya `bitEdit` (atau hak upload untuk Pegawai/Stokis). Audit trail: `txtInsertedBy` / `txtUpdatedBy` / `dtInserted` / `dtUpdated`.
 
@@ -344,12 +349,12 @@ Data pelanggan/outlet **diinput dari aplikasi mobile** (SFA), sehingga Web Porta
 
 Modul **Channel** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal**. Sumber: `Views/FPRS/MasterData/Channel/index.html`.
 
-Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK). Tidak terintegrasi Master Data API. Modal edit menampilkan bit **Active** dan daftar pelanggan ter-paginasi yang tergabung pada channel tersebut (relasi 1 pelanggan → 1 channel, 1 channel → banyak pelanggan) berdasarkan data `md_pelanggan`.
+Modul **Channel** menampilkan klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK) yang bersumber dari **Master Data API** (`/api/v1/Channel`). Web Admin bersifat **view-only** — tidak ada Tambah/Ubah/Hapus. Aksi baris hanya **Detail** (modal read-only) yang menampilkan bit **Active** dan daftar pelanggan ter-paginasi pada channel tersebut (relasi 1 pelanggan → 1 channel) dari `md_pelanggan`.
 
 | Aspek | Keterangan |
 |-------|------------|
-| **Tujuan Form** | Mengelola daftar channel pelanggan (MT/GT/SPC/MED/GI/ECOM, dll.) untuk segmentasi dan kebijakan penjualan. Setiap pelanggan tergabung pada tepat satu channel. |
-| **Pengguna** | Admin Master Data, Sales Operations. |
+| **Tujuan Form** | Menampilkan master channel pelanggan dari Master Data API untuk segmentasi penjualan. Web Admin view-only (list + detail pelanggan per channel); create/update hanya di Master Data. |
+| **Pengguna** | Admin Master Data, Sales Operations (read). |
 
 
 > **Integrasi API (rencana):** `/api/v1/Channel`
@@ -364,9 +369,9 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
 | NO | `No` | Text | Ya | Kolom grid dashboard list |
-| NAMA CHANNEL | `NamaChannel` | Text | Ya | `mChannel` \| `txtNama` |
+| NAMA CHANNEL | `NamaChannel` | Text | Ya | `Master Data API /api/v1/Channel` \| `mChannel.txtNama` |
 | TOTAL PELANGGAN | `TotalPelanggan` | Text | Ya | `mPelanggan` \| `COUNT(*) (derived)` |
-| STATUS | `Status` | Text | Ya | `mChannel` \| `bitActive` |
+| STATUS | `Status` | Text | Ya | `Master Data API /api/v1/Channel` \| `mChannel.bitActive` |
 
 #### 3.3.2 Tombol Aksi — Dashboard List
 
@@ -374,19 +379,20 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 |----------|--------|--------------|-------------|--------|
 | ![](screenshots/ss_btn_channel_tambah-channel.png) | Tambah Channel | `openModal()` | btn-success | Membuka modal form untuk menambah data baru. |
 | ![](screenshots/ss_btn_channel_edit.png) | Edit | `editItem('1')` | btn-outline-secondary | Membuka modal form dalam mode ubah untuk baris yang dipilih. |
+| — | Tutup | `—` | btn-secondary | Menjalankan aksi Tutup. |
 
 ![Master Data — Channel — Form Modal (full page)](screenshots/ss_48_master_channel_modal.png)
 
 
-**Dashboard list** menampilkan DataTable channel. **Form modal** muncul di atas halaman yang sama (bukan halaman terpisah). Mode **Tambah**: pengguna mengisi Nama Channel dan Status Active/Inactive. Mode **Ubah**: field yang sama ditampilkan terisi, ditambah panel **Pelanggan pada Channel Ini** (read-only, paginasi) yang menampilkan outlet dengan `channel` yang cocok.
+**Dashboard list** menampilkan DataTable channel (sumber API). **Modal Detail** (view-only) muncul di atas halaman yang sama: Nama Channel & Status read-only, plus panel **Pelanggan pada Channel Ini** (paginasi) untuk outlet dengan `channel` yang cocok. Tidak ada tombol Tambah/Simpan.
 
 
-#### 3.3.3 Form Modal (Tambah / Ubah)
+#### 3.3.3 Modal Detail (view-only)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
-| Nama Channel | `inputNama` | Text | Ya | (kosong) | Wajib | `mChannel` \| `txtNama` |
-| Status | `inputActive` | Text | Tidak | (kosong) | — | `mChannel` \| `bitActive` |
+| Nama Channel | `inputNama` | Text (readonly) | Tidak | (kosong) | readonly | `Master Data API /api/v1/Channel` \| `mChannel.txtNama` |
+| Status | `inputActive` | Text | Tidak | (kosong) | readonly | `Master Data API /api/v1/Channel` \| `mChannel.bitActive` |
 | Pelanggan pada Channel Ini | `custSection` | Sub-tabel (read-only) | — | — | — | Hanya mode Ubah; data dari `md_pelanggan`, paginasi 5 baris |
 
 #### 3.3.4 Tombol Aksi — Form Modal
@@ -395,27 +401,21 @@ Modul **Channel** mengelola klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-G
 |----------|--------|--------------|-------------|--------|
 | ![](screenshots/ss_btn_channel_simpan.png) | Simpan | `saveItem()` | btn-success | Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi. |
 
-#### 3.3.5 Business Rules
-
-| Rule ID | Aturan |
-|---------|--------|
-| BR-MD05 | Nama channel wajib diisi. |
-
-#### 3.3.6 CRUD
+#### 3.3.5 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
-| **Create** | Klik Tambah → isi modal → Simpan | Admin | Persist ke localStorage |
-| **Read** | dashboard list (DataTable); modal edit menampilkan pelanggan ter-paginasi | Semua role | — |
-| **Update** | Klik Edit → ubah nama/bit Active → Simpan | Admin | — |
+| **Read** | dashboard list (DataTable) + modal Detail (pelanggan ter-paginasi) | Semua role dengan bitView | View-only |
 
 #### 3.3.6 Mapping Database MAVEN
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Nama Channel | `mChannel` | `txtNama` | UQ | |
+| Nama Channel | `mChannel` | `txtNama` | UQ | Sumber Master Data API `/api/v1/Channel` (sync/read) |
 | Total Pelanggan | — | — | | Kolom turunan COUNT(`mPelanggan`) |
-| Status | `mChannel` | `bitActive` | | |
+| Status | `mChannel` | `bitActive` | | Dari API; tidak diubah di Web Admin |
+
+> Web Admin **view-only**. Create/Update Channel dilakukan di Master Data; MAVEN sync/cache ke `mChannel` untuk FK `mPelanggan.intChannelID`.
 
 ### 3.4 Pegawai
 
@@ -480,8 +480,8 @@ Master pegawai/sales force bersifat **upload-only** (pola seperti Master Stokis)
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD06 | File kosong atau format header tidak dikenali. |
-| BR-MD07 | Tidak ada baris data yang dapat diproses. |
+| BR-MD05 | File kosong atau format header tidak dikenali. |
+| BR-MD06 | Tidak ada baris data yang dapat diproses. |
 
 #### 3.4.6 CRUD
 
@@ -570,8 +570,8 @@ Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD08 | File kosong atau format header tidak dikenali. |
-| BR-MD09 | Tidak ada baris data yang dapat diproses. |
+| BR-MD07 | File kosong atau format header tidak dikenali. |
+| BR-MD08 | Tidak ada baris data yang dapat diproses. |
 
 #### 3.5.6 CRUD
 
@@ -609,6 +609,7 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Kolom | Field Key | Render | Sortable | Keterangan |
 |-------|-----------|--------|----------|------------|
+| NAMA | `Nama` | Text | Ya | Kolom grid dashboard list |
 | JABATAN | `Jabatan` | Text | Ya | `Master Data API /api/v1/Position` \| `mJabatan.txtJabatanName → mLimitTargetHarian.txtJabatan` |
 | TYPE JABATAN | `TypeJabatan` | Text | Ya | `Master Data API /api/v1/Position` \| `tipe jabatan → mLimitTargetHarian.txtTypeJabatan` |
 | MIN HARIAN | `MinHarian` | Text | Ya | `mLimitTargetHarianVer` \| `intMinimalHarian` |
@@ -632,6 +633,7 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
+| Nama | `inputNama` | Text | Ya | (kosong) | Wajib; maks. 150 karakter | — |
 | Jabatan | `inputJabatan` | Dropdown | Ya | (kosong) | Wajib | `Master Data API /api/v1/Position` \| `mJabatan.txtJabatanName` |
 | Type Jabatan | `inputTypeJabatan` | Dropdown | Ya | (kosong) | Wajib | `Master Data API /api/v1/Position` \| `tipe jabatan (mTipeJabatan / intTipeJabatanId)` |
 | Minimal Harian | `inputMin` | Number | Ya | (kosong) | Wajib; min=0 | — |
@@ -645,19 +647,21 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD10 | ID limit tidak ditemukan. |
-| BR-MD11 | Data limit tidak ditemukan. |
-| BR-MD12 | Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD09 | ID limit tidak ditemukan. |
+| BR-MD10 | Data limit tidak ditemukan. |
+| BR-MD11 | Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD12 | Nama Limit wajib diisi. |
 | BR-MD13 | Jabatan dan Type Jabatan wajib diisi. |
 | BR-MD14 | Semua field angka dan periode wajib diisi (≥0). |
 | BR-MD15 | Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
 | BR-MD16 | Tanggal mulai tidak boleh backdate. Minimal hari ini. |
 | BR-MD17 | Tanggal selesai tidak boleh sebelum tanggal mulai. |
-| BR-MD18 | Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
-| BR-MD19 | Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
-| BR-MD20 | Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
-| BR-MD21 | Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
-| BR-MD22 | Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
+| BR-MD18 | Nama Limit sudah dipakai (unik global). |
+| BR-MD19 | Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
+| BR-MD20 | Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
+| BR-MD21 | Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
+| BR-MD22 | Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
+| BR-MD23 | Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
 
 #### 3.6.5 CRUD
 
@@ -672,6 +676,7 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
+| Nama | `mLimitTargetHarian` | `txtNama` | UQ | Wajib; unik global (case-insensitive di UI) |
 | Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | LOV dari Master Data API `/api/v1/Position` (`mJabatan.txtJabatanName`); *unik bersama Type |
 | Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | LOV tipe jabatan dari API Position (ikut jabatan terpilih) |
 | Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
@@ -683,7 +688,7 @@ Modul **Limit** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**.
 | Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
 | Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
 
-> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position` (tooltip UI: `Source : Master Data API /api/v1/Position | …`). Nilai yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position`. **Nama** = input lokal wajib & unik global (`txtNama`). Nilai jabatan/type yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
 
 
 #### 3.6.7 Sumber Data Jabatan & Type Jabatan (Master Data API)
@@ -692,6 +697,7 @@ Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type 
 
 | Field UI | Sumber API (rencana produksi) | Persistensi lokal Limit |
 |----------|-------------------------------|-------------------------|
+| Nama | Input lokal (wajib, unik global) | Disimpan di `mLimitTargetHarian.txtNama` |
 | Jabatan | `/api/v1/Position` → `mJabatan.txtJabatanName` (mis. MD, Motoris) | Disimpan di `mLimitTargetHarian.txtJabatan` |
 | Type Jabatan | `/api/v1/Position` → tipe jabatan terkait (mis. MD Reguler, Motoris Reguler) | Disimpan di `mLimitTargetHarian.txtTypeJabatan` |
 
@@ -705,7 +711,7 @@ Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type 
 
 #### 3.6.8 Narasi Validasi & Alur Versi
 
-Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
+Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**, dengan **Nama** header wajib & unik global. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
 
 **Alur singkat:** isi header (Create) / form versi → klik Save/Update → validasi field → (Update) cek overlap periode versi aktif → simpan atau tampilkan dialog penyelesaian bentrok.
 
@@ -713,6 +719,7 @@ Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**
 
 | Rule ID | Kondisi | Tampilan |
 |---------|---------|----------|
+| BR-MD12 | Nama Limit kosong | (Swal: Nama Limit wajib diisi) |
 | BR-MD13 | Jabatan / Type Jabatan kosong | ![Validasi jabatan wajib](screenshots/ss_51_limit_val_jabatan_wajib.png) |
 | BR-MD14 | Angka atau periode kosong / &lt; 0 | ![Validasi field wajib](screenshots/ss_52_limit_val_field_wajib.png) |
 | BR-MD15 | Maximal Harian &lt; Minimal Harian | ![Validasi max &lt; min](screenshots/ss_53_limit_val_max_lt_min.png) |
@@ -723,6 +730,7 @@ Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**
 
 | Rule ID | Kondisi | Tampilan |
 |---------|---------|----------|
+| BR-MD18a | Create/Update: Nama Limit sudah dipakai (unik global) | (Swal Duplikat Nama) |
 | BR-MD18 | Create: pasangan Jabatan + Type sudah ada | ![Validasi duplikat](screenshots/ss_56_limit_val_duplikat.png) |
 | BR-MD22 | Update: periode versi baru bentrok dengan versi aktif | ![Validasi periode bentrok](screenshots/ss_57_limit_val_periode_bentrok.png) |
 
@@ -842,7 +850,7 @@ Modul **Alasan** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **modal*
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-MD23 | Nama dan Tipe wajib diisi. |
+| BR-MD24 | Nama dan Tipe wajib diisi. |
 
 #### 3.8.6 CRUD
 
@@ -875,25 +883,26 @@ Rule ID memakai prefix `BR-MD`. Sumber: pesan validasi / SweetAlert di HTML.
 | BR-MD02 | [Master Data — Produk] Data produk belum termuat. Pilih ulang Kode Produk. |
 | BR-MD03 | [Master Data — Produk] Harga beli harus lebih dari 0. |
 | BR-MD04 | [Master Data — Produk] Kode "${kode}" sudah terdaftar pada Master Produk. |
-| BR-MD05 | [Master Data — Channel] Nama channel wajib diisi. |
-| BR-MD06 | [Master Data — Pegawai] File kosong atau format header tidak dikenali. |
-| BR-MD07 | [Master Data — Pegawai] Tidak ada baris data yang dapat diproses. |
-| BR-MD08 | [Master Data — Stokis] File kosong atau format header tidak dikenali. |
-| BR-MD09 | [Master Data — Stokis] Tidak ada baris data yang dapat diproses. |
-| BR-MD10 | [Master Data — Limit] ID limit tidak ditemukan. |
-| BR-MD11 | [Master Data — Limit] Data limit tidak ditemukan. |
-| BR-MD12 | [Master Data — Limit] Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD05 | [Master Data — Pegawai] File kosong atau format header tidak dikenali. |
+| BR-MD06 | [Master Data — Pegawai] Tidak ada baris data yang dapat diproses. |
+| BR-MD07 | [Master Data — Stokis] File kosong atau format header tidak dikenali. |
+| BR-MD08 | [Master Data — Stokis] Tidak ada baris data yang dapat diproses. |
+| BR-MD09 | [Master Data — Limit] ID limit tidak ditemukan. |
+| BR-MD10 | [Master Data — Limit] Data limit tidak ditemukan. |
+| BR-MD11 | [Master Data — Limit] Menutup versi aktif akan membuat periode versi lama tidak valid. Geser tanggal mulai versi baru saja. |
+| BR-MD12 | [Master Data — Limit] Nama Limit wajib diisi. |
 | BR-MD13 | [Master Data — Limit] Jabatan dan Type Jabatan wajib diisi. |
 | BR-MD14 | [Master Data — Limit] Semua field angka dan periode wajib diisi (≥0). |
 | BR-MD15 | [Master Data — Limit] Maximal Harian tidak boleh lebih kecil dari Minimal Harian. |
 | BR-MD16 | [Master Data — Limit] Tanggal mulai tidak boleh backdate. Minimal hari ini. |
 | BR-MD17 | [Master Data — Limit] Tanggal selesai tidak boleh sebelum tanggal mulai. |
-| BR-MD18 | [Master Data — Limit] Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
-| BR-MD19 | [Master Data — Limit] Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
-| BR-MD20 | [Master Data — Limit] Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
-| BR-MD21 | [Master Data — Limit] Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
-| BR-MD22 | [Master Data — Limit] Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
-| BR-MD23 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
+| BR-MD18 | [Master Data — Limit] Nama Limit sudah dipakai (unik global). |
+| BR-MD19 | [Master Data — Limit] Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header). |
+| BR-MD20 | [Master Data — Limit] Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal. |
+| BR-MD21 | [Master Data — Limit] Tanggal mulai yang digeser melebihi tanggal selesai. Perpanjang tanggal selesai dulu. |
+| BR-MD22 | [Master Data — Limit] Setelah digeser masih bentrok. Tutup versi aktif lebih awal. |
+| BR-MD23 | [Master Data — Limit] Periode bentrok: tanggal mulai versi baru bentrok dengan versi aktif — pilih Tutup versi aktif lebih awal / Geser mulai versi baru / Batal. |
+| BR-MD24 | [Master Data — Alasan] Nama dan Tipe wajib diisi. |
 
 ### 4.2 Aturan Produksi (di luar prototipe)
 
@@ -907,12 +916,12 @@ Aturan berikut **wajib** di backend MAVEN / kebijakan operasional, meskipun prot
 | BR-PR04 | Produk | Identitas SKU (kode/nama/umbrella/brand) bersumber Master Data API; aplikasi hanya boleh mengubah harga beli, skema pajak, unit default PCS, dan status. |
 | BR-PR05 | Produk | Harga jual = f(harga beli, persentase pajak); tidak diinput manual. |
 | BR-PR06 | Pajak | Hapus ditolak jika `mProduk.intPajakID` masih mereferensikan record tersebut. |
-| BR-PR07 | Channel | Nama channel unik; nonaktifkan via `bitActive` (bukan hard-delete). |
+| BR-PR07 | Channel | Web Admin **view-only**; create/update/delete hanya di Master Data API `/api/v1/Channel`; MAVEN sync ke `mChannel`. |
 | BR-PR08 | Pelanggan | Web Admin **read-only**; create/update hanya dari Mobile SFA / job sync (fase integrasi). |
 | BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |
 | BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |
 | BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |
-| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |
+| BR-PR12 | Limit | `txtNama` wajib & unik global; header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |
 
 ---
 
@@ -935,7 +944,7 @@ Konstanta di aplikasi **harus** match `mMenu.txtMenuCode` (bukan `txtMenuName`):
 |-------|---------------|--------------|-------------|------------------|-----------|
 | Produk | `MPR` | Product | `/MasterData/Product` | `bitView` | `bitEdit` |
 | Pelanggan | `MPL` | Customer | `/MasterData/Customer` | `bitView` | — (read-only) |
-| Channel | `MCH` | Channel | `/MasterData/Channel` | `bitView` | `bitEdit` |
+| Channel | `MCH` | Channel | `/MasterData/Channel` | `bitView` | — (read-only) |
 | Pegawai | `MPE` | Employee | `/MasterData/Pegawai` | `bitView` | `bitEdit` (upload) |
 | Pajak | `MTX` | Tax | `/MasterData/Tax` | `bitView` | `bitEdit` / `bitDelete` |
 | Alasan | `MRS` | Reason | `/MasterData/Reason` | `bitView` | `bitEdit` / `bitDelete` |
@@ -949,7 +958,7 @@ Parent menu Data Master: `intParentID = 3936`, `intModuleID = 2749` (sama untuk 
 |-------|-------------------|------------------|------------|
 | Produk | Create / Read / Update | Read | Hapus tidak tersedia |
 | Pelanggan | Read | Read | View-only; sumber mobile |
-| Channel | Create / Read / Update | Read | Nonaktif via bit Active |
+| Channel | Read | Read | View-only; sumber `/api/v1/Channel` |
 | Pegawai | Upload / Read | Read | Sinkronisasi CSV |
 | Stokis | Upload / Read | Read | Sinkronisasi CSV |
 | Pajak | Create / Read / Update / Delete | Read | Cek FK produk sebelum hapus |
@@ -978,11 +987,12 @@ Kontrol perubahan = RBAC + audit trail kolom insert/update. Jika di masa depan d
 | Endpoint | Modul FPRS | Arah | Digunakan untuk |
 |----------|------------|------|-----------------|
 | `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
+| `GET /api/v1/Channel` | Channel | Inbound sync / list | Master channel view-only di Web Admin |
 | `GET /api/v1/Position` | Limit | Inbound LOV | Dropdown **Jabatan** & **Type Jabatan** pada form Create/Detail |
 | `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
 | `/api/v1/Tax` | Pajak | Opsional sync | Referensi skema pajak; v1 boleh fully lokal di `mPajak` |
 | `/api/v1/Reason` | Alasan | Opsional sync | Referensi alasan; v1 boleh fully lokal di `mAlasan` |
-| — | Channel, Pegawai, Stokis | Lokal / CSV | Tidak bergantung Master Data API |
+| — | Pegawai, Stokis | Lokal / CSV | Tidak bergantung Master Data API |
 
 ### 6.2 Persistensi Produksi MAVEN
 
@@ -1221,6 +1231,7 @@ erDiagram
     mLimitTargetHarian {
         int intLimitID PK
         uuid txtGuid UK
+        varchar txtNama UK
         varchar txtJabatan
         varchar txtTypeJabatan
         boolean bitActive
@@ -1522,6 +1533,7 @@ CREATE TABLE "mStokis" (
 CREATE TABLE "mLimitTargetHarian" (
     "intLimitID"      serial PRIMARY KEY,
     "txtGuid"         uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"         varchar(150) NOT NULL,
     "txtJabatan"      varchar(50)  NOT NULL,
     "txtTypeJabatan"  varchar(100) NOT NULL,
     "bitActive"       boolean NOT NULL DEFAULT true,
@@ -1531,6 +1543,7 @@ CREATE TABLE "mLimitTargetHarian" (
     "txtUpdatedBy"    varchar(100) NULL,
     "dtNonActive"     timestamp without time zone NULL,
     CONSTRAINT "mLimitTargetHarian_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarian_txtNama_uq" UNIQUE ("txtNama"),
     CONSTRAINT "mLimitTargetHarian_jabatan_type_uq" UNIQUE ("txtJabatan", "txtTypeJabatan")
 );
 

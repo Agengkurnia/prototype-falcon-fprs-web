@@ -39,6 +39,11 @@
                     <div class="card-body">
                         <h5 class="border-bottom pb-2 text-success mb-3">Header</h5>
                         <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label" title="Source : mLimitTargetHarian.txtNama">Nama</label>
+                                <input type="text" class="form-control" id="viewNama" readonly disabled
+                                    title="Source : mLimitTargetHarian.txtNama" />
+                            </div>
                                 <div class="col-md-6">
                                 <label class="form-label" title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName">Jabatan</label>
                                 <input type="text" class="form-control" id="viewJabatan" readonly disabled
@@ -144,6 +149,7 @@ function currentVersion(item){
 }
 
 function fillForm(ver){
+    document.getElementById('viewNama').value = record.nama || '-';
     document.getElementById('viewJabatan').value = record.jabatan || '-';
     document.getElementById('viewTypeJabatan').value = record.typeJabatan || '-';
     document.getElementById('viewMin').value = ver ? ver.minimalHarian : '-';

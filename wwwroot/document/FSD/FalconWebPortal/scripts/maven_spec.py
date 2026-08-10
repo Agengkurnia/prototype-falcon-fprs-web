@@ -113,6 +113,7 @@ MAVEN_MAPPING = {
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
+| Nama | `mLimitTargetHarian` | `txtNama` | UQ | Wajib; unik global (case-insensitive di UI) |
 | Jabatan | `mLimitTargetHarian` | `txtJabatan` | UQ* | LOV dari Master Data API `/api/v1/Position` (`mJabatan.txtJabatanName`); *unik bersama Type |
 | Type Jabatan | `mLimitTargetHarian` | `txtTypeJabatan` | UQ* | LOV tipe jabatan dari API Position (ikut jabatan terpilih) |
 | Minimal Harian | `mLimitTargetHarianVer` | `intMinimalHarian` | | Target kunjungan dasbor mobile |
@@ -124,7 +125,7 @@ MAVEN_MAPPING = {
 | Active (versi) | `mLimitTargetHarianVer` | `bitActive` | | Versi aktif dalam periode |
 | Active (header) | `mLimitTargetHarian` | `bitActive` | | Soft-delete header |
 
-> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position` (tooltip UI: `Source : Master Data API /api/v1/Position | …`). Nilai yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
+> **Sumber LOV Header:** Jabatan & Type Jabatan = Master Data API `/api/v1/Position`. **Nama** = input lokal wajib & unik global (`txtNama`). Nilai jabatan/type yang dipilih **disimpan** di `mLimitTargetHarian` (snapshot teks); Update append versi ke `mLimitTargetHarianVer`. DDL: `MAVEN.DAL/Scripts/012_mLimitTargetHarian.sql`.
 ''',
     'master-pajak': '''#### 3.7.6 Mapping Database MAVEN
 
@@ -371,6 +372,7 @@ erDiagram
     mLimitTargetHarian {
         int intLimitID PK
         uuid txtGuid UK
+        varchar txtNama UK
         varchar txtJabatan
         varchar txtTypeJabatan
         boolean bitActive
@@ -672,6 +674,7 @@ CREATE TABLE "mStokis" (
 CREATE TABLE "mLimitTargetHarian" (
     "intLimitID"      serial PRIMARY KEY,
     "txtGuid"         uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNama"         varchar(150) NOT NULL,
     "txtJabatan"      varchar(50)  NOT NULL,
     "txtTypeJabatan"  varchar(100) NOT NULL,
     "bitActive"       boolean NOT NULL DEFAULT true,
@@ -681,6 +684,7 @@ CREATE TABLE "mLimitTargetHarian" (
     "txtUpdatedBy"    varchar(100) NULL,
     "dtNonActive"     timestamp without time zone NULL,
     CONSTRAINT "mLimitTargetHarian_txtGuid_uq" UNIQUE ("txtGuid"),
+    CONSTRAINT "mLimitTargetHarian_txtNama_uq" UNIQUE ("txtNama"),
     CONSTRAINT "mLimitTargetHarian_jabatan_type_uq" UNIQUE ("txtJabatan", "txtTypeJabatan")
 );
 

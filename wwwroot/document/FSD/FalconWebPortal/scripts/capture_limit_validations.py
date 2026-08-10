@@ -32,6 +32,7 @@ SEED_VER_KEY = 'md_limit_target_seed_ver'
 SEED_LIMIT = [
     {
         'id': 900001,
+        'nama': 'Limit Motoris Reguler Capture',
         'jabatan': 'Motoris',
         'typeJabatan': 'Motoris Reguler',
         'versions': [
@@ -69,6 +70,19 @@ def seed_storage(page):
             localStorage.setItem(seedKey, 'capture-val');
         }""",
         [KEY, SEED_VER_KEY, SEED_LIMIT],
+    )
+
+
+def install_seed_init(context_or_page):
+    """Pastikan seed Limit tersedia sebelum script halaman jalan."""
+    payload = json.dumps(SEED_LIMIT)
+    context_or_page.add_init_script(
+        f"""() => {{
+            try {{
+                localStorage.setItem({json.dumps(KEY)}, {json.dumps(payload)});
+                localStorage.setItem({json.dumps(SEED_VER_KEY)}, 'capture-val');
+            }} catch (e) {{}}
+        }}"""
     )
 
 
@@ -114,24 +128,21 @@ def goto_create(page, base):
     seed_storage(page)
     page.reload(wait_until='domcontentloaded')
     page.wait_for_selector('#btnUpdate', timeout=15000)
-    time.sleep(0.5)
+    page.wait_for_function('() => typeof window.saveForm === "function"', timeout=20000)
+    time.sleep(0.4)
 
 
 def goto_edit(page, base, record_id=900001):
-    # Buka via index lalu klik Detail — atau set param seperti MasterDataParam
-    page.goto(f'{base}/{INDEX}', wait_until='domcontentloaded')
-    page.wait_for_selector('#tblBody', timeout=15000)
-    seed_storage(page)
-    page.reload(wait_until='domcontentloaded')
-    page.wait_for_selector('#tblBody tr', timeout=15000)
+    dismiss_swal(page)
+    page.goto(f'{base}/{DETAIL_EDIT}?id={record_id}', wait_until='domcontentloaded', timeout=30000)
+    page.wait_for_selector('#btnUpdate', timeout=20000)
+    page.wait_for_function('() => typeof window.saveForm === "function"', timeout=20000)
     time.sleep(0.4)
-    # Klik Detail baris pertama
-    detail = page.locator('#tblBody a, #tblBody button, #tblBody .btn').filter(has_text='Detail').first
-    if detail.count() == 0:
-        # fallback: link mata / title Detail
-        detail = page.locator('#tblBody a[title*="Detail"], #tblBody a[href*="detail"]').first
-    detail.click()
-    page.wait_for_selector('#btnUpdate', timeout=15000)
+
+
+def click_save(page):
+    # saveForm async — jangan menunggu Promise di evaluate agar Swal tetap muncul
+    page.evaluate('() => { void window.saveForm(); }')
     time.sleep(0.5)
 
 
@@ -143,57 +154,66 @@ def capture(base_url: str):
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page(viewport={'width': 1440, 'height': 900})
+        context = browser.new_context(viewport={'width': 1440, 'height': 900})
+        install_seed_init(context)
+        page = context.new_page()
 
-        # --- 1 Jabatan wajib ---
+        # --- 1 Jabatan wajib (Nama diisi dulu supaya Swal jabatan yang tampil) ---
         print('1) Jabatan / Type wajib')
         goto_create(page, base)
-        page.click('#btnUpdate')
+        page.fill('#inputNama', 'Limit Capture Validasi')
+        page.select_option('#inputJabatan', '')
+        click_save(page)
         shot_swal(page, 'ss_51_limit_val_jabatan_wajib.png')
         dismiss_swal(page)
 
         # --- 2 Field angka/periode wajib ---
         print('2) Field angka & periode wajib')
+        page.fill('#inputNama', 'Limit Capture Validasi')
         page.select_option('#inputJabatan', 'MD')
         page.wait_for_timeout(200)
         page.select_option('#inputTypeJabatan', 'MD Reguler')
         # kosongkan angka
         for sel in ('#inputMin', '#inputMax', '#inputHke', '#inputHkeBulanan'):
             page.fill(sel, '')
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_52_limit_val_field_wajib.png')
         dismiss_swal(page)
 
         # --- 3 Max < Min ---
         print('3) Max < Min')
+        page.fill('#inputNama', 'Limit Capture Validasi')
         fill_valid_numbers(page, min_v=30, max_v=10)
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_53_limit_val_max_lt_min.png')
         dismiss_swal(page)
 
         # --- 4 Backdate ---
         print('4) Tanggal mulai backdate')
+        page.fill('#inputNama', 'Limit Capture Validasi')
         fill_valid_numbers(page, min_v=10, max_v=20, mulai='2020-01-01', selesai='2099-12-31')
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_54_limit_val_backdate.png')
         dismiss_swal(page)
 
         # --- 5 Selesai < Mulai ---
         print('5) Tanggal selesai < mulai')
         today = page.evaluate("() => new Date().toISOString().slice(0, 10)")
+        page.fill('#inputNama', 'Limit Capture Validasi')
         # selesai = kemarin relative to mulai=today → use mulai far future and selesai earlier
         fill_valid_numbers(page, min_v=10, max_v=20, mulai='2030-06-01', selesai='2030-01-01')
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_55_limit_val_selesai_lt_mulai.png')
         dismiss_swal(page)
 
-        # --- 6 Duplikat header ---
+        # --- 6 Duplikat header (nama unik agar kena unik jabatan+type, bukan nama) ---
         print('6) Duplikat jabatan+type')
+        page.fill('#inputNama', 'Limit Capture Duplikat Type')
         page.select_option('#inputJabatan', 'Motoris')
         page.wait_for_timeout(200)
         page.select_option('#inputTypeJabatan', 'Motoris Reguler')
         fill_valid_numbers(page, min_v=10, max_v=20, mulai=today, selesai='2099-12-31')
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_56_limit_val_duplikat.png')
         dismiss_swal(page)
 
@@ -201,35 +221,25 @@ def capture(base_url: str):
         print('7) Periode bentrok')
         goto_edit(page, base)
         # form sudah prefill versi baru dengan mulai=today → overlap dengan seed sampai 2099
+        page.fill('#inputNama', 'Limit Motoris Reguler Capture')
         fill_valid_numbers(page, min_v=30, max_v=35, mulai=today, selesai='2099-12-31')
-        page.click('#btnUpdate')
+        click_save(page)
         shot_swal(page, 'ss_57_limit_val_periode_bentrok.png')
         dismiss_swal(page)
 
         # --- 8 History page ---
         print('8) Halaman History')
-        page.goto(f'{base}/{INDEX}', wait_until='domcontentloaded')
-        page.wait_for_selector('#tblBody', timeout=15000)
-        seed_storage(page)
-        page.reload(wait_until='domcontentloaded')
-        page.wait_for_selector('#tblBody tr', timeout=15000)
-        time.sleep(0.8)
-        href = page.evaluate("""() => {
-            const a = [...document.querySelectorAll('#tblBody a')].find(x =>
-                /history/i.test(x.getAttribute('href') || '') || /History/i.test(x.textContent || '')
-            );
-            return a ? a.href : null;
-        }""")
-        if not href:
-            raise RuntimeError('Link History tidak ditemukan di list Limit')
-        page.goto(href, wait_until='domcontentloaded')
-        time.sleep(1.2)
+        dismiss_swal(page)
+        page.goto(f'{base}/{HISTORY}?id=900001', wait_until='domcontentloaded', timeout=30000)
+        page.wait_for_selector('#viewNama, #viewJabatan', timeout=20000)
+        time.sleep(1.0)
         page.screenshot(
             path=os.path.join(SCREENSHOTS_DIR, 'ss_58_master_limit_history.png'),
             full_page=True,
         )
         print('   saved ss_58_master_limit_history.png')
 
+        context.close()
         browser.close()
 
     print(f'\nCapture validasi Limit selesai -> {SCREENSHOTS_DIR}')

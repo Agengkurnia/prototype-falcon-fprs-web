@@ -7,16 +7,17 @@
 - Menu: **Data Master → Lainnya → Limit**
 
 ## Layout (ala PRM, CSS Falcon)
-- **List**: kolom Jabatan, Type Jabatan, Min/Max Harian, Active; aksi **Detail** (ikon mata) + **History** sejajar; tombol **Create**.
-- **Detail**: form editable + **Update** / **Back**. Update = append versi baru (masuk History). Tanggal mulai tidak boleh backdate; bentrok → pilih tutup versi aktif atau geser mulai.
+- **List**: kolom Nama, Jabatan, Type Jabatan, Min/Max Harian, Active; aksi **Detail** (ikon mata) + **History** sejajar; tombol **Create**.
+- **Detail**: form editable + **Update** / **Back**. Header: **Nama** (wajib, unik global), Jabatan, Type. Update = append versi baru (masuk History). Tanggal mulai tidak boleh backdate; bentrok → pilih tutup versi aktif atau geser mulai.
 - **History**: form readonly + panel **Version** (Select); view-only.
 
 ## Model
 
-**Header** (unik: Jabatan + Type Jabatan)
+**Header** (unik: `nama` global; juga unik Jabatan + Type Jabatan)
 
 | Field | Nilai contoh |
 |-------|----------------|
+| `nama` | Limit MD Reguler / Limit Motoris Reguler |
 | `jabatan` | MD / Motoris |
 | `typeJabatan` | MD Reguler / Motoris Reguler |
 
@@ -32,7 +33,7 @@
 | `active` | Status |
 
 ## Seed
-`wwwroot/data/limit-target.json` → `md_limit_target` (seed ver `4`)
+`wwwroot/data/limit-target.json` → `md_limit_target` (seed ver `5`)
 
 ## Runtime (mobile)
 - Role default prototype: **motoris** (login non-MD); legacy `canvasser` di-migrate ke `motoris`

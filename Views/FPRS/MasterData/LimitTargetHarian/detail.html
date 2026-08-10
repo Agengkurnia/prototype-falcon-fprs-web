@@ -47,6 +47,13 @@
             <div class="card-body">
                 <h5 class="border-bottom pb-2 text-success mb-3">Header</h5>
                 <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label" title="Source : mLimitTargetHarian.txtNama">Nama <span class="required-mark">*</span></label>
+                        <input type="text" class="form-control" id="inputNama" maxlength="150"
+                            placeholder="Contoh: Limit MD Reguler"
+                            title="Source : mLimitTargetHarian.txtNama" />
+                        <div class="form-text">Wajib &amp; unik (global). Identitas tampilan Limit di list &amp; history.</div>
+                    </div>
                     <div class="col-md-6">
                         <label class="form-label" title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName">Jabatan <span class="required-mark">*</span></label>
                         <select class="form-select" id="inputJabatan" onchange="onJabatanChange()"
@@ -213,8 +220,9 @@ function load(){
         document.getElementById('btnUpdateLabel').textContent = 'Save';
         document.getElementById('versionHint').textContent = 'Membuat header baru beserta versi pertama.';
         recordId = null;
-        record = { jabatan: '', typeJabatan: '', versions: [] };
+        record = { nama: '', jabatan: '', typeJabatan: '', versions: [] };
         setIdentityEditable(true);
+        document.getElementById('inputNama').value = '';
         onJabatanChange();
         fillVersionForm(null, true);
         return;
@@ -233,6 +241,7 @@ function load(){
         return;
     }
     setIdentityEditable(false);
+    document.getElementById('inputNama').value = record.nama || '';
     document.getElementById('inputJabatan').value = record.jabatan || '';
     onJabatanChange();
     document.getElementById('inputTypeJabatan').value = record.typeJabatan || '';
@@ -248,8 +257,23 @@ function findActiveOverlap(mulai, selesai, versions){
     }) || null;
 }
 
+function normNama(s){ return String(s || '').trim().replace(/\s+/g, ' '); }
+function namaKey(s){ return normNama(s).toLowerCase(); }
+
+function findDupNama(nama, excludeId){
+    const key = namaKey(nama);
+    if (!key) return null;
+    return getData().find(d =>
+        namaKey(d.nama) === key && String(d.id) !== String(excludeId || '')
+    ) || null;
+}
+
 function persistCreate(header, version){
     const data = getData();
+    if (findDupNama(header.nama)) {
+        Swal.fire('Duplikat', `Nama Limit "${header.nama}" sudah dipakai.`, 'warning');
+        return false;
+    }
     const dup = data.find(d => d.jabatan === header.jabatan && d.typeJabatan === header.typeJabatan);
     if (dup) {
         Swal.fire('Duplikat', `Limit untuk ${header.jabatan} / ${header.typeJabatan} sudah ada.`, 'warning');
@@ -258,6 +282,7 @@ function persistCreate(header, version){
     const id = Date.now();
     data.push({
         id,
+        nama: header.nama,
         jabatan: header.jabatan,
         typeJabatan: header.typeJabatan,
         versions: [{ id: 'v-' + Date.now(), ...version }]
@@ -268,10 +293,14 @@ function persistCreate(header, version){
     return true;
 }
 
-function persistAppend(version, closePrev){
+function persistAppend(version, closePrev, nama){
     const data = getData();
     const idx = data.findIndex(d => String(d.id) === String(recordId));
     if (idx < 0) return false;
+    if (findDupNama(nama, recordId)) {
+        Swal.fire('Duplikat', `Nama Limit "${nama}" sudah dipakai.`, 'warning');
+        return false;
+    }
     const versions = Array.isArray(data[idx].versions) ? data[idx].versions.slice() : [];
 
     if (closePrev) {
@@ -285,7 +314,7 @@ function persistAppend(version, closePrev){
     }
 
     versions.push({ id: 'v-' + Date.now(), ...version });
-    data[idx] = { ...data[idx], versions };
+    data[idx] = { ...data[idx], nama, versions };
     saveData(data);
     record = data[idx];
     Swal.fire({ icon:'success', title:'Versi ditambahkan', text:'Perubahan masuk History.', timer:1400, showConfirmButton:false })
@@ -294,6 +323,7 @@ function persistAppend(version, closePrev){
 }
 
 async function saveForm(){
+    const nama = normNama(document.getElementById('inputNama').value);
     const jabatan = document.getElementById('inputJabatan').value;
     const typeJabatan = document.getElementById('inputTypeJabatan').value;
     const minimalHarian = parseInt(document.getElementById('inputMin').value, 10);
@@ -305,8 +335,16 @@ async function saveForm(){
     const active = document.getElementById('inputActive').checked;
     const today = todayStr();
 
+    if (!nama) {
+        Swal.fire('Peringatan', 'Nama Limit wajib diisi.', 'warning');
+        return;
+    }
     if (!jabatan || !typeJabatan) {
         Swal.fire('Peringatan', 'Jabatan dan Type Jabatan wajib diisi.', 'warning');
+        return;
+    }
+    if (findDupNama(nama, isCreate ? null : recordId)) {
+        Swal.fire('Duplikat', `Nama Limit "${nama}" sudah dipakai.`, 'warning');
         return;
     }
     if ([minimalHarian, maximalHarian, targetHke, targetHkeBulanan].some(n => Number.isNaN(n) || n < 0) || !mulai || !selesai) {
@@ -333,19 +371,19 @@ async function saveForm(){
     };
 
     if (isCreate) {
-        persistCreate({ jabatan, typeJabatan }, version);
+        persistCreate({ nama, jabatan, typeJabatan }, version);
         return;
     }
 
     const versions = ensureVersions(record);
     if (!active) {
-        persistAppend(version, null);
+        persistAppend(version, null, nama);
         return;
     }
 
     const overlap = findActiveOverlap(mulai, selesai, versions);
     if (!overlap) {
-        persistAppend(version, null);
+        persistAppend(version, null, nama);
         return;
     }
 
@@ -371,7 +409,7 @@ async function saveForm(){
     if (result.isDismissed) return;
 
     if (result.isConfirmed) {
-        persistAppend(version, overlap);
+        persistAppend(version, overlap, nama);
         return;
     }
 
@@ -398,7 +436,7 @@ async function saveForm(){
             timer: 1400,
             showConfirmButton: false
         });
-        persistAppend(version, null);
+        persistAppend(version, null, nama);
     }
 }
 

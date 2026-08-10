@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "nama": "Limit MD Reguler",
     "jabatan": "MD",
     "typeJabatan": "MD Reguler",
     "versions": [
@@ -28,6 +29,7 @@
   },
   {
     "id": 2,
+    "nama": "Limit Motoris Reguler",
     "jabatan": "Motoris",
     "typeJabatan": "Motoris Reguler",
     "versions": [

@@ -44,6 +44,7 @@
                 <table class="table table-bordered table-hover" id="tbl">
                     <thead>
                         <tr>
+                            <th title="Source : mLimitTargetHarian.txtNama">NAMA</th>
                             <th title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName → mLimitTargetHarian.txtJabatan">JABATAN</th>
                             <th title="Source : Master Data API /api/v1/Position | tipe jabatan → mLimitTargetHarian.txtTypeJabatan">TYPE JABATAN</th>
                             <th class="text-end" title="Source : mLimitTargetHarianVer | intMinimalHarian">MIN HARIAN</th>
@@ -64,7 +65,7 @@
 
 const KEY = 'md_limit_target';
 const SEED_VER_KEY = 'md_limit_target_seed_ver';
-const SEED_VER = '4';
+const SEED_VER = '5';
 
 function getData(){ return JSON.parse(localStorage.getItem(KEY) || '[]'); }
 function saveData(d){ localStorage.setItem(KEY, JSON.stringify(d)); }
@@ -111,7 +112,8 @@ function render(){
     if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
     $('#tblBody').empty();
     const rows = getData().slice().sort((a,b) =>
-        String(a.jabatan||'').localeCompare(String(b.jabatan||''))
+        String(a.nama||'').localeCompare(String(b.nama||''))
+        || String(a.jabatan||'').localeCompare(String(b.jabatan||''))
         || String(a.typeJabatan||'').localeCompare(String(b.typeJabatan||''))
     );
     rows.forEach((item) => {
@@ -120,7 +122,8 @@ function render(){
         const detailHref = MasterDataParam.editUrl('detail.html', item.id);
         const historyHref = MasterDataParam.editUrl('history.html', item.id);
         $('#tblBody').append(`<tr>
-            <td><strong>${item.jabatan || '-'}</strong></td>
+            <td><strong>${item.nama || '-'}</strong></td>
+            <td>${item.jabatan || '-'}</td>
             <td>${item.typeJabatan || '-'}</td>
             <td class="text-end">${ver ? ver.minimalHarian : '-'}</td>
             <td class="text-end">${ver ? ver.maximalHarian : '-'}</td>
@@ -136,7 +139,7 @@ function render(){
     $('#tbl').DataTable({
         language:{ search:'', searchPlaceholder:'Search...', lengthMenu:'_MENU_ entries', info:'_START_-_END_ of _TOTAL_', paginate:{ previous:'‹', next:'›' }, zeroRecords:'Tidak ada data' },
         pageLength:10,
-        columnDefs:[{ orderable:false, targets:[5] }],
+        columnDefs:[{ orderable:false, targets:[6] }],
         dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
     });
 }

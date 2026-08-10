@@ -29,7 +29,7 @@ from maven_spec import (  # noqa: E402
     chapter_erd,
 )
 
-TANGGAL = '7 Agustus 2026'
+TANGGAL = '10 Agustus 2026'
 
 LIMIT_VALIDATION_SECTION = '''
 #### 3.6.7 Sumber Data Jabatan & Type Jabatan (Master Data API)
@@ -38,6 +38,7 @@ Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type 
 
 | Field UI | Sumber API (rencana produksi) | Persistensi lokal Limit |
 |----------|-------------------------------|-------------------------|
+| Nama | Input lokal (wajib, unik global) | Disimpan di `mLimitTargetHarian.txtNama` |
 | Jabatan | `/api/v1/Position` → `mJabatan.txtJabatanName` (mis. MD, Motoris) | Disimpan di `mLimitTargetHarian.txtJabatan` |
 | Type Jabatan | `/api/v1/Position` → tipe jabatan terkait (mis. MD Reguler, Motoris Reguler) | Disimpan di `mLimitTargetHarian.txtTypeJabatan` |
 
@@ -51,7 +52,7 @@ Pada halaman **Create / Detail** (form Header), dropdown **Jabatan** dan **Type 
 
 #### 3.6.8 Narasi Validasi & Alur Versi
 
-Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
+Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**, dengan **Nama** header wajib & unik global. Create membuat header + versi pertama; **Update selalu append versi baru** (append-only) ke History — versi lama tidak di-overwrite.
 
 **Alur singkat:** isi header (Create) / form versi → klik Save/Update → validasi field → (Update) cek overlap periode versi aktif → simpan atau tampilkan dialog penyelesaian bentrok.
 
@@ -59,6 +60,7 @@ Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**
 
 | Rule ID | Kondisi | Tampilan |
 |---------|---------|----------|
+| BR-MD12 | Nama Limit kosong | (Swal: Nama Limit wajib diisi) |
 | BR-MD13 | Jabatan / Type Jabatan kosong | ![Validasi jabatan wajib](screenshots/ss_51_limit_val_jabatan_wajib.png) |
 | BR-MD14 | Angka atau periode kosong / &lt; 0 | ![Validasi field wajib](screenshots/ss_52_limit_val_field_wajib.png) |
 | BR-MD15 | Maximal Harian &lt; Minimal Harian | ![Validasi max &lt; min](screenshots/ss_53_limit_val_max_lt_min.png) |
@@ -69,6 +71,7 @@ Modul **Limit** mengelola target kunjungan harian per **Jabatan + Type Jabatan**
 
 | Rule ID | Kondisi | Tampilan |
 |---------|---------|----------|
+| BR-MD18a | Create/Update: Nama Limit sudah dipakai (unik global) | (Swal Duplikat Nama) |
 | BR-MD18 | Create: pasangan Jabatan + Type sudah ada | ![Validasi duplikat](screenshots/ss_56_limit_val_duplikat.png) |
 | BR-MD22 | Update: periode versi baru bentrok dengan versi aktif | ![Validasi periode bentrok](screenshots/ss_57_limit_val_periode_bentrok.png) |
 
@@ -102,14 +105,14 @@ def preamble() -> str:
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.8
+### Versi Dokumen: 1.9
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.8 |
+| **Versi** | 1.9 |
 | **Tanggal** | {TANGGAL} |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -121,7 +124,8 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.8** | **{TANGGAL}** | **Tim IT** | Channel: **view-only** (sumber API `/api/v1/Channel`); hapus Tambah/Edit di UI + FSD |
+| **1.9** | **{TANGGAL}** | **Tim IT** | Limit: field **Nama** wajib & unik global (`txtNama`); kolom list + input Header |
+| **1.8** | **7 Agustus 2026** | **Tim IT** | Channel: **view-only** (sumber API `/api/v1/Channel`); hapus Tambah/Edit di UI + FSD |
 | **1.7** | **6 Agustus 2026** | **Tim IT** | Limit: sumber LOV Jabatan/Type dari API `/api/v1/Position` (tooltip + narasi FSD) |
 | **1.6** | **6 Agustus 2026** | **Tim IT** | Limit: screenshot + narasi validasi (field, duplikat, periode bentrok) + History |
 | **1.5** | **6 Agustus 2026** | **Tim IT** | ERD + DDL **Limit** (`mLimitTargetHarian` / `mLimitTargetHarianVer`); script `012_mLimitTargetHarian.sql` |
@@ -259,7 +263,7 @@ Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan 
 | CSV Pegawai/Stokis | Upload file | Header dikenali; baris wajib; Stokis: GPS unik | Upsert Active; absen di file → Inactive + hist | Tidak ada |
 | Channel | Buka list/detail | — (read-only; sumber API) | Tampil / sync dari `/api/v1/Channel` → `mChannel` | N/A |
 | Pelanggan | Buka list/detail | — (read-only) | Tampil dari `mPelanggan` | N/A |
-| Limit | Create header / append versi | Jabatan+type unik; Max≥Min; no backdate; overlap dialog | `mLimitTargetHarian` + Ver | Tidak ada |
+| Limit | Create header / append versi | Nama wajib+unik global; Jabatan+type unik; Max≥Min; no backdate; overlap dialog | `mLimitTargetHarian` + Ver | Tidak ada |
 
 **Catatan approval:** modul Data Master **tidak** memakai workflow approval multi-level. Perubahan langsung tersimpan jika user punya `bitEdit` (atau hak upload untuk Pegawai/Stokis). Audit trail: `txtInsertedBy` / `txtUpdatedBy` / `dtInserted` / `dtUpdated`.
 
@@ -334,7 +338,7 @@ def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
         '| BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |',
         '| BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |',
         '| BR-PR11 | Alasan | `txtTipe` terbatas enum: Return, Kunjungan, Order, Lainnya. |',
-        '| BR-PR12 | Limit | Header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |',
+        '| BR-PR12 | Limit | `txtNama` wajib & unik global; header unik (`txtJabatan`+`txtTypeJabatan`); Update = append `mLimitTargetHarianVer`; Max ≥ Min; no backdate; bentrok periode wajib dialog tutup-versi / geser-mulai. |',
         '',
         '---',
         '',

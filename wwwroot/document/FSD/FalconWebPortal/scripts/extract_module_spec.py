@@ -644,8 +644,13 @@ def extract_validations(html: str) -> list[str]:
     ):
         msg = m.group(1)
         msg = re.sub(r'\$\{[^}]+\}', '…', msg)
-        if 'sudah ada' in msg.lower():
-            vals.append('Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header).')
+        if 'sudah ada' in msg.lower() and 'nama' in msg.lower():
+            vals.append('Nama Limit sudah dipakai (unik global).')
+        elif 'sudah ada' in msg.lower() or 'sudah dipakai' in msg.lower():
+            if 'nama' in msg.lower():
+                vals.append('Nama Limit sudah dipakai (unik global).')
+            else:
+                vals.append('Limit untuk pasangan Jabatan / Type Jabatan sudah ada (duplikat header).')
         elif 'tidak ada slot' in msg.lower():
             vals.append(
                 'Tidak ada slot tanggal mulai ≥ hari ini tanpa menutup versi aktif lebih awal.'
