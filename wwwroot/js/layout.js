@@ -52,7 +52,7 @@ class Layout {
         if (hrefUrl.includes('/Canvassing/') || hrefUrl.includes('/Penjualan/')) {
             styles.push('wwwroot/css/canvassing-v2.css');
         }
-        if (hrefUrl.includes('/MasterData/')) {
+        if (hrefUrl.includes('/MasterData/') || hrefUrl.includes('/MasterDataPortal/')) {
             styles.push('wwwroot/css/master-data.css');
         }
 
@@ -131,6 +131,34 @@ class Layout {
             /* Hide Vuexy injected deny button globally */
             .swal2-deny {
                 display: none !important;
+            }
+
+            /* ===== Prototype switcher (bottom of sidebar) ===== */
+            .layout-menu .menu-inner {
+                display: flex;
+                flex-direction: column;
+                height: calc(100vh - 120px);
+                overflow-y: auto;
+            }
+            .menu-prototype-spacer {
+                flex: 1 1 auto;
+                min-height: 2rem;
+                pointer-events: none;
+            }
+            .menu-header.menu-prototype-header {
+                margin-top: 0.25rem;
+                padding-top: 1rem !important;
+                border-top: 1px solid rgba(67, 89, 113, 0.18);
+            }
+            .menu-header.menu-prototype-header .menu-header-text {
+                color: #a1acb8;
+                letter-spacing: 0.06em;
+            }
+            .menu-item.menu-prototype-item > .menu-link {
+                opacity: 0.92;
+            }
+            .menu-item.menu-prototype-item > .menu-link:hover {
+                opacity: 1;
             }
 
             /* ===== Layout and Transitions ===== */
@@ -232,20 +260,33 @@ class Layout {
             content = document.body.innerHTML;
         }
 
-        const sidebar = `
-            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-                <div class="app-brand demo">
-                    <a href="${this.basePath}index.html" class="app-brand-link">
-                        <span class="app-brand-logo demo">
-                            <img src="${this.basePath}wwwroot/assets/images/logo-kalbe.png" alt="Kalbe" style="width: auto; height: 80px; object-fit: contain;">
-                        </span>
-                    </a>
-                    <button id="sidebar-close-btn" class="sidebar-close-btn d-xl-none" aria-label="Close menu">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="menu-divider mt-0"></div>
-                <ul class="menu-inner py-1">
+        const isMasterDataPortal = window.location.href.includes('/MasterDataPortal/');
+        const portalChannelHref = `${this.basePath}Views/MasterDataPortal/Channel/index.html`;
+
+        const sidebarMenuInner = isMasterDataPortal
+            ? `
+                    <li class="menu-header small text-uppercase">
+                        <span class="menu-header-text">Master Data</span>
+                    </li>
+                    <li class="menu-item">
+                        <a href="${portalChannelHref}" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-sitemap" style="color:#1565c0;"></i>
+                            <div data-i18n="Channel">Channel</div>
+                        </a>
+                    </li>
+
+                    <li class="menu-prototype-spacer" aria-hidden="true"></li>
+                    <li class="menu-header small text-uppercase menu-prototype-header">
+                        <span class="menu-header-text">Pindah Prototype</span>
+                    </li>
+                    <li class="menu-item menu-prototype-item">
+                        <a href="${this.basePath}index.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-arrow-left" style="color:#005d41;"></i>
+                            <div data-i18n="Man Power GT">Man Power GT</div>
+                        </a>
+                    </li>
+                `
+            : `
                     <!-- Dashboard -->
                     <li class="menu-item">
                         <a href="${this.basePath}index.html" class="menu-link">
@@ -265,23 +306,18 @@ class Layout {
                             <div data-i18n="Data Master">Data Master</div>
                         </a>
                         <ul class="menu-sub">
-                            <!-- Master Produk (child tunggal, dinaikkan) -->
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
-                            <!-- Pelanggan Subgroup -->
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <div data-i18n="Pelanggan">Pelanggan</div>
                                 </a>
                                 <ul class="menu-sub">
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Master Pelanggan">Master Pelanggan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div><span class="badge bg-label-secondary ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">View-only</span></a></li>
                                 </ul>
                             </li>
-                            <!-- Master Pegawai (child tunggal, dinaikkan) -->
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div></a></li>
-                            <!-- Pajak (child tunggal, dinaikkan) -->
                             <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pajak/index.html" class="menu-link"><div data-i18n="Pajak">Pajak</div></a></li>
-                            <!-- Lainnya Subgroup -->
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
                                     <div data-i18n="Lainnya">Lainnya</div>
@@ -328,13 +364,45 @@ class Layout {
                         </ul>
                     </li>
 
+                    <li class="menu-prototype-spacer" aria-hidden="true"></li>
+                    <li class="menu-header small text-uppercase menu-prototype-header">
+                        <span class="menu-header-text">Pindah Prototype</span>
+                    </li>
+
+                    <!-- Master Data Portal -->
+                    <li class="menu-item menu-prototype-item">
+                        <a href="${this.basePath}Views/MasterDataPortal/Channel/index.html" class="menu-link">
+                            <i class="menu-icon tf-icons fas fa-database" style="color:#1565c0;"></i>
+                            <div data-i18n="Master Data Portal">Master Data Portal</div>
+                        </a>
+                    </li>
+
                     <!-- SFA Mobile WebView -->
-                    <li class="menu-item">
+                    <li class="menu-item menu-prototype-item">
                         <a href="${this.basePath}Views/Mobile/home.html" class="menu-link">
                             <i class="menu-icon tf-icons fas fa-mobile-alt" style="color:#00897b;"></i>
                             <div data-i18n="SFA Mobile">SFA Mobile</div>
                         </a>
                     </li>
+                `;
+
+        const brandHref = isMasterDataPortal ? portalChannelHref : `${this.basePath}index.html`;
+
+        const sidebar = `
+            <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+                <div class="app-brand demo">
+                    <a href="${brandHref}" class="app-brand-link">
+                        <span class="app-brand-logo demo">
+                            <img src="${this.basePath}wwwroot/assets/images/logo-kalbe.png" alt="Kalbe" style="width: auto; height: 80px; object-fit: contain;">
+                        </span>
+                    </a>
+                    <button id="sidebar-close-btn" class="sidebar-close-btn d-xl-none" aria-label="Close menu">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="menu-divider mt-0"></div>
+                <ul class="menu-inner py-1">
+                    ${sidebarMenuInner}
                 </ul>
             </aside>
         `;

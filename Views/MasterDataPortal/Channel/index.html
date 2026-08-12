@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Channel – Master Data Portal</title>
+    <link rel="stylesheet" href="../../../wwwroot/css/master-data.css"/>
+    <style>
+@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
+.badge-status{display:inline-block;padding:.25rem .6rem;border-radius:12px;font-size:.75rem;font-weight:600}
+.badge-active{background:#e6f4ea;color:#1e7e34}
+.badge-inactive{background:#f8d7da;color:#842029}
+.row-actions{display:flex;gap:6px;justify-content:center;flex-wrap:nowrap}
+.nav-tabs .nav-link{cursor:pointer}
+.nav-tabs .nav-link.active{color:#005d41;font-weight:600;border-bottom-color:#005d41}
+.accordion-button:not(.collapsed){background:#e8f5e9;color:#005d41;box-shadow:none}
+.accordion-button:focus{box-shadow:0 0 0 .15rem rgba(0,93,65,.15)}
+.accordion-button{font-weight:600;color:#005d41}
+#accManage .accordion-body{
+    padding:1.25rem 1.35rem 1.5rem;
+}
+#accManage .accordion-body > .d-flex{
+    margin-bottom:1rem !important;
+}
+#accManage .accordion-body .dataTables_wrapper{
+    margin-top:.25rem;
+}
+</style>
+</head>
+<body>
+<div id="app-content">
+
+<div id="listContainer">
+    <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+        <div>
+            <h2 class="title-page mb-1">Channel</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html" class="a-breadcrumb">Home</a></li>
+                    <li class="breadcrumb-item">Data Master</li>
+                    <li class="breadcrumb-item active">Channel</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-label-info"><i class="fa fa-database me-1"></i> Master Data Portal</span>
+            <button type="button" class="btn btn-success" id="btnAddMapping"><i class="fa fa-plus me-1"></i> Tambah Mapping</button>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs mb-3" id="indexTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-mapping-btn" data-bs-toggle="tab" data-bs-target="#tabMapping" type="button" role="tab">Mapping</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-manage-btn" data-bs-toggle="tab" data-bs-target="#tabManage" type="button" role="tab">Manage</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <!-- MAPPING -->
+        <div class="tab-pane fade show active" id="tabMapping" role="tabpanel">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        Triple unik <strong>Channel · Type Customer · Account</strong> (seed CSV Master Data).
+                    </p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="tblMapping" style="width:100%">
+                            <thead><tr>
+                                <th style="width:50px;">NO</th>
+                                <th>CHANNEL</th>
+                                <th>TYPE CUSTOMER</th>
+                                <th>ACCOUNT</th>
+                                <th style="width:90px;text-align:center;">AKSI</th>
+                            </tr></thead>
+                            <tbody id="tblMappingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MANAGE -->
+        <div class="tab-pane fade" id="tabManage" role="tabpanel">
+            <div class="accordion" id="accManage">
+                <!-- Channel -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="hdChannel">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accChannel" aria-expanded="true" aria-controls="accChannel">
+                            <i class="fa fa-sitemap me-2"></i> Channel
+                        </button>
+                    </h2>
+                    <div id="accChannel" class="accordion-collapse collapse show" aria-labelledby="hdChannel" data-bs-parent="#accManage">
+                        <div class="accordion-body">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-success btn-sm" id="btnAddChannel"><i class="fa fa-plus me-1"></i> Tambah Channel</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="tblChannel" style="width:100%">
+                                    <thead><tr>
+                                        <th style="width:50px;">NO</th>
+                                        <th>NAMA CHANNEL</th>
+                                        <th class="text-center"># MAPPING</th>
+                                        <th style="width:100px;">STATUS</th>
+                                        <th style="width:90px;text-align:center;">AKSI</th>
+                                    </tr></thead>
+                                    <tbody id="tblChannelBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type Customer -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="hdTypeCus">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accTypeCus" aria-expanded="false" aria-controls="accTypeCus">
+                            <i class="fa fa-users me-2"></i> Type Customer
+                        </button>
+                    </h2>
+                    <div id="accTypeCus" class="accordion-collapse collapse" aria-labelledby="hdTypeCus" data-bs-parent="#accManage">
+                        <div class="accordion-body">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-success btn-sm" id="btnAddTypeCus"><i class="fa fa-plus me-1"></i> Tambah Type Customer</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="tblTypeCus" style="width:100%">
+                                    <thead><tr>
+                                        <th style="width:50px;">NO</th>
+                                        <th>NAMA TYPE CUSTOMER</th>
+                                        <th class="text-center"># MAPPING</th>
+                                        <th style="width:100px;">STATUS</th>
+                                        <th style="width:90px;text-align:center;">AKSI</th>
+                                    </tr></thead>
+                                    <tbody id="tblTypeCusBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="hdAccount">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#accAccount" aria-expanded="false" aria-controls="accAccount">
+                            <i class="fa fa-id-badge me-2"></i> Account
+                        </button>
+                    </h2>
+                    <div id="accAccount" class="accordion-collapse collapse" aria-labelledby="hdAccount" data-bs-parent="#accManage">
+                        <div class="accordion-body">
+                            <div class="d-flex justify-content-end mb-2">
+                                <button type="button" class="btn btn-success btn-sm" id="btnAddAccount"><i class="fa fa-plus me-1"></i> Tambah Account</button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="tblAccount" style="width:100%">
+                                    <thead><tr>
+                                        <th style="width:50px;">NO</th>
+                                        <th>KODE</th>
+                                        <th class="text-center"># MAPPING</th>
+                                        <th style="width:100px;">STATUS</th>
+                                        <th style="width:90px;text-align:center;">AKSI</th>
+                                    </tr></thead>
+                                    <tbody id="tblAccountBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Channel -->
+<div class="modal fade" id="modalChannel" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="modalChannelTitle">Channel</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <input type="hidden" id="chEditId"/>
+        <div class="mb-3">
+            <label class="form-label">Nama Channel <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="chNama" maxlength="150"/>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="chActive" checked/>
+            <label class="form-check-label" for="chActive">Active</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="btnSaveChannel">Simpan</button>
+    </div>
+</div></div></div>
+
+<!-- Modal Type Customer -->
+<div class="modal fade" id="modalTypeCus" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="modalTypeCusTitle">Type Customer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <input type="hidden" id="tcEditId"/>
+        <div class="mb-3">
+            <label class="form-label">Nama <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="tcNama" maxlength="150"/>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="tcActive" checked/>
+            <label class="form-check-label" for="tcActive">Active</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="btnSaveTypeCus">Simpan</button>
+    </div>
+</div></div></div>
+
+<!-- Modal Account -->
+<div class="modal fade" id="modalAccount" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title" id="modalAccountTitle">Account</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <input type="hidden" id="accEditId"/>
+        <div class="mb-3">
+            <label class="form-label">Kode <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="accKode" maxlength="50"/>
+        </div>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="accActive" checked/>
+            <label class="form-check-label" for="accActive">Active</label>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="btnSaveAccount">Simpan</button>
+    </div>
+</div></div></div>
+
+<!-- Modal Mapping -->
+<div class="modal fade" id="modalMapping" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">Tambah Mapping</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+        <div class="mb-3">
+            <label class="form-label">Channel <span class="text-danger">*</span></label>
+            <select class="form-select" id="mapChannel"></select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Type Customer <span class="text-danger">*</span></label>
+            <select class="form-select" id="mapTypeCus"></select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Account <span class="text-danger">*</span></label>
+            <select class="form-select" id="mapAccount"></select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="btnSaveMapping">Simpan</button>
+    </div>
+</div></div></div>
+
+</div>
+
+<script src="../../../wwwroot/js/layout.js"></script>
+<script>
+document.addEventListener('layoutReady', () => {
+"use strict";
+
+const KEYS = {
+    channel: 'md_channel',
+    typeCus: 'md_type_customer',
+    account: 'md_account',
+    mapping: 'md_channel_mapping'
+};
+const SEED = {
+    channel: { verKey: 'md_channel_seed_ver', ver: 'hierarchy-20260812b', file: 'channel.json' },
+    typeCus: { verKey: 'md_type_customer_seed_ver', ver: 'hierarchy-20260812b', file: 'type-customer.json' },
+    account: { verKey: 'md_account_seed_ver', ver: 'hierarchy-20260812b', file: 'account.json' },
+    mapping: { verKey: 'md_channel_mapping_seed_ver', ver: 'hierarchy-20260812b', file: 'channel-mapping.json' }
+};
+const DATA_BASE = '../../../wwwroot/data/';
+const DT_LANG = {
+    search: '', searchPlaceholder: 'Cari...', lengthMenu: '_MENU_ entri',
+    info: '_START_-_END_ dari _TOTAL_', paginate: { previous: '‹', next: '›' },
+    zeroRecords: 'Tidak ada data'
+};
+const DT_DOM = '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>';
+
+function get(key){ return JSON.parse(localStorage.getItem(key) || '[]'); }
+function set(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+function nextId(list){ return list.reduce((m, x) => Math.max(m, Number(x.id) || 0), 0) + 1; }
+function badge(active){
+    return active !== false
+        ? '<span class="badge-status badge-active">Active</span>'
+        : '<span class="badge-status badge-inactive">Inactive</span>';
+}
+function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function destroyDt(sel){
+    if ($.fn.DataTable.isDataTable(sel)) $(sel).DataTable().destroy();
+}
+function adjustDt(sel){
+    if ($.fn.DataTable.isDataTable(sel)) $(sel).DataTable().columns.adjust();
+}
+
+function ensureSeed(storeKey, meta){
+    const ok = localStorage.getItem(meta.verKey) === meta.ver && localStorage.getItem(storeKey);
+    if (ok) return Promise.resolve(get(storeKey));
+    return fetch(DATA_BASE + meta.file)
+        .then(r => r.json())
+        .then(d => {
+            const arr = Array.isArray(d) ? d : [];
+            set(storeKey, arr);
+            localStorage.setItem(meta.verKey, meta.ver);
+            return arr;
+        })
+        .catch(() => { set(storeKey, []); localStorage.setItem(meta.verKey, meta.ver); return []; });
+}
+
+function loadAll(){
+    return Promise.all([
+        ensureSeed(KEYS.channel, SEED.channel),
+        ensureSeed(KEYS.typeCus, SEED.typeCus),
+        ensureSeed(KEYS.account, SEED.account),
+        ensureSeed(KEYS.mapping, SEED.mapping)
+    ]);
+}
+
+function mappingOfChannel(channelId){
+    return get(KEYS.mapping).filter(m => String(m.channelId) === String(channelId));
+}
+function accountById(id){ return get(KEYS.account).find(a => String(a.id) === String(id)); }
+function typeCusById(id){ return get(KEYS.typeCus).find(t => String(t.id) === String(id)); }
+function channelById(id){ return get(KEYS.channel).find(c => String(c.id) === String(id)); }
+
+function renderAll(){
+    renderMappingTable();
+    renderChannelTable();
+    renderTypeCusTable();
+    renderAccountTable();
+}
+
+/* ---- Mapping tab ---- */
+function renderMappingTable(){
+    destroyDt('#tblMapping');
+    const $b = $('#tblMappingBody').empty();
+    const rows = get(KEYS.mapping).slice().sort((a, b) => {
+        const ca = channelById(a.channelId)?.nama || '';
+        const cb = channelById(b.channelId)?.nama || '';
+        const n = String(ca).localeCompare(String(cb));
+        if (n !== 0) return n;
+        const ta = typeCusById(a.typeCustomerId)?.nama || '';
+        const tb = typeCusById(b.typeCustomerId)?.nama || '';
+        return String(ta).localeCompare(String(tb));
+    });
+    rows.forEach((m, i) => {
+        const ch = channelById(m.channelId);
+        const tc = typeCusById(m.typeCustomerId);
+        const acc = accountById(m.accountId);
+        $b.append(`<tr>
+            <td>${i + 1}</td>
+            <td>${esc(ch ? ch.nama : '-')}</td>
+            <td>${esc(tc ? tc.nama : '-')}</td>
+            <td><strong>${esc(acc ? acc.kode : '-')}</strong></td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-danger btn-sm btn-del-map" data-id="${m.id}" title="Hapus"><i class="fa fa-trash"></i></button>
+            </td>
+        </tr>`);
+    });
+    $('#tblMapping').DataTable({
+        language: DT_LANG, pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [4] }],
+        dom: DT_DOM
+    });
+}
+
+/* ---- Manage: Channel ---- */
+function renderChannelTable(){
+    destroyDt('#tblChannel');
+    const $b = $('#tblChannelBody').empty();
+    const channels = get(KEYS.channel).slice().sort((a,b) => String(a.nama||'').localeCompare(String(b.nama||'')));
+    channels.forEach((item, i) => {
+        $b.append(`<tr>
+            <td>${i + 1}</td>
+            <td>${esc(item.nama)}</td>
+            <td class="text-center">${mappingOfChannel(item.id).length}</td>
+            <td>${badge(item.active)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-success btn-sm btn-edit-ch" data-id="${item.id}" title="Ubah"><i class="fa fa-pen"></i></button>
+            </td>
+        </tr>`);
+    });
+    $('#tblChannel').DataTable({
+        language: DT_LANG, pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [4] }],
+        dom: DT_DOM
+    });
+}
+
+function openChannelModal(id){
+    if (id) {
+        const c = channelById(id);
+        if (!c) return;
+        $('#chEditId').val(c.id);
+        $('#chNama').val(c.nama || '');
+        $('#chActive').prop('checked', c.active !== false);
+        $('#modalChannelTitle').text('Ubah Channel');
+    } else {
+        $('#chEditId').val('');
+        $('#chNama').val('');
+        $('#chActive').prop('checked', true);
+        $('#modalChannelTitle').text('Tambah Channel');
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalChannel')).show();
+}
+
+function saveChannel(){
+    const nama = String($('#chNama').val() || '').trim();
+    if (!nama) { Swal.fire('Peringatan', 'Nama Channel wajib diisi.', 'warning'); return; }
+    const editId = $('#chEditId').val();
+    const data = get(KEYS.channel);
+    const dup = data.find(c =>
+        String(c.nama||'').toLowerCase() === nama.toLowerCase() &&
+        String(c.id) !== String(editId || '')
+    );
+    if (dup) { Swal.fire('Duplikat', 'Nama Channel sudah dipakai.', 'warning'); return; }
+    if (editId) {
+        const idx = data.findIndex(c => String(c.id) === String(editId));
+        if (idx < 0) return;
+        data[idx] = { ...data[idx], nama, active: $('#chActive').is(':checked') };
+    } else {
+        data.push({ id: nextId(data), nama, active: $('#chActive').is(':checked') });
+    }
+    set(KEYS.channel, data);
+    bootstrap.Modal.getInstance(document.getElementById('modalChannel'))?.hide();
+    renderAll();
+    Swal.fire({ icon:'success', title:'Tersimpan', timer:800, showConfirmButton:false });
+}
+
+/* ---- Manage: Type Customer ---- */
+function renderTypeCusTable(){
+    destroyDt('#tblTypeCus');
+    const $b = $('#tblTypeCusBody').empty();
+    const maps = get(KEYS.mapping);
+    const rows = get(KEYS.typeCus).slice().sort((a,b) => String(a.nama||'').localeCompare(String(b.nama||'')));
+    rows.forEach((t, i) => {
+        const nMap = maps.filter(m => String(m.typeCustomerId) === String(t.id)).length;
+        $b.append(`<tr>
+            <td>${i + 1}</td>
+            <td>${esc(t.nama)}</td>
+            <td class="text-center">${nMap}</td>
+            <td>${badge(t.active)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-success btn-sm btn-edit-tc" data-id="${t.id}" title="Ubah"><i class="fa fa-pen"></i></button>
+            </td>
+        </tr>`);
+    });
+    $('#tblTypeCus').DataTable({
+        language: DT_LANG, pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [4] }],
+        dom: DT_DOM
+    });
+}
+
+function openTypeCusModal(id){
+    if (id) {
+        const t = typeCusById(id);
+        if (!t) return;
+        $('#tcEditId').val(t.id);
+        $('#tcNama').val(t.nama || '');
+        $('#tcActive').prop('checked', t.active !== false);
+        $('#modalTypeCusTitle').text('Ubah Type Customer');
+    } else {
+        $('#tcEditId').val('');
+        $('#tcNama').val('');
+        $('#tcActive').prop('checked', true);
+        $('#modalTypeCusTitle').text('Tambah Type Customer');
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalTypeCus')).show();
+}
+
+function saveTypeCus(){
+    const nama = String($('#tcNama').val() || '').trim();
+    if (!nama) { Swal.fire('Peringatan', 'Nama Type Customer wajib diisi.', 'warning'); return; }
+    const editId = $('#tcEditId').val();
+    const data = get(KEYS.typeCus);
+    const dup = data.find(t =>
+        String(t.nama||'').toLowerCase() === nama.toLowerCase() &&
+        String(t.id) !== String(editId || '')
+    );
+    if (dup) { Swal.fire('Duplikat', 'Nama Type Customer sudah dipakai.', 'warning'); return; }
+    if (editId) {
+        const idx = data.findIndex(t => String(t.id) === String(editId));
+        if (idx < 0) return;
+        data[idx] = { ...data[idx], nama, active: $('#tcActive').is(':checked') };
+    } else {
+        data.push({ id: nextId(data), nama, active: $('#tcActive').is(':checked') });
+    }
+    set(KEYS.typeCus, data);
+    bootstrap.Modal.getInstance(document.getElementById('modalTypeCus'))?.hide();
+    renderAll();
+    Swal.fire({ icon:'success', title:'Tersimpan', timer:800, showConfirmButton:false });
+}
+
+/* ---- Manage: Account ---- */
+function renderAccountTable(){
+    destroyDt('#tblAccount');
+    const $b = $('#tblAccountBody').empty();
+    const maps = get(KEYS.mapping);
+    const rows = get(KEYS.account).slice().sort((a,b) => String(a.kode||'').localeCompare(String(b.kode||'')));
+    rows.forEach((a, i) => {
+        const nMap = maps.filter(m => String(m.accountId) === String(a.id)).length;
+        $b.append(`<tr>
+            <td>${i + 1}</td>
+            <td><strong>${esc(a.kode)}</strong></td>
+            <td class="text-center">${nMap}</td>
+            <td>${badge(a.active)}</td>
+            <td class="text-center">
+                <button type="button" class="btn btn-outline-success btn-sm btn-edit-acc" data-id="${a.id}" title="Ubah"><i class="fa fa-pen"></i></button>
+            </td>
+        </tr>`);
+    });
+    $('#tblAccount').DataTable({
+        language: DT_LANG, pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [4] }],
+        dom: DT_DOM
+    });
+}
+
+function openAccountModal(id){
+    if (id) {
+        const a = accountById(id);
+        if (!a) return;
+        $('#accEditId').val(a.id);
+        $('#accKode').val(a.kode || '');
+        $('#accActive').prop('checked', a.active !== false);
+        $('#modalAccountTitle').text('Ubah Account');
+    } else {
+        $('#accEditId').val('');
+        $('#accKode').val('');
+        $('#accActive').prop('checked', true);
+        $('#modalAccountTitle').text('Tambah Account');
+    }
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalAccount')).show();
+}
+
+function saveAccount(){
+    const kode = String($('#accKode').val() || '').trim().toUpperCase();
+    if (!kode) { Swal.fire('Peringatan', 'Kode Account wajib diisi.', 'warning'); return; }
+    const editId = $('#accEditId').val();
+    const data = get(KEYS.account);
+    const dup = data.find(a =>
+        String(a.kode||'').toUpperCase() === kode &&
+        String(a.id) !== String(editId || '')
+    );
+    if (dup) { Swal.fire('Duplikat', 'Kode Account sudah dipakai.', 'warning'); return; }
+    if (editId) {
+        const idx = data.findIndex(a => String(a.id) === String(editId));
+        if (idx < 0) return;
+        data[idx] = { ...data[idx], kode, active: $('#accActive').is(':checked') };
+    } else {
+        data.push({ id: nextId(data), kode, active: $('#accActive').is(':checked') });
+    }
+    set(KEYS.account, data);
+    bootstrap.Modal.getInstance(document.getElementById('modalAccount'))?.hide();
+    renderAll();
+    Swal.fire({ icon:'success', title:'Tersimpan', timer:800, showConfirmButton:false });
+}
+
+/* ---- Mapping CRUD ---- */
+function openMappingModal(){
+    const channels = get(KEYS.channel).filter(c => c.active !== false)
+        .slice().sort((a,b) => String(a.nama||'').localeCompare(String(b.nama||'')));
+    const tcs = get(KEYS.typeCus).filter(t => t.active !== false)
+        .slice().sort((a,b) => String(a.nama||'').localeCompare(String(b.nama||'')));
+    const accs = get(KEYS.account).filter(a => a.active !== false)
+        .slice().sort((a,b) => String(a.kode||'').localeCompare(String(b.kode||'')));
+
+    if (!channels.length) {
+        Swal.fire('Peringatan', 'Belum ada Channel aktif. Tambah di tab Manage.', 'warning');
+        return;
+    }
+    if (!tcs.length) {
+        Swal.fire('Peringatan', 'Belum ada Type Customer aktif. Tambah di tab Manage.', 'warning');
+        return;
+    }
+    if (!accs.length) {
+        Swal.fire('Peringatan', 'Belum ada Account aktif. Tambah di tab Manage.', 'warning');
+        return;
+    }
+
+    const $ch = $('#mapChannel').empty();
+    const $tc = $('#mapTypeCus').empty();
+    const $acc = $('#mapAccount').empty();
+    channels.forEach(c => $ch.append(`<option value="${c.id}">${esc(c.nama)}</option>`));
+    tcs.forEach(t => $tc.append(`<option value="${t.id}">${esc(t.nama)}</option>`));
+    accs.forEach(a => $acc.append(`<option value="${a.id}">${esc(a.kode)}</option>`));
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalMapping')).show();
+}
+
+function saveMapping(){
+    const channelId = Number($('#mapChannel').val());
+    const typeCustomerId = Number($('#mapTypeCus').val());
+    const accountId = Number($('#mapAccount').val());
+    if (!channelId || !typeCustomerId || !accountId) {
+        Swal.fire('Peringatan', 'Channel, Type Customer, dan Account wajib dipilih.', 'warning');
+        return;
+    }
+    const data = get(KEYS.mapping);
+    const dup = data.find(m =>
+        String(m.channelId) === String(channelId) &&
+        String(m.typeCustomerId) === String(typeCustomerId) &&
+        String(m.accountId) === String(accountId)
+    );
+    if (dup) { Swal.fire('Duplikat', 'Mapping triple sudah ada.', 'warning'); return; }
+    data.push({ id: nextId(data), channelId, typeCustomerId, accountId });
+    set(KEYS.mapping, data);
+    bootstrap.Modal.getInstance(document.getElementById('modalMapping'))?.hide();
+    renderAll();
+    Swal.fire({ icon:'success', title:'Mapping ditambah', timer:800, showConfirmButton:false });
+}
+
+function deleteMapping(id){
+    Swal.fire({
+        title: 'Hapus mapping?',
+        text: 'Triple Channel–TypeCus–Account akan dihapus.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Hapus',
+        confirmButtonColor: '#dc3545'
+    }).then(res => {
+        if (!res.isConfirmed) return;
+        set(KEYS.mapping, get(KEYS.mapping).filter(m => String(m.id) !== String(id)));
+        renderAll();
+    });
+}
+
+/* ---- Events ---- */
+$('#btnAddMapping').on('click', openMappingModal);
+$('#btnSaveMapping').on('click', saveMapping);
+$('#btnAddChannel').on('click', () => openChannelModal(null));
+$('#btnSaveChannel').on('click', saveChannel);
+$('#btnAddTypeCus').on('click', () => openTypeCusModal(null));
+$('#btnSaveTypeCus').on('click', saveTypeCus);
+$('#btnAddAccount').on('click', () => openAccountModal(null));
+$('#btnSaveAccount').on('click', saveAccount);
+
+$(document).on('click', '.btn-edit-ch', function(){ openChannelModal($(this).data('id')); });
+$(document).on('click', '.btn-edit-tc', function(){ openTypeCusModal($(this).data('id')); });
+$(document).on('click', '.btn-edit-acc', function(){ openAccountModal($(this).data('id')); });
+$(document).on('click', '.btn-del-map', function(){ deleteMapping($(this).data('id')); });
+
+$('#tab-manage-btn').on('shown.bs.tab', () => {
+    adjustDt('#tblChannel');
+    adjustDt('#tblTypeCus');
+    adjustDt('#tblAccount');
+});
+$('#accChannel, #accTypeCus, #accAccount').on('shown.bs.collapse', function(){
+    const map = { accChannel: '#tblChannel', accTypeCus: '#tblTypeCus', accAccount: '#tblAccount' };
+    adjustDt(map[this.id]);
+});
+
+loadAll().then(renderAll);
+});
+</script>
+</body>
+</html>

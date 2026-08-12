@@ -29,7 +29,7 @@ from maven_spec import (  # noqa: E402
     chapter_erd,
 )
 
-TANGGAL = '10 Agustus 2026'
+TANGGAL = '12 Agustus 2026'
 
 LIMIT_VALIDATION_SECTION = '''
 #### 3.6.7 Sumber Data Jabatan & Type Jabatan (Master Data API)
@@ -105,14 +105,14 @@ def preamble() -> str:
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.9
+### Versi Dokumen: 1.10
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.9 |
+| **Versi** | 1.10 |
 | **Tanggal** | {TANGGAL} |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -124,7 +124,8 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
-| **1.9** | **{TANGGAL}** | **Tim IT** | Limit: field **Nama** wajib & unik global (`txtNama`); kolom list + input Header |
+| **1.10** | **{TANGGAL}** | **Tim IT** | Channel: hierarki **Channel → Type Customer → Account**; tab Manage + Mapping (simulasi Master Data) |
+| **1.9** | **10 Agustus 2026** | **Tim IT** | Limit: field **Nama** wajib & unik global (`txtNama`); kolom list + input Header |
 | **1.8** | **7 Agustus 2026** | **Tim IT** | Channel: **view-only** (sumber API `/api/v1/Channel`); hapus Tambah/Edit di UI + FSD |
 | **1.7** | **6 Agustus 2026** | **Tim IT** | Limit: sumber LOV Jabatan/Type dari API `/api/v1/Position` (tooltip + narasi FSD) |
 | **1.6** | **6 Agustus 2026** | **Tim IT** | Limit: screenshot + narasi validasi (field, duplikat, periode bentrok) + History |
@@ -172,7 +173,7 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MA
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
 | Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
-| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan & Channel (API) |
+| Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
 | Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
 | Desain database produksi MAVEN (PostgreSQL + EF Core) | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
 | Mapping UI → tabel/kolom MAVEN & skrip DDL | — |
@@ -213,7 +214,8 @@ Modul Data Master memakai **empat pola** pengelolaan data:
 | Form (add/edit) | Produk | Halaman detail fleksibel + LOV SKU | Katalog SKU dari Master Data API; harga/pajak/status di DB FPRS |
 | Modal CRUD | Pajak, Alasan | Modal di dalam Index | Tabel lokal MAVEN (`mPajak`, `mAlasan`) |
 | Upload-only (CSV + history) | Pegawai, Stokis | Download/Upload CSV, status disinkronkan | File CSV sebagai input; hasil di `mPegawai` / `mStokis` + tabel riwayat |
-| View-only (sumber API / mobile) | Channel, Pelanggan | List + detail read-only | Channel: Master Data API `/api/v1/Channel`; Pelanggan: Mobile SFA → `mPelanggan` |
+| View-only (sumber mobile) | Pelanggan | List + detail read-only | Mobile SFA → `mPelanggan` |
+| Hierarki + mapping (simulasi MD) | Channel | Detail tabs Manage + Mapping | Channel → Type Customer → Account; triple mapping; prototype localStorage |
 | Form + versi (append-only) | Limit | Header + versi periode | LOV jabatan dari API Position; persist `mLimitTargetHarian` / Ver |
 
 ### 2.3 Business Flow (Swimlane)
@@ -261,7 +263,7 @@ Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan 
 | Form Produk | Create / Edit | Kode dari LOV API; harga beli > 0; kode unik | Insert/update `mProduk` | Tidak ada — langsung simpan |
 | Modal Pajak/Alasan | Tambah / Ubah (/ Hapus) | Field wajib; unik nama/kode; Pajak cek FK produk sebelum hapus | Persist ke tabel terkait | Tidak ada |
 | CSV Pegawai/Stokis | Upload file | Header dikenali; baris wajib; Stokis: GPS unik | Upsert Active; absen di file → Inactive + hist | Tidak ada |
-| Channel | Buka list/detail | — (read-only; sumber API) | Tampil / sync dari `/api/v1/Channel` → `mChannel` | N/A |
+| Channel | Manage / Mapping | TypeCus unik/Channel; Account unik; triple unik | Persist simulasi MD (Channel/TypeCus/Account/mapping) | Tidak ada |
 | Pelanggan | Buka list/detail | — (read-only) | Tampil dari `mPelanggan` | N/A |
 | Limit | Create header / append versi | Nama wajib+unik global; Jabatan+type unik; Max≥Min; no backdate; overlap dialog | `mLimitTargetHarian` + Ver | Tidak ada |
 
@@ -333,7 +335,7 @@ def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
         '| BR-PR04 | Produk | Identitas SKU (kode/nama/umbrella/brand) bersumber Master Data API; aplikasi hanya boleh mengubah harga beli, skema pajak, unit default PCS, dan status. |',
         '| BR-PR05 | Produk | Harga jual = f(harga beli, persentase pajak); tidak diinput manual. |',
         '| BR-PR06 | Pajak | Hapus ditolak jika `mProduk.intPajakID` masih mereferensikan record tersebut. |',
-        '| BR-PR07 | Channel | Web Admin **view-only**; create/update/delete hanya di Master Data API `/api/v1/Channel`; MAVEN sync ke `mChannel`. |',
+        '| BR-PR07 | Channel | Hierarki Channel → Type Customer → Account; mapping triple unik; prototype simulasi Master Data (CRUD Web Admin). |',
         '| BR-PR08 | Pelanggan | Web Admin **read-only**; create/update hanya dari Mobile SFA / job sync (fase integrasi). |',
         '| BR-PR09 | Pegawai | Upload CSV: baris di file → Active (insert/update); NIK yang tidak ada di file → Inactive + catat `mPegawaiStatusHist`. |',
         '| BR-PR10 | Stokis | Upload CSV: sama pola Active/Inactive; `lat`/`lng` wajib dan unik antar outlet; catat `mStokisStatusHist`. |',
@@ -366,7 +368,7 @@ Konstanta di aplikasi **harus** match `mMenu.txtMenuCode` (bukan `txtMenuName`):
 |-------|---------------|--------------|-------------|------------------|-----------|
 | Produk | `MPR` | Product | `/MasterData/Product` | `bitView` | `bitEdit` |
 | Pelanggan | `MPL` | Customer | `/MasterData/Customer` | `bitView` | — (read-only) |
-| Channel | `MCH` | Channel | `/MasterData/Channel` | `bitView` | — (read-only) |
+| Channel | `MCH` | Channel | `/MasterData/Channel` | `bitView` | `bitEdit` |
 | Pegawai | `MPE` | Employee | `/MasterData/Pegawai` | `bitView` | `bitEdit` (upload) |
 | Pajak | `MTX` | Tax | `/MasterData/Tax` | `bitView` | `bitEdit` / `bitDelete` |
 | Alasan | `MRS` | Reason | `/MasterData/Reason` | `bitView` | `bitEdit` / `bitDelete` |
@@ -380,7 +382,7 @@ Parent menu Data Master: `intParentID = 3936`, `intModuleID = 2749` (sama untuk 
 |-------|-------------------|------------------|------------|
 | Produk | Create / Read / Update | Read | Hapus tidak tersedia |
 | Pelanggan | Read | Read | View-only; sumber mobile |
-| Channel | Read | Read | View-only; sumber `/api/v1/Channel` |
+| Channel | Create / Read / Update | Read | Hierarki + mapping Type Customer / Account |
 | Pegawai | Upload / Read | Read | Sinkronisasi CSV |
 | Stokis | Upload / Read | Read | Sinkronisasi CSV |
 | Pajak | Create / Read / Update / Delete | Read | Cek FK produk sebelum hapus |
@@ -412,7 +414,7 @@ def chapter_integration(reg: dict) -> str:
 | Endpoint | Modul FPRS | Arah | Digunakan untuk |
 |----------|------------|------|-----------------|
 | `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
-| `GET /api/v1/Channel` | Channel | Inbound sync / list | Master channel view-only di Web Admin |
+| `GET /api/v1/Channel` | Channel | Referensi / sync (rencana) | Prototype: simulasi lokal hierarki + mapping; produksi boleh sync |
 | `GET /api/v1/Position` | Limit | Inbound LOV | Dropdown **Jabatan** & **Type Jabatan** pada form Create/Detail |
 | `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
 | `/api/v1/Tax` | Pajak | Opsional sync | Referensi skema pajak; v1 boleh fully lokal di `mPajak` |

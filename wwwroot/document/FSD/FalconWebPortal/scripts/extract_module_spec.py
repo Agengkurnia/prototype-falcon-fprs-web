@@ -116,10 +116,12 @@ MODULE_ENRICHMENT = {
         'menggunakan **NIK**. Halaman `detail.html` menampilkan data pegawai secara read-only beserta riwayat status.'
     ),
     'master-channel': (
-        'Modul **Channel** menampilkan klasifikasi channel pelanggan (mis. MT-HPM-NKA, GT-GROSIR, MED-APOTIK) '
-        'yang bersumber dari **Master Data API** (`/api/v1/Channel`). Web Admin bersifat **view-only** — '
-        'tidak ada Tambah/Ubah/Hapus. Aksi baris hanya **Detail** (modal read-only) yang menampilkan bit **Active** '
-        'dan daftar pelanggan ter-paginasi pada channel tersebut (relasi 1 pelanggan → 1 channel) dari `md_pelanggan`.'
+        'Modul **Channel** memakai **dual-surface**: CRUD hierarki '
+        '**Channel → Type Customer → Account** di **Master Data Portal** '
+        '(`Views/MasterDataPortal/Channel/`), sementara menu Channel di '
+        '**Man Power GT** (`Views/FPRS/MasterData/Channel/`) **view-only**. '
+        'Data berbagi `localStorage`/seed. Portal: tab **Manage** + **Mapping** (triple unik; seed CSV). '
+        'Panel pelanggan legacy read-only (`md_pelanggan.channel` belum di-remap ke triple).'
     ),
     'master-stokis': (
         'Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat stok). Menampilkan '
@@ -190,10 +192,10 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'master-channel': {
         'purpose': (
-            'Menampilkan master channel pelanggan dari Master Data API untuk segmentasi penjualan. '
-            'Web Admin view-only (list + detail pelanggan per channel); create/update hanya di Master Data.'
+            'Mengelola hierarki Channel → Type Customer → Account + mapping triple di '
+            '**Master Data Portal**; menu Channel Man Power GT hanya view-only.'
         ),
-        'users': 'Admin Master Data, Sales Operations (read).',
+        'users': 'Admin Master Data (CRUD Portal); Sales Ops / Supervisor (view FPRS).',
     },
     'master-pegawai': {
         'purpose': (
@@ -294,9 +296,9 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
 
 MODAL_FORM_INTRO = {
     'master-channel': (
-        '**Dashboard list** menampilkan DataTable channel (sumber API). **Modal Detail** (view-only) muncul di atas '
-        'halaman yang sama: Nama Channel & Status read-only, plus panel **Pelanggan pada Channel Ini** '
-        '(paginasi) untuk outlet dengan `channel` yang cocok. Tidak ada tombol Tambah/Simpan.'
+        '**Dashboard list** menampilkan Channel. **Detail in-page** punya tab **Manage** '
+        '(CRUD Channel, Type Customer scoped, Account global) dan tab **Mapping** '
+        '(CRUD triple Channel–TypeCus–Account; pelanggan legacy read-only).'
     ),
     'master-pajak': (
         '**Dashboard list** menampilkan daftar skema pajak. **Form modal** untuk Tambah/Ubah berisi '
@@ -330,7 +332,7 @@ def apply_fsd_terms(text: str) -> str:
 
 def form_section_label(mod: dict, form_html: str, ui_type: str) -> str:
     if mod.get('id') == 'master-channel':
-        return 'Modal Detail (view-only)'
+        return 'Detail — Manage / Mapping'
     if ui_type == 'modal':
         return 'Form Modal (Tambah / Ubah)'
     if form_html and (' disabled' in form_html or 'readonly' in form_html):
@@ -918,10 +920,10 @@ def crud_table(mod: dict) -> str:
         ]
     elif mid == 'master-channel':
         rows = [
-            ('Create', '—', '—', 'Dikelola di Master Data API `/api/v1/Channel`; tidak tersedia di Web Admin'),
-            ('Read', 'dashboard list (DataTable) + modal Detail (pelanggan ter-paginasi)', 'Semua role dengan bitView', 'View-only'),
-            ('Update', '—', '—', 'Tidak tersedia di Web Admin'),
-            ('Delete', '—', '—', 'Tidak tersedia di Web Admin'),
+            ('Create', 'Master Data Portal: Tambah Channel / Type Customer / Account / Mapping', 'Admin Master Data', 'localStorage simulasi; FPRS tidak punya Create'),
+            ('Read', 'Portal + FPRS: list + detail (Manage & Mapping); FPRS view-only', 'Semua role dengan bitView', 'Shared seed/localStorage'),
+            ('Update', 'Hanya di Master Data Portal (tab Manage)', 'Admin Master Data', 'TypeCus unik per Channel; Account unik global'),
+            ('Delete', 'Portal: hapus Mapping; soft nonaktif via Status', 'Admin Master Data', 'FPRS tidak bisa hapus/ubah'),
         ]
     elif mid == 'penjualan-faktur':
         rows = [

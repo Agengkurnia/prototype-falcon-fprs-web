@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "nama": "DRUG ,HEALTH & BEAUTY",
+    "active": true
+  },
+  {
+    "id": 2,
+    "nama": "PEDAGANG BESAR FARMASI",
+    "active": true
+  },
+  {
+    "id": 3,
+    "nama": "RS & KLINIK",
+    "active": true
+  },
+  {
+    "id": 4,
+    "nama": "TOKO SUSU",
+    "active": true
+  },
+  {
+    "id": 5,
+    "nama": "ECOMMERCE",
+    "active": true
+  },
+  {
+    "id": 6,
+    "nama": "MINI MARKET",
+    "active": true
+  },
+  {
+    "id": 7,
+    "nama": "TOKO SUSU TRADITIONAL",
+    "active": true
+  },
+  {
+    "id": 8,
+    "nama": "HYPERMARKET",
+    "active": true
+  },
+  {
+    "id": 9,
+    "nama": "SUPERMARKET",
+    "active": true
+  },
+  {
+    "id": 10,
+    "nama": "WHOLESALE",
+    "active": true
+  },
+  {
+    "id": 11,
+    "nama": "GROSIR",
+    "active": true
+  },
+  {
+    "id": 12,
+    "nama": "BIDAN",
+    "active": true
+  },
+  {
+    "id": 13,
+    "nama": "TOKO OBAT",
+    "active": true
+  },
+  {
+    "id": 14,
+    "nama": "TOKO BUAH",
+    "active": true
+  },
+  {
+    "id": 15,
+    "nama": "GENERAL INST",
+    "active": true
+  },
+  {
+    "id": 16,
+    "nama": "HORECA",
+    "active": true
+  },
+  {
+    "id": 17,
+    "nama": "APOTIK",
+    "active": true
+  },
+  {
+    "id": 18,
+    "nama": "TOKO KELONTONG",
+    "active": true
+  },
+  {
+    "id": 19,
+    "nama": "HEALTH CARE PROFFESIONAL (HCP)",
+    "active": true
+  },
+  {
+    "id": 20,
+    "nama": "BABY SHOP",
+    "active": true
+  },
+  {
+    "id": 21,
+    "nama": "SUBDIST",
+    "active": true
+  }
+]

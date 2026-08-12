@@ -13,171 +13,134 @@
 </style>
 </head>
 <body>
-    <div id="app-content">
+<div id="app-content">
 
-<div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-<div>
-    <h2 class="title-page mb-1">Channel</h2>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
-            <li class="breadcrumb-item">Data Master</li>
-            <li class="breadcrumb-item active">Channel</li>
-        </ol>
-    </nav>
-</div>
-<span class="badge bg-label-info align-self-center"><i class="fa fa-link me-1"></i> View-only — sumber Master Data API</span>
-</div>
-
-<div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-    <i class="fa fa-link me-2 text-info"></i>
-    <strong>Sumber data:</strong> Master Channel diambil dari
-    <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Channel</code></a>.
-    Web Admin <strong>tidak</strong> menambah/mengubah/menghapus channel — hanya menampilkan daftar &amp; detail (termasuk pelanggan terkait).
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-
-<div class="card"><div class="card-body"><div class="table-responsive">
-<table class="table table-bordered table-hover" id="tbl">
-<thead><tr>
-    <th style="width:50px;">NO</th>
-    <th title="Source : Master Data API /api/v1/Channel | mChannel.txtNama">NAMA CHANNEL</th>
-    <th style="text-align:center;" title="Source : mPelanggan | COUNT(*) (derived)">TOTAL PELANGGAN</th>
-    <th style="width:100px;" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive">STATUS</th>
-    <th style="width:80px;text-align:center;">AKSI</th>
-</tr></thead>
-<tbody id="tblBody"></tbody>
-</table></div></div></div>
-
-<div class="modal fade" id="modalForm" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
-<div class="modal-header"><h5 class="modal-title" id="modalTitle">Detail Channel</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-<div class="modal-body">
-<input type="hidden" id="editId"/>
-<div class="mb-3">
-    <label class="form-label" title="Source : Master Data API /api/v1/Channel | mChannel.txtNama">Nama Channel</label>
-    <input type="text" class="form-control bg-light" id="inputNama" readonly disabled title="Source : Master Data API /api/v1/Channel | mChannel.txtNama"/>
-</div>
-<div class="mb-3">
-    <label class="form-label d-block" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive">Status</label>
-    <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" role="switch" id="inputActive" disabled style="cursor:not-allowed;" title="Source : Master Data API /api/v1/Channel | mChannel.bitActive"/>
-        <label class="form-check-label" for="inputActive" id="activeLabel">Active</label>
-    </div>
-    <div class="form-text">Data channel dikelola di Master Data (API) — tidak dapat diubah di Web Admin.</div>
-</div>
-
-<div id="custSection">
-    <hr/>
-    <div class="d-flex align-items-center justify-content-between mb-2">
-        <h6 class="mb-0 text-success fw-bold"><i class="fa fa-users me-1"></i> Pelanggan pada Channel Ini</h6>
-        <span class="badge bg-label-success" id="custCount">0 pelanggan</span>
-    </div>
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered mb-2">
-            <thead><tr><th style="width:40px;">#</th><th title="Source : mPelanggan | txtKode">KODE</th><th title="Source : mPelanggan | txtNama">NAMA PELANGGAN</th><th title="Source : mPelanggan | txtKota">KOTA</th></tr></thead>
-            <tbody id="custBody"></tbody>
-        </table>
-    </div>
-    <div class="d-flex align-items-center justify-content-between">
-        <small class="text-muted" id="custPageInfo">-</small>
-        <div class="btn-group btn-group-sm">
-            <button type="button" class="btn btn-outline-secondary" id="custPrev" onclick="custGoto(-1)"><i class="fa fa-chevron-left"></i></button>
-            <button type="button" class="btn btn-outline-secondary" id="custNext" onclick="custGoto(1)"><i class="fa fa-chevron-right"></i></button>
+<div id="listContainer">
+    <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
+        <div>
+            <h2 class="title-page mb-1">Channel</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
+                    <li class="breadcrumb-item">Data Master</li>
+                    <li class="breadcrumb-item active">Channel</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+            <span class="badge bg-label-secondary"><i class="fa fa-eye me-1"></i> View-only</span>
+            <a class="btn btn-outline-primary" href="../../../MasterDataPortal/Channel/index.html">
+                <i class="fa fa-external-link-alt me-1"></i> Kelola di Master Data Portal
+            </a>
         </div>
     </div>
-</div>
-</div>
-<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button></div>
-</div></div></div>
+
+    <div class="alert alert-secondary border-0 shadow-sm mb-3" role="alert">
+        <i class="fa fa-info-circle me-2"></i>
+        Man Power GT menampilkan <strong>list mapping</strong> saja (view-only).
+        Kelola data di
+        <a href="../../../MasterDataPortal/Channel/index.html" class="alert-link">Master Data Portal</a>.
     </div>
-    <script src="../../../../wwwroot/js/layout.js"></script>
-    <script>
-        document.addEventListener('layoutReady', () => {
 
-const KEY='md_channel';
-const SEED_VER_KEY='md_channel_seed_ver';
-const SEED_VER='dummy-jul2026';
-const PEL_KEY='md_pelanggan';
-const PEL_SEED_VER_KEY='md_pelanggan_seed_ver';
-const PEL_SEED_VER='mobile-jul2026-c';
-const CUST_PAGE_SIZE=5;
-let pelangganData=[];
-let custPage=1;
-let custCurrentChannel='';
+    <div class="card"><div class="card-body"><div class="table-responsive">
+        <table class="table table-bordered table-hover" id="tbl" style="width:100%">
+            <thead><tr>
+                <th style="width:50px;">NO</th>
+                <th>CHANNEL</th>
+                <th>TYPE CUSTOMER</th>
+                <th>ACCOUNT</th>
+            </tr></thead>
+            <tbody id="tblBody"></tbody>
+        </table>
+    </div></div></div>
+</div>
 
-function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
-function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
+</div>
 
-function loadPelanggan(){
-    const raw=localStorage.getItem(PEL_KEY);
-    const verOk=localStorage.getItem(PEL_SEED_VER_KEY)===PEL_SEED_VER;
-    if(raw&&verOk){pelangganData=JSON.parse(raw);return Promise.resolve();}
-    return fetch('../../../../wwwroot/data/pelanggan.json').then(r=>r.json()).then(d=>{pelangganData=d;localStorage.setItem(PEL_KEY,JSON.stringify(d));localStorage.setItem(PEL_SEED_VER_KEY,PEL_SEED_VER);}).catch(()=>{pelangganData=[];});
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script>
+document.addEventListener('layoutReady', () => {
+"use strict";
+
+const KEYS = {
+    channel: 'md_channel',
+    typeCus: 'md_type_customer',
+    account: 'md_account',
+    mapping: 'md_channel_mapping'
+};
+const SEED = {
+    channel: { verKey: 'md_channel_seed_ver', ver: 'hierarchy-20260812b', file: 'channel.json' },
+    typeCus: { verKey: 'md_type_customer_seed_ver', ver: 'hierarchy-20260812b', file: 'type-customer.json' },
+    account: { verKey: 'md_account_seed_ver', ver: 'hierarchy-20260812b', file: 'account.json' },
+    mapping: { verKey: 'md_channel_mapping_seed_ver', ver: 'hierarchy-20260812b', file: 'channel-mapping.json' }
+};
+const DATA_BASE = '../../../../wwwroot/data/';
+
+function get(key){ return JSON.parse(localStorage.getItem(key) || '[]'); }
+function set(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function pelangganOf(channelNama){
-    return pelangganData.filter(p=>(p.channel||'')===channelNama);
+function ensureSeed(storeKey, meta){
+    const ok = localStorage.getItem(meta.verKey) === meta.ver && localStorage.getItem(storeKey);
+    if (ok) return Promise.resolve(get(storeKey));
+    return fetch(DATA_BASE + meta.file)
+        .then(r => r.json())
+        .then(d => {
+            const arr = Array.isArray(d) ? d : [];
+            set(storeKey, arr);
+            localStorage.setItem(meta.verKey, meta.ver);
+            return arr;
+        })
+        .catch(() => { set(storeKey, []); localStorage.setItem(meta.verKey, meta.ver); return []; });
 }
 
-function loadData(){
-    loadPelanggan().then(()=>{
-        const needSeed=!localStorage.getItem(KEY)||localStorage.getItem(SEED_VER_KEY)!==SEED_VER;
-        if(needSeed){
-            fetch('../../../../wwwroot/data/channel.json').then(r=>r.json()).then(d=>{saveData(d);localStorage.setItem(SEED_VER_KEY,SEED_VER);render();});
-        }else{render();}
+function loadAll(){
+    return Promise.all([
+        ensureSeed(KEYS.channel, SEED.channel),
+        ensureSeed(KEYS.typeCus, SEED.typeCus),
+        ensureSeed(KEYS.account, SEED.account),
+        ensureSeed(KEYS.mapping, SEED.mapping)
+    ]);
+}
+
+function accountById(id){ return get(KEYS.account).find(a => String(a.id) === String(id)); }
+function typeCusById(id){ return get(KEYS.typeCus).find(t => String(t.id) === String(id)); }
+function channelById(id){ return get(KEYS.channel).find(c => String(c.id) === String(id)); }
+
+function renderList(){
+    if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
+    const $b = $('#tblBody').empty();
+    const rows = get(KEYS.mapping).slice().sort((a, b) => {
+        const ca = channelById(a.channelId)?.nama || '';
+        const cb = channelById(b.channelId)?.nama || '';
+        const n = String(ca).localeCompare(String(cb));
+        if (n !== 0) return n;
+        const ta = typeCusById(a.typeCustomerId)?.nama || '';
+        const tb = typeCusById(b.typeCustomerId)?.nama || '';
+        return String(ta).localeCompare(String(tb));
+    });
+    rows.forEach((m, i) => {
+        const ch = channelById(m.channelId);
+        const tc = typeCusById(m.typeCustomerId);
+        const acc = accountById(m.accountId);
+        $b.append(`<tr>
+            <td>${i + 1}</td>
+            <td>${esc(ch ? ch.nama : '-')}</td>
+            <td>${esc(tc ? tc.nama : '-')}</td>
+            <td><strong>${esc(acc ? acc.kode : '-')}</strong></td>
+        </tr>`);
+    });
+    $('#tbl').DataTable({
+        language:{ search:'', searchPlaceholder:'Cari...', lengthMenu:'_MENU_ entri', info:'_START_-_END_ dari _TOTAL_', paginate:{ previous:'‹', next:'›' }, zeroRecords:'Tidak ada data' },
+        pageLength:10,
+        dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
     });
 }
 
-function render(){
-    if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();$('#tblBody').empty();
-    getData().forEach((item,i)=>{
-        const total=(item.totalPelanggan!=null)?item.totalPelanggan:pelangganOf(item.nama).length;
-        const badge=(item.active!==false)?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';
-        $('#tblBody').append(`<tr><td>${i+1}</td><td><strong>${item.nama}</strong></td><td class="text-center">${total}</td><td>${badge}</td><td><div class="row-actions"><button type="button" class="btn-action btn-action-view" onclick="viewItem('${item.id}')" title="Detail"><i class="fa fa-eye"></i></button></div></td></tr>`);
-    });
-    $('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[4]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
-}
-
-function renderCustomers(){
-    const list=pelangganOf(custCurrentChannel);
-    const totalPages=Math.max(1,Math.ceil(list.length/CUST_PAGE_SIZE));
-    if(custPage>totalPages)custPage=totalPages;
-    $('#custCount').text(`${list.length} pelanggan`);
-    const start=(custPage-1)*CUST_PAGE_SIZE;
-    const rows=list.slice(start,start+CUST_PAGE_SIZE);
-    const $b=$('#custBody').empty();
-    if(!rows.length){
-        $b.append('<tr><td colspan="4" class="text-center text-muted py-3">Belum ada pelanggan pada channel ini</td></tr>');
-    }else{
-        rows.forEach((p,idx)=>{$b.append(`<tr><td>${start+idx+1}</td><td><small class="text-muted">${p.kode||'-'}</small></td><td>${p.nama||'-'}</td><td><small>${p.kota||p.alamat||'-'}</small></td></tr>`);});
-    }
-    $('#custPageInfo').text(`Halaman ${custPage} dari ${totalPages}`);
-    $('#custPrev').prop('disabled',custPage<=1);
-    $('#custNext').prop('disabled',custPage>=totalPages);
-}
-
-function custGoto(dir){custPage+=dir;renderCustomers();}
-
-function updateActiveLabel(){document.getElementById('activeLabel').textContent=document.getElementById('inputActive').checked?'Active':'Inactive';}
-
-/** View-only detail (sumber Master Data API — tidak ada Tambah/Ubah). */
-function viewItem(id){
-    const item=getData().find(d=>String(d.id)===String(id));
-    if(!item)return;
-    document.getElementById('editId').value=item.id;
-    document.getElementById('inputNama').value=item.nama||'';
-    document.getElementById('inputActive').checked=item.active!==false;
-    updateActiveLabel();
-    document.getElementById('modalTitle').textContent='Detail Channel';
-    custCurrentChannel=item.nama;custPage=1;
-    renderCustomers();
-    bootstrap.Modal.getOrCreateInstance(document.getElementById('modalForm')).show();
-}
-
-$(document).ready(loadData);
-window.viewItem = viewItem;
-window.custGoto = custGoto;
-        });
-    </script>
+loadAll().then(renderList);
+});
+</script>
 </body>
 </html>

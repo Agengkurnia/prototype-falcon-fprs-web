@@ -14,7 +14,7 @@ Dokumentasi fungsional halaman panel admin di `Views/FPRS/`. Modul Master Data m
 | Pelanggan | `MasterData/Pelanggan/` | [master_pelanggan.md](master_pelanggan.md) — view-only, data dari mobile (foto, wilayah, GPS) |
 | Pegawai | `MasterData/Pegawai/` | [master_pegawai.md](master_pegawai.md) — view-only, upload CSV + riwayat |
 | **Stokis / Grosir** | `MasterData/Stokis/` | [master_stokis.md](master_stokis.md) — view-only, Outlet ID, upload CSV (sync Active/Inactive) |
-| Channel | `MasterData/Channel/` | [master_channel.md](master_channel.md) |
+| Channel | FPRS `MasterData/Channel/` (view-only) + Portal `Views/MasterDataPortal/Channel/` (CRUD) | [master_channel.md](master_channel.md) |
 | Pajak | `MasterData/Pajak/` | [master_pajak.md](master_pajak.md) |
 | Alasan | `MasterData/Alasan/` | [master_alasan.md](master_alasan.md) |
 | **Limit** | `MasterData/LimitTargetHarian/` | [master_limit_target_harian.md](master_limit_target_harian.md) — list/detail/history ala PRM |

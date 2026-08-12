@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "kode": "IND",
+    "active": true
+  },
+  {
+    "id": 2,
+    "kode": "NKA",
+    "active": true
+  },
+  {
+    "id": 3,
+    "kode": "RKA",
+    "active": true
+  },
+  {
+    "id": 4,
+    "kode": "MM",
+    "active": true
+  },
+  {
+    "id": 5,
+    "kode": "MTI",
+    "active": true
+  }
+]

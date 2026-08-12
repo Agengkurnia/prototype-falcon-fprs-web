@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "channelId": 1,
+    "typeCustomerId": 1,
+    "accountId": 1
+  },
+  {
+    "id": 2,
+    "channelId": 1,
+    "typeCustomerId": 2,
+    "accountId": 2
+  },
+  {
+    "id": 3,
+    "channelId": 1,
+    "typeCustomerId": 3,
+    "accountId": 1
+  },
+  {
+    "id": 4,
+    "channelId": 2,
+    "typeCustomerId": 4,
+    "accountId": 1
+  },
+  {
+    "id": 5,
+    "channelId": 3,
+    "typeCustomerId": 5,
+    "accountId": 1
+  },
+  {
+    "id": 6,
+    "channelId": 1,
+    "typeCustomerId": 1,
+    "accountId": 2
+  },
+  {
+    "id": 7,
+    "channelId": 1,
+    "typeCustomerId": 1,
+    "accountId": 3
+  },
+  {
+    "id": 8,
+    "channelId": 4,
+    "typeCustomerId": 6,
+    "accountId": 4
+  },
+  {
+    "id": 9,
+    "channelId": 2,
+    "typeCustomerId": 7,
+    "accountId": 1
+  },
+  {
+    "id": 10,
+    "channelId": 4,
+    "typeCustomerId": 8,
+    "accountId": 3
+  },
+  {
+    "id": 11,
+    "channelId": 4,
+    "typeCustomerId": 6,
+    "accountId": 1
+  },
+  {
+    "id": 12,
+    "channelId": 4,
+    "typeCustomerId": 9,
+    "accountId": 2
+  },
+  {
+    "id": 13,
+    "channelId": 4,
+    "typeCustomerId": 10,
+    "accountId": 2
+  },
+  {
+    "id": 14,
+    "channelId": 5,
+    "typeCustomerId": 11,
+    "accountId": 1
+  },
+  {
+    "id": 15,
+    "channelId": 1,
+    "typeCustomerId": 12,
+    "accountId": 1
+  },
+  {
+    "id": 16,
+    "channelId": 1,
+    "typeCustomerId": 13,
+    "accountId": 1
+  },
+  {
+    "id": 17,
+    "channelId": 4,
+    "typeCustomerId": 9,
+    "accountId": 3
+  },
+  {
+    "id": 18,
+    "channelId": 2,
+    "typeCustomerId": 14,
+    "accountId": 5
+  },
+  {
+    "id": 19,
+    "channelId": 6,
+    "typeCustomerId": 15,
+    "accountId": 1
+  },
+  {
+    "id": 20,
+    "channelId": 7,
+    "typeCustomerId": 16,
+    "accountId": 1
+  },
+  {
+    "id": 21,
+    "channelId": 1,
+    "typeCustomerId": 17,
+    "accountId": 1
+  },
+  {
+    "id": 22,
+    "channelId": 4,
+    "typeCustomerId": 6,
+    "accountId": 5
+  },
+  {
+    "id": 23,
+    "channelId": 4,
+    "typeCustomerId": 9,
+    "accountId": 5
+  },
+  {
+    "id": 24,
+    "channelId": 5,
+    "typeCustomerId": 18,
+    "accountId": 1
+  },
+  {
+    "id": 25,
+    "channelId": 1,
+    "typeCustomerId": 19,
+    "accountId": 1
+  },
+  {
+    "id": 26,
+    "channelId": 1,
+    "typeCustomerId": 2,
+    "accountId": 1
+  },
+  {
+    "id": 27,
+    "channelId": 4,
+    "typeCustomerId": 8,
+    "accountId": 2
+  },
+  {
+    "id": 28,
+    "channelId": 4,
+    "typeCustomerId": 10,
+    "accountId": 1
+  },
+  {
+    "id": 29,
+    "channelId": 2,
+    "typeCustomerId": 20,
+    "accountId": 1
+  },
+  {
+    "id": 30,
+    "channelId": 8,
+    "typeCustomerId": 21,
+    "accountId": 1
+  }
+]

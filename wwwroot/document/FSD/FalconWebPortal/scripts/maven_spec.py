@@ -77,11 +77,14 @@ MAVEN_MAPPING = {
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Nama Channel | `mChannel` | `txtNama` | UQ | Sumber Master Data API `/api/v1/Channel` (sync/read) |
-| Total Pelanggan | — | — | | Kolom turunan COUNT(`mPelanggan`) |
-| Status | `mChannel` | `bitActive` | | Dari API; tidak diubah di Web Admin |
+| Nama Channel | `mChannel` | `txtNama` | UQ | Prototype: simulasi Master Data (hierarki + mapping) |
+| # Type Customer / # Mapping | — | — | | Derived COUNT |
+| Status | `mChannel` | `bitActive` | | Soft active |
+| Type Customer | `mTypeCustomer` *(rencana)* | `txtNama` | UQ* | *unik per Channel; seed `type-customer.json` |
+| Account | `mAccount` *(rencana)* | `txtKode` | UQ | Kode reusable (IND/NKA/…); seed `account.json` |
+| Mapping | `mChannelMapping` *(rencana)* | channel+typeCus+account | UQ | Triple; seed `channel-mapping.json` |
 
-> Web Admin **view-only**. Create/Update Channel dilakukan di Master Data; MAVEN sync/cache ke `mChannel` untuk FK `mPelanggan.intChannelID`.
+> Web Admin prototype: **CRUD simulasi Master Data** (tab Manage + Mapping). Produksi boleh sync/cache ke `mChannel` (+ tabel Type Customer / Account / mapping bila diimplementasikan).
 ''',
     'master-pegawai': '''#### 3.4.6 Mapping Database MAVEN
 

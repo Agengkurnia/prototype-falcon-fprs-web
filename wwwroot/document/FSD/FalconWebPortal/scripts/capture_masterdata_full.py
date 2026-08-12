@@ -106,7 +106,7 @@ def append_unique_buttons(target: list, extras: list) -> None:
 
 
 MODAL_SHOT_MODE = {
-    'master-channel': 'view',  # view-only — Detail (eye), bukan Edit/Tambah
+    'master-channel': 'edit',  # screenshot CRUD dari Master Data Portal
 }
 
 
