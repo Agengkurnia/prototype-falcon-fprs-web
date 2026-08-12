@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
     <style>
 @font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}@font-face{font-family:'Kalbe Geometric';font-weight:700;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Bold.woff2')format('woff2')}
+.photo-frame{width:100%;max-width:280px;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#f1f3f5;display:flex;align-items:center;justify-content:center;border:1px solid #e9ecef;margin:0 auto;}
+.photo-frame img{width:100%;height:100%;object-fit:cover;}
+.photo-frame .placeholder{color:#adb5bd;text-align:center;font-size:.85rem;padding:16px;}
+.photo-frame .placeholder i{font-size:2.4rem;display:block;margin-bottom:8px;}
+.photo-actions{max-width:280px;margin:0.75rem auto 0;}
+.produk-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid #e9ecef;vertical-align:middle;}
 </style>
 </head>
 <body>
@@ -27,68 +33,88 @@
                 <div class="alert alert-info border-0 shadow-sm mb-3" role="alert">
                     <i class="fa fa-link me-2 text-info"></i>
                     <strong>Sumber data:</strong> Pilih <strong>Kode Produk</strong> untuk lookup ke <strong>Master Data API</strong> — nama, umbrella brand, brand &amp; divisi terisi otomatis (read-only).
-                    <strong>Harga Beli</strong>, <strong>Skema Pajak</strong>, dan <strong>Status</strong> diisi di aplikasi ini. <strong>Harga Jual</strong> dihitung otomatis (Harga Beli + PPN). Unit selalu <strong>PCS</strong>.
+                    <strong>Harga Beli</strong>, <strong>Skema Pajak</strong>, <strong>Status</strong>, dan <strong>Foto Produk</strong> diisi di aplikasi ini. <strong>Harga Jual</strong> dihitung otomatis (Harga Beli + PPN). Unit selalu <strong>PCS</strong>.
                 </div>
 
                 <div class="card">
                     <div class="card-body">
                         <form id="formProduk" onsubmit="saveDataForm(event)">
                             <input type="hidden" id="editId" />
+                            <input type="hidden" id="fotoData" value="" />
 
                             <div class="row g-3">
-                                <h5 class="border-bottom pb-2 text-success"><i class="fa fa-box me-1"></i> Informasi Produk</h5>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Source : mProduk | txtKode">Kode Produk <span class="required-mark">*</span></label>
-                                    <select class="form-select" id="kode" required title="Source : mProduk | txtKode">
-                                        <option value="">-- Pilih Kode Produk (Master Data API) --</option>
-                                    </select>
-                                    <small class="text-muted">Data produk terisi otomatis dari Master Data API.</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Source : mProduk | txtNama">Nama Produk</label>
-                                    <input type="text" class="form-control bg-light" id="nama" placeholder="Terisi otomatis dari API..." readonly title="Source : mProduk | txtNama" />
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Source : mProduk | txtUmbrella">Umbrella Brand</label>
-                                    <input type="text" class="form-control bg-light" id="umbrella" placeholder="—" readonly title="Source : mProduk | txtUmbrella" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Source : mProduk | intBrandID (FK mBrand)">Brand</label>
-                                    <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly title="Source : mProduk | intBrandID (FK mBrand)" />
+                                <div class="col-lg-4">
+                                    <h5 class="border-bottom pb-2 text-success"><i class="fa fa-camera me-1"></i> Foto Produk</h5>
+                                    <div class="photo-frame" id="photoFrame">
+                                        <div class="placeholder" id="photoPlaceholder"><i class="fa fa-box-open"></i>Belum ada foto produk</div>
+                                        <img src="" id="photoImg" class="d-none" alt="Foto Produk"/>
+                                    </div>
+                                    <div class="photo-actions">
+                                        <input type="file" class="form-control form-control-sm" id="fotoFile" accept="image/png,image/jpeg,image/webp,image/gif"/>
+                                        <div class="d-flex gap-2 mt-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm flex-fill" id="btnClearFoto"><i class="fa fa-trash me-1"></i> Hapus foto</button>
+                                        </div>
+                                        <small class="text-muted d-block mt-2">JPG/PNG/WebP, maks. ±2&nbsp;MB (akan dikompres otomatis).</small>
+                                    </div>
                                 </div>
 
-                                <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-tags me-1"></i> Harga & Pajak</h5>
+                                <div class="col-lg-8">
+                                    <div class="row g-3">
+                                        <h5 class="border-bottom pb-2 text-success"><i class="fa fa-box me-1"></i> Informasi Produk</h5>
 
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Source : mProduk | decHargaBeli">Harga Beli <span class="required-mark">*</span></label>
-                                    <input type="number" class="form-control" id="hargaBeli" placeholder="Rp..." required min="0" oninput="recalcHargaJual()" title="Source : mProduk | decHargaBeli" />
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Source : mProduk | intPajakID (FK mPajak)">Skema Pajak <span class="required-mark">*</span></label>
-                                    <select class="form-select" id="namaPajak" required onchange="recalcHargaJual()" title="Source : mProduk | intPajakID (FK mPajak)">
-                                        <option value="PPN 11%">PPN (11%)</option>
-                                        <option value="NoPPN">No PPN (0%)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label fw-bold" title="Source : mProduk | decHargaJual">Harga Jual <span class="text-muted fw-normal">(otomatis)</span></label>
-                                    <input type="number" class="form-control bg-light" id="hargaJual" readonly title="Source : mProduk | decHargaJual" />
-                                    <small class="text-muted">= Harga Beli + PPN</small>
-                                </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : mProduk | txtKode">Kode Produk <span class="required-mark">*</span></label>
+                                            <select class="form-select" id="kode" required title="Source : mProduk | txtKode">
+                                                <option value="">-- Pilih Kode Produk (Master Data API) --</option>
+                                            </select>
+                                            <small class="text-muted">Data produk terisi otomatis dari Master Data API.</small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : mProduk | txtNama">Nama Produk</label>
+                                            <input type="text" class="form-control bg-light" id="nama" placeholder="Terisi otomatis dari API..." readonly title="Source : mProduk | txtNama" />
+                                        </div>
 
-                                <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-cube me-1"></i> Unit & Status</h5>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : mProduk | txtUmbrella">Umbrella Brand</label>
+                                            <input type="text" class="form-control bg-light" id="umbrella" placeholder="—" readonly title="Source : mProduk | txtUmbrella" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : mProduk | intBrandID (FK mBrand)">Brand</label>
+                                            <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly title="Source : mProduk | intBrandID (FK mBrand)" />
+                                        </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold" title="Source : mProduk | intUnitID (FK mUnit)">Unit Konversi</label>
-                                    <input type="text" class="form-control bg-light" id="unitNama" value="PCS" readonly title="Source : mProduk | intUnitID (FK mUnit)" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold d-block" title="Source : mProduk | bitActive">Status Produk</label>
-                                    <div class="form-check form-switch mt-2">
-                                        <input class="form-check-input" type="checkbox" role="switch" id="status" checked onchange="updateStatusLabel()" style="cursor:pointer;" title="Source : mProduk | bitActive" />
-                                        <label class="form-check-label" for="status" id="statusLabel">Active</label>
+                                        <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-tags me-1"></i> Harga & Pajak</h5>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" title="Source : mProduk | decHargaBeli">Harga Beli <span class="required-mark">*</span></label>
+                                            <input type="number" class="form-control" id="hargaBeli" placeholder="Rp..." required min="0" oninput="recalcHargaJual()" title="Source : mProduk | decHargaBeli" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" title="Source : mProduk | intPajakID (FK mPajak)">Skema Pajak <span class="required-mark">*</span></label>
+                                            <select class="form-select" id="namaPajak" required onchange="recalcHargaJual()" title="Source : mProduk | intPajakID (FK mPajak)">
+                                                <option value="PPN 11%">PPN (11%)</option>
+                                                <option value="NoPPN">No PPN (0%)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold" title="Source : mProduk | decHargaJual">Harga Jual <span class="text-muted fw-normal">(otomatis)</span></label>
+                                            <input type="number" class="form-control bg-light" id="hargaJual" readonly title="Source : mProduk | decHargaJual" />
+                                            <small class="text-muted">= Harga Beli + PPN</small>
+                                        </div>
+
+                                        <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-cube me-1"></i> Unit & Status</h5>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : mProduk | intUnitID (FK mUnit)">Unit Konversi</label>
+                                            <input type="text" class="form-control bg-light" id="unitNama" value="PCS" readonly title="Source : mProduk | intUnitID (FK mUnit)" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold d-block" title="Source : mProduk | bitActive">Status Produk</label>
+                                            <div class="form-check form-switch mt-2">
+                                                <input class="form-check-input" type="checkbox" role="switch" id="status" checked onchange="updateStatusLabel()" style="cursor:pointer;" title="Source : mProduk | bitActive" />
+                                                <label class="form-check-label" for="status" id="statusLabel">Active</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -107,6 +133,7 @@
 
 const KEY = 'md_produk';
 const PPN_RATE = 0.11;
+const MAX_FOTO_BYTES = 2 * 1024 * 1024;
 let catalog = [];
 let currentDivisi = '';
 
@@ -120,6 +147,82 @@ function setLocalData(data) {
 function updateStatusLabel() {
     const on = document.getElementById('status').checked;
     document.getElementById('statusLabel').textContent = on ? 'Active' : 'Inactive';
+}
+
+function setFotoPreview(dataUrl) {
+    const img = document.getElementById('photoImg');
+    const ph = document.getElementById('photoPlaceholder');
+    const hidden = document.getElementById('fotoData');
+    if (dataUrl) {
+        hidden.value = dataUrl;
+        img.src = dataUrl;
+        img.classList.remove('d-none');
+        ph.classList.add('d-none');
+    } else {
+        hidden.value = '';
+        img.src = '';
+        img.classList.add('d-none');
+        ph.classList.remove('d-none');
+    }
+}
+
+function clearFoto() {
+    document.getElementById('fotoFile').value = '';
+    setFotoPreview('');
+}
+
+function compressImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Gagal membaca file.'));
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('File bukan gambar valid.'));
+            img.onload = () => {
+                const maxSide = 800;
+                let { width, height } = img;
+                if (width > maxSide || height > maxSide) {
+                    if (width >= height) {
+                        height = Math.round(height * (maxSide / width));
+                        width = maxSide;
+                    } else {
+                        width = Math.round(width * (maxSide / height));
+                        height = maxSide;
+                    }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                resolve(canvas.toDataURL('image/jpeg', 0.78));
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function onFotoSelected(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        Swal.fire('Peringatan', 'File harus berupa gambar.', 'warning');
+        e.target.value = '';
+        return;
+    }
+    if (file.size > MAX_FOTO_BYTES) {
+        Swal.fire('Peringatan', 'Ukuran file maksimal 2 MB.', 'warning');
+        e.target.value = '';
+        return;
+    }
+    try {
+        const dataUrl = await compressImage(file);
+        setFotoPreview(dataUrl);
+    } catch (err) {
+        Swal.fire('Error', err.message || 'Gagal memproses foto.', 'error');
+        e.target.value = '';
+    }
 }
 
 function recalcHargaJual() {
@@ -139,7 +242,6 @@ function fillFromMaster(item) {
     recalcHargaJual();
 }
 
-// LOV: lookup Master Data API (disimulasikan dari produk.json)
 function loadCatalog() {
     return fetch('../../../../wwwroot/data/produk.json')
         .then(r => r.json())
@@ -165,7 +267,6 @@ function onKodeChange() {
 function checkEditMode() {
     const editId = MasterDataParam.parseRecordId();
     if (editId) {
-        // Mode Ubah
         document.getElementById('formTitle').textContent = 'Ubah Produk';
         document.getElementById('breadcrumbActive').textContent = 'Ubah';
         document.getElementById('editId').value = editId;
@@ -180,7 +281,7 @@ function checkEditMode() {
                 sel.appendChild(opt);
             }
             sel.value = item.kode;
-            sel.disabled = true; // Kode tidak dapat diubah saat edit
+            sel.disabled = true;
             sel.classList.add('bg-light');
 
             document.getElementById('nama').value = item.nama || '';
@@ -193,15 +294,16 @@ function checkEditMode() {
             document.getElementById('status').checked = (item.status || 'active') === 'active';
             updateStatusLabel();
             recalcHargaJual();
+            setFotoPreview(item.foto || '');
         }
     } else {
-        // Mode Tambah
         document.getElementById('formTitle').textContent = 'Tambah Produk';
         document.getElementById('breadcrumbActive').textContent = 'Tambah';
         document.getElementById('namaPajak').value = 'PPN 11%';
         document.getElementById('status').checked = true;
         updateStatusLabel();
         document.getElementById('unitNama').value = 'PCS';
+        setFotoPreview('');
     }
 }
 
@@ -268,6 +370,7 @@ function saveDataForm(event) {
 
     recalcHargaJual();
     const hargaJual = parseFloat(document.getElementById('hargaJual').value) || 0;
+    const foto = document.getElementById('fotoData').value || '';
 
     const newObj = {
         id: editId ? (isNaN(editId) ? editId : parseInt(editId)) : Date.now(),
@@ -281,7 +384,8 @@ function saveDataForm(event) {
         namaPajak: document.getElementById('namaPajak').value,
         unitNama: 'PCS',
         status: document.getElementById('status').checked ? 'active' : 'inactive',
-        partnerId: ''
+        partnerId: '',
+        foto: foto
     };
 
     if (editId) {
@@ -298,6 +402,8 @@ function saveDataForm(event) {
 }
 
 $(document).ready(function() {
+    document.getElementById('fotoFile').addEventListener('change', onFotoSelected);
+    document.getElementById('btnClearFoto').addEventListener('click', clearFoto);
     loadCatalog().then(function() {
         checkEditMode();
         initKodeSelect2();

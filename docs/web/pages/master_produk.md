@@ -9,6 +9,7 @@ Katalog produk. Data dasar (nama, umbrella brand, brand, divisi) di-lookup dari 
 - **index.html**: kolom `KATEGORI` diganti `UMBRELLA BRAND`; kartu statistik "Rata-rata Harga" diganti kartu jumlah "Umbrella Brand". Aksi baris hanya **Detail / Ubah** (ikon mata → `detail.html?id=`); tombol Edit & Hapus dihilangkan. Tombol **Tambah Produk** → `detail.html`.
 - **detail.html**: satu halaman untuk **Tambah & Ubah**.
   - **Kode Produk = LOV** yang lookup Master Data API (disimulasikan dari `produk.json`); memilih kode mengisi otomatis nama/umbrella/brand/divisi/harga beli. Saat mode Ubah, Kode read-only.
+  - **Foto Produk**: upload JPG/PNG/WebP (kompres otomatis), simpan field `foto` (data URL) di localStorage; tampil di form + thumbnail list index.
   - **Harga Beli** editable; **Harga Jual** read-only = `Harga Beli + PPN` (11% bila skema PPN, 0% bila NoPPN), dihitung otomatis.
   - **Skema Pajak** default **PPN 11%**.
   - **Unit** read-only `PCS`; input **berat, panjang, lebar, tinggi dihapus** dari form.
