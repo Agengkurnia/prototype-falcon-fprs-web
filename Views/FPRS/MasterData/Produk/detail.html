@@ -33,6 +33,7 @@
                 <div class="alert alert-info border-0 shadow-sm mb-3" role="alert">
                     <i class="fa fa-link me-2 text-info"></i>
                     <strong>Sumber data:</strong> Pilih <strong>Kode Produk</strong> untuk lookup ke <strong>Master Data API</strong> — nama, umbrella brand, brand &amp; divisi terisi otomatis (read-only).
+                    <strong>Product Category</strong> dari Param <code>PRODUCT_CATEGORY_GT</code> (<code>/api/v1/Param</code>).
                     <strong>Harga Beli</strong>, <strong>Skema Pajak</strong>, <strong>Status</strong>, dan <strong>Foto Produk</strong> diisi di aplikasi ini. <strong>Harga Jual</strong> dihitung otomatis (Harga Beli + PPN). Unit selalu <strong>PCS</strong>.
                 </div>
 
@@ -81,6 +82,13 @@
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold" title="Source : mProduk | intBrandID (FK mBrand)">Brand</label>
                                             <input type="text" class="form-control bg-light" id="brand" placeholder="—" readonly title="Source : mProduk | intBrandID (FK mBrand)" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold" title="Source : Master Data API /api/v1/Param | paramCode=PRODUCT_CATEGORY_GT">Product Category <span class="required-mark">*</span></label>
+                                            <select class="form-select" id="kategori" required title="Source : Master Data API /api/v1/Param | paramCode=PRODUCT_CATEGORY_GT">
+                                                <option value="">-- Pilih (Master Data API / Param) --</option>
+                                            </select>
+                                            <small class="text-muted">LOV dari <code>/api/v1/Param</code> — <code>paramCode = PRODUCT_CATEGORY_GT</code>.</small>
                                         </div>
 
                                         <h5 class="border-bottom pb-2 text-success mt-4"><i class="fa fa-tags me-1"></i> Harga & Pajak</h5>
@@ -135,6 +143,7 @@ const KEY = 'md_produk';
 const PPN_RATE = 0.11;
 const MAX_FOTO_BYTES = 2 * 1024 * 1024;
 let catalog = [];
+let kategoriList = [];
 let currentDivisi = '';
 
 function getLocalData() {
@@ -258,6 +267,34 @@ function loadCatalog() {
         .catch(() => { catalog = []; });
 }
 
+function loadProductCategory() {
+    // Simulasi Master Data API: GET /api/v1/Param?paramCode=PRODUCT_CATEGORY_GT
+    return fetch('../../../../wwwroot/data/param-product-category-gt.json')
+        .then(r => r.json())
+        .then(payload => {
+            const items = Array.isArray(payload)
+                ? payload
+                : (Array.isArray(payload.items) ? payload.items : []);
+            kategoriList = items.filter(k => k.active !== false);
+            const sel = document.getElementById('kategori');
+            while (sel.options.length > 1) sel.remove(1);
+            kategoriList
+                .slice()
+                .sort((a, b) => String(a.name || a.nama || '').localeCompare(String(b.name || b.nama || '')))
+                .forEach(k => {
+                    const name = k.name || k.nama || k.value || '';
+                    const code = k.code || k.paramValue || k.value || name;
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.dataset.id = k.id != null ? k.id : '';
+                    opt.dataset.code = code;
+                    opt.textContent = name;
+                    sel.appendChild(opt);
+                });
+        })
+        .catch(() => { kategoriList = []; });
+}
+
 function onKodeChange() {
     const kode = document.getElementById('kode').value;
     const master = catalog.find(p => p.kode === kode);
@@ -295,6 +332,15 @@ function checkEditMode() {
             updateStatusLabel();
             recalcHargaJual();
             setFotoPreview(item.foto || '');
+            const kat = item.kategori || '';
+            const selKat = document.getElementById('kategori');
+            if (kat && !Array.from(selKat.options).some(o => o.value === kat)) {
+                const opt = document.createElement('option');
+                opt.value = kat;
+                opt.textContent = kat;
+                selKat.appendChild(opt);
+            }
+            selKat.value = kat;
         }
     } else {
         document.getElementById('formTitle').textContent = 'Tambah Produk';
@@ -361,6 +407,12 @@ function saveDataForm(event) {
         firstError = firstError || 'hargaBeli';
     }
 
+    const kategori = document.getElementById('kategori').value.trim();
+    if (!kategori) {
+        showFieldError('kategori', 'Product Category wajib dipilih.');
+        firstError = firstError || 'kategori';
+    }
+
     if (firstError) {
         const el = document.getElementById(firstError);
         if (el) { el.focus(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
@@ -371,6 +423,9 @@ function saveDataForm(event) {
     recalcHargaJual();
     const hargaJual = parseFloat(document.getElementById('hargaJual').value) || 0;
     const foto = document.getElementById('fotoData').value || '';
+    const katOpt = document.getElementById('kategori').selectedOptions[0];
+    const kategoriId = katOpt && katOpt.dataset.id ? Number(katOpt.dataset.id) : null;
+    const kategoriCode = katOpt && katOpt.dataset.code ? katOpt.dataset.code : '';
 
     const newObj = {
         id: editId ? (isNaN(editId) ? editId : parseInt(editId)) : Date.now(),
@@ -378,6 +433,9 @@ function saveDataForm(event) {
         nama: nama,
         umbrella: document.getElementById('umbrella').value.trim(),
         brand: document.getElementById('brand').value.trim(),
+        kategori: kategori,
+        kategoriCode: kategoriCode,
+        kategoriId: kategoriId,
         divisi: currentDivisi,
         hargaBeli: hargaBeli,
         hargaJual: hargaJual,
@@ -404,7 +462,7 @@ function saveDataForm(event) {
 $(document).ready(function() {
     document.getElementById('fotoFile').addEventListener('change', onFotoSelected);
     document.getElementById('btnClearFoto').addEventListener('click', clearFoto);
-    loadCatalog().then(function() {
+    Promise.all([loadCatalog(), loadProductCategory()]).then(function() {
         checkEditMode();
         initKodeSelect2();
     });

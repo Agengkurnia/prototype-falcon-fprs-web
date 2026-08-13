@@ -42,12 +42,13 @@ MAVEN_MAPPING = {
 | Nama Produk | `mProduk` | `txtNama` | | Read-only dari API |
 | Umbrella Brand | `mProduk` | `txtUmbrella` | | Read-only dari API |
 | Brand | `mProduk` | `intBrandID` | FK → `mBrand` | Reuse tabel MAVEN existing |
+| Product Category | `mProduk` | `txtKategoriCode` | | LOV dari `GET /api/v1/Param?paramCode=PRODUCT_CATEGORY_GT`; simpan kode + label cache |
+| Foto Produk | `mProduk` | `txtFoto` | | URL/path atau blob; prototipe: data URL di field `foto` |
 | Harga Beli | `mProduk` | `decHargaBeli` | | ≥ 0 |
 | Harga Jual | `mProduk` | `decHargaJual` | | Dihitung otomatis |
 | Skema Pajak | `mProduk` | `intPajakID` | FK → `mPajak` | |
 | Unit | `mProduk` | `intUnitID` | FK → `mUnit` | Selalu PCS di prototipe |
 | Status | `mProduk` | `bitActive` | | active → true |
-| Kategori (API) | `mProduk` | `intKategoriID` | FK → `mKategoriProduk` | |
 | Divisi (API) | `mProduk` | `intDivisiID` | FK → `mDivisi` | |
 ''',
     'master-pelanggan': '''#### 3.2.6 Mapping Database MAVEN
@@ -77,14 +78,15 @@ MAVEN_MAPPING = {
 
 | Field UI / Kolom Grid | Tabel MAVEN | Kolom MAVEN | Kunci | Keterangan |
 |-----------------------|-------------|-------------|-------|------------|
-| Nama Channel | `mChannel` | `txtNama` | UQ | Prototype: simulasi Master Data (hierarki + mapping) |
-| # Type Customer / # Mapping | — | — | | Derived COUNT |
-| Status | `mChannel` | `bitActive` | | Soft active |
-| Type Customer | `mTypeCustomer` *(rencana)* | `txtNama` | UQ* | *unik per Channel; seed `type-customer.json` |
-| Account | `mAccount` *(rencana)* | `txtKode` | UQ | Kode reusable (IND/NKA/…); seed `account.json` |
+| Nama Channel | `mChannel` | `txtNama` | UQ | Master global |
+| Status Channel | `mChannel` | `bitActive` | | Soft active |
+| Type Customer | `mTypeCustomer` *(rencana)* | `txtNama` | UQ | **Master global** (bukan child Channel); seed `type-customer.json` |
+| Status Type Customer | `mTypeCustomer` | `bitActive` | | Soft active |
+| Account | `mAccount` *(rencana)* | `txtKode` | UQ | Kode reusable (IND/NKA/RKA/MM/MTI); seed `account.json` |
+| Status Account | `mAccount` | `bitActive` | | Soft active |
 | Mapping | `mChannelMapping` *(rencana)* | channel+typeCus+account | UQ | Triple; seed `channel-mapping.json` |
 
-> Web Admin prototype: **CRUD simulasi Master Data** (tab Manage + Mapping). Produksi boleh sync/cache ke `mChannel` (+ tabel Type Customer / Account / mapping bila diimplementasikan).
+> **Dual-surface:** CRUD di **Master Data Portal** (tab Mapping + Manage accordion). Menu Channel **Man Power GT** = list mapping view-only. Produksi sync/cache ke `mChannel` + Type Customer / Account / mapping.
 ''',
     'master-pegawai': '''#### 3.4.6 Mapping Database MAVEN
 
@@ -162,7 +164,7 @@ Cara baca bab ini:
 ### 7.1 ERD Produksi (1 halaman)
 
 Diagram di bawah mengikuti tabel di `MAVEN.DAL/Scripts/001_*.sql`, `002_*.sql`, dan `012_mLimitTargetHarian.sql`.
-Kolom digambar **lengkap** (termasuk audit). Lookup tanpa FK constraint (`mKategoriProduk`, `mDivisi`, `mDaftarHarga`) **tidak** digambar — kolom cadangan dicatat di bawah.
+Kolom digambar **lengkap** (termasuk audit). Lookup tanpa FK constraint (`mDivisi`, `mDaftarHarga`) **tidak** digambar — kolom cadangan dicatat di bawah. **Product Category** bersumber Master Data Param (`PRODUCT_CATEGORY_GT`), bukan tabel lokal.
 
 ```mermaid
 %%{init: {"theme":"default","themeVariables":{"fontSize":"16px"},"er":{"layoutDirection":"TB","entityPadding":8,"fontSize":16}}}%%
@@ -185,13 +187,14 @@ erDiagram
         varchar txtPartnerId
         numeric decHargaBeli
         numeric decHargaJual
-        int intKategoriID
+        varchar txtKategoriCode
         int intBrandID FK
         int intDivisiID
         int intUnitID FK
         int intPajakID FK
         varchar txtUmbrella
         varchar txtSupplier
+        varchar txtFoto
         numeric decBerat
         numeric decPanjang
         numeric decLebar
@@ -406,7 +409,7 @@ erDiagram
 
 > `mAlasan` standalone (tanpa FK). `mLimitTargetHarian` standalone (tanpa FK ke pegawai — jabatan teks). `mBrand` reuse tabel existing MAVEN.
 
-**Kolom cadangan v1 (belum ada FK di DDL):** `intKategoriID`, `intDivisiID`, `intDaftarHargaID` — nullable; tabel lookup belum digambar.
+**Kolom cadangan v1 (belum ada FK di DDL):** `txtKategoriCode` (LOV Param `PRODUCT_CATEGORY_GT`), `intDivisiID`, `intDaftarHargaID` — nullable; tabel lookup eksternal tidak digambar.
 
 ### 7.2 Daftar Relasi FK (selaras diagram 7.1)
 
@@ -442,22 +445,8 @@ Skrip DDL siap dieksekusi di PostgreSQL. Urutan: lookup (7.4.1) dulu, lalu maste
 #### 7.4.1 Tabel Lookup
 
 ```sql
--- Kategori Produk (self-reference)
-CREATE TABLE "mKategoriProduk" (
-    "intKategoriID"       serial PRIMARY KEY,
-    "txtGuid"             uuid NOT NULL DEFAULT gen_random_uuid(),
-    "txtNama"             varchar(100) NOT NULL,
-    "intParentKategoriID" int NULL,
-    "bitActive"           boolean NOT NULL DEFAULT true,
-    "dtInserted"          timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "txtInsertedBy"       varchar(100) NULL,
-    "dtUpdated"           timestamp without time zone NULL,
-    "txtUpdatedBy"        varchar(100) NULL,
-    "dtNonActive"         timestamp without time zone NULL,
-    CONSTRAINT "mKategoriProduk_txtNama_uq" UNIQUE ("txtNama"),
-    CONSTRAINT "mKategoriProduk_parent_fk" FOREIGN KEY ("intParentKategoriID")
-        REFERENCES "mKategoriProduk" ("intKategoriID")
-);
+-- Product Category: LOV dari Master Data API Param `PRODUCT_CATEGORY_GT` (bukan tabel lokal).
+-- Kolom `mProduk.txtKategoriCode` menyimpan kode nilai param terpilih.
 
 -- Divisi
 CREATE TABLE "mDivisi" (
@@ -578,7 +567,7 @@ CREATE TABLE "mPegawai" (
 #### 7.4.2 Tabel Master Inti
 
 ```sql
--- Produk (FK: kategori, brand, divisi, unit, pajak)
+-- Produk (FK: brand, divisi, unit, pajak; kategori dari Param PRODUCT_CATEGORY_GT)
 CREATE TABLE "mProduk" (
     "intProdukID"   serial PRIMARY KEY,
     "txtGuid"       uuid NOT NULL DEFAULT gen_random_uuid(),
@@ -587,13 +576,14 @@ CREATE TABLE "mProduk" (
     "txtPartnerId"  varchar(100) NULL,
     "decHargaBeli"  numeric(18,2) NULL,
     "decHargaJual"  numeric(18,2) NULL,
-    "intKategoriID" int NULL,
+    "txtKategoriCode" varchar(50) NULL,
     "intBrandID"    int NULL,
     "intDivisiID"   int NULL,
     "intUnitID"     int NULL,
     "intPajakID"    int NULL,
     "txtUmbrella"   varchar(100) NULL,
     "txtSupplier"   varchar(255) NULL,
+    "txtFoto"       varchar(500) NULL,
     "decBerat"      numeric(10,3) NULL,
     "decPanjang"    numeric(10,2) NULL,
     "decLebar"      numeric(10,2) NULL,
@@ -605,7 +595,6 @@ CREATE TABLE "mProduk" (
     "txtUpdatedBy"  varchar(100) NULL,
     "dtNonActive"   timestamp without time zone NULL,
     CONSTRAINT "mProduk_txtKode_uq"    UNIQUE ("txtKode"),
-    CONSTRAINT "mProduk_kategori_fk"   FOREIGN KEY ("intKategoriID") REFERENCES "mKategoriProduk" ("intKategoriID"),
     CONSTRAINT "mProduk_brand_fk"      FOREIGN KEY ("intBrandID")    REFERENCES "mBrand" ("IntId"),
     CONSTRAINT "mProduk_divisi_fk"     FOREIGN KEY ("intDivisiID")   REFERENCES "mDivisi" ("intDivisiID"),
     CONSTRAINT "mProduk_unit_fk"       FOREIGN KEY ("intUnitID")     REFERENCES "mUnit" ("intUnitID"),

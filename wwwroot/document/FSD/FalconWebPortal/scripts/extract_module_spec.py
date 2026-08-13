@@ -20,7 +20,10 @@ from fsd_ui_section import (  # noqa: E402
     SubsectionCounter,
     buttons_table_md,
     filter_buttons_by_context,
+    format_db_source_note,
+    module_overview_channel,
     resolve_button_shot_file,
+    screenshot_embed_md,
     screenshot_placeholder_md,
     screenshot_single_md,
     shot_view_kind,
@@ -60,7 +63,11 @@ SS_BY_MODULE = {
     'master-brand': ['ss_13_master_brand_index.png', 'ss_14_master_brand_modal.png'],
     'master-pelanggan': ['ss_15_master_pelanggan_index.png', 'ss_16_master_pelanggan_detail.png'],
     'master-grup-pelanggan': ['ss_17_master_grup_pelanggan_index.png', 'ss_18_master_grup_modal.png'],
-    'master-channel': ['ss_47_master_channel_index.png', 'ss_48_master_channel_modal.png'],
+    'master-channel': [
+        'ss_47_master_channel_portal_mapping.png',
+        'ss_48_master_channel_portal_manage.png',
+        'ss_59_master_channel_fprs_viewonly.png',
+    ],
     'master-pegawai': ['ss_19_master_pegawai_index.png', 'ss_20_master_pegawai_detail.png'],
     'master-akun': ['ss_21_master_akun_index.png', 'ss_22_master_akun_modal_tambah.png', 'ss_23_master_akun_modal_edit.png'],
     'master-posisi': ['ss_24_master_posisi_index.png', 'ss_25_master_posisi_modal.png'],
@@ -86,22 +93,38 @@ SCREENSHOT_EMBED_LIMIT = {
     'master-pelanggan': 2,
     'master-pegawai': 2,
     'master-stokis': 2,
-    'master-channel': 2,
+    'master-channel': 3,
     'master-pajak': 2,
     'master-alasan': 2,
     'penjualan-faktur': 2,
     'penjualan-stok-motoris': 1,
 }
 
+CHANNEL_SURFACE_CAPTIONS = [
+    ('ss_47_master_channel_portal_mapping.png', 'Master Data Portal — Tab Mapping'),
+    ('ss_48_master_channel_portal_manage.png', 'Master Data Portal — Tab Manage'),
+    ('ss_59_master_channel_fprs_viewonly.png', 'Man Power GT — View-only List'),
+]
+
+CHANNEL_MODAL_CAPTIONS = [
+    ('ss_71_channel_modal_mapping.png', 'Modal Tambah Mapping'),
+    ('ss_72_channel_modal_channel.png', 'Modal Tambah Channel'),
+    ('ss_73_channel_modal_type_customer.png', 'Modal Tambah Type Customer'),
+    ('ss_74_channel_modal_account.png', 'Modal Tambah Account'),
+]
+
 MODULE_ENRICHMENT = {
     'master-produk': (
         'Halaman dashboard list menampilkan **summary cards** (`cntTotal`, `cntActive`, `cntInactive`, `cntUmbrella`) '
-        'dan DataTable `#tbl` dengan filter per kolom, termasuk kolom **Umbrella Brand**. Tombol **Tambah Produk** '
-        'mengarah ke `detail.html`. Halaman `detail.html` bersifat fleksibel (add & edit): **Kode Produk** berupa '
-        'LOV searchable (Select2) yang mengambil data dari Master Data API, mengunci field turunan (nama, umbrella, '
-        'brand) menjadi read-only. **Harga Beli** dapat diedit, **Harga Jual** read-only dihitung otomatis '
-        '(`Harga Beli + PPN`, default skema PPN 11%). **Unit Konversi** dikunci ke `PCS`, dan **Status Produk** '
-        'berupa checkbox aktif/nonaktif.'
+        'dan DataTable `#tbl` dengan filter per kolom, termasuk kolom **Category**, **Umbrella Brand**, dan thumbnail **Foto**. '
+        'Tombol **Tambah Produk** mengarah ke `detail.html`. Halaman `detail.html` bersifat fleksibel (add & edit): '
+        '**Kode Produk** berupa LOV searchable (Select2) yang mengambil data dari Master Data API, mengunci field '
+        'turunan (nama, umbrella, brand) menjadi read-only. **Product Category** dropdown wajib dari Master Data API '
+        '`GET /api/v1/Param` dengan **`paramCode = PRODUCT_CATEGORY_GT`** (prototipe: seed `param-product-category-gt.json`; '
+        'simpan `kategori`, `kategoriCode`, `kategoriId`). **Foto Produk** dapat di-upload (JPG/PNG/WebP, dikompres '
+        'otomatis) dan disimpan pada field `foto`. **Harga Beli** dapat diedit, **Harga Jual** read-only dihitung '
+        'otomatis (`Harga Beli + PPN`, default skema PPN 11%). **Unit Konversi** dikunci ke `PCS`, dan '
+        '**Status Produk** berupa checkbox aktif/nonaktif.'
     ),
     'master-pelanggan': (
         'Data pelanggan/outlet **diinput dari aplikasi mobile** (SFA), sehingga Web Portal bersifat **view-only** — '
@@ -115,14 +138,7 @@ MODULE_ENRICHMENT = {
         'Setiap pegawai memiliki **role** (Motoris / SPG GT) dan penempatan **Branch** & **Region**. Identitas unik '
         'menggunakan **NIK**. Halaman `detail.html` menampilkan data pegawai secara read-only beserta riwayat status.'
     ),
-    'master-channel': (
-        'Modul **Channel** memakai **dual-surface**: CRUD hierarki '
-        '**Channel → Type Customer → Account** di **Master Data Portal** '
-        '(`Views/MasterDataPortal/Channel/`), sementara menu Channel di '
-        '**Man Power GT** (`Views/FPRS/MasterData/Channel/`) **view-only**. '
-        'Data berbagi `localStorage`/seed. Portal: tab **Manage** + **Mapping** (triple unik; seed CSV). '
-        'Panel pelanggan legacy read-only (`md_pelanggan.channel` belum di-remap ke triple).'
-    ),
+    'master-channel': '',  # narasi via module_overview_channel()
     'master-stokis': (
         'Master **Stokis/Grosir** bersifat **upload-only** (Download/Upload CSV + riwayat stok). Menampilkan '
         '**Branch** dan **Region** (menggantikan kolom Kota), koordinat GPS untuk validasi check-in mobile, serta '
@@ -156,8 +172,8 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     'master-produk': {
         'purpose': (
             'Mendaftarkan dan memelihara data SKU/produk (kode, umbrella brand, brand, harga beli, harga jual, '
-            'pajak, status) sebagai referensi transaksi penjualan. Data produk bersumber dari Master Data API, '
-            'sedangkan harga jual, pajak, dan status dikelola di aplikasi ini.'
+            'pajak, status, foto produk) sebagai referensi transaksi penjualan. Data produk bersumber dari Master Data API, '
+            'sedangkan harga jual, pajak, status, dan foto dikelola di aplikasi ini.'
         ),
         'users': 'Admin Master Data, IT Operations — pengelola katalog produk Kalbe.',
     },
@@ -192,8 +208,8 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
     },
     'master-channel': {
         'purpose': (
-            'Mengelola hierarki Channel → Type Customer → Account + mapping triple di '
-            '**Master Data Portal**; menu Channel Man Power GT hanya view-only.'
+            'Mengelola master Channel, Type Customer (global), Account, dan mapping triple di '
+            '**Master Data Portal** (tab Mapping + Manage); menu Channel Man Power GT hanya list mapping view-only.'
         ),
         'users': 'Admin Master Data (CRUD Portal); Sales Ops / Supervisor (view FPRS).',
     },
@@ -296,9 +312,10 @@ MODULE_FORM_META: dict[str, dict[str, str]] = {
 
 MODAL_FORM_INTRO = {
     'master-channel': (
-        '**Dashboard list** menampilkan Channel. **Detail in-page** punya tab **Manage** '
-        '(CRUD Channel, Type Customer scoped, Account global) dan tab **Mapping** '
-        '(CRUD triple Channel–TypeCus–Account; pelanggan legacy read-only).'
+        '**Master Data Portal** — tab **Mapping** (default): DataTable semua triple Channel · Type Customer · Account; '
+        'tombol Tambah Mapping. Tab **Manage**: accordion master global **Channel**, **Type Customer**, **Account** '
+        '(masing-masing DataTable + modal Tambah/Ubah). '
+        '**Man Power GT**: list mapping view-only tanpa detail.'
     ),
     'master-pajak': (
         '**Dashboard list** menampilkan daftar skema pajak. **Form modal** untuk Tambah/Ubah berisi '
@@ -332,14 +349,14 @@ def apply_fsd_terms(text: str) -> str:
 
 def form_section_label(mod: dict, form_html: str, ui_type: str) -> str:
     if mod.get('id') == 'master-channel':
-        return 'Detail — Manage / Mapping'
+        return 'Portal — Mapping / Manage'
     if ui_type == 'modal':
         return 'Form Modal (Tambah / Ubah)'
     if form_html and (' disabled' in form_html or 'readonly' in form_html):
         if 'saveDataForm' not in form_html and 'saveItem' not in form_html:
             return 'Form Detail (read-only)'
     if mod.get('formPath', '').endswith('detail.html'):
-        return 'Form Detail (read-only)'
+        return 'Form Tambah/Ubah'
     return 'Form Tambah/Ubah'
 
 
@@ -410,8 +427,7 @@ def source_keterangan(attrs_or_html: str) -> str:
     if not m:
         return ''
     table, col = m.group(1).strip(), m.group(2).strip()
-    # Escape | so markdown table cells do not split
-    return f'`{table}` \\| `{col}`'
+    return format_db_source_note(table, col)
 
 
 def extract_columns(html: str) -> list[dict]:
@@ -628,7 +644,17 @@ def extract_modal_fields(html: str) -> list[dict]:
             'mandatory': '—',
             'default': '—',
             'validation': '—',
-            'note': 'Hanya mode Ubah; data dari `md_pelanggan`, paginasi 5 baris',
+            'note': 'Legacy (sudah dihapus dari UI Channel terkini)',
+        })
+    if 'fotoFile' in body or 'fotoData' in body:
+        fields.append({
+            'label': 'Foto Produk',
+            'id': '`fotoFile` / `fotoData`',
+            'type': 'File upload (image) → data URL',
+            'mandatory': 'Tidak',
+            'default': '(kosong)',
+            'validation': 'Image JPG/PNG/WebP/GIF; maks. ±2 MB; dikompres otomatis',
+            'note': format_db_source_note('mProduk', 'txtFoto'),
         })
     return fields
 
@@ -913,17 +939,17 @@ def crud_table(mod: dict) -> str:
         ]
     elif mid == 'master-produk':
         rows = [
-            ('Create', 'Klik Tambah Produk → `detail.html` (LOV Kode Produk)', 'Admin', 'Persist ke localStorage'),
-            ('Read', 'dashboard list (DataTable) + `detail.html`', 'Semua role', '—'),
-            ('Update', 'Buka `detail.html?param=` → ubah harga beli/pajak/status', 'Admin', 'Kode & data API read-only'),
+            ('Create', 'Klik Tambah Produk → `detail.html` (LOV Kode Produk + upload Foto)', 'Admin', 'Simpan setelah validasi'),
+            ('Read', 'dashboard list (DataTable + thumbnail foto) + `detail.html`', 'Semua role', '—'),
+            ('Update', 'Buka `detail.html?param=` → ubah harga beli/pajak/status/foto', 'Admin', 'Kode & data API read-only'),
             ('Delete', '—', '—', 'Tombol hapus dihilangkan'),
         ]
     elif mid == 'master-channel':
         rows = [
-            ('Create', 'Master Data Portal: Tambah Channel / Type Customer / Account / Mapping', 'Admin Master Data', 'localStorage simulasi; FPRS tidak punya Create'),
-            ('Read', 'Portal + FPRS: list + detail (Manage & Mapping); FPRS view-only', 'Semua role dengan bitView', 'Shared seed/localStorage'),
-            ('Update', 'Hanya di Master Data Portal (tab Manage)', 'Admin Master Data', 'TypeCus unik per Channel; Account unik global'),
-            ('Delete', 'Portal: hapus Mapping; soft nonaktif via Status', 'Admin Master Data', 'FPRS tidak bisa hapus/ubah'),
+            ('Create', 'Portal: Tambah Mapping / Channel / Type Customer / Account (tab Manage)', 'Admin Master Data', 'TypeCus & Account global; FPRS tidak punya Create'),
+            ('Read', 'Portal Mapping+Manage; FPRS list mapping view-only (tanpa detail)', 'Semua role dengan bitView', 'Data sama di kedua surface'),
+            ('Update', 'Hanya di Master Data Portal (tab Manage / Mapping)', 'Admin Master Data', 'TypeCus unik global; Account unik global; triple unik'),
+            ('Delete', 'Portal: hapus baris Mapping; soft nonaktif master via Status', 'Admin Master Data', 'FPRS tidak bisa hapus/ubah'),
         ]
     elif mid == 'penjualan-faktur':
         rows = [
@@ -943,10 +969,10 @@ def crud_table(mod: dict) -> str:
         ]
     elif ui_type == 'modal':
         rows = [
-            ('Create', 'Klik Tambah → isi modal → Simpan', 'Admin', 'Persist ke localStorage'),
+            ('Create', 'Klik Tambah → isi modal → Simpan', 'Admin', 'Simpan setelah validasi'),
             ('Read', 'dashboard list (DataTable)', 'Semua role', '—'),
             ('Update', 'Klik Edit → ubah modal → Simpan', 'Admin', '—'),
-            ('Delete', 'Klik Hapus → konfirmasi Swal', 'Admin', 'Hapus dari localStorage'),
+            ('Delete', 'Klik Hapus → konfirmasi Swal', 'Admin', 'Hapus permanen setelah konfirmasi'),
         ]
     else:
         rows = [
@@ -974,14 +1000,21 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
 
     ui_type = mod.get('type', 'page')
     short_label = mod['label'].split('—')[-1].strip() if '—' in mod['label'] else mod['label']
-    lines = [
-        f'### {chapter}.{sub} {short_label}',
-        '',
-        f'Modul **{short_label}** merupakan bagian dari Web Portal Falcon FPRS. '
-        f'Tipe UI: **{ui_type}**. '
-        f'Sumber: `{mod["htmlPath"]}`.',
-        '',
-    ]
+    if mod['id'] == 'master-channel':
+        lines = [
+            f'### {chapter}.{sub} {short_label}',
+            '',
+            module_overview_channel(mod),
+            '',
+        ]
+    else:
+        lines = [
+            f'### {chapter}.{sub} {short_label}',
+            '',
+            f'Modul **{short_label}** merupakan bagian dari Web Portal Falcon FPRS. '
+            f'Tipe UI: **{ui_type}**.',
+            '',
+        ]
     enrich = MODULE_ENRICHMENT.get(mod['id'])
     if enrich:
         lines.append(enrich)
@@ -991,20 +1024,26 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
     if narrative:
         lines.append(narrative)
 
-    if mod.get('apiEndpoint'):
-        lines.append(f'> **Integrasi API (rencana):** `{mod["apiEndpoint"]}`')
-        lines.append('')
-    if mod.get('storageKey'):
-        lines.append(f'> **localStorage key:** `{mod["storageKey"]}`')
-        lines.append('')
-
     sec = SubsectionCounter(chapter, sub)
 
     shots = module_shot_files(mod)
     all_buttons = get_module_buttons(mod, index_html, form_html, detail_html)
 
     # --- Dashboard list: screenshot → kolom → tombol aksi ---
-    if shots:
+    if mod['id'] == 'master-channel':
+        for shot, caption in CHANNEL_SURFACE_CAPTIONS:
+            if os.path.exists(os.path.join(SCREENSHOTS_DIR, shot)):
+                lines.append(screenshot_embed_md(
+                    f'Master Data — Channel — {caption}', shot,
+                ))
+                lines.append('')
+        for shot, caption in CHANNEL_MODAL_CAPTIONS:
+            if os.path.exists(os.path.join(SCREENSHOTS_DIR, shot)):
+                lines.append(screenshot_embed_md(
+                    f'Master Data — Channel — {caption}', shot,
+                ))
+                lines.append('')
+    elif shots:
         lines.append(screenshot_single_md(mod['label'], shots[0], 'dashboard'))
         lines.append('')
     else:
@@ -1026,14 +1065,17 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
         lines.append('')
 
     dash_buttons = filter_buttons_by_context(all_buttons, 'dashboard')
+    if mod['id'] == 'master-channel':
+        dash_buttons = all_buttons
     if dash_buttons:
-        lines.append(sec.next('Tombol Aksi — Dashboard List'))
+        btn_title = 'Tombol Aksi — Mapping & Manage' if mod['id'] == 'master-channel' else 'Tombol Aksi — Dashboard List'
+        lines.append(sec.next(btn_title))
         lines.append('')
         lines.extend(buttons_table_md(dash_buttons))
         lines.append('')
 
     # --- Tampilan sekunder (modal / detail): screenshot → narasi form → field → tombol ---
-    secondary_shot = shots[1] if len(shots) > 1 else None
+    secondary_shot = None if mod['id'] == 'master-channel' else (shots[1] if len(shots) > 1 else None)
     has_detail_view = bool(detail_html and ui_type != 'modal')
 
     if secondary_shot:
@@ -1044,7 +1086,7 @@ def module_section(chapter: str, sub: int, mod: dict, br_counters: dict, all_rul
             intro = modal_form_intro(mod['id'])
             if intro:
                 lines.append(intro)
-    elif has_detail_view:
+    elif has_detail_view and mod['id'] != 'master-channel':
         lines.append(
             'Halaman **detail** (`detail.html`) diakses melalui aksi baris pada dashboard list '
             '(parameter URL terenkripsi `?param=`).'

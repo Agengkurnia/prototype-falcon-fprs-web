@@ -9,6 +9,7 @@ CHAPTER_RE = re.compile(r'^##\s+(\d+)\.\s+')
 SUBSECTION_RE = re.compile(r'^###\s+(\d+)\.(\d+)\s+')
 SUBSUBSECTION_RE = re.compile(r'^####\s+\d+(?:\.\d+)+\s+(.+)$')
 IMAGE_RE = re.compile(r'^!\[([^\]]*)\]\(([^)]+)\)\s*$')
+FIG_TITLE_COMMENT_RE = re.compile(r'^<!--\s*fig-title:\s*(.+?)\s*-->$', re.I)
 TABLE_ROW_RE = re.compile(r'^\|.+\|$')
 TABLE_SEP_RE = re.compile(r'^\|[\s|:\-]+\|$')
 BOLD_LINE_RE = re.compile(r'^\*\*(.+?)\*\*\s*$')
@@ -84,6 +85,7 @@ def preprocess_captions(md_text: str) -> str:
     tbl_counter = 0
     in_code = False
     prev_line = ''
+    pending_fig_title: str | None = None
 
     i = 0
     while i < len(lines):
@@ -120,20 +122,33 @@ def preprocess_captions(md_text: str) -> str:
                 i += 1
             continue
 
+        m_fig_title = FIG_TITLE_COMMENT_RE.match(stripped)
+        if m_fig_title:
+            pending_fig_title = m_fig_title.group(1).strip()
+            i += 1
+            prev_line = stripped
+            continue
+
         img = IMAGE_RE.match(stripped)
         if img and chapter is not None:
             alt = img.group(1).strip()
+            path = img.group(2).strip()
             next_stripped = lines[i + 1].strip() if i + 1 < len(lines) else ''
             if not FIG_CAPTION_RE.match(next_stripped):
                 fig_counter += 1
                 number = f'{chapter}.{fig_counter}'
-                title = sanitize_figure_title(alt, fallback=f'Gambar {number}')
-                out.append(line)
+                title = pending_fig_title or sanitize_figure_title(
+                    alt, fallback=f'Gambar {number}',
+                )
+                pending_fig_title = None
+                out.append(f'![]({path})')
                 out.append('')
                 out.append(_format_caption('fig', number, title))
                 i += 1
                 prev_line = _format_caption('fig', number, title)
                 continue
+
+        pending_fig_title = None
 
         if TABLE_ROW_RE.match(stripped) and chapter is not None:
             if TABLE_ROW_RE.match(prev_line.strip()):

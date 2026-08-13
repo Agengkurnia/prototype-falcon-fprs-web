@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Mobile SFA
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.2
+### Versi Dokumen: 1.3
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Mobile SFA — Man Power GT |
-| **Versi** | 1.2 |
-| **Tanggal** | 4 Agustus 2026 |
+| **Versi** | 1.3 |
+| **Tanggal** | 12 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -21,6 +21,7 @@
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
+| **1.3** | **12 Agustus 2026** | **Tim IT** | Standar narasi validasi + `fig-title` (caption tunggal); screenshot validasi SweetAlert BR-M01, BR-M15–BR-M18 |
 | **1.2** | **4 Agustus 2026** | **Tim IT** | Swimlane **PlantUML** kolom role; Document Approval; screenshot ulang; deliverable Project Log |
 | **1.1** | **4 Agustus 2026** | **Tim IT** | Rename sistem ke **Man Power GT**; screenshot ulang |
 | **1.0** | **7 Juli 2026** | **Tim ICT** | Initial draft – Mobile SFA prototipe (Views/Mobile, 20 halaman) |
@@ -233,7 +234,8 @@ Halaman login merupakan pintu masuk aplikasi Mobile SFA. Pengguna memasukkan kre
 
 **Tampilan 01 Login:**
 
-![01 Login](screenshots/ss_01_login.png)
+<!-- fig-title: Mobile SFA — Login -->
+![](screenshots/ss_01_login.png)
 
 #### Tabel Field — Login
 
@@ -257,6 +259,17 @@ Halaman login merupakan pintu masuk aplikasi Mobile SFA. Pengguna memasukkan kre
 | BR-M02 | Session persisten | Data user disimpan ke `sfa_user` via `SfaStore.saveUser()` |
 | BR-M03 | Redirect pasca-login | Setelah loading ~1.5 detik, redirect ke `home.html` |
 
+#### Narasi Validasi (Login)
+
+Validasi login di `login.html` bersifat **client-side**: jika username atau password kosong, wrapper input (`userGroup` / `passGroup`) diberi animasi **shake** tanpa dialog SweetAlert. Tidak ada submit ke server sampai kedua field terisi.
+
+| Rule ID | Kondisi | Pesan / Perilaku UI |
+|---------|---------|---------------------|
+| BR-M01 | Username atau password kosong | Animasi **shake** pada grup input yang kosong |
+
+<!-- fig-title: Validasi login — field wajib -->
+![](screenshots/ss_m01_val_login_kosong.png)
+
 #### Tabel CRUD — Login
 
 | Operasi | Entitas | Method/API | Persistensi |
@@ -278,7 +291,8 @@ Beranda SFA menampilkan sapaan dinamis, banner **Periode Penjualan** bulan berja
 
 **Tampilan 02 Home:**
 
-![02 Home](screenshots/ss_02_home.png)
+<!-- fig-title: Mobile SFA — Beranda -->
+![](screenshots/ss_02_home.png)
 
 #### Tabel Field — Header & KPI
 
@@ -341,7 +355,8 @@ Dasbor menampilkan analitik performa sales dengan filter periode (Hari/Minggu/Bu
 
 **Tampilan 03 Dasbor:**
 
-![03 Dasbor](screenshots/ss_03_dasbor.png)
+<!-- fig-title: Mobile SFA — Dasbor -->
+![](screenshots/ss_03_dasbor.png)
 
 #### Tabel Field — Dasbor
 
@@ -388,7 +403,8 @@ Halaman profil menampilkan avatar inisial, informasi akun canvasser (username, r
 
 **Tampilan 04 Profil:**
 
-![04 Profil](screenshots/ss_04_profil.png)
+<!-- fig-title: Mobile SFA — Profil -->
+![](screenshots/ss_04_profil.png)
 
 #### Tabel Field — Profil
 
@@ -429,7 +445,8 @@ Dashboard target menampilkan progress visual (bar) untuk target kunjungan, effec
 
 **Tampilan 05 Target:**
 
-![05 Target](screenshots/ss_05_target.png)
+<!-- fig-title: Mobile SFA — Target KPI -->
+![](screenshots/ss_05_target.png)
 
 #### Tabel Field — Target
 
@@ -465,7 +482,8 @@ Bottom navigation adalah komponen shell bersama pada halaman `home.html`, `dasbo
 
 **Tampilan 06 Bottom Nav:**
 
-![06 Bottom Nav](screenshots/ss_06_bottom_nav.png)
+<!-- fig-title: Mobile SFA — Bottom Navigation -->
+![](screenshots/ss_06_bottom_nav.png)
 
 #### Tabel Field — Bottom Navigation
 
@@ -500,7 +518,8 @@ Halaman daftar rute kunjungan menampilkan outlet rute hari ini dengan filter sta
 
 **Tampilan 07 Visit List:**
 
-![07 Visit List](screenshots/ss_07_visit_list.png)
+<!-- fig-title: Mobile SFA — Daftar Kunjungan -->
+![](screenshots/ss_07_visit_list.png)
 
 #### Tabel Field — Visit List
 
@@ -546,7 +565,8 @@ Halaman detail kunjungan menampilkan peta mini outlet vs posisi salesman, inform
 
 **Tampilan 08 Visit Detail:**
 
-![08 Visit Detail](screenshots/ss_08_visit_detail.png)
+<!-- fig-title: Mobile SFA — Detail Kunjungan -->
+![](screenshots/ss_08_visit_detail.png)
 
 #### Tabel Field — Header & Info Outlet
 
@@ -617,6 +637,33 @@ Halaman detail kunjungan menampilkan peta mini outlet vs posisi salesman, inform
 | BR-M18 | Order atau alasan | Harus ada `hasOrder` atau `hasNoOrderReason` untuk complete visit |
 | BR-M19 | Terminologi Visit | UI menggunakan "Mulai Visit" / "Selesai Visit", bukan Check-In/Out |
 
+#### Narasi Validasi (Detail Kunjungan)
+
+Validasi di **visit_detail.html** ditampilkan sebagai dialog **SweetAlert** (`Swal.fire`) saat aturan bisnis kunjungan dilanggar. Visit di luar radius GPS 100 m memerlukan alasan remote dan foto bukti toko sebelum check-in. User **Modern Trade (MD)** wajib menyelesaikan cek stok sebelum menutup visit.
+
+| Rule ID | Kondisi | Pesan UI (SweetAlert) |
+|---------|---------|------------------------|
+| BR-M16 | Jarak outlet > 100 m | **Visit di Luar Radius** — jarak melampaui 100 m |
+| BR-M16 | Foto bukti belum diambil (luar radius) | **Foto Diperlukan** — foto bukti outlet wajib |
+| BR-M15 | Masih ada visit `checked_in` di outlet lain | **Visit Aktif di Outlet Lain** |
+| BR-M18 | Belum input SO maupun alasan Tidak Beli | **Aktivitas Belum Lengkap** |
+| BR-M17 | Cek stok belum selesai (user MD) | **Cek Stok Belum Dilakukan** |
+
+<!-- fig-title: Validasi visit luar radius GPS -->
+![](screenshots/ss_m02_val_visit_luar_radius.png)
+
+<!-- fig-title: Validasi foto bukti wajib -->
+![](screenshots/ss_m03_val_foto_wajib.png)
+
+<!-- fig-title: Validasi visit aktif di outlet lain -->
+![](screenshots/ss_m04_val_visit_aktif_lain.png)
+
+<!-- fig-title: Validasi aktivitas visit belum lengkap -->
+![](screenshots/ss_m05_val_aktivitas_belum_lengkap.png)
+
+<!-- fig-title: Validasi cek stok wajib -->
+![](screenshots/ss_m06_val_cek_stok_wajib.png)
+
 #### Tabel CRUD — Visit Detail
 
 | Operasi | Entitas | Method/API | Keterangan |
@@ -645,7 +692,8 @@ Modul sales order terintegrasi dengan visit aktif. Pengguna memilih pelanggan (p
 
 **Tampilan 09 Order Input:**
 
-![09 Order Input](screenshots/ss_09_order_input.png)
+<!-- fig-title: Mobile SFA — Input Sales Order -->
+![](screenshots/ss_09_order_input.png)
 
 #### Tabel Field — Header & Tab
 
@@ -736,7 +784,8 @@ Halaman input transaksi penjualan mandiri dengan pemilihan pelanggan wajib, tang
 
 **Tampilan 10 Order Add:**
 
-![10 Order Add](screenshots/ss_10_order_add.png)
+<!-- fig-title: Mobile SFA — Tambah Order Mandiri -->
+![](screenshots/ss_10_order_add.png)
 
 #### Tabel Field — Order Add
 
@@ -786,7 +835,8 @@ Daftar riwayat faktur penjualan periode 30 hari terakhir dengan ringkasan total 
 
 **Tampilan 11 Invoice List:**
 
-![11 Invoice List](screenshots/ss_11_invoice_list.png)
+<!-- fig-title: Mobile SFA — Daftar Faktur -->
+![](screenshots/ss_11_invoice_list.png)
 
 #### Tabel Field — Invoice List
 
@@ -820,7 +870,8 @@ Halaman review faktur penjualan read-only.
 
 **Tampilan 12 Invoice Detail:**
 
-![12 Invoice Detail](screenshots/ss_12_invoice_detail.png)
+<!-- fig-title: Mobile SFA — Detail Faktur -->
+![](screenshots/ss_12_invoice_detail.png)
 
 #### Tabel Field — Invoice Detail
 
@@ -859,7 +910,8 @@ Halaman daftar piutang/AR outstanding per pelanggan dengan ringkasan total outst
 
 **Tampilan 13 Collection List:**
 
-![13 Collection List](screenshots/ss_13_collection_list.png)
+<!-- fig-title: Mobile SFA — Daftar Penagihan -->
+![](screenshots/ss_13_collection_list.png)
 
 #### Tabel Field — Collection List
 
@@ -893,7 +945,8 @@ Modul input pencatatan pembayaran piutang: pilih invoice checkbox, input nominal
 
 **Tampilan 14 Collection Input:**
 
-![14 Collection Input](screenshots/ss_14_collection_input.png)
+<!-- fig-title: Mobile SFA — Input Penagihan -->
+![](screenshots/ss_14_collection_input.png)
 
 #### Tabel Field — Collection Input
 
@@ -960,7 +1013,8 @@ Daftar seluruh outlet dengan pencarian nama/kode, filter kategori (Semua, Aktif,
 
 **Tampilan 15 Outlet List:**
 
-![15 Outlet List](screenshots/ss_15_outlet_list.png)
+<!-- fig-title: Mobile SFA — Daftar Outlet -->
+![](screenshots/ss_15_outlet_list.png)
 
 #### Tabel Field — Outlet List
 
@@ -997,7 +1051,8 @@ Informasi lengkap outlet dengan peta Leaflet, status GPS, galeri foto, saldo AR,
 
 **Tampilan 16 Outlet Detail:**
 
-![16 Outlet Detail](screenshots/ss_16_outlet_detail.png)
+<!-- fig-title: Mobile SFA — Detail Outlet -->
+![](screenshots/ss_16_outlet_detail.png)
 
 #### Tabel Field — Outlet Detail
 
@@ -1052,7 +1107,8 @@ Form pendaftaran outlet baru lapangan dengan foto toko wajib, mask NPWP, dropdow
 
 **Tampilan 17 Outlet Add:**
 
-![17 Outlet Add](screenshots/ss_17_outlet_add.png)
+<!-- fig-title: Mobile SFA — Tambah Outlet -->
+![](screenshots/ss_17_outlet_add.png)
 
 #### Tabel Field — Outlet Add
 
@@ -1113,7 +1169,8 @@ Katalog produk grid responsif dengan filter kategori, pencarian, mode cek stok (
 
 **Tampilan 18 Product Catalog:**
 
-![18 Product Catalog](screenshots/ss_18_product_catalog.png)
+<!-- fig-title: Mobile SFA — Katalog Produk -->
+![](screenshots/ss_18_product_catalog.png)
 
 #### Tabel Field — Product Catalog
 
@@ -1160,7 +1217,8 @@ Detail produk dengan hero image, info stok/harga per UOM, konversi satuan, deskr
 
 **Tampilan 19 Product Detail:**
 
-![19 Product Detail](screenshots/ss_19_product_detail.png)
+<!-- fig-title: Mobile SFA — Detail Produk -->
+![](screenshots/ss_19_product_detail.png)
 
 #### Tabel Field — Product Detail
 
@@ -1194,7 +1252,8 @@ Formulir konfirmasi kulakan/pemindahan stok dari stokis: lokasi check-in, bukti 
 
 **Tampilan 20 Restock Review:**
 
-![20 Restock Review](screenshots/ss_20_restock_review.png)
+<!-- fig-title: Mobile SFA — Review Restock -->
+![](screenshots/ss_20_restock_review.png)
 
 #### Tabel Field — Restock Review
 
@@ -1220,7 +1279,8 @@ Halaman detail antrean data sync offline menampilkan KPI pending/success/failed,
 
 **Tampilan 21 Sync Detail:**
 
-![21 Sync Detail](screenshots/ss_21_sync_detail.png)
+<!-- fig-title: Mobile SFA — Detail Sinkronisasi -->
+![](screenshots/ss_21_sync_detail.png)
 
 #### Tabel Field — Sync Detail
 

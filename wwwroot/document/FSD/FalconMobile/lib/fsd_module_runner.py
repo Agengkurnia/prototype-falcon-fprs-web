@@ -36,7 +36,7 @@ from fsd_build import (
     run_pandoc,
     postprocess_docx,
 )
-from fsd_captions import preprocess_captions
+from fsd_captions import preprocess_captions, sanitize_figure_title
 from fsd_deliver import DeliverableConfig, deliver_fsd_outputs
 
 
@@ -63,13 +63,37 @@ class ModuleBuildConfig:
     swimlane_image_width_cm: float = 17.0
     default_image_width_cm: float = 15.0
     erd_image_width_cm: float = 17.0
+    erd_png_min_width: int = 2600
     portrait_image_max_width_cm: float | None = None
     portrait_image_max_height_cm: float | None = None
     deliverable: DeliverableConfig | None = None
 
 
+_DIAGRAM_N_RE = re.compile(r'^Diagram\s+\d+$', re.I)
+_HEADING_RE = re.compile(r'^(#{2,4})\s+(.+)$', re.M)
+_HEADING_NUM_RE = re.compile(r'^\d+(?:\.\d+)*\s*[.—–-]?\s*')
+
+
 def _rel(script_dir: str, path: str) -> str:
     return os.path.relpath(path, script_dir).replace('\\', '/')
+
+
+def _figure_title_near(src: str, pos: int, code: str = '') -> str:
+    """Derive DOCX figure title from nearest heading — never use 'Diagram N'."""
+    if 'erDiagram' in code:
+        fallback = 'ERD'
+    elif is_swimlane_mermaid(code) or is_swimlane_plantuml(code):
+        fallback = 'Business Flow'
+    else:
+        fallback = 'Alur'
+    chunk = src[:pos]
+    headings = list(_HEADING_RE.finditer(chunk))
+    if not headings:
+        return fallback
+    raw = headings[-1].group(2).strip()
+    raw = _HEADING_NUM_RE.sub('', raw).strip()
+    raw = re.sub(r'\s*[—(].*$', '', raw).strip() or raw
+    return sanitize_figure_title(raw, fallback=fallback)
 
 
 def build_fsd_module(config: ModuleBuildConfig, script_file: str):
@@ -107,14 +131,22 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
         if is_swimlane_mermaid(code):
             has_swimlane = True
         handled = False
+        png_path = None
         for h in config.mermaid_handlers:
             if h.match(code):
                 render_kroki(code, h.png_path, h.label)
+                png_path = h.png_path
                 handled = True
                 break
         if not handled:
-            generic = os.path.join(screenshots, f'{config.slug}_diagram_{i + 1}.png')
-            render_kroki(code, generic, f'Diagram-{i + 1}')
+            png_path = os.path.join(screenshots, f'{config.slug}_diagram_{i + 1}.png')
+            render_kroki(code, png_path, f'Diagram-{i + 1}')
+        if png_path and 'erDiagram' in code:
+            try:
+                from fsd_build import ensure_png_min_width
+                ensure_png_min_width(png_path, config.erd_png_min_width)
+            except Exception:
+                pass
 
     mermaid_counter = [0]
 
@@ -124,13 +156,16 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
         for h in config.mermaid_handlers:
             if h.match(code):
                 cap = h.caption or h.label
+                if _DIAGRAM_N_RE.match(cap or ''):
+                    cap = _figure_title_near(text, m.start(), code)
                 if os.path.exists(h.png_path):
-                    return f'\n![{cap}]({_rel(script_dir, h.png_path)})\n'
+                    return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, h.png_path)})\n'
                 return f'\n> *[{cap} – diagram tidak dapat di-render]*\n'
         generic = os.path.join(screenshots, f'{config.slug}_diagram_{mermaid_counter[0]}.png')
+        cap = _figure_title_near(text, m.start(), code)
         if os.path.exists(generic):
-            return f'\n![Diagram {mermaid_counter[0]}]({_rel(script_dir, generic)})\n'
-        return f'\n> *[Diagram {mermaid_counter[0]} – tidak dapat di-render]*\n'
+            return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, generic)})\n'
+        return f'\n> *[{cap} – tidak dapat di-render]*\n'
 
     text = re.sub(r'```mermaid\s*\n(.*?)```', replace_mermaid, text, flags=re.DOTALL)
 
@@ -158,13 +193,16 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
         for h in config.plantuml_handlers:
             if h.match(code):
                 cap = h.caption or h.label
+                if _DIAGRAM_N_RE.match(cap or ''):
+                    cap = _figure_title_near(text, m.start(), code)
                 if os.path.exists(h.png_path):
-                    return f'\n![{cap}]({_rel(script_dir, h.png_path)})\n'
+                    return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, h.png_path)})\n'
                 return f'\n> *[{cap} – diagram tidak dapat di-render]*\n'
         generic = os.path.join(screenshots, f'{config.slug}_plantuml_{plantuml_counter[0]}.png')
+        cap = _figure_title_near(text, m.start(), code)
         if os.path.exists(generic):
-            return f'\n![Diagram {plantuml_counter[0]}]({_rel(script_dir, generic)})\n'
-        return f'\n> *[Diagram {plantuml_counter[0]} – tidak dapat di-render]*\n'
+            return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, generic)})\n'
+        return f'\n> *[{cap} – tidak dapat di-render]*\n'
 
     text = re.sub(r'```plantuml\s*\n(.*?)```', replace_plantuml, text, flags=re.DOTALL)
 

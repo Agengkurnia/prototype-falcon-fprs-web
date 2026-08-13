@@ -30,6 +30,11 @@ REGISTRY_PATH = os.path.join(PROTOTYPE_ROOT, 'lib', 'fsd', 'module-registry.json
 sys.path.insert(0, SCRIPT_DIR)
 sys.path.insert(0, os.path.join(WORKSPACE_DIR, 'lib'))
 from capture_action_buttons import capture_module_buttons, save_manifest, shot_element  # noqa: E402
+from capture_channel_extras import (  # noqa: E402
+    capture_channel_buttons,
+    capture_channel_modals,
+    capture_channel_validations,
+)
 from fsd_ui_section import REUSABLE_BUTTON_FILES  # noqa: E402
 
 MASTER_ORDER = [
@@ -106,8 +111,62 @@ def append_unique_buttons(target: list, extras: list) -> None:
 
 
 MODAL_SHOT_MODE = {
-    'master-channel': 'edit',  # screenshot CRUD dari Master Data Portal
+    # Channel: dual-surface handled by capture_channel_surfaces()
 }
+
+
+CHANNEL_SURFACE_SHOTS = [
+    ('ss_47_master_channel_portal_mapping.png', 'portal_mapping'),
+    ('ss_48_master_channel_portal_manage.png', 'portal_manage'),
+    ('ss_59_master_channel_fprs_viewonly.png', 'fprs_viewonly'),
+]
+
+
+def wait_channel_portal(page):
+    try:
+        page.wait_for_selector('#tblMapping, #tblMappingBody tr', timeout=20000)
+    except Exception:
+        pass
+    time.sleep(1.0)
+
+
+def wait_channel_fprs(page):
+    try:
+        page.wait_for_selector('#tblBody tr, #tbl tbody tr', timeout=20000)
+    except Exception:
+        pass
+    time.sleep(1.0)
+
+
+def capture_channel_surfaces(page, base_url: str) -> int:
+    """Portal (Mapping + Manage) dan Man Power GT view-only."""
+    done = 0
+    portal_url = base_url.rstrip('/') + '/Views/MasterDataPortal/Channel/index.html'
+    page.goto(portal_url, wait_until='domcontentloaded', timeout=30000)
+    wait_channel_portal(page)
+    page.evaluate('() => window.scrollTo(0, 0)')
+    full_shot(page, CHANNEL_SURFACE_SHOTS[0][0])
+    done += 1
+
+    manage_btn = page.locator('#tab-manage-btn')
+    if manage_btn.count():
+        manage_btn.click(timeout=8000)
+        try:
+            page.wait_for_selector('#accManage .accordion-button', timeout=10000)
+        except Exception:
+            pass
+        time.sleep(1.0)
+        page.evaluate('() => window.scrollTo(0, 0)')
+        full_shot(page, CHANNEL_SURFACE_SHOTS[1][0])
+        done += 1
+
+    fprs_url = base_url.rstrip('/') + '/Views/FPRS/MasterData/Channel/index.html'
+    page.goto(fprs_url, wait_until='domcontentloaded', timeout=30000)
+    wait_channel_fprs(page)
+    page.evaluate('() => window.scrollTo(0, 0)')
+    full_shot(page, CHANNEL_SURFACE_SHOTS[2][0])
+    done += 1
+    return done
 
 
 def module_page_shots(mod: dict) -> list[str]:
@@ -150,8 +209,7 @@ def wait_detail_ready(page, mod_id: str) -> None:
         try:
             page.wait_for_selector('#formProduk, #kode', timeout=15000)
             page.wait_for_function(
-                "() => { const n = document.querySelector('#nama'); "
-                "return n && n.value && n.value.length > 0; }",
+                "() => document.querySelectorAll('#kategori option').length > 1",
                 timeout=20000,
             )
         except Exception:
@@ -220,6 +278,11 @@ def open_modal_for_shot(page, mod_id: str):
         else:
             raise RuntimeError('Tombol Detail (view) tidak ditemukan untuk shot modal')
         if mod_id == 'master-channel':
+            try:
+                page.wait_for_selector('#modalMapping.show, #modalChannel.show, #modalTypeCus.show, #modalAccount.show, .modal.show', timeout=10000)
+            except Exception:
+                pass
+        elif mod_id == 'master-channel-legacy':
             try:
                 page.wait_for_selector('#custSection', timeout=10000)
             except Exception:
@@ -310,6 +373,22 @@ def capture(base_url, only=None):
             print(f'[{mid}] {mod["label"]}')
             page = browser.new_page(viewport={'width': 1440, 'height': 900})
             try:
+                if mid == 'master-channel':
+                    done += capture_channel_surfaces(page, base_url)
+                    portal_url = base_url.rstrip('/') + '/Views/MasterDataPortal/Channel/index.html'
+                    page.goto(portal_url, wait_until='domcontentloaded', timeout=30000)
+                    wait_channel_portal(page)
+                    try:
+                        btn_manifest[mid] = capture_channel_buttons(page, SCREENSHOTS_DIR)
+                    except Exception as e:
+                        print(f'   WARN channel buttons: {e}')
+                        btn_manifest[mid] = btn_manifest.get(mid, [])
+                    try:
+                        done += capture_channel_modals(page, SCREENSHOTS_DIR)
+                    except Exception as e:
+                        print(f'   WARN channel modals: {e}')
+                    continue
+
                 index_url = base_url.rstrip('/') + '/' + mod['htmlPath'].replace('\\', '/')
                 page.goto(index_url, wait_until='domcontentloaded', timeout=30000)
                 wait_ready(page)
@@ -364,6 +443,13 @@ def capture(base_url, only=None):
             print(f'   WARN common buttons: {e}')
 
         browser.close()
+
+    if only is None or 'master-channel' in only:
+        try:
+            print('[master-channel] validasi SweetAlert')
+            capture_channel_validations(base_url, SCREENSHOTS_DIR)
+        except Exception as e:
+            print(f'   WARN channel validations: {e}')
 
     save_manifest(SCREENSHOTS_DIR, btn_manifest)
     print(f'\nSelesai. {done} page screenshot + {sum(len(v) for v in btn_manifest.values())} button shots')

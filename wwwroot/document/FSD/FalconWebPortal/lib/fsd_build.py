@@ -21,6 +21,7 @@ BORDER_COLOR = '000000'
 FONT_NAME = 'Calibri'
 FONT_SIZE_BODY = 11
 FONT_SIZE_TABLE = 9
+FONT_SIZE_SOURCE = 9
 HEADING_FONT_SIZES = {
     'Heading 1': 20,
     'Heading 2': 18,
@@ -323,6 +324,40 @@ def postprocess_headings(doc, content_start: int):
             _apply_font(run, size, bold=True)
 
 
+def postprocess_source_notes(doc, content_start: int):
+    """Italic + font lebih kecil untuk baris catatan sumber (paragraf & sel tabel)."""
+    source_para_re = re.compile(
+        r'^(Sumber\b|Source\s*:|Master Data API|Integrasi API)',
+        re.I,
+    )
+    source_cell_re = re.compile(
+        r'(`[^`]+`\s*\\\|\s*`[^`]+`|Master Data API|m[A-Z]\w+\s*\|)',
+        re.I,
+    )
+    for i, para in enumerate(doc.paragraphs):
+        if i < content_start:
+            continue
+        raw = (para.text or '').strip()
+        if not raw or not source_para_re.search(raw):
+            continue
+        for run in para.runs:
+            run.italic = True
+            _apply_font(run, FONT_SIZE_SOURCE)
+
+    for ti, table in enumerate(doc.tables):
+        if ti < COVER_TABLE_COUNT:
+            continue
+        for row in table.rows[1:]:
+            for cell in row.cells:
+                text = (cell.text or '').strip()
+                if not text or not source_cell_re.search(text):
+                    continue
+                for para in cell.paragraphs:
+                    for run in para.runs:
+                        run.italic = True
+                        _apply_font(run, FONT_SIZE_SOURCE, bold=None)
+
+
 def postprocess_captions(doc, content_start: int):
     for i, para in enumerate(doc.paragraphs):
         if i < content_start:
@@ -416,4 +451,5 @@ def postprocess_docx(
     postprocess_page_breaks(doc, content_start)
     postprocess_headings(doc, content_start)
     postprocess_captions(doc, content_start)
+    postprocess_source_notes(doc, content_start)
     doc.save(docx_path)

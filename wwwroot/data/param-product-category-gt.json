@@ -1,0 +1,15 @@
+{
+  "paramCode": "PRODUCT_CATEGORY_GT",
+  "api": "/api/v1/Param",
+  "note": "Simulasi Master Data API — Parameter Management (paramCode = PRODUCT_CATEGORY_GT)",
+  "items": [
+    { "id": 1, "code": "FORMULA", "name": "Susu Formula", "active": true },
+    { "id": 2, "code": "HEALTH_DRINK", "name": "Minuman Kesehatan", "active": true },
+    { "id": 3, "code": "SUPPLEMENT", "name": "Suplemen", "active": true },
+    { "id": 4, "code": "BABY_FOOD", "name": "Makanan Bayi", "active": true },
+    { "id": 5, "code": "CHILD_MILK", "name": "Susu Anak", "active": true },
+    { "id": 6, "code": "MATERNAL_MILK", "name": "Susu Ibu Hamil", "active": true },
+    { "id": 7, "code": "ISOTONIC", "name": "Minuman Isotonik", "active": true },
+    { "id": 8, "code": "COCONUT_JUICE", "name": "Jus Kelapa", "active": true }
+  ]
+}

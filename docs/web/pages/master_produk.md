@@ -4,11 +4,12 @@
 `Views/FPRS/MasterData/Produk/` — `index.html`, `detail.html` (form add/edit fleksibel)
 
 ## Fungsi
-Katalog produk. Data dasar (nama, umbrella brand, brand, divisi) di-lookup dari **Master Data API** lewat LOV **Kode Produk** dan bersifat read-only. Field yang diisi di aplikasi ini: **Harga Beli, Skema Pajak, Status**. **Harga Jual** dihitung otomatis dan **Unit** selalu `PCS`.
+Katalog produk. Data dasar (nama, umbrella brand, brand, divisi) di-lookup dari **Master Data API** lewat LOV **Kode Produk** dan bersifat read-only. Field yang diisi di aplikasi ini: **Harga Beli, Skema Pajak, Status, Foto Produk, Product Category**. **Harga Jual** dihitung otomatis dan **Unit** selalu `PCS`.
 
-- **index.html**: kolom `KATEGORI` diganti `UMBRELLA BRAND`; kartu statistik "Rata-rata Harga" diganti kartu jumlah "Umbrella Brand". Aksi baris hanya **Detail / Ubah** (ikon mata → `detail.html?id=`); tombol Edit & Hapus dihilangkan. Tombol **Tambah Produk** → `detail.html`.
+- **index.html**: kolom `KATEGORI` diganti `UMBRELLA BRAND`; kartu statistik "Rata-rata Harga" diganti kartu jumlah "Umbrella Brand". Kolom **CATEGORY** + **FOTO**. Aksi baris hanya **Detail / Ubah** (ikon mata → `detail.html?id=`); tombol Edit & Hapus dihilangkan. Tombol **Tambah Produk** → `detail.html`.
 - **detail.html**: satu halaman untuk **Tambah & Ubah**.
   - **Kode Produk = LOV** yang lookup Master Data API (disimulasikan dari `produk.json`); memilih kode mengisi otomatis nama/umbrella/brand/divisi/harga beli. Saat mode Ubah, Kode read-only.
+  - **Product Category**: dropdown wajib; LOV dari **Master Data API** `GET /api/v1/Param` dengan **`paramCode = PRODUCT_CATEGORY_GT`** (prototipe: seed `param-product-category-gt.json`). Disimpan sebagai `kategori` + `kategoriCode` (+ `kategoriId`).
   - **Foto Produk**: upload JPG/PNG/WebP (kompres otomatis), simpan field `foto` (data URL) di localStorage; tampil di form + thumbnail list index.
   - **Harga Beli** editable; **Harga Jual** read-only = `Harga Beli + PPN` (11% bila skema PPN, 0% bila NoPPN), dihitung otomatis.
   - **Skema Pajak** default **PPN 11%**.

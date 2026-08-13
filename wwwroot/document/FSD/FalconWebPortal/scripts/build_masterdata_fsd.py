@@ -50,7 +50,7 @@ def build() -> str:
                 'prepared_by': 'Tim IT – Man Power GT',
                 'date': '12/08/2026',
                 'revision_date': '12 Agustus 2026',
-                'revision_desc': 'v1.10 – Channel: Type Customer + Account mapping (Manage/Mapping tabs)',
+                'revision_desc': 'v1.17 – Channel: tombol aksi + screenshot validasi',
             },
             plantuml_handlers=[
                 PlantumlHandler(

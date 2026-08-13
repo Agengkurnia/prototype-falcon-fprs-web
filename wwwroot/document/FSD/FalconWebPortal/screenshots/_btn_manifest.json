@@ -1,28 +1,140 @@
 {
   "master-channel": [
     {
+      "file": "ss_btn_channel_tambah-mapping.png",
+      "label": "Tambah Mapping",
+      "id": "btnAddMapping",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Membuka modal untuk menambah triple mapping baru."
+    },
+    {
+      "file": "ss_btn_channel_hapus.png",
+      "label": "Hapus",
+      "id": "btn-del-map",
+      "style": "btn-outline-danger",
+      "function": "—",
+      "narrative": "Menghapus baris mapping setelah konfirmasi."
+    },
+    {
+      "file": "ss_btn_channel_tab-mapping.png",
+      "label": "Mapping",
+      "id": "tab-mapping-btn",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Menampilkan tab daftar triple mapping."
+    },
+    {
+      "file": "ss_btn_channel_tab-manage.png",
+      "label": "Manage",
+      "id": "tab-manage-btn",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Menampilkan tab kelola master Channel, Type Customer, dan Account."
+    },
+    {
+      "file": "ss_btn_channel_accordion-channel.png",
+      "label": "Channel",
+      "id": "hdChannel",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel master Channel pada tab Manage."
+    },
+    {
       "file": "ss_btn_channel_tambah-channel.png",
       "label": "Tambah Channel",
-      "id": "openModal()",
+      "id": "btnAddChannel",
       "style": "btn-success",
-      "function": "openModal()",
-      "narrative": "Membuka modal form untuk menambah data baru."
+      "function": "—",
+      "narrative": "Membuka modal tambah master Channel."
     },
     {
-      "file": "ss_btn_channel_edit.png",
-      "label": "Edit",
-      "id": "editItem('1')",
-      "style": "btn-outline-secondary",
-      "function": "editItem('1')",
-      "narrative": "Membuka modal form dalam mode ubah untuk baris yang dipilih."
+      "file": "ss_btn_channel_ubah-channel.png",
+      "label": "Ubah Channel",
+      "id": "btn-edit-ch",
+      "style": "btn-outline-success",
+      "function": "—",
+      "narrative": "Membuka modal ubah master Channel terpilih."
     },
     {
-      "file": "ss_btn_channel_simpan.png",
-      "label": "Simpan",
-      "id": "saveItem()",
+      "file": "ss_btn_channel_simpan-channel.png",
+      "label": "Simpan Channel",
+      "id": "btnSaveChannel",
       "style": "btn-success",
-      "function": "saveItem()",
-      "narrative": "Menyimpan perubahan dari modal ke penyimpanan lokal setelah validasi."
+      "function": "—",
+      "narrative": "Menyimpan master Channel setelah validasi."
+    },
+    {
+      "file": "ss_btn_channel_accordion-type-customer.png",
+      "label": "Type Customer",
+      "id": "hdTypeCus",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel master Type Customer (global)."
+    },
+    {
+      "file": "ss_btn_channel_tambah-type-customer.png",
+      "label": "Tambah Type Customer",
+      "id": "btnAddTypeCus",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Membuka modal tambah Type Customer."
+    },
+    {
+      "file": "ss_btn_channel_ubah-type-customer.png",
+      "label": "Ubah Type Customer",
+      "id": "btn-edit-tc",
+      "style": "btn-outline-success",
+      "function": "—",
+      "narrative": "Membuka modal ubah Type Customer terpilih."
+    },
+    {
+      "file": "ss_btn_channel_simpan-type-customer.png",
+      "label": "Simpan Type Customer",
+      "id": "btnSaveTypeCus",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menyimpan master Type Customer setelah validasi."
+    },
+    {
+      "file": "ss_btn_channel_accordion-account.png",
+      "label": "Account",
+      "id": "hdAccount",
+      "style": "btn-secondary",
+      "function": "—",
+      "narrative": "Membuka panel master Account (global)."
+    },
+    {
+      "file": "ss_btn_channel_tambah-account.png",
+      "label": "Tambah Account",
+      "id": "btnAddAccount",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Membuka modal tambah Account."
+    },
+    {
+      "file": "ss_btn_channel_ubah-account.png",
+      "label": "Ubah Account",
+      "id": "btn-edit-acc",
+      "style": "btn-outline-success",
+      "function": "—",
+      "narrative": "Membuka modal ubah Account terpilih."
+    },
+    {
+      "file": "ss_btn_channel_simpan-account.png",
+      "label": "Simpan Account",
+      "id": "btnSaveAccount",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menyimpan master Account setelah validasi."
+    },
+    {
+      "file": "ss_btn_channel_simpan-mapping.png",
+      "label": "Simpan Mapping",
+      "id": "btnSaveMapping",
+      "style": "btn-success",
+      "function": "—",
+      "narrative": "Menyimpan triple mapping setelah validasi."
     }
   ],
   "master-pajak": [],
@@ -76,6 +188,14 @@
       "style": "btn-outline-secondary",
       "function": "—",
       "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "ss_btn_produk_hapus-foto.png",
+      "label": "Hapus foto",
+      "id": "btnClearFoto",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menghapus data terpilih setelah konfirmasi pengguna."
     },
     {
       "file": "ss_btn_produk_simpan-produk.png",

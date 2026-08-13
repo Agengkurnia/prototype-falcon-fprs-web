@@ -35,9 +35,9 @@ if __name__ == '__main__':
             'brd_no': '2026.SHP-FSD.0103',
             'pid_no': '2026.SHP-PID.0101',
             'prepared_by': 'Tim IT – Man Power GT',
-            'date': '04/08/2026',
-            'revision_date': '4 Agustus 2026',
-            'revision_desc': 'v1.2 – PlantUML swimlane standar; screenshot ulang; Man Power GT',
+            'date': '12/08/2026',
+            'revision_date': '12 Agustus 2026',
+            'revision_desc': 'v1.3 – Narasi validasi + fig-title caption tunggal; screenshot validasi visit/login',
         },
         plantuml_handlers=[
             PlantumlHandler(

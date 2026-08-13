@@ -154,12 +154,12 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
                 if _DIAGRAM_N_RE.match(cap or ''):
                     cap = _figure_title_near(text, m.start(), code)
                 if os.path.exists(h.png_path):
-                    return f'\n![{cap}]({_rel(script_dir, h.png_path)})\n'
+                    return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, h.png_path)})\n'
                 return f'\n> *[{cap} – diagram tidak dapat di-render]*\n'
         generic = os.path.join(screenshots, f'{config.slug}_diagram_{mermaid_counter[0]}.png')
         cap = _figure_title_near(text, m.start(), code)
         if os.path.exists(generic):
-            return f'\n![{cap}]({_rel(script_dir, generic)})\n'
+            return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, generic)})\n'
         return f'\n> *[{cap} – tidak dapat di-render]*\n'
 
     text = re.sub(r'```mermaid\s*\n(.*?)```', replace_mermaid, text, flags=re.DOTALL)
@@ -195,12 +195,12 @@ def build_fsd_module(config: ModuleBuildConfig, script_file: str):
                 if _DIAGRAM_N_RE.match(cap or ''):
                     cap = _figure_title_near(text, m.start(), code)
                 if os.path.exists(h.png_path):
-                    return f'\n![{cap}]({_rel(script_dir, h.png_path)})\n'
+                    return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, h.png_path)})\n'
                 return f'\n> *[{cap} – diagram tidak dapat di-render]*\n'
         generic = os.path.join(screenshots, f'{config.slug}_plantuml_{plantuml_counter[0]}.png')
         cap = _figure_title_near(text, m.start(), code)
         if os.path.exists(generic):
-            return f'\n![{cap}]({_rel(script_dir, generic)})\n'
+            return f'\n<!-- fig-title: {cap} -->\n![]({_rel(script_dir, generic)})\n'
         return f'\n> *[{cap} – tidak dapat di-render]*\n'
 
     text = re.sub(r'```plantuml\s*\n(.*?)```', replace_plantuml, text, flags=re.DOTALL)

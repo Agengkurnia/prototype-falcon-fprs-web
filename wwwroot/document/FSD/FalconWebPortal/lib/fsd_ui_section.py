@@ -25,6 +25,19 @@ def shot_view_kind(ui_type: str, shot: str, index: int) -> str:
     return 'modal' if ui_type == 'modal' else 'detail'
 
 
+def screenshot_embed_md(
+    title: str,
+    shot: str,
+    *,
+    screenshots_prefix: str = 'screenshots',
+) -> str:
+    """Embed screenshot: judul hanya di caption Gambar (bukan alt Pandoc)."""
+    if not shot:
+        return ''
+    safe_title = (title or '').strip()
+    return f'<!-- fig-title: {safe_title} -->\n![]({screenshots_prefix}/{shot})\n'
+
+
 def screenshot_single_md(
     module_label: str,
     shot: str,
@@ -32,7 +45,7 @@ def screenshot_single_md(
     *,
     screenshots_prefix: str = 'screenshots',
 ) -> str:
-    """Satu gambar saja — caption bernomor (Gambar N.M) ditambahkan otomatis saat build."""
+    """Satu gambar — caption bernomor (Gambar N.M) ditambahkan otomatis saat build."""
     if not shot:
         return ''
     suffix = {
@@ -40,8 +53,8 @@ def screenshot_single_md(
         'modal': ' — Form Modal (full page)',
         'detail': ' — Halaman Detail',
     }.get(view_kind, '')
-    alt = f'{module_label}{suffix}'.strip()
-    return f'![{alt}]({screenshots_prefix}/{shot})\n'
+    title = f'{module_label}{suffix}'.strip()
+    return screenshot_embed_md(title, shot, screenshots_prefix=screenshots_prefix)
 
 
 def screenshot_placeholder_md(shot_path: str) -> str:
@@ -134,6 +147,36 @@ def resolve_button_shot_file(shot: str, label: str, shots_dir: str) -> str:
         if os.path.exists(cpath):
             return common
     return shot or ''
+
+
+def source_path_md(label: str, path: str) -> str:
+    """Path sumber — italic (Pandoc native, lebih andal daripada HTML di DOCX)."""
+    safe = (path or '').strip()
+    if not safe:
+        return ''
+    return f'*{label}: {safe}*'
+
+
+def format_db_source_note(table: str, col: str) -> str:
+    """Catatan sumber kolom/field — italic untuk DOCX (pipe di-escape untuk tabel MD)."""
+    return f'*{table} \\| {col}*'
+
+
+def module_overview_channel(mod: dict) -> str:
+    """Narasi ringkas modul Channel — paragraf + poin."""
+    parts = [
+        'Modul **Channel** mengatur klasifikasi outlet lewat **mapping triple**: '
+        '**Channel** · **Type Customer** · **Account** (kombinasi unik).',
+        '',
+        'Prototipe memakai **dual-surface**:',
+        '',
+        '- **Master Data Portal** — kelola master dan mapping (tab **Mapping** + **Manage**).',
+        '- **Man Power GT** — lihat daftar mapping saja; tanpa tambah, ubah, atau hapus.',
+        '',
+        '**Type Customer** adalah master **global** (bukan turunan Channel). '
+        'Hubungan ke Channel hanya lewat baris mapping.',
+    ]
+    return '\n'.join(parts) + '\n'
 
 
 UI_SECTION_FLOW = [

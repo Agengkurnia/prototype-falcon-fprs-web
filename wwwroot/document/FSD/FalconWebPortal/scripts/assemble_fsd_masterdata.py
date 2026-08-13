@@ -88,6 +88,33 @@ Pada dialog **Periode bentrok**, pengguna memilih:
 **Pemakaian di dashboard Mobile:** target kunjungan = `minimalHarian` dari versi Limit yang **aktif pada tanggal** filter, untuk jabatan yang dipetakan dari role user (MD → MD/MD Reguler; selain itu → Motoris/Motoris Reguler). Transaksi visit **tidak** menyimpan FK Limit; nilai target di-resolve saat baca KPI.
 '''
 
+CHANNEL_VALIDATION_SECTION = '''
+#### 3.3.5 Narasi Validasi (Master Data Portal)
+
+Validasi di modul **Channel** ditampilkan sebagai dialog **SweetAlert** (`Swal.fire`) saat simpan master atau mapping gagal. **Type Customer** dan **Account** bersifat master **global**; triple **Channel · Type Customer · Account** harus unik.
+
+**Validasi master (modal Channel / Type Customer / Account):**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD08 | Nama Channel kosong | ![Validasi nama Channel wajib](screenshots/ss_60_channel_val_nama_channel_wajib.png) |
+| BR-MD09 | Nama Channel sudah dipakai | ![Validasi nama Channel duplikat](screenshots/ss_61_channel_val_nama_channel_duplikat.png) |
+| BR-MD10 | Nama Type Customer kosong | ![Validasi Type Customer wajib](screenshots/ss_62_channel_val_typecus_wajib.png) |
+| BR-MD11 | Nama Type Customer sudah dipakai | ![Validasi Type Customer duplikat](screenshots/ss_63_channel_val_typecus_duplikat.png) |
+| BR-MD12 | Kode Account kosong | ![Validasi Account wajib](screenshots/ss_64_channel_val_account_wajib.png) |
+| BR-MD13 | Kode Account sudah dipakai | ![Validasi Account duplikat](screenshots/ss_65_channel_val_account_duplikat.png) |
+
+**Validasi mapping (tab Mapping):**
+
+| Rule ID | Kondisi | Tampilan |
+|---------|---------|----------|
+| BR-MD14 | Belum ada Channel aktif | ![Validasi tidak ada Channel aktif](screenshots/ss_66_channel_val_no_channel_aktif.png) |
+| BR-MD15 | Belum ada Type Customer aktif | ![Validasi tidak ada Type Customer aktif](screenshots/ss_67_channel_val_no_typecus_aktif.png) |
+| BR-MD16 | Belum ada Account aktif | ![Validasi tidak ada Account aktif](screenshots/ss_68_channel_val_no_account_aktif.png) |
+| BR-MD17 | Channel / Type Customer / Account belum dipilih di modal | ![Validasi mapping wajib dipilih](screenshots/ss_69_channel_val_mapping_wajib.png) |
+| BR-MD18 | Triple mapping sudah ada | ![Validasi mapping duplikat](screenshots/ss_70_channel_val_mapping_duplikat.png) |
+'''
+
 # Document Approval — standar Man Power GT / SHP
 DOCUMENT_APPROVAL = [
     ('Muhammad Rafi', 'SHP Channel & Customer Development'),
@@ -105,14 +132,14 @@ def preamble() -> str:
     return f'''# FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Data Master (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.10
+### Versi Dokumen: 1.17
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Data Master — Web Admin Man Power GT |
-| **Versi** | 1.10 |
+| **Versi** | 1.17 |
 | **Tanggal** | {TANGGAL} |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -124,6 +151,13 @@ def preamble() -> str:
 
 | Versi | Tanggal | Diubah Oleh | Keterangan |
 |---------|-------------|-------------|------------|
+| **1.17** | **{TANGGAL}** | **Tim IT** | Channel: screenshot tombol aksi lengkap + validasi SweetAlert (BR-MD08–18) |
+| **1.16** | **{TANGGAL}** | **Tim IT** | Perbaikan caption ganda pada gambar (alt Pandoc vs Gambar N.M) |
+| **1.15** | **{TANGGAL}** | **Tim IT** | Channel: kembalikan tabel Aspek; hilangkan metadata prototipe; catatan sumber italic |
+| **1.14** | **{TANGGAL}** | **Tim IT** | Narasi modul Channel: paragraf + poin; path sumber italic/kecil |
+| **1.13** | **{TANGGAL}** | **Tim IT** | Channel: screenshot dual-surface (Portal Mapping/Manage + MP GT view-only); Produk: refresh screenshot |
+| **1.12** | **{TANGGAL}** | **Tim IT** | Produk: **Product Category** dari Param `PRODUCT_CATEGORY_GT` (`/api/v1/Param`) |
+| **1.11** | **{TANGGAL}** | **Tim IT** | Channel dual-surface (Portal Mapping/Manage + FPRS list-only); TypeCus global; Produk: upload **Foto Produk** |
 | **1.10** | **{TANGGAL}** | **Tim IT** | Channel: hierarki **Channel → Type Customer → Account**; tab Manage + Mapping (simulasi Master Data) |
 | **1.9** | **10 Agustus 2026** | **Tim IT** | Limit: field **Nama** wajib & unik global (`txtNama`); kolom list + input Header |
 | **1.8** | **7 Agustus 2026** | **Tim IT** | Channel: **view-only** (sumber API `/api/v1/Channel`); hapus Tambah/Edit di UI + FSD |
@@ -154,7 +188,8 @@ def preamble() -> str:
 Nutritionals untuk mengelola tenaga lapangan General Trade (motoris / canvasser),
 administrasi data master terkait, monitoring penjualan lapangan, dan pelacakan
 kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Data Master** Web Admin
-(`Views/FPRS/MasterData/`) — kumpulan halaman referensi yang menjadi fondasi transaksi.
+(`Views/FPRS/MasterData/` dan **Master Data Portal** `Views/MasterDataPortal/` untuk Channel) —
+kumpulan halaman referensi yang menjadi fondasi transaksi.
 
 Prototipe Web Portal berupa *high-fidelity interactive prototype* berbasis HTML
 statis (MPA) bertema Vuexy/Bootstrap yang menggunakan **localStorage** dan file
@@ -172,7 +207,7 @@ alur kerja admin sebelum integrasi penuh ke Master Data API Kalbe dan backend MA
 
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
-| Modul Data Master Web (`Views/FPRS/MasterData/`) | Modul Penjualan, Kunjungan, Dashboard |
+| Modul Data Master Web (`Views/FPRS/MasterData/`) + **Master Data Portal** (`Views/MasterDataPortal/`) untuk Channel | Modul Penjualan, Kunjungan, Dashboard |
 | Produk, Pelanggan, Channel, Pegawai, Stokis, Limit, Pajak, Alasan | Mobile SFA (`Views/Mobile/`, Flutter APK) — kecuali sebagai **sumber data** Pelanggan |
 | Persistensi prototipe (localStorage + JSON seed) | Modul DOFS MAVEN yang sudah ada |
 | Desain database produksi MAVEN (PostgreSQL + EF Core) | Workflow approval multi-level (tidak berlaku untuk Data Master v1) |
@@ -211,11 +246,11 @@ Modul Data Master memakai **empat pola** pengelolaan data:
 
 | Pola | Modul | Cara Kelola | Sumber kebenaran (produksi) |
 |------|-------|-------------|------------------------------|
-| Form (add/edit) | Produk | Halaman detail fleksibel + LOV SKU | Katalog SKU dari Master Data API; harga/pajak/status di DB FPRS |
+| Form (add/edit) | Produk | Halaman detail fleksibel + LOV SKU + Param Category | Katalog SKU dari Master Data API; category dari Param `PRODUCT_CATEGORY_GT`; harga/pajak/status/foto di DB FPRS |
 | Modal CRUD | Pajak, Alasan | Modal di dalam Index | Tabel lokal MAVEN (`mPajak`, `mAlasan`) |
 | Upload-only (CSV + history) | Pegawai, Stokis | Download/Upload CSV, status disinkronkan | File CSV sebagai input; hasil di `mPegawai` / `mStokis` + tabel riwayat |
 | View-only (sumber mobile) | Pelanggan | List + detail read-only | Mobile SFA → `mPelanggan` |
-| Hierarki + mapping (simulasi MD) | Channel | Detail tabs Manage + Mapping | Channel → Type Customer → Account; triple mapping; prototype localStorage |
+| Dual-surface (Portal CRUD + MP GT view-only) | Channel | Portal: tab Mapping + Manage; FPRS: list mapping saja | Channel → Type Customer → Account; triple mapping |
 | Form + versi (append-only) | Limit | Header + versi periode | LOV jabatan dari API Position; persist `mLimitTargetHarian` / Ver |
 
 ### 2.3 Business Flow (Swimlane)
@@ -263,7 +298,7 @@ Hand-off Admin → Sistem: setiap operasi form/modal/upload dibaca dan disimpan 
 | Form Produk | Create / Edit | Kode dari LOV API; harga beli > 0; kode unik | Insert/update `mProduk` | Tidak ada — langsung simpan |
 | Modal Pajak/Alasan | Tambah / Ubah (/ Hapus) | Field wajib; unik nama/kode; Pajak cek FK produk sebelum hapus | Persist ke tabel terkait | Tidak ada |
 | CSV Pegawai/Stokis | Upload file | Header dikenali; baris wajib; Stokis: GPS unik | Upsert Active; absen di file → Inactive + hist | Tidak ada |
-| Channel | Manage / Mapping | TypeCus unik/Channel; Account unik; triple unik | Persist simulasi MD (Channel/TypeCus/Account/mapping) | Tidak ada |
+| Channel | Portal Mapping/Manage; FPRS view-only | TypeCus global; Account unik; triple unik | Persist simulasi MD (Channel/TypeCus/Account/mapping) | Tidak ada |
 | Pelanggan | Buka list/detail | — (read-only) | Tampil dari `mPelanggan` | N/A |
 | Limit | Create header / append versi | Nama wajib+unik global; Jabatan+type unik; Max≥Min; no backdate; overlap dialog | `mLimitTargetHarian` + Ver | Tidak ada |
 
@@ -296,6 +331,8 @@ def chapter_master_data(reg: dict, all_rules: list) -> str:
             lines.append(mapping)
         if mid == 'master-limit-target-harian':
             lines.append(LIMIT_VALIDATION_SECTION)
+        if mid == 'master-channel':
+            lines.append(CHANNEL_VALIDATION_SECTION)
     return '\n'.join(lines)
 
 
@@ -332,7 +369,7 @@ def chapter_business_rules(rules: list[tuple[str, str]]) -> str:
         '| BR-PR01 | Semua | Akses halaman membutuhkan `bitView` pada `mRoleAccess` untuk `txtMenuCode` terkait; tanpa hak → HTTP 403. |',
         '| BR-PR02 | Semua | Create/Update/Delete/Upload membutuhkan `bitEdit` (atau `bitDelete` untuk hapus); audit `txtInsertedBy` / `txtUpdatedBy` wajib terisi dari user login. |',
         '| BR-PR03 | Semua | **Tidak ada approval workflow** untuk Data Master v1 — simpan langsung setelah validasi lolos. |',
-        '| BR-PR04 | Produk | Identitas SKU (kode/nama/umbrella/brand) bersumber Master Data API; aplikasi hanya boleh mengubah harga beli, skema pajak, unit default PCS, dan status. |',
+        '| BR-PR04 | Produk | Identitas SKU (kode/nama/umbrella/brand) bersumber Master Data API; **Product Category** dari Param `PRODUCT_CATEGORY_GT`; aplikasi hanya boleh mengubah kategori (param), harga beli, skema pajak, foto, unit default PCS, dan status. |',
         '| BR-PR05 | Produk | Harga jual = f(harga beli, persentase pajak); tidak diinput manual. |',
         '| BR-PR06 | Pajak | Hapus ditolak jika `mProduk.intPajakID` masih mereferensikan record tersebut. |',
         '| BR-PR07 | Channel | Hierarki Channel → Type Customer → Account; mapping triple unik; prototype simulasi Master Data (CRUD Web Admin). |',
@@ -414,6 +451,7 @@ def chapter_integration(reg: dict) -> str:
 | Endpoint | Modul FPRS | Arah | Digunakan untuk |
 |----------|------------|------|-----------------|
 | `GET /api/v1/Sku` | Produk | Inbound LOV | Pilih kode produk; isi nama, umbrella, brand (read-only di form) |
+| `GET /api/v1/Param?paramCode=PRODUCT_CATEGORY_GT` | Produk | Inbound LOV | Dropdown **Product Category** pada form Create/Edit |
 | `GET /api/v1/Channel` | Channel | Referensi / sync (rencana) | Prototype: simulasi lokal hierarki + mapping; produksi boleh sync |
 | `GET /api/v1/Position` | Limit | Inbound LOV | Dropdown **Jabatan** & **Type Jabatan** pada form Create/Detail |
 | `/api/v1/Customer` | Pelanggan | Inbound sync (fase 4b) | Isi/update `mPelanggan` dari mobile/SFA — **belum** di v1 web write |
