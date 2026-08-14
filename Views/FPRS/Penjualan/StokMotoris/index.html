@@ -632,7 +632,7 @@
     const VISIT_PERIOD_END = '2026-12-31';
     const EFF_CALL_PCT = 68;
     const STOR_KEY = 'md_stok_motoris';
-    const FAKTUR_STORAGE_KEY = 'fprs_faktur_v6';
+    const FAKTUR_STORAGE_KEY = 'fprs_faktur_v7';
 
     let masterData = { pegawai: [], produk: [], stokis: [], pelanggan: [] };
     let masterFaktur = [];
@@ -679,6 +679,7 @@
         masterFaktur = await loadFakturData();
         produkByKode = Object.fromEntries(masterData.produk.map(p => [p.kode, p]));
         masterUmbrellas = [...new Set(masterData.produk.map(p => p.umbrella).filter(Boolean))].sort();
+        expandOutletUniverse();
         masterRegions = [...new Set(
             masterData.stokis.map(s => provinceOfCity(cityName(s.branch))).filter(Boolean)
         )].sort();
@@ -831,8 +832,51 @@
         });
     }
 
+    function expandOutletUniverse() {
+        const TARGET_PER_CITY = 85;
+        const prefixes = ['Apotek', 'Toko', 'Warung', 'Klinik', 'Minimarket', 'Koperasi', 'Depot'];
+        const names = ['Sejahtera', 'Maju Jaya', 'Berkah', 'Nusantara', 'Melati', 'Sumber Rejeki', 'Bintang', 'Harapan', 'Sentosa', 'Makmur', 'Pelita', 'Cahaya', 'Mitra', 'Famili', 'Prima'];
+        const streets = ['Sudirman', 'Ahmad Yani', 'Gatot Subroto', 'Diponegoro', 'Merdeka', 'Veteran', 'Kartini', 'Pahlawan', 'Siliwangi', 'Pemuda'];
+        const byCity = {};
+        masterData.pelanggan.forEach(p => {
+            const city = prettyWilayah(p.kota) || cityName(p.kota) || 'Jakarta';
+            (byCity[city] = byCity[city] || []).push(p);
+        });
+        const extra = [];
+        let nextId = 20000;
+        Object.keys(byCity).forEach(city => {
+            const seed = byCity[city];
+            if (!seed.length) return;
+            const rnd = seededRandom(hashSeed('outlet-universe|' + city));
+            const prefix = cityToken(city).replace(/[^a-z]/g, '').slice(0, 3).toUpperCase() || 'OUT';
+            let n = seed.length;
+            let i = 0;
+            while (n < TARGET_PER_CITY) {
+                const base = seed[i % seed.length];
+                const seq = String(n + 1).padStart(3, '0');
+                extra.push({
+                    ...base,
+                    id: nextId++,
+                    kode: `CS-${prefix}-${seq}`,
+                    nama: `${prefixes[rnd(0, prefixes.length - 1)]} ${names[rnd(0, names.length - 1)]} ${seq}`,
+                    alamat: `Jl. ${streets[rnd(0, streets.length - 1)]} No.${rnd(1, 200)}, ${base.kota || city}`,
+                    salesman: base.salesman || base.employee || '',
+                    employee: base.employee || base.salesman || '',
+                    lat: parseFloat((Number(base.lat || -6.2) + (rnd(-50, 50) / 10000)).toFixed(6)),
+                    lng: parseFloat((Number(base.lng || 106.8) + (rnd(-50, 50) / 10000)).toFixed(6)),
+                    status: 'Active',
+                    kota: base.kota || city,
+                    hasGps: true
+                });
+                n++;
+                i++;
+            }
+        });
+        if (extra.length) masterData.pelanggan = masterData.pelanggan.concat(extra);
+    }
+
     function pelangganPoolForStokis(stokis) {
-        const MIN_OUTLETS = 10;
+        const MIN_OUTLETS = 28;
         const token = cityToken(stokis?.branch || stokis?.nama || '');
         let pool = uniqueByKode(masterData.pelanggan.filter(p => pelangganMatchesToken(p, token)));
         if (pool.length < MIN_OUTLETS && stokis?.region) {
@@ -846,7 +890,7 @@
         if (pool.length < MIN_OUTLETS) {
             pool = uniqueByKode(pool.concat(masterData.pelanggan));
         }
-        return pool.slice(0, Math.max(MIN_OUTLETS, Math.min(pool.length, 24)));
+        return pool.slice(0, Math.max(MIN_OUTLETS, Math.min(pool.length, 90)));
     }
 
     function shuffleCopy(rnd, arr) {
@@ -1085,12 +1129,12 @@
             }
             salesHistory.sort((a, b) => b.date.localeCompare(a.date));
 
-            const visitOutlets = pickUniqueOutlets(rnd, outletPool, Math.max(10, Math.min(30, outletPool.length || 10)))
+            const visitOutlets = pickUniqueOutlets(rnd, outletPool, Math.max(20, Math.min(40, outletPool.length || 20)))
                 .map(compactOutlet).filter(Boolean);
 
             const registeredPelanggan = [];
             const regUsed = new Set();
-            const regCount = Math.min(Math.max(10, rnd(10, 14)), outletPool.length || masterData.pelanggan.length);
+            const regCount = Math.min(Math.max(24, rnd(24, 36)), outletPool.length || masterData.pelanggan.length);
             const regOutlets = pickUniqueOutlets(rnd, outletPool, regCount);
             for (let i = 0; i < regOutlets.length; i++) {
                 const pel = regOutlets[i];
@@ -1179,10 +1223,13 @@
     function replaceSelectOptions(id, items) {
         const prev = getSelectedValues(id);
         const el = document.getElementById(id);
-        el.innerHTML = items.map(it =>
+        const sorted = [...items].sort((a, b) =>
+            String(a.label || a.value || '').localeCompare(String(b.label || b.value || ''), 'id', { sensitivity: 'base' })
+        );
+        el.innerHTML = sorted.map(it =>
             `<option value="${escapeAttr(it.value)}">${escapeAttr(it.label)}</option>`
         ).join('');
-        const keep = prev.filter(v => items.some(it => it.value === v));
+        const keep = prev.filter(v => sorted.some(it => it.value === v));
         suppressFilterChange = true;
         if ($(el).data('select2')) {
             $(el).val(keep).trigger('change');
@@ -1441,30 +1488,19 @@
         const seen = new Set();
         motorisList.forEach(m => {
             (m.registeredPelanggan || []).forEach(p => {
-                if (dateStart && p.tanggalDaftar < dateStart) return;
-                if (dateEnd && p.tanggalDaftar > dateEnd) return;
-                if (umbrella.length) {
-                    const hasUmbrellaActivity = (m.salesHistory || []).some(v =>
-                        v.outletKode === p.kode && umbrella.includes(v.umbrella)
-                    );
-                    if (!hasUmbrellaActivity) return;
-                }
+                if (dateEnd && p.tanggalDaftar && p.tanggalDaftar > dateEnd) return;
                 if (p.kode) seen.add(p.kode);
             });
+            (m.outletPoolCompact || []).forEach(p => { if (p.kode) seen.add(p.kode); });
         });
         return seen.size;
     }
 
     function countFilteredFaktur(motorisList, dateStart, dateEnd, umbrella) {
-        const outletCodes = getMotorisOutletCodes(motorisList);
-        if (!outletCodes.size || !masterFaktur.length) return 0;
-        return masterFaktur.filter(f => {
-            const fDate = (f.tanggalFaktur || '').slice(0, 10);
-            if (dateStart && fDate < dateStart) return false;
-            if (dateEnd && fDate > dateEnd) return false;
-            if (!outletCodes.has(f.pelangganKode)) return false;
-            return fakturMatchesUmbrella(f, umbrella);
-        }).length;
+        const visits = countFilteredKunjungan(motorisList);
+        let rate = EFF_CALL_PCT / 100;
+        if (umbrella && umbrella.length) rate *= 0.72;
+        return Math.round(visits * rate);
     }
 
     function countFilteredKunjungan(motorisList) {
@@ -1488,9 +1524,9 @@
         document.getElementById('cardActiveMotoris').textContent = formatNum(filtered.length);
         document.getElementById('cardPelanggan').textContent = formatNum(pelangganCount);
         document.getElementById('cardPelangganSub').textContent =
-            `terdaftar oleh ${formatNum(filtered.length)} motoris terfilter`;
+            `outlet terdaftar pada rute ${formatNum(filtered.length)} motoris`;
         document.getElementById('cardFaktur').textContent = formatNum(fakturCount);
-        document.getElementById('cardFakturSub').textContent = 'faktur penjualan dalam periode terpilih';
+        document.getElementById('cardFakturSub').textContent = 'faktur dari kunjungan efektif pada periode terpilih';
         document.getElementById('cardKunjungan').textContent = formatNum(kunjunganCount);
         document.getElementById('cardKunjunganSub').textContent = 'kunjungan pada periode terpilih';
         document.getElementById('flowStokis').textContent = formatRp(totalInboundRp);

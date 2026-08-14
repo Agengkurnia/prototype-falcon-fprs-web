@@ -378,7 +378,7 @@
         /* =========================================
            DATA & STATE
         ========================================= */
-        const STORAGE_KEY = 'fprs_faktur_v6';
+        const STORAGE_KEY = 'fprs_faktur_v7';
         const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
 
         let allData = [];
@@ -435,8 +435,8 @@
            POPULATE FILTER DROPDOWNS
         ========================================= */
         function populateFilters(data) {
-            const pelList = [...new Set(data.map(d => d.pelangganNama))].sort();
-            const salesList = [...new Set(data.map(d => d.salesNama))].sort();
+            const pelList = [...new Set(data.map(d => d.pelangganNama))].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
+            const salesList = [...new Set(data.map(d => d.salesNama))].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
 
             const pelSel = document.getElementById('filterPelanggan');
             pelList.forEach(p => {

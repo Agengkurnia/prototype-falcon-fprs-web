@@ -173,7 +173,7 @@ def main() -> None:
 
     invoices = []
     seq = 6100
-    n = 160
+    n = 1400
     extra_boost = 4
     planned_days = [pick_day(rng) for _ in range(n)]
     planned_days.extend([d for d in BOOST_DAYS for _ in range(extra_boost)])
