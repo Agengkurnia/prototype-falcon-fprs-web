@@ -41,22 +41,22 @@ def report_faktur() -> str:
 Tombol **Ekspor** pada dashboard list. Di prototipe masih **mock** (konfirmasi Swal tanpa file).
 Target produksi: Excel `.xlsx`, **1 baris = 1 faktur** (header-level), mengikuti filter list + scope RBAC region.
 
-> **Sumber produksi:** query atas `tFaktur` dengan join `mPelanggan`, `mPegawai` (dan opsional `mStokis` untuk gudang).
+> **Sumber produksi:** query atas `tPenjualanFaktur` dengan join `mPelanggan`, `mPegawai` (dan opsional `mStokis` untuk gudang).
 > **Prototipe saat ini:** field denormalized di `fprs_faktur` / `faktur.json` (belum persist ke MAVEN).
 
 | # | Nama kolom (rencana) | Keterangan | Tabel sumber | Kolom produksi |
 |---|----------------------|------------|--------------|----------------|
-| 1 | Tanggal Faktur | Tanggal dokumen | `tFaktur` | `dtFaktur` |
-| 2 | Nomor Faktur | ID / nomor faktur | `tFaktur` | `txtNomorFaktur` |
-| 3 | Kode Pelanggan | Kode outlet | `mPelanggan` | `txtKode` (FK `tFaktur.intPelangganID`) |
+| 1 | Tanggal Faktur | Tanggal dokumen | `tPenjualanFaktur` | `dtTanggalFaktur` |
+| 2 | Nomor Faktur | ID / nomor faktur | `tPenjualanFaktur` | `txtNomorFaktur` |
+| 3 | Kode Pelanggan | Kode outlet | `mPelanggan` | `txtKode` (FK `tPenjualanFaktur.intPelangganID`) |
 | 4 | Nama Pelanggan | Nama outlet | `mPelanggan` | `txtNama` |
-| 5 | Sales | Nama / kode sales / motoris | `mPegawai` | `txtNama` atau `txtKode` (FK `tFaktur.intPegawaiID`) |
-| 6 | Jatuh Tempo | Tanggal jatuh tempo | `tFaktur` | `dtJatuhTempo` |
-| 7 | Jumlah Tagihan | Total tagihan | `tFaktur` | `decJumlahTagihan` |
-| 8 | Belum Dibayar | Sisa piutang | `tFaktur` | `decBelumDibayar` |
-| 9 | Status | Paid / Unpaid / Draft / dll. | `tFaktur` | `txtStatus` |
+| 5 | Sales | Nama / kode sales / motoris | `mPegawai` | `txtNama` atau `txtKode` (FK `tPenjualanFaktur.intPegawaiID`) |
+| 6 | Jatuh Tempo | Tanggal jatuh tempo | `tPenjualanFaktur` | `dtJatuhTempo` |
+| 7 | Jumlah Tagihan | Total tagihan | `tPenjualanFaktur` | `decJumlahTagihan` |
+| 8 | Belum Dibayar | Sisa piutang | `tPenjualanFaktur` | `decBelumDibayar` |
+| 9 | Status | Paid / Unpaid / Draft / dll. | `tPenjualanFaktur` | `txtStatus` |
 
-Kolom opsional (belum di sheet v1, tersedia di DB): `tFaktur.txtGudang`, `tFaktur.txtTipe`, `tFaktur.txtJangkaWaktu`, `tFaktur.txtCatatan`.
+Kolom opsional (belum di sheet v1, tersedia di DB): `tPenjualanFaktur.txtGudang`, `tPenjualanFaktur.txtTipe`, `tPenjualanFaktur.txtJangkaWaktu`, `tPenjualanFaktur.txtCatatan`.
 
 '''
 
@@ -68,76 +68,76 @@ def report_stok_motoris() -> str:
 Tombol **Export Excel** memanggil `exportToExcel()` (SheetJS). File: `StokMotoris_Export_YYYY-MM-DD.xlsx`.
 Baris mengikuti filter dashboard + motoris terfilter (scope region RBAC berlaku di produksi).
 
-> **Sumber produksi:** join `tFaktur` + `tFakturItem` + master (`mPelanggan`, `mPegawai`, `mProduk`, `mPajak`, `mUnit`, `mStokis`) untuk sheet **SalesInvoices**;
-> sheet **DailyVisits** dari `tKunjunganMotoris` + `mPegawai` + `mPelanggan`.
+> **Sumber produksi:** join `tPenjualanFaktur` + `tPenjualanFakturItem` + master (`mPelanggan`, `mPegawai`, `mProduk`, `mPajak`, `mUnit`, `mStokis`) untuk sheet **SalesInvoices**;
+> sheet **DailyVisits** dari `tKunjunganHarian` + `mPegawai` + `mPelanggan`.
 > **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
 
 ##### Sheet `SalesInvoices` (29 kolom — 1 baris per item faktur)
 
 | # | Kolom | Keterangan | Tabel sumber | Kolom produksi |
 |---|-------|------------|--------------|----------------|
-| 1 | Date | Tanggal faktur (`YYYY-MM-DD`) | `tFaktur` | `dtFaktur` (date) |
-| 2 | SalesInvoiceNo | Nomor / ID faktur | `tFaktur` | `txtNomorFaktur` |
-| 3 | InvoiceStatus | Status faktur | `tFaktur` | `txtStatus` |
+| 1 | Date | Tanggal faktur (`YYYY-MM-DD`) | `tPenjualanFaktur` | `dtTanggalFaktur` (date) |
+| 2 | SalesInvoiceNo | Nomor / ID faktur | `tPenjualanFaktur` | `txtNomorFaktur` |
+| 3 | InvoiceStatus | Status faktur | `tPenjualanFaktur` | `txtStatus` |
 | 4 | InvoiceDocType | Tipe dokumen export | — | Konstanta `MobileCanvass` (belum kolom DB v1) |
-| 5 | InvoiceGenerateFrom | Asal generate | `tFaktur` | `txtTipe` (mis. Canvass → Canvassing) |
+| 5 | InvoiceGenerateFrom | Asal generate | `tPenjualanFaktur` | `txtTipe` (mis. Canvass → Canvassing) |
 | 6 | IsInvoiceReturn | Flag retur | — | Konstanta `false` (belum kolom DB v1) |
-| 7 | EmployeeCode | Kode motoris / sales | `mPegawai` | `txtKode` (FK `tFaktur.intPegawaiID`) |
+| 7 | EmployeeCode | Kode motoris / sales | `mPegawai` | `txtKode` (FK `tPenjualanFaktur.intPegawaiID`) |
 | 8 | EmployeeName | Nama motoris / sales | `mPegawai` | `txtNama` |
-| 9 | CustomerCode | Kode pelanggan | `mPelanggan` | `txtKode` (FK `tFaktur.intPelangganID`) |
+| 9 | CustomerCode | Kode pelanggan | `mPelanggan` | `txtKode` (FK `tPenjualanFaktur.intPelangganID`) |
 | 10 | CustomerName | Nama pelanggan | `mPelanggan` | `txtNama` |
 | 11 | CustomerAddress | Alamat pelanggan | `mPelanggan` | `txtAlamat` |
 | 12 | OrderLatitude | Latitude outlet | `mPelanggan` | `decLat` |
 | 13 | OrderLongitude | Longitude outlet | `mPelanggan` | `decLng` |
-| 14 | WarehouseCode | Kode gudang | `tFaktur` / `mStokis` | Derivasi dari `txtGudang` atau `mStokis.txtOutletId` |
-| 15 | WarehouseName | Nama gudang | `tFaktur` / `mStokis` | `txtGudang` atau `mStokis.txtNama` |
-| 16 | PaymentTermName | Jangka waktu pembayaran | `tFaktur` | `txtJangkaWaktu` |
-| 17 | ProductCode | Kode produk (line) | `mProduk` | `txtKode` (FK `tFakturItem.intProdukID`) |
+| 14 | WarehouseCode | Kode gudang | `tPenjualanFaktur` / `mStokis` | Derivasi dari `txtGudang` atau `mStokis.txtOutletId` |
+| 15 | WarehouseName | Nama gudang | `tPenjualanFaktur` / `mStokis` | `txtGudang` atau `mStokis.txtNama` |
+| 16 | PaymentTermName | Jangka waktu pembayaran | `tPenjualanFaktur` | `txtJangkaWaktu` |
+| 17 | ProductCode | Kode produk (line) | `mProduk` | `txtKode` (FK `tPenjualanFakturItem.intProdukID`) |
 | 18 | ProductName | Nama produk | `mProduk` | `txtNama` |
 | 19 | QuantityL | Qty unit besar (Karton) | — | Kosong v1 (konversi UOM belum di DB) |
 | 20 | UnitL | Satuan L | — | Konstanta `KARTON` |
 | 21 | QuantityM | Qty unit menengah | — | Kosong v1 |
 | 22 | UnitM | Satuan M | — | Konstanta `RENCENG` |
-| 23 | QuantityS | Qty unit kecil (PCS) | `tFakturItem` | `decQty` |
-| 24 | UnitS | Satuan S | `mUnit` | `txtNama` (FK `tFakturItem.intUnitID`; fallback PCS) |
-| 25 | TotalQuantity | Total qty | `tFakturItem` | `decQty` (prototipe = QuantityS) |
-| 26 | SellPrice | Harga jual per unit | `tFakturItem` | `decHargaUnit` |
-| 27 | TaxCode | Kode pajak line | `mPajak` | `txtKodePajak` (FK `tFakturItem.intPajakID`) |
-| 28 | LineTotal | Nilai baris | `tFakturItem` | `decLineTotal` (atau hitung `decQty × decHargaUnit − decDiskon`) |
-| 29 | InvoiceNotes | Catatan header faktur | `tFaktur` | `txtCatatan` |
+| 23 | QuantityS | Qty unit kecil (PCS) | `tPenjualanFakturItem` | `decQty` |
+| 24 | UnitS | Satuan S | `mUnit` | `txtNama` (FK `tPenjualanFakturItem.intUnitID`; fallback PCS) |
+| 25 | TotalQuantity | Total qty | `tPenjualanFakturItem` | `decQty` (prototipe = QuantityS) |
+| 26 | SellPrice | Harga jual per unit | `tPenjualanFakturItem` | `decHargaUnit` |
+| 27 | TaxCode | Kode pajak line | `mPajak` | `txtKodePajak` (FK `tPenjualanFakturItem.intPajakID`) |
+| 28 | LineTotal | Nilai baris | `tPenjualanFakturItem` | `decLineTotal` (atau hitung `decQty × decHargaUnit − decDiskon`) |
+| 29 | InvoiceNotes | Catatan header faktur | `tPenjualanFaktur` | `txtCatatan` |
 
 ##### Sheet `DailyVisits` (28 kolom — 1 baris per kunjungan)
 
 | # | Kolom | Keterangan | Tabel sumber | Kolom produksi |
 |---|-------|------------|--------------|----------------|
-| 1 | EmployeeCode | Kode motoris | `mPegawai` | `txtKode` (FK `tKunjunganMotoris.intPegawaiID`) |
+| 1 | EmployeeCode | Kode motoris | `mPegawai` | `txtKode` (FK `tKunjunganHarian.intPegawaiID`) |
 | 2 | EmployeeName | Nama motoris | `mPegawai` | `txtNama` |
 | 3 | Role | Peran lapangan | `mPegawai` | `txtRole` (prototipe: hardcode `Canvasser`) |
-| 4 | Date | Tanggal kunjungan | `tKunjunganMotoris` | `dtKunjungan` |
+| 4 | Date | Tanggal kunjungan | `tKunjunganHarian` | `dtTanggal` |
 | 5 | Planned | Kunjungan terencana | — | Kosong v1 (belum kolom planned) |
 | 6 | UnPlaned | Kunjungan tidak terencana | — | Derivasi export (prototipe: `1`) |
-| 7 | Visited | Sudah dikunjungi | `tKunjunganMotoris` | Ada baris kunjungan (prototipe: `1`) |
-| 8 | CustomerCode | Kode outlet | `mPelanggan` | `txtKode` (FK `tKunjunganMotoris.intPelangganID`) |
+| 7 | Visited | Sudah dikunjungi | `tKunjunganHarian` | Ada baris kunjungan (prototipe: `1`) |
+| 8 | CustomerCode | Kode outlet | `mPelanggan` | `txtKode` (FK `tKunjunganHarian.intPelangganID`) |
 | 9 | CustomerName | Nama outlet | `mPelanggan` | `txtNama` |
 | 10 | CustomerAddress | Alamat outlet | `mPelanggan` | `txtAlamat` |
 | 11 | CustomerLatitude | Lat master outlet | `mPelanggan` | `decLat` |
 | 12 | CustomerLongitude | Lng master outlet | `mPelanggan` | `decLng` |
-| 13 | CheckInTime | Waktu check-in (ISO) | `tKunjunganMotoris` | `dtCheckIn` |
-| 14 | CheckOutTime | Waktu check-out (ISO) | `tKunjunganMotoris` | `dtCheckOut` |
-| 15 | Duration | Durasi `HH:MM:SS` | `tKunjunganMotoris` | Hitung dari `dtCheckIn`–`dtCheckOut` atau `intDurasiMenit` |
-| 16 | Distance in Meter Check in | Jarak GPS check-in ke outlet (m) | `tKunjunganMotoris` + `mPelanggan` | Hitung Haversine(`decCheckInLat/Lng`, `mPelanggan.decLat/decLng`) |
-| 17 | CheckInLatitude | Lat check-in | `tKunjunganMotoris` | `decCheckInLat` |
-| 18 | CheckInLongitude | Lng check-in | `tKunjunganMotoris` | `decCheckInLng` |
-| 19 | CheckOutLatitude | Lat check-out | `tKunjunganMotoris` | `decCheckOutLat` |
-| 20 | CheckOutLongitude | Lng check-out | `tKunjunganMotoris` | `decCheckOutLng` |
-| 21 | Distance in Meter Check out | Jarak GPS check-out ke outlet (m) | `tKunjunganMotoris` + `mPelanggan` | Hitung Haversine(`decCheckOutLat/Lng`, `mPelanggan.decLat/decLng`) |
+| 13 | CheckInTime | Waktu check-in (ISO) | `tKunjunganHarian` | `dtCheckIn` |
+| 14 | CheckOutTime | Waktu check-out (ISO) | `tKunjunganHarian` | `dtCheckOut` |
+| 15 | Duration | Durasi `HH:MM:SS` | `tKunjunganHarian` | Hitung dari `dtCheckIn`–`dtCheckOut` atau `intDurasiMenit` |
+| 16 | Distance in Meter Check in | Jarak GPS check-in ke outlet (m) | `tKunjunganHarian` + `mPelanggan` | Hitung Haversine(`decCheckInLat/Lng`, `mPelanggan.decLat/decLng`) |
+| 17 | CheckInLatitude | Lat check-in | `tKunjunganHarian` | `decCheckInLat` |
+| 18 | CheckInLongitude | Lng check-in | `tKunjunganHarian` | `decCheckInLng` |
+| 19 | CheckOutLatitude | Lat check-out | `tKunjunganHarian` | `decCheckOutLat` |
+| 20 | CheckOutLongitude | Lng check-out | `tKunjunganHarian` | `decCheckOutLng` |
+| 21 | Distance in Meter Check out | Jarak GPS check-out ke outlet (m) | `tKunjunganHarian` + `mPelanggan` | Hitung Haversine(`decCheckOutLat/Lng`, `mPelanggan.decLat/decLng`) |
 | 22 | Pseq | Urutan planned | — | Kosong v1 |
-| 23 | Aseq | Urutan aktual kunjungan | `tKunjunganMotoris` | Urutan baris / `intKunjunganID` (belum kolom `intUrutan` v1) |
-| 24 | TotalSales | Nilai penjualan kunjungan | `tKunjunganMotoris` | `decTotalSales` (atau agregat `tFaktur` via `intFakturID`) |
-| 25 | Description | Ringkasan aktivitas | `tKunjunganMotoris` | `txtDeskripsi` |
+| 23 | Aseq | Urutan aktual kunjungan | `tKunjunganHarian` | Urutan baris / `intKunjunganID` (belum kolom `intUrutan` v1) |
+| 24 | TotalSales | Nilai penjualan kunjungan | `tKunjunganHarian` | `decTotalSales` (atau agregat `tPenjualanFaktur` via `intPenjualanFakturID`) |
+| 25 | Description | Ringkasan aktivitas | `tKunjunganHarian` | `txtDeskripsi` |
 | 26 | Unvisited | Flag tidak dikunjungi | — | Derivasi export (prototipe: `0` jika ada kunjungan) |
 | 27 | TargetCall | Target call | — | KPI / konfig (prototipe: `1`) |
-| 28 | EffCall | Effective call (ada transaksi) | `tKunjunganMotoris` | `bitHasTransaction` → `1` / `0` |
+| 28 | EffCall | Effective call (ada transaksi) | `tKunjunganHarian` | `bitHasTransaction` → `1` / `0` |
 
 '''
 

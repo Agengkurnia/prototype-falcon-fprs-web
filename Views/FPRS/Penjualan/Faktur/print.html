@@ -242,7 +242,7 @@ body {
                 <span>Telepon : (021) 4287-3377</span>
                 <span id="hdrSales">Salesman : —</span>
                 <span>NPWP : 01.000.000.0-000.000</span>
-                <span id="hdrGudang">Gudang : —</span>
+                <span id="hdrGudang">Stokis : —</span>
             </div>
         </div>
         <div class="inv-title-block">
@@ -334,7 +334,7 @@ body {
 <script>
 (function() {
     const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
-    const STORAGE_KEY = 'fprs_faktur';
+    const STORAGE_KEY = 'fprs_faktur_v6';
 
     function fmtD(s) {
         if (!s) return '—';
@@ -392,7 +392,7 @@ body {
                       + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
         document.getElementById('hdrPrintTs').textContent   = 'Tanggal print: ' + printTs + ' | ' + item.id;
         document.getElementById('hdrSales').textContent     = 'Salesman : ' + (item.salesNama || '—');
-        document.getElementById('hdrGudang').textContent    = 'Gudang : ' + (item.gudang || '—');
+        document.getElementById('hdrGudang').textContent    = 'Stokis : ' + (item.gudang || '—');
         document.getElementById('metaNoFaktur').textContent = item.id;
         document.getElementById('metaTglFaktur').textContent   = fmtD(item.tanggalFaktur);
         document.getElementById('metaJatuhTempo').textContent  = fmtD(item.tanggalJatuhTempo);

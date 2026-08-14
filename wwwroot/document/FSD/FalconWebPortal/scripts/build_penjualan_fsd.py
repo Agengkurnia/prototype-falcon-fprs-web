@@ -41,9 +41,9 @@ def build() -> str:
                 'brd_no': '2026.SHP-FSD.0102',
                 'pid_no': '2026.SHP-PID.0101',
                 'prepared_by': 'Tim IT – Man Power GT',
-                'date': '04/08/2026',
-                'revision_date': '4 Agustus 2026',
-                'revision_desc': 'v1.4 – Swimlane PlantUML standar (kolom role)',
+                'date': '14/08/2026',
+                'revision_date': '14 Agustus 2026',
+                'revision_desc': 'v1.8 – dummy 900 kunjungan/hari dari 300 motoris',
             },
             plantuml_handlers=[
                 PlantumlHandler(
@@ -54,15 +54,15 @@ def build() -> str:
             ],
             mermaid_handlers=[
                 MermaidHandler(
-                    lambda c: 'erDiagram' in c and 'tFaktur' in c,
+                    lambda c: 'erDiagram' in c and 'tPenjualanFaktur' in c,
                     os.path.join(SCREENSHOTS_DIR, 'ss_pj_erd.png'),
                     'ERD', 'ERD – Modul Penjualan',
                 ),
             ],
             default_image_width_cm=17.0,
             swimlane_image_width_cm=17.0,
-            erd_image_width_cm=17.0,
-            erd_png_min_width=2800,
+            erd_image_width_cm=10.2,
+            erd_png_min_width=3600,
             deliverable=DeliverableConfig(
                 project_log_name=PROJECT_LOG_NAME,
                 deliverable_code=DELIVERABLE_CODE,

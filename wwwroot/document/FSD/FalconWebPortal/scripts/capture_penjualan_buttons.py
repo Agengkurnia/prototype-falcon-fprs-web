@@ -68,7 +68,7 @@ def capture_faktur(page) -> None:
     shot_loc(page, page.locator("#btnResetFilter"), "ss_btn_penjualan-faktur_reset.png", pad=2)
 
     # Detail page Cetak button (optional richer shot)
-    page.goto(f"{BASE}/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2606146101", wait_until="domcontentloaded")
+    page.goto(f"{BASE}/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612206217", wait_until="domcontentloaded")
     time.sleep(1.2)
     shot_loc(page, page.locator("#btnCetak, .btn-cetak-faktur"), "ss_btn_penjualan-faktur_cetak-detail.png", pad=2)
 
@@ -79,10 +79,18 @@ def capture_stok(page) -> None:
     page.goto(url, wait_until="domcontentloaded", timeout=60000)
     try:
         page.wait_for_selector(".dash-card, .filter-bar", timeout=30000)
-        page.wait_for_function("() => document.querySelectorAll('.dash-card').length >= 3", timeout=30000)
+        page.wait_for_function(
+            """() => {
+                const info = document.querySelector('#balanceTable_info, .dataTables_info');
+                if (info && /300/.test(info.textContent || '')) return true;
+                const links = document.querySelectorAll('#balanceTableBody a.motoris-link');
+                return links.length >= 10;
+            }""",
+            timeout=60000,
+        )
     except Exception:
         pass
-    time.sleep(1.5)
+    time.sleep(1.0)
 
     shot_loc(
         page,
@@ -106,7 +114,7 @@ def capture_stok(page) -> None:
             }
         }"""
     )
-    time.sleep(0.8)
+    time.sleep(2.5)
     shot_loc(
         page,
         page.locator(".filter-reset-btn, button").filter(has_text="Reset Semua"),

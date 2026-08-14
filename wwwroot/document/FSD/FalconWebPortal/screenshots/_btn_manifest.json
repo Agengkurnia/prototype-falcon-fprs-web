@@ -324,6 +324,22 @@
       "style": "btn-outline-secondary",
       "function": "—",
       "narrative": "Menjalankan aksi terkait tombol Ekspor."
+    },
+    {
+      "file": "ss_btn_common_lihat-detail.png",
+      "label": "Lihat Detail",
+      "id": "—",
+      "style": "btn-outline-secondary",
+      "function": "—",
+      "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
+    },
+    {
+      "file": "",
+      "label": "Cetak Faktur",
+      "id": "cetakFaktur('SI-2606146101')",
+      "style": "btn-outline-secondary",
+      "function": "cetakFaktur('SI-2606146101')",
+      "narrative": "Menjalankan aksi terkait tombol Cetak Faktur."
     }
   ],
   "penjualan-stok-motoris": [

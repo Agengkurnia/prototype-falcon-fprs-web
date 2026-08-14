@@ -39,11 +39,11 @@ def wait_dashboard(page) -> None:
             "() => document.querySelectorAll('#balanceTableBody tr a.motoris-link, "
             "#balanceTableBody tr .motoris-link').length > 0 "
             "|| document.querySelectorAll('#auditTableBody tr button').length > 0",
-            timeout=45000,
+            timeout=60000,
         )
     except Exception:
         pass
-    time.sleep(1.5)
+    time.sleep(2.5)
 
 
 def capture(base_url: str) -> None:

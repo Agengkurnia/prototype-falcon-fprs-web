@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Penjualan (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.4
+### Versi Dokumen: 1.8
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Penjualan — Web Admin Man Power GT |
-| **Versi** | 1.4 |
-| **Tanggal** | 4 Agustus 2026 |
+| **Versi** | 1.8 |
+| **Tanggal** | 14 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -24,7 +24,11 @@
 | 1.1 | 17 Juli 2026 | Tim IT | Tambah bab **Skalabilitas & Tuning** (Fase A): agregasi SQL, batas filter/export, seed UAT 6 bulan Cash/Lunas, script `008`–`010` |
 | 1.2 | 21 Juli 2026 | Tim IT | Rename sistem ke **Man Power GT**; tambah business rule Filter & Pop-up dashboard **(+screenshot & narasi)**; hapus cuplikan SQL; wording **Produksi → Database** |
 | 1.3 | 4 Agustus 2026 | Tim IT | Screenshot ulang Faktur + Stok Motoris (dashboard, filter, popup, tombol aksi) |
-| **1.4** | **4 Agustus 2026** | **Tim IT** | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
+| 1.4 | 4 Agustus 2026 | Tim IT | Swimlane Bab 2 diganti ke **PlantUML** kolom role (standar FSD Engine) |
+| 1.5 | 14 Agustus 2026 | Tim IT | ERD nama fisik MAVEN + `tStokMotorisSaldo`; DDL PostgreSQL lengkap (§7.4) |
+| 1.6 | 14 Agustus 2026 | Tim IT | Prototipe: gudang = nama stokis; sales = nama pegawai; history penjualan 1 kota/kecamatan; ERD kolom lengkap sesuai DDL |
+| 1.7 | 14 Agustus 2026 | Tim IT | Screenshot ulang Faktur + Stok Motoris; dummy 300 motoris × 30 kunjungan/hari; faktur seluruhnya Paid; wilayah nama kota |
+| **1.8** | **14 Agustus 2026** | **Tim IT** | Dummy Stok Motoris: **900 kunjungan/hari** dari **300 motoris** (3/motoris/hari); data tetap tersebar sepanjang 2026 |
 
 ---
 
@@ -70,7 +74,7 @@ database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 |---------------|-----------------|
 | Faktur Penjualan (list, detail, print) | Modul Canvassing (belum ada UI aktif) |
 | Monitoring Stok Motoris (dashboard + export Excel) | Create/Edit/Hapus faktur di Web Admin |
-| Persistensi prototipe (`fprs_faktur`, `md_stok_motoris`) + seed MAVEN | Mobile SFA (sumber order — disebut sebagai integrasi) |
+| Persistensi prototipe (`fprs_faktur_v5`, `md_stok_motoris`) + seed MAVEN | Mobile SFA (sumber order — disebut sebagai integrasi) |
 | RBAC Super Admin / Sales Manager / RSM | Approval multi-level transaksi |
 | Spesifikasi kolom report Excel/CSV | Modul Master Data & Kunjungan (dokumen terpisah) |
 | Tuning Fase A (agregasi SQL, index, seed 6 bulan) | Tuning Fase B (tabel agregat harian / partition — roadmap) |
@@ -96,7 +100,7 @@ database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 | Arsitektur | Static MPA — satu `.html` per halaman | ASP.NET Core MVC + service layer |
 | UI Framework | Bootstrap 5.3, Vuexy Admin Theme | Vuexy + Razor Views |
 | JavaScript | jQuery, DataTables, Select2, SweetAlert2, Chart.js, Leaflet, SheetJS | Sama / setara (Chart.js 2.9 lokal) |
-| Persistensi | `fprs_faktur`, `md_stok_motoris` + seed JSON | PostgreSQL: `tPenjualanFaktur`, `tKunjunganHarian`, `tStokMotorisSaldo`, `tStokMotorisMutasi` |
+| Persistensi | `fprs_faktur_v5`, `md_stok_motoris` + seed JSON | PostgreSQL: `tPenjualanFaktur`, `tKunjunganHarian`, `tStokMotorisSaldo`, `tStokMotorisMutasi` |
 | Auth / Menu | Tidak ada login | KNGlobal SSO + `mMenu` / `mRoleAccess` (`TSO`, `DMS`) |
 | Navigasi | `wwwroot/js/layout.js` | Menu dinamis dari KNGlobal |
 | Folder kode | `Views/FPRS/Penjualan/` | `Controllers/PowerGT/...`, `Views/PowerGT/...` |
@@ -155,7 +159,7 @@ Bab ini mendeskripsikan modul **Faktur** dan **Stok Motoris**: dashboard list / 
 
 Modul **Faktur** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/Faktur/index.html`; database: `/Transaction/SalesOrder`.
 
-Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Unpaid/nilai) dan DataTable `#tblFaktur` dengan filter tanggal, pelanggan, sales, dan status. Data faktur bersumber dari aktivitas **Mobile SFA** (`localStorage` key `fprs_faktur`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` menampilkan header pelanggan, item line, ringkasan pembayaran, dan tombol Cetak menuju `print.html`.
+Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) dan DataTable `#tblFaktur` dengan filter tanggal, pelanggan, sales, dan status. **Semua faktur dummy berstatus Paid** (`belumDibayar = 0`); tidak ada Unpaid/Draft. Data faktur bersumber dari aktivitas **Mobile SFA** (`localStorage` key `fprs_faktur_v5`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` menampilkan header pelanggan, item line, ringkasan pembayaran, dan tombol Cetak menuju `print.html`. Field UI **Stokis** (prototipe `gudang`) menampilkan nama stokis, bukan nama gudang fiktif. Filter Sales menampilkan **nama pegawai** (`mPegawai.txtNama`).
 
 | Aspek | Keterangan |
 |-------|------------|
@@ -165,7 +169,7 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Unpaid/nilai) dan
 
 > **Integrasi API (rencana):** `/api/v1/Invoice`
 
-> **localStorage key:** `fprs_faktur`
+> **localStorage key:** `fprs_faktur_v5`
 
 ![Penjualan — Faktur — Dashboard List](screenshots/ss_38_faktur_index.png)
 
@@ -210,29 +214,31 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Unpaid/nilai) dan
 Tombol **Ekspor** pada dashboard list. Di prototipe masih **mock** (konfirmasi Swal tanpa file).
 Target database: Excel `.xlsx`, **1 baris = 1 faktur** (header-level), mengikuti filter list + scope RBAC region.
 
-> **Sumber database:** query atas `tFaktur` dengan join `mPelanggan`, `mPegawai` (dan opsional `mStokis` untuk gudang).
-> **Prototipe saat ini:** field denormalized di `fprs_faktur` / `faktur.json` (belum persist ke MAVEN).
+> **Sumber database:** query atas `tPenjualanFaktur` dengan join `mPelanggan`, `mPegawai`. Field `txtGudang` / `txtWarehouseCode` adalah **snapshot stokis** (`mStokis.txtNama` / `mStokis.txtOutletId`), bukan gudang terpisah.
+> **Prototipe saat ini:** field denormalized di `fprs_faktur_v5` / `faktur.json` (belum persist ke MAVEN). `salesNama` memakai nama `mPegawai`; `gudang` memakai nama `mStokis`.
 
 | # | Nama kolom (rencana) | Keterangan | Tabel sumber | Kolom database |
 |---|----------------------|------------|--------------|----------------|
-| 1 | Tanggal Faktur | Tanggal dokumen | `tFaktur` | `dtFaktur` |
-| 2 | Nomor Faktur | ID / nomor faktur | `tFaktur` | `txtNomorFaktur` |
-| 3 | Kode Pelanggan | Kode outlet | `mPelanggan` | `txtKode` (FK `tFaktur.intPelangganID`) |
-| 4 | Nama Pelanggan | Nama outlet | `mPelanggan` | `txtNama` |
-| 5 | Sales | Nama / kode sales / motoris | `mPegawai` | `txtNama` atau `txtKode` (FK `tFaktur.intPegawaiID`) |
-| 6 | Jatuh Tempo | Tanggal jatuh tempo | `tFaktur` | `dtJatuhTempo` |
-| 7 | Jumlah Tagihan | Total tagihan | `tFaktur` | `decJumlahTagihan` |
-| 8 | Belum Dibayar | Sisa piutang | `tFaktur` | `decBelumDibayar` |
-| 9 | Status | Paid / Unpaid / Draft / dll. | `tFaktur` | `txtStatus` |
+| 1 | Tanggal Faktur | Tanggal dokumen | `tPenjualanFaktur` | `dtTanggalFaktur` |
+| 2 | Nomor Faktur | ID / nomor faktur | `tPenjualanFaktur` | `txtNomorFaktur` |
+| 3 | Kode Pelanggan | Kode outlet | `mPelanggan` / snapshot | `txtKode` (FK `tPenjualanFaktur.intPelangganID`) atau `txtPelangganKode` |
+| 4 | Nama Pelanggan | Nama outlet | `mPelanggan` / snapshot | `txtNama` atau `txtPelangganNama` |
+| 5 | Sales | Nama / kode sales / motoris | `mPegawai` / snapshot | `txtNama` / `txtKode` (FK `intPegawaiID`) atau `txtSalesNama` / `txtSalesKode` |
+| 6 | Jatuh Tempo | Tanggal jatuh tempo | `tPenjualanFaktur` | `dtJatuhTempo` |
+| 7 | Jumlah Tagihan | Total tagihan | `tPenjualanFaktur` | `decJumlahTagihan` |
+| 8 | Belum Dibayar | Sisa piutang | `tPenjualanFaktur` | `decBelumDibayar` |
+| 9 | Status | Paid / Unpaid / Draft / dll. | `tPenjualanFaktur` | `txtStatus` |
 
-Kolom opsional (belum di sheet v1, tersedia di DB): `tFaktur.txtGudang`, `tFaktur.txtTipe`, `tFaktur.txtJangkaWaktu`, `tFaktur.txtCatatan`.
+Kolom opsional (belum di sheet v1, tersedia di DB): `tPenjualanFaktur.txtGudang` (nama stokis), `tPenjualanFaktur.txtTipe`, `tPenjualanFaktur.txtJangkaWaktuPembayaran`, `tPenjualanFaktur.txtCatatan`.
 
 
 ### 3.2 Stok Motoris
 
 Modul **Stok Motoris** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/StokMotoris/index.html`; database: `/Dashboard/MotorisStock`.
 
-Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur`. Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** memuat ulang data master dan meregenerasi dashboard.
+Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur_v5`. Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** memuat ulang data master dan meregenerasi dashboard.
+
+**Asumsi dummy prototipe (v1.8):** **300 motoris**; **minimal 900 kunjungan per hari** secara nasional (300 × 3 kunjungan/motoris/hari). Filter tanggal default **1 Jan – 31 Des 2026** — kartu Kunjungan ≈ `900 × jumlah hari` pada rentang itu. Data faktur, kunjungan, penjualan, dan kulakan **tersebar sepanjang tahun 2026**. Wilayah memakai **nama kota** (Jakarta, Depok, Bekasi, …) tanpa angka. Satu motoris beroperasi di kota stokis yang sama. History penjualan menampilkan **10 toko berbeda**.
 
 | Aspek | Keterangan |
 |-------|------------|
@@ -305,7 +311,7 @@ Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: 
 
 ![Stok Motoris — Pop-up Detail Motoris (Sebaran Outlet)](screenshots/ss_sm_popup_motoris.png)
 
-**Narasi UI:** Pop-up menampilkan profil motoris (nama, kode, area, region) di header hijau. Di kiri, tabel **Stok per SKU** menampilkan nilai saldo berjalan per produk plus baris TOTAL. Di kanan atas, mini chart **Penjualan 7 Hari Terakhir** (line Chart.js) dan kartu **Info Kulakan Terakhir** (tanggal, stokis, nilai, status GPS Valid/Invalid). Bagian bawah **Sebaran Outlet Dikunjungi** menampilkan peta Leaflet dengan marker bernomor untuk outlet yang dikunjungi pada periode terkait; caption di bawah peta menuliskan jumlah outlet (contoh: *10 outlet dalam 30 hari terakhir*). Scroll ke bawah pada pop-up (jika ada) menampilkan **History Penjualan Terakhir** hingga 10 transaksi.
+**Narasi UI:** Pop-up menampilkan profil motoris (nama, kode, area, region) di header hijau. Di kiri, tabel **Stok per SKU** menampilkan nilai saldo berjalan per produk plus baris TOTAL. Di kanan atas, mini chart **Penjualan 7 Hari Terakhir** (line Chart.js) dan kartu **Info Kulakan Terakhir** (tanggal, stokis, nilai, status GPS Valid/Invalid). Bagian bawah **Sebaran Outlet Dikunjungi** menampilkan peta Leaflet dengan marker bernomor untuk outlet yang dikunjungi pada periode terkait; caption di bawah peta menuliskan jumlah outlet (contoh: *10 outlet dalam 30 hari terakhir*). Scroll ke bawah pada pop-up (jika ada) menampilkan **History Penjualan Terakhir** hingga 10 transaksi — tanggal berurutan mundur, **10 toko berbeda** di kota/wilayah stokis motoris (bukan 1 toko berulang, bukan lintas pulau).
 
 **Isi pop-up:**
 
@@ -316,7 +322,7 @@ Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: 
 | Penjualan 7 Hari Terakhir | Mini chart line Chart.js (Rp per hari) |
 | Info Kulakan Terakhir | Tanggal, nama stokis, nilai Rp, status GPS Valid/Invalid |
 | **Sebaran Outlet Dikunjungi** | Peta Leaflet: marker bernomor outlet dikunjungi; circle marker oranye untuk stokis kulakan terakhir; tooltip outlet; klik nama outlet di history mem-focus marker (`focusMotorisMapMarker`) |
-| History Penjualan Terakhir | Tabel hingga **10 transaksi** terakhir: #, Tanggal, Outlet, Produk, Nilai (Rp) |
+| History Penjualan Terakhir | Tabel hingga **10 transaksi** terakhir (1 hari 1 baris, mundur dari akhir periode): #, Tanggal, Outlet, Produk, Nilai (Rp). **Minimal 10 toko berbeda** di kota/wilayah stokis motoris. |
 
 **Business rule pop-up:**
 
@@ -325,6 +331,7 @@ Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: 
 | BR-SM-P01 | Data detail mengikuti filter dashboard yang aktif (region/area/umbrand/tanggal). |
 | BR-SM-P02 | Marker peta hanya digambar jika outlet punya koordinat `lat`/`lng`; outlet tanpa GPS tetap tampil di tabel tanpa link peta. |
 | BR-SM-P03 | Pop-up **read-only** — tidak ada aksi ubah data; tutup via tombol close (✕). |
+| BR-SM-P08 | History penjualan, kunjungan, dan pelanggan terdaftar satu motoris berada di wilayah stokis yang sama (kota/region, bukan lintas pulau). Dummy: **minimal 10 toko berbeda** per motoris; kulakan inbound memakai stokis yang sama. |
 
 
 ##### B. Pop-up Audit — *ID Transaksi & Pergerakan Stok*
@@ -371,76 +378,76 @@ Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: 
 Tombol **Export Excel** memanggil `exportToExcel()` (SheetJS / endpoint MAVEN). File: `StokMotoris_Export_YYYY-MM-DD.xlsx`.
 Baris mengikuti filter dashboard + motoris terfilter (scope region RBAC berlaku di database).
 
-> **Sumber database:** join `tFaktur` + `tFakturItem` + master (`mPelanggan`, `mPegawai`, `mProduk`, `mPajak`, `mUnit`, `mStokis`) untuk sheet **SalesInvoices**;
-> sheet **DailyVisits** dari `tKunjunganMotoris` + `mPegawai` + `mPelanggan`.
-> **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
+> **Sumber database:** join `tPenjualanFaktur` + `tPenjualanFakturItem` + master (`mPelanggan`, `mPegawai`) untuk sheet **SalesInvoices** (kode/nama produk & pajak adalah snapshot di item);
+> sheet **DailyVisits** dari `tKunjunganHarian` + `mPegawai` + `mPelanggan`.
+> **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur_v5`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
 
 ##### Sheet `SalesInvoices` (29 kolom — 1 baris per item faktur)
 
 | # | Kolom | Keterangan | Tabel sumber | Kolom database |
 |---|-------|------------|--------------|----------------|
-| 1 | Date | Tanggal faktur (`YYYY-MM-DD`) | `tFaktur` | `dtFaktur` (date) |
-| 2 | SalesInvoiceNo | Nomor / ID faktur | `tFaktur` | `txtNomorFaktur` |
-| 3 | InvoiceStatus | Status faktur | `tFaktur` | `txtStatus` |
-| 4 | InvoiceDocType | Tipe dokumen export | — | Konstanta `MobileCanvass` (belum kolom DB v1) |
-| 5 | InvoiceGenerateFrom | Asal generate | `tFaktur` | `txtTipe` (mis. Canvass → Canvassing) |
-| 6 | IsInvoiceReturn | Flag retur | — | Konstanta `false` (belum kolom DB v1) |
-| 7 | EmployeeCode | Kode motoris / sales | `mPegawai` | `txtKode` (FK `tFaktur.intPegawaiID`) |
-| 8 | EmployeeName | Nama motoris / sales | `mPegawai` | `txtNama` |
-| 9 | CustomerCode | Kode pelanggan | `mPelanggan` | `txtKode` (FK `tFaktur.intPelangganID`) |
-| 10 | CustomerName | Nama pelanggan | `mPelanggan` | `txtNama` |
-| 11 | CustomerAddress | Alamat pelanggan | `mPelanggan` | `txtAlamat` |
+| 1 | Date | Tanggal faktur (`YYYY-MM-DD`) | `tPenjualanFaktur` | `dtTanggalFaktur` (date) |
+| 2 | SalesInvoiceNo | Nomor / ID faktur | `tPenjualanFaktur` | `txtNomorFaktur` |
+| 3 | InvoiceStatus | Status faktur | `tPenjualanFaktur` | `txtStatus` |
+| 4 | InvoiceDocType | Tipe dokumen export | `tPenjualanFaktur` | `txtInvoiceDocType` |
+| 5 | InvoiceGenerateFrom | Asal generate | `tPenjualanFaktur` | `txtInvoiceGenerateFrom` / `txtTipe` |
+| 6 | IsInvoiceReturn | Flag retur | `tPenjualanFaktur` | `bitInvoiceReturn` |
+| 7 | EmployeeCode | Kode motoris / sales | `mPegawai` / snapshot | `txtKode` (FK `intPegawaiID`) atau `txtSalesKode` |
+| 8 | EmployeeName | Nama motoris / sales | `mPegawai` / snapshot | `txtNama` atau `txtSalesNama` |
+| 9 | CustomerCode | Kode pelanggan | `mPelanggan` / snapshot | `txtKode` (FK `intPelangganID`) atau `txtPelangganKode` |
+| 10 | CustomerName | Nama pelanggan | `mPelanggan` / snapshot | `txtNama` atau `txtPelangganNama` |
+| 11 | CustomerAddress | Alamat pelanggan | `mPelanggan` / snapshot | `txtAlamat` atau `txtPelangganAlamat` |
 | 12 | OrderLatitude | Latitude outlet | `mPelanggan` | `decLat` |
 | 13 | OrderLongitude | Longitude outlet | `mPelanggan` | `decLng` |
-| 14 | WarehouseCode | Kode gudang | `tFaktur` / `mStokis` | Derivasi dari `txtGudang` atau `mStokis.txtOutletId` |
-| 15 | WarehouseName | Nama gudang | `tFaktur` / `mStokis` | `txtGudang` atau `mStokis.txtNama` |
-| 16 | PaymentTermName | Jangka waktu pembayaran | `tFaktur` | `txtJangkaWaktu` |
-| 17 | ProductCode | Kode produk (line) | `mProduk` | `txtKode` (FK `tFakturItem.intProdukID`) |
-| 18 | ProductName | Nama produk | `mProduk` | `txtNama` |
+| 14 | WarehouseCode | Kode stokis (outlet id) | `tPenjualanFaktur` / `mStokis` | `txtWarehouseCode` ← snapshot `mStokis.txtOutletId` |
+| 15 | WarehouseName | Nama stokis | `tPenjualanFaktur` / `mStokis` | `txtGudang` ← snapshot `mStokis.txtNama` |
+| 16 | PaymentTermName | Jangka waktu pembayaran | `tPenjualanFaktur` | `txtJangkaWaktuPembayaran` |
+| 17 | ProductCode | Kode produk (line) | `tPenjualanFakturItem` | `txtKodeProduk` (snapshot, bukan FK) |
+| 18 | ProductName | Nama produk | `tPenjualanFakturItem` | `txtNamaProduk` |
 | 19 | QuantityL | Qty unit besar (Karton) | — | Kosong v1 (konversi UOM belum di DB) |
 | 20 | UnitL | Satuan L | — | Konstanta `KARTON` |
 | 21 | QuantityM | Qty unit menengah | — | Kosong v1 |
 | 22 | UnitM | Satuan M | — | Konstanta `RENCENG` |
-| 23 | QuantityS | Qty unit kecil (PCS) | `tFakturItem` | `decQty` |
-| 24 | UnitS | Satuan S | `mUnit` | `txtNama` (FK `tFakturItem.intUnitID`; fallback PCS) |
-| 25 | TotalQuantity | Total qty | `tFakturItem` | `decQty` (prototipe = QuantityS) |
-| 26 | SellPrice | Harga jual per unit | `tFakturItem` | `decHargaUnit` |
-| 27 | TaxCode | Kode pajak line | `mPajak` | `txtKodePajak` (FK `tFakturItem.intPajakID`) |
-| 28 | LineTotal | Nilai baris | `tFakturItem` | `decLineTotal` (atau hitung `decQty × decHargaUnit − decDiskon`) |
-| 29 | InvoiceNotes | Catatan header faktur | `tFaktur` | `txtCatatan` |
+| 23 | QuantityS | Qty unit kecil (PCS) | `tPenjualanFakturItem` | `decQty` |
+| 24 | UnitS | Satuan S | `tPenjualanFakturItem` | `txtSatuan` (default PCS) |
+| 25 | TotalQuantity | Total qty | `tPenjualanFakturItem` | `decQty` (prototipe = QuantityS) |
+| 26 | SellPrice | Harga jual per unit | `tPenjualanFakturItem` | `decHargaUnit` |
+| 27 | TaxCode | Kode pajak line | `tPenjualanFakturItem` | `txtPajak` (snapshot) |
+| 28 | LineTotal | Nilai baris | `tPenjualanFakturItem` | `decLineTotal` |
+| 29 | InvoiceNotes | Catatan header faktur | `tPenjualanFaktur` | `txtCatatan` |
 
 ##### Sheet `DailyVisits` (28 kolom — 1 baris per kunjungan)
 
 | # | Kolom | Keterangan | Tabel sumber | Kolom database |
 |---|-------|------------|--------------|----------------|
-| 1 | EmployeeCode | Kode motoris | `mPegawai` | `txtKode` (FK `tKunjunganMotoris.intPegawaiID`) |
-| 2 | EmployeeName | Nama motoris | `mPegawai` | `txtNama` |
-| 3 | Role | Peran lapangan | `mPegawai` | `txtRole` (prototipe: hardcode `Canvasser`) |
-| 4 | Date | Tanggal kunjungan | `tKunjunganMotoris` | `dtKunjungan` |
-| 5 | Planned | Kunjungan terencana | — | Kosong v1 (belum kolom planned) |
-| 6 | UnPlaned | Kunjungan tidak terencana | — | Derivasi export (prototipe: `1`) |
-| 7 | Visited | Sudah dikunjungi | `tKunjunganMotoris` | Ada baris kunjungan (prototipe: `1`) |
-| 8 | CustomerCode | Kode outlet | `mPelanggan` | `txtKode` (FK `tKunjunganMotoris.intPelangganID`) |
-| 9 | CustomerName | Nama outlet | `mPelanggan` | `txtNama` |
-| 10 | CustomerAddress | Alamat outlet | `mPelanggan` | `txtAlamat` |
-| 11 | CustomerLatitude | Lat master outlet | `mPelanggan` | `decLat` |
-| 12 | CustomerLongitude | Lng master outlet | `mPelanggan` | `decLng` |
-| 13 | CheckInTime | Waktu check-in (ISO) | `tKunjunganMotoris` | `dtCheckIn` |
-| 14 | CheckOutTime | Waktu check-out (ISO) | `tKunjunganMotoris` | `dtCheckOut` |
-| 15 | Duration | Durasi `HH:MM:SS` | `tKunjunganMotoris` | Hitung dari `dtCheckIn`–`dtCheckOut` atau `intDurasiMenit` |
-| 16 | Distance in Meter Check in | Jarak GPS check-in ke outlet (m) | `tKunjunganMotoris` + `mPelanggan` | Hitung Haversine(`decCheckInLat/Lng`, `mPelanggan.decLat/decLng`) |
-| 17 | CheckInLatitude | Lat check-in | `tKunjunganMotoris` | `decCheckInLat` |
-| 18 | CheckInLongitude | Lng check-in | `tKunjunganMotoris` | `decCheckInLng` |
-| 19 | CheckOutLatitude | Lat check-out | `tKunjunganMotoris` | `decCheckOutLat` |
-| 20 | CheckOutLongitude | Lng check-out | `tKunjunganMotoris` | `decCheckOutLng` |
-| 21 | Distance in Meter Check out | Jarak GPS check-out ke outlet (m) | `tKunjunganMotoris` + `mPelanggan` | Hitung Haversine(`decCheckOutLat/Lng`, `mPelanggan.decLat/decLng`) |
-| 22 | Pseq | Urutan planned | — | Kosong v1 |
-| 23 | Aseq | Urutan aktual kunjungan | `tKunjunganMotoris` | Urutan baris / `intKunjunganID` (belum kolom `intUrutan` v1) |
-| 24 | TotalSales | Nilai penjualan kunjungan | `tKunjunganMotoris` | `decTotalSales` (atau agregat `tFaktur` via `intFakturID`) |
-| 25 | Description | Ringkasan aktivitas | `tKunjunganMotoris` | `txtDeskripsi` |
-| 26 | Unvisited | Flag tidak dikunjungi | — | Derivasi export (prototipe: `0` jika ada kunjungan) |
-| 27 | TargetCall | Target call | — | KPI / konfig (prototipe: `1`) |
-| 28 | EffCall | Effective call (ada transaksi) | `tKunjunganMotoris` | `bitHasTransaction` → `1` / `0` |
+| 1 | EmployeeCode | Kode motoris | `tKunjunganHarian` / `mPegawai` | `txtEmployeeCode` atau `mPegawai.txtKode` (FK `intPegawaiID`) |
+| 2 | EmployeeName | Nama motoris | `tKunjunganHarian` / `mPegawai` | `txtEmployeeName` atau `mPegawai.txtNama` |
+| 3 | Role | Peran lapangan | `tKunjunganHarian` / `mPegawai` | `txtRole` |
+| 4 | Date | Tanggal kunjungan | `tKunjunganHarian` | `dtTanggal` |
+| 5 | Planned | Kunjungan terencana | `tKunjunganHarian` | `bitPlanned` |
+| 6 | UnPlaned | Kunjungan tidak terencana | `tKunjunganHarian` | `bitUnplanned` |
+| 7 | Visited | Sudah dikunjungi | `tKunjunganHarian` | `bitVisited` |
+| 8 | CustomerCode | Kode outlet | `tKunjunganHarian` / `mPelanggan` | `txtCustomerCode` atau `mPelanggan.txtKode` (FK `intPelangganID`) |
+| 9 | CustomerName | Nama outlet | `tKunjunganHarian` / `mPelanggan` | `txtCustomerName` atau `mPelanggan.txtNama` |
+| 10 | CustomerAddress | Alamat outlet | `tKunjunganHarian` / `mPelanggan` | `txtCustomerAddress` atau `mPelanggan.txtAlamat` |
+| 11 | CustomerLatitude | Lat master outlet | `tKunjunganHarian` / `mPelanggan` | `decCustomerLat` atau `mPelanggan.decLat` |
+| 12 | CustomerLongitude | Lng master outlet | `tKunjunganHarian` / `mPelanggan` | `decCustomerLng` atau `mPelanggan.decLng` |
+| 13 | CheckInTime | Waktu check-in (ISO) | `tKunjunganHarian` | `dtCheckIn` |
+| 14 | CheckOutTime | Waktu check-out (ISO) | `tKunjunganHarian` | `dtCheckOut` |
+| 15 | Duration | Durasi `HH:MM:SS` | `tKunjunganHarian` | `txtDuration` atau `intDurationMinutes` |
+| 16 | Distance in Meter Check in | Jarak GPS check-in ke outlet (m) | `tKunjunganHarian` | `decDistanceCheckInM` |
+| 17 | CheckInLatitude | Lat check-in | `tKunjunganHarian` | `decCheckInLat` |
+| 18 | CheckInLongitude | Lng check-in | `tKunjunganHarian` | `decCheckInLng` |
+| 19 | CheckOutLatitude | Lat check-out | `tKunjunganHarian` | `decCheckOutLat` |
+| 20 | CheckOutLongitude | Lng check-out | `tKunjunganHarian` | `decCheckOutLng` |
+| 21 | Distance in Meter Check out | Jarak GPS check-out ke outlet (m) | `tKunjunganHarian` | `decDistanceCheckOutM` |
+| 22 | Pseq | Urutan planned | `tKunjunganHarian` | `intPseq` |
+| 23 | Aseq | Urutan aktual kunjungan | `tKunjunganHarian` | `intAseq` |
+| 24 | TotalSales | Nilai penjualan kunjungan | `tKunjunganHarian` | `decTotalSales` |
+| 25 | Description | Ringkasan aktivitas | `tKunjunganHarian` | `txtDescription` |
+| 26 | Unvisited | Flag tidak dikunjungi | `tKunjunganHarian` | `bitUnvisited` |
+| 27 | TargetCall | Target call | `tKunjunganHarian` | `intTargetCall` |
+| 28 | EffCall | Effective call (ada transaksi) | `tKunjunganHarian` | `intEffCall` |
 
 
 ## 4. Aturan Bisnis (Rekap)
@@ -468,7 +475,7 @@ Rule ID memakai prefix `BR-PJ`. Sumber: pesan validasi / SweetAlert di HTML.
 | BR-PR-PJ09 | Stok Motoris | Export Excel dibatasi maksimal **31 hari** kalender; rentang lebih lebar ditolak dengan pesan jelas. |
 | BR-PR-PJ10 | Stok Motoris | KPI/chart/balance memakai **agregasi SQL** (`SUM`/`COUNT`/`GROUP BY`); raw mutasi hanya untuk audit trail berpaginasi. |
 | BR-SM-F01–F03 | Stok Motoris | Aturan filter dashboard — lihat §3.2.1. |
-| BR-SM-P01–P07 | Stok Motoris | Aturan pop-up Detail Motoris & Audit — lihat §3.2.4. |
+| BR-SM-P01–P08 | Stok Motoris | Aturan pop-up Detail Motoris & Audit — lihat §3.2.4. |
 
 ---
 
@@ -512,7 +519,7 @@ Monitoring penjualan Web Admin **tidak** memakai antrian approval. Kontrol = RBA
 
 | Key / file | Penggunaan |
 |------------|------------|
-| `fprs_faktur` | List/detail/print Faktur; input sheet SalesInvoices |
+| `fprs_faktur_v5` | List/detail/print Faktur; input sheet SalesInvoices |
 | `md_stok_motoris` | Snapshot dashboard Stok Motoris + visitHistory |
 | `wwwroot/data/faktur.json` | Seed faktur |
 | `pegawai.json`, `produk.json`, `stokis.json`, `pelanggan.json` | Master untuk generate dashboard (nama asli motoris) |
@@ -534,220 +541,463 @@ Seed & index UAT skala didokumentasikan di **Bab 8**.
 
 Cara baca bab ini:
 
-1. **7.1** — ERD konseptual: master Data Master + transaksi Penjualan / kunjungan / mutasi stok.
+1. **7.1** — ERD fisik PostgreSQL (nama tabel MAVEN).
 2. **7.2** — daftar FK selaras diagram.
 3. **7.3** — pemetaan prototipe → kolom database.
+4. **7.4** — DDL PostgreSQL (`CREATE TABLE` / index).
 
-> **Status implementasi MAVEN (v1.2):** tabel database memakai nama `tPenjualanFaktur`, `tPenjualanFakturItem`, `tKunjunganHarian`, `tStokMotorisSaldo`, `tStokMotorisMutasi` (DDL di `MAVEN.DAL/Scripts/004_*`, `006_*`).
-> Diagram 7.1 tetap memakai nama konseptual FSD (`tFaktur`, …) agar selaras spesifikasi report; mapping nama ada di Bab 6 & Bab 8.
-> Seed UAT + index Fase A: script `008`–`010` — lihat **Bab 8 Skalabilitas & Tuning**.
-> DDL lengkap tidak dicantumkan di FSD; referensi ke file script di repository MAVEN.
+> Alias FSD lama: `tFaktur` = `tPenjualanFaktur`; `tFakturItem` = `tPenjualanFakturItem`; `tKunjunganMotoris` = `tKunjunganHarian`.
+> Kolom `txtKodeProduk`, `txtGudang` (**nama stokis**), `txtWarehouseCode` (**kode stokis / outlet id**), `txtOutletNama`, `txtPelangganKode`, dll. adalah **snapshot** (bukan FK) — selaras dashboard (agregasi cepat).
+> Master (`mPegawai`, `mPelanggan`, …) tidak dibuat di bab ini; lihat FSD Data Master. Seed UAT `008`–`010` ada di **Bab 8**.
 
 ### 7.1 ERD Penjualan (1 halaman)
 
+Kolom pada diagram sama dengan DDL §7.4 / skrip MAVEN `004` + `006` (dan master `002` untuk `mPegawai` / `mPelanggan`).
+
 ```mermaid
-%%{init: {"theme":"default","themeVariables":{"fontSize":"15px"},"er":{"layoutDirection":"TB","entityPadding":8,"fontSize":15}}}%%
+%%{init: {"theme":"default","themeVariables":{"fontSize":"13px"},"er":{"layoutDirection":"TB","entityPadding":6,"fontSize":13}}}%%
 erDiagram
-    mPelanggan ||--o{ tFaktur : intPelangganID
-    mPegawai ||--o{ tFaktur : intPegawaiID
-    mStokis ||--o{ tFaktur : intStokisID
-    tFaktur ||--|{ tFakturItem : intFakturID
-    mProduk ||--o{ tFakturItem : intProdukID
-    mPajak ||--o{ tFakturItem : intPajakID
-    mUnit ||--o{ tFakturItem : intUnitID
-    mPegawai ||--o{ tKunjunganMotoris : intPegawaiID
-    mPelanggan ||--o{ tKunjunganMotoris : intPelangganID
-    tFaktur ||--o| tKunjunganMotoris : intFakturID
+    mPelanggan ||--o{ tPenjualanFaktur : intPelangganID
+    mPegawai ||--o{ tPenjualanFaktur : intPegawaiID
+    tPenjualanFaktur ||--|{ tPenjualanFakturItem : intFakturID
+    mPegawai ||--o{ tKunjunganHarian : intPegawaiID
+    mPelanggan ||--o{ tKunjunganHarian : intPelangganID
+    mPegawai ||--o{ tStokMotorisSaldo : intPegawaiID
     mPegawai ||--o{ tStokMotorisMutasi : intPegawaiID
-    mProduk ||--o{ tStokMotorisMutasi : intProdukID
-    mStokis ||--o{ tStokMotorisMutasi : intStokisID
-    tFaktur ||--o| tStokMotorisMutasi : intFakturID
+    mPegawai ||--o{ mPelanggan : intSalesmanID
 
     mPelanggan {
         int intPelangganID PK
-        uuid txtGuid UK
+        uuid txtGuid
         varchar txtKode UK
         varchar txtNama
+        varchar txtPartnerId
         varchar txtAlamat
-        int intChannelID FK
-        int intSalesmanID FK
+        varchar txtTelepon
+        varchar txtPemilik
+        varchar txtNpwp
+        varchar txtRtRw
+        varchar txtKelurahan
+        varchar txtKecamatan
         varchar txtKota
+        int intChannelID FK
+        int intDaftarHargaID
+        int intSalesmanID FK
+        varchar txtGrupPelanggan
+        varchar txtOutletType
+        varchar txtWaktuPembayaran
+        timestamp dtKunjunganTerakhir
+        timestamp dtTransaksiTerakhir
         numeric decLat
         numeric decLng
+        boolean bitHasGps
+        varchar txtPhoto
         boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
     }
     mPegawai {
         int intPegawaiID PK
-        uuid txtGuid UK
+        uuid txtGuid
         varchar txtKode UK
         varchar txtNama
         varchar txtRole
+        varchar txtTelepon
         varchar txtBranch
         varchar txtRegion
+        varchar txtKeterangan
         boolean bitActive
+        timestamp dtInserted
+        varchar txtInsertedBy
+        timestamp dtUpdated
+        varchar txtUpdatedBy
+        timestamp dtNonActive
     }
-    mProduk {
-        int intProdukID PK
-        uuid txtGuid UK
-        varchar txtKode UK
-        varchar txtNama
-        varchar txtUmbrella
-        numeric decHargaJual
-        int intUnitID FK
-        int intPajakID FK
-        boolean bitActive
-    }
-    mPajak {
-        int intPajakID PK
-        varchar txtKodePajak UK
-        varchar txtNamaPajak
-        numeric decPersentase
-        boolean bitActive
-    }
-    mUnit {
-        int intUnitID PK
-        varchar txtNama UK
-        boolean bitActive
-    }
-    mStokis {
-        int intStokisID PK
-        uuid txtGuid UK
-        varchar txtOutletId UK
-        varchar txtNama
-        varchar txtBranch
-        varchar txtRegion
-        numeric decLat
-        numeric decLng
-        boolean bitActive
-    }
-    tFaktur {
+    tPenjualanFaktur {
         int intFakturID PK
-        uuid txtGuid UK
+        uuid txtGuid
         varchar txtNomorFaktur UK
-        timestamp dtFaktur
-        timestamp dtJatuhTempo
+        timestamp dtTanggalFaktur
         int intPelangganID FK
+        varchar txtPelangganKode
+        varchar txtPelangganNama
+        varchar txtPelangganAlamat
         int intPegawaiID FK
-        int intStokisID FK
+        varchar txtSalesKode
+        varchar txtSalesNama
+        varchar txtRegion
+        varchar txtBranch
         varchar txtGudang
-        varchar txtTipe
-        varchar txtStatus
-        varchar txtJangkaWaktu
-        varchar txtKodeTransaksi
+        varchar txtWarehouseCode
+        timestamp dtJatuhTempo
+        varchar txtJangkaWaktuPembayaran
         numeric decJumlahTagihan
         numeric decBelumDibayar
+        varchar txtStatus
+        varchar txtTipe
+        varchar txtKodeTransaksi
         varchar txtCatatan
-        varchar txtSource
+        varchar txtSumber
+        varchar txtInvoiceDocType
+        varchar txtInvoiceGenerateFrom
+        boolean bitInvoiceReturn
         timestamp dtInserted
         varchar txtInsertedBy
         timestamp dtUpdated
         varchar txtUpdatedBy
     }
-    tFakturItem {
-        int intFakturItemID PK
-        uuid txtGuid UK
+    tPenjualanFakturItem {
+        int intItemID PK
         int intFakturID FK
-        int intProdukID FK
-        int intPajakID FK
-        int intUnitID FK
+        int intLineNo
+        varchar txtKodeProduk
+        varchar txtNamaProduk
         numeric decQty
+        varchar txtSatuan
         numeric decHargaUnit
         numeric decDiskon
+        varchar txtPajak
         numeric decLineTotal
-        int intUrutan
     }
-    tKunjunganMotoris {
+    tKunjunganHarian {
         int intKunjunganID PK
-        uuid txtGuid UK
+        uuid txtGuid
         int intPegawaiID FK
+        varchar txtEmployeeCode
+        varchar txtEmployeeName
+        varchar txtRole
+        date dtTanggal
+        boolean bitPlanned
+        boolean bitUnplanned
+        boolean bitVisited
+        boolean bitUnvisited
         int intPelangganID FK
-        int intFakturID FK
-        date dtKunjungan
+        varchar txtCustomerCode
+        varchar txtCustomerName
+        varchar txtCustomerAddress
+        numeric decCustomerLat
+        numeric decCustomerLng
         timestamp dtCheckIn
         timestamp dtCheckOut
+        varchar txtDuration
+        int intDurationMinutes
+        numeric decDistanceCheckInM
         numeric decCheckInLat
         numeric decCheckInLng
         numeric decCheckOutLat
         numeric decCheckOutLng
-        int intDurasiMenit
-        boolean bitHasTransaction
+        numeric decDistanceCheckOutM
+        int intPseq
+        int intAseq
         numeric decTotalSales
-        varchar txtDeskripsi
+        varchar txtDescription
+        int intTargetCall
+        int intEffCall
+        varchar txtRegion
         timestamp dtInserted
+        varchar txtInsertedBy
+    }
+    tStokMotorisSaldo {
+        int intSaldoID PK
+        int intPegawaiID FK
+        varchar txtKodeProduk UK
+        varchar txtNamaProduk
+        varchar txtUmbrella
+        varchar txtBrand
+        int intQtyKarton
+        int intQtyDus
+        int intQtyPcs
+        int intInboundKrt
+        numeric decPricePerPcs
+        int intAgingDays
+        int intSellThroughPct
+        date dtLastKulakan
+        varchar txtLastStokisNama
+        varchar txtLastStokisKode
+        timestamp dtUpdated
+        varchar txtUpdatedBy
     }
     tStokMotorisMutasi {
         int intMutasiID PK
-        uuid txtGuid UK
+        varchar txtTxId
+        date dtTanggal
+        varchar tmWaktu
         int intPegawaiID FK
-        int intProdukID FK
-        int intStokisID FK
-        int intFakturID FK
-        date dtMutasi
+        varchar txtSalesCode
+        varchar txtMotorisNama
+        varchar txtRegion
+        varchar txtArea
         varchar txtTipe
+        varchar txtKodeProduk
+        varchar txtNamaProduk
+        varchar txtUmbrella
+        varchar txtBrand
         numeric decQty
-        varchar txtSatuan
-        varchar txtOutlet
-        varchar txtGps
+        varchar txtQtyUnit
+        numeric decAmount
+        varchar txtOutletNama
+        boolean bitGpsValid
+        varchar txtGpsCoords
+        varchar txtGpsDetails
+        boolean bitNota
         varchar txtStatus
+        text txtPayloadJson
         timestamp dtInserted
+        varchar txtInsertedBy
     }
 ```
 
-**Gambar 7.1 — ERD Modul Penjualan**
+<!-- fig-title: Gambar 7.1 — ERD – Modul Penjualan -->
 
 ### 7.2 Daftar Relasi FK
 
 | # | Table Turunan/Child Table | Kolom FK | Tabel Induk | Kardinalitas | Wajib terisi? |
 |---|---------------------------|----------|-------------|--------------|---------------|
-| 1 | `tFaktur` | `intPelangganID` | `mPelanggan` | many-to-one | Ya |
-| 2 | `tFaktur` | `intPegawaiID` | `mPegawai` | many-to-one | Ya (sales / motoris) |
-| 3 | `tFaktur` | `intStokisID` | `mStokis` | many-to-one | Opsional (jika gudang = stokis) |
-| 4 | `tFakturItem` | `intFakturID` | `tFaktur` | many-to-one | Ya |
-| 5 | `tFakturItem` | `intProdukID` | `mProduk` | many-to-one | Ya |
-| 6 | `tFakturItem` | `intPajakID` | `mPajak` | many-to-one | Opsional (line tax) |
-| 7 | `tFakturItem` | `intUnitID` | `mUnit` | many-to-one | Disarankan (default PCS) |
-| 8 | `tKunjunganMotoris` | `intPegawaiID` | `mPegawai` | many-to-one | Ya |
-| 9 | `tKunjunganMotoris` | `intPelangganID` | `mPelanggan` | many-to-one | Ya |
-| 10 | `tKunjunganMotoris` | `intFakturID` | `tFaktur` | many-to-one | Opsional (kunjungan tanpa transaksi) |
-| 11 | `tStokMotorisMutasi` | `intPegawaiID` | `mPegawai` | many-to-one | Ya |
-| 12 | `tStokMotorisMutasi` | `intProdukID` | `mProduk` | many-to-one | Ya |
-| 13 | `tStokMotorisMutasi` | `intStokisID` | `mStokis` | many-to-one | Opsional (kulakan) |
-| 14 | `tStokMotorisMutasi` | `intFakturID` | `tFaktur` | many-to-one | Opsional (mutasi dari penjualan) |
+| 1 | `tPenjualanFaktur` | `intPelangganID` | `mPelanggan` | many-to-one | Opsional (snapshot `txtPelanggan*` tetap diisi) |
+| 2 | `tPenjualanFaktur` | `intPegawaiID` | `mPegawai` | many-to-one | Opsional (snapshot `txtSales*` tetap diisi) |
+| 3 | `tPenjualanFakturItem` | `intFakturID` | `tPenjualanFaktur` | many-to-one | Ya (`ON DELETE CASCADE`) |
+| 4 | `tKunjunganHarian` | `intPegawaiID` | `mPegawai` | many-to-one | Ya |
+| 5 | `tKunjunganHarian` | `intPelangganID` | `mPelanggan` | many-to-one | Opsional |
+| 6 | `tStokMotorisSaldo` | `intPegawaiID` | `mPegawai` | many-to-one | Ya |
+| 7 | `tStokMotorisMutasi` | `intPegawaiID` | `mPegawai` | many-to-one | Ya |
+| 8 | `mPelanggan` | `intSalesmanID` | `mPegawai` | many-to-one | Opsional |
 
-**Catatan agregasi:** dashboard Stok Motoris dan sheet Excel `SalesInvoices` / `DailyVisits` adalah **view / query** atas tabel di atas — bukan tabel fisik terpisah di v1.
+**Catatan agregasi:** dashboard Stok Motoris dan sheet Excel `SalesInvoices` / `DailyVisits` adalah **query** atas tabel di atas — bukan tabel fisik terpisah. Saldo per motoris × SKU ada di **`tStokMotorisSaldo`**.
 
 ### 7.3 Pemetaan Prototipe → Database
 
 | Prototipe (`faktur.json` / UI) | Database |
 |--------------------------------|----------|
-| `id` (mis. `SI-2606146101`) | `tFaktur.txtNomorFaktur` (+ `intFakturID` PK) |
-| `tanggalFaktur` | `tFaktur.dtFaktur` |
-| `tanggalJatuhTempo` | `tFaktur.dtJatuhTempo` |
-| `pelangganKode` / `pelangganNama` | FK `intPelangganID` → `mPelanggan` |
-| `salesNama` | FK `intPegawaiID` → `mPegawai` (match `txtKode` / nama) |
-| `gudang` | `txtGudang` dan/atau `intStokisID` → `mStokis` |
-| `status` (Paid/Unpaid/Draft/…) | `tFaktur.txtStatus` |
-| `tipe` (Canvass) | `tFaktur.txtTipe` |
+| `id` (mis. `SI-2612086120`) | `tPenjualanFaktur.txtNomorFaktur` (+ `intFakturID` PK) |
+| `tanggalFaktur` | `tPenjualanFaktur.dtTanggalFaktur` |
+| `tanggalJatuhTempo` | `tPenjualanFaktur.dtJatuhTempo` |
+| `pelangganKode` / `pelangganNama` | FK `intPelangganID` + snapshot `txtPelangganKode` / `txtPelangganNama` |
+| `salesNama` | FK `intPegawaiID` + snapshot `txtSalesNama` / `txtSalesKode` (nama pegawai, bukan kode kota) |
+| `gudang` (label UI **Stokis**) | snapshot `txtGudang` = `mStokis.txtNama`; `txtWarehouseCode` = `mStokis.txtOutletId` (bukan FK) |
+| `status` (Paid/Unpaid/Draft/…) | `tPenjualanFaktur.txtStatus` |
+| `tipe` (Canvass) | `tPenjualanFaktur.txtTipe` |
 | `jumlahTagihan` / `belumDibayar` | `decJumlahTagihan` / `decBelumDibayar` |
-| `items[].kode` | FK `intProdukID` → `mProduk.txtKode` |
+| `items[].kode` | `tPenjualanFakturItem.txtKodeProduk` (snapshot) |
 | `items[].qty` / `hargaUnit` / `diskon` | `decQty` / `decHargaUnit` / `decDiskon` |
-| `items[].pajak` | FK `intPajakID` atau kode di join `mPajak` |
-| `items[].satuan` | FK `intUnitID` → `mUnit` |
-| `visitHistory` (Stok Motoris) | `tKunjunganMotoris` |
-| Audit stok / kulakan (dashboard) | `tStokMotorisMutasi` (`txtTipe`: Kulakan / Penjualan / Adjust) |
-| `md_stok_motoris` snapshot | **Tidak** dipersist sebagai tabel — dihitung dari mutasi + faktur |
+| `items[].pajak` | `tPenjualanFakturItem.txtPajak` |
+| `items[].satuan` | `tPenjualanFakturItem.txtSatuan` |
+| `visitHistory` (Stok Motoris) | `tKunjunganHarian` |
+| Audit stok / kulakan (dashboard) | `tStokMotorisMutasi` (`txtTipe`: `inbound` / `outbound`) |
+| `md_stok_motoris` snapshot | `tStokMotorisSaldo` (1 baris per motoris × SKU) |
 
-**Scope RBAC region:** filter database memakai `mPegawai.txtRegion` dan/atau `mStokis.txtRegion` (Sales Manager filter; RSM hard-filter).
+**Scope RBAC region:** filter database memakai `mPegawai.txtRegion` dan/atau snapshot `txtRegion` pada faktur / kunjungan / mutasi (Sales Manager filter; RSM hard-filter).
 
-### 7.4 Referensi DDL
+### 7.4 Query Pembuatan Tabel (DDL PostgreSQL)
 
-DDL lengkap **tidak** dicantumkan di FSD. Lihat file script di repository MAVEN:
+Skrip DDL siap dieksekusi di PostgreSQL. Urutan: master Data Master (`001`/`002`) dulu, lalu 7.4.1 Faktur, lalu 7.4.2 kunjungan & stok, lalu 7.4.3 index dashboard. Ekstensi bila perlu: `CREATE EXTENSION IF NOT EXISTS pgcrypto;`
 
-| File | Isi |
-|------|-----|
-| `MAVEN.DAL/Scripts/004_tPenjualanFaktur.sql` | Header & item faktur |
-| `MAVEN.DAL/Scripts/006_penjualan_kunjungan_stok_fase2.sql` | Kunjungan harian, saldo & mutasi stok motoris |
-| `MAVEN.DAL/Scripts/002_*.sql` / `011_*.sql` | Master terkait (pegawai, stokis, history) |
+> Implementasi MAVEN: `MAVEN.DAL/Scripts/004_tPenjualanFaktur.sql`, `006_penjualan_kunjungan_stok_fase2.sql`, `010_dashboard_indexes_faseA.sql`.
+
+#### 7.4.1 Tabel Transaksi Faktur
+
+```sql
+CREATE TABLE IF NOT EXISTS "tPenjualanFaktur" (
+    "intFakturID"           serial PRIMARY KEY,
+    "txtGuid"               uuid NOT NULL DEFAULT gen_random_uuid(),
+    "txtNomorFaktur"        varchar(50) NOT NULL,
+    "dtTanggalFaktur"       timestamp without time zone NOT NULL,
+    "intPelangganID"        int NULL,
+    "txtPelangganKode"      varchar(50) NULL,
+    "txtPelangganNama"      varchar(255) NULL,
+    "txtPelangganAlamat"    varchar(500) NULL,
+    "intPegawaiID"          int NULL,
+    "txtSalesKode"          varchar(50) NULL,
+    "txtSalesNama"          varchar(255) NULL,
+    "txtRegion"             varchar(100) NULL,
+    "txtBranch"             varchar(100) NULL,
+    "txtGudang"             varchar(100) NULL,
+    "txtWarehouseCode"      varchar(20) NULL,
+    "dtJatuhTempo"          timestamp without time zone NULL,
+    "txtJangkaWaktuPembayaran" varchar(50) NULL,
+    "decJumlahTagihan"      numeric(18,2) NOT NULL DEFAULT 0,
+    "decBelumDibayar"       numeric(18,2) NOT NULL DEFAULT 0,
+    "txtStatus"             varchar(30) NOT NULL DEFAULT 'Draft',
+    "txtTipe"               varchar(50) NULL,
+    "txtKodeTransaksi"      varchar(255) NULL,
+    "txtCatatan"            varchar(1000) NULL,
+    "txtSumber"             varchar(50) NOT NULL DEFAULT 'Mobile',
+    "txtInvoiceDocType"     varchar(50) NULL DEFAULT 'MobileCanvass',
+    "txtInvoiceGenerateFrom" varchar(50) NULL,
+    "bitInvoiceReturn"      boolean NOT NULL DEFAULT false,
+    "dtInserted"            timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"         varchar(100) NULL,
+    "dtUpdated"             timestamp without time zone NULL,
+    "txtUpdatedBy"          varchar(100) NULL,
+    CONSTRAINT "tPenjualanFaktur_nomor_uq" UNIQUE ("txtNomorFaktur"),
+    CONSTRAINT "tPenjualanFaktur_pelanggan_fk" FOREIGN KEY ("intPelangganID") REFERENCES "mPelanggan" ("intPelangganID"),
+    CONSTRAINT "tPenjualanFaktur_pegawai_fk" FOREIGN KEY ("intPegawaiID") REFERENCES "mPegawai" ("intPegawaiID")
+);
+
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_dtTanggal_idx" ON "tPenjualanFaktur" ("dtTanggalFaktur");
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_status_idx" ON "tPenjualanFaktur" ("txtStatus");
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_region_idx" ON "tPenjualanFaktur" ("txtRegion");
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_sales_idx" ON "tPenjualanFaktur" ("txtSalesNama");
+
+CREATE TABLE IF NOT EXISTS "tPenjualanFakturItem" (
+    "intItemID"             serial PRIMARY KEY,
+    "intFakturID"           int NOT NULL,
+    "intLineNo"             int NOT NULL DEFAULT 1,
+    "txtKodeProduk"         varchar(50) NULL,
+    "txtNamaProduk"         varchar(255) NULL,
+    "decQty"                numeric(18,4) NOT NULL DEFAULT 0,
+    "txtSatuan"             varchar(20) NULL DEFAULT 'PCS',
+    "decHargaUnit"          numeric(18,2) NOT NULL DEFAULT 0,
+    "decDiskon"             numeric(18,2) NOT NULL DEFAULT 0,
+    "txtPajak"              varchar(50) NULL,
+    "decLineTotal"          numeric(18,2) NOT NULL DEFAULT 0,
+    CONSTRAINT "tPenjualanFakturItem_faktur_fk" FOREIGN KEY ("intFakturID") REFERENCES "tPenjualanFaktur" ("intFakturID") ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS "tPenjualanFakturItem_faktur_idx" ON "tPenjualanFakturItem" ("intFakturID");
+CREATE INDEX IF NOT EXISTS "tPenjualanFakturItem_produk_idx" ON "tPenjualanFakturItem" ("txtKodeProduk");
+```
+
+#### 7.4.2 Tabel Kunjungan & Stok Motoris
+
+```sql
+CREATE TABLE IF NOT EXISTS "tKunjunganHarian" (
+    "intKunjunganID"        serial PRIMARY KEY,
+    "txtGuid"               uuid NOT NULL DEFAULT gen_random_uuid(),
+    "intPegawaiID"          int NOT NULL,
+    "txtEmployeeCode"       varchar(50) NULL,
+    "txtEmployeeName"       varchar(255) NULL,
+    "txtRole"               varchar(50) NULL DEFAULT 'Canvasser',
+    "dtTanggal"             date NOT NULL,
+    "bitPlanned"            boolean NULL,
+    "bitUnplanned"          boolean NULL,
+    "bitVisited"            boolean NOT NULL DEFAULT true,
+    "bitUnvisited"          boolean NOT NULL DEFAULT false,
+    "intPelangganID"        int NULL,
+    "txtCustomerCode"       varchar(50) NULL,
+    "txtCustomerName"       varchar(255) NULL,
+    "txtCustomerAddress"    varchar(500) NULL,
+    "decCustomerLat"        numeric(10,7) NULL,
+    "decCustomerLng"        numeric(10,7) NULL,
+    "dtCheckIn"             timestamp without time zone NULL,
+    "dtCheckOut"            timestamp without time zone NULL,
+    "txtDuration"           varchar(20) NULL,
+    "intDurationMinutes"    int NULL,
+    "decDistanceCheckInM"   numeric(12,2) NULL,
+    "decCheckInLat"         numeric(10,7) NULL,
+    "decCheckInLng"         numeric(10,7) NULL,
+    "decCheckOutLat"        numeric(10,7) NULL,
+    "decCheckOutLng"        numeric(10,7) NULL,
+    "decDistanceCheckOutM"  numeric(12,2) NULL,
+    "intPseq"               int NULL,
+    "intAseq"               int NULL,
+    "decTotalSales"         numeric(18,2) NOT NULL DEFAULT 0,
+    "txtDescription"        varchar(1000) NULL,
+    "intTargetCall"         int NULL DEFAULT 1,
+    "intEffCall"            int NULL DEFAULT 0,
+    "txtRegion"             varchar(100) NULL,
+    "dtInserted"            timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"         varchar(100) NULL,
+    CONSTRAINT "tKunjunganHarian_pegawai_fk" FOREIGN KEY ("intPegawaiID") REFERENCES "mPegawai" ("intPegawaiID"),
+    CONSTRAINT "tKunjunganHarian_pelanggan_fk" FOREIGN KEY ("intPelangganID") REFERENCES "mPelanggan" ("intPelangganID")
+);
+
+CREATE INDEX IF NOT EXISTS "tKunjunganHarian_tanggal_idx" ON "tKunjunganHarian" ("dtTanggal");
+CREATE INDEX IF NOT EXISTS "tKunjunganHarian_pegawai_tanggal_idx" ON "tKunjunganHarian" ("intPegawaiID", "dtTanggal");
+CREATE INDEX IF NOT EXISTS "tKunjunganHarian_region_idx" ON "tKunjunganHarian" ("txtRegion");
+
+CREATE TABLE IF NOT EXISTS "tStokMotorisSaldo" (
+    "intSaldoID"            serial PRIMARY KEY,
+    "intPegawaiID"          int NOT NULL,
+    "txtKodeProduk"         varchar(50) NOT NULL,
+    "txtNamaProduk"         varchar(255) NULL,
+    "txtUmbrella"           varchar(100) NULL,
+    "txtBrand"              varchar(100) NULL,
+    "intQtyKarton"          int NOT NULL DEFAULT 0,
+    "intQtyDus"             int NOT NULL DEFAULT 0,
+    "intQtyPcs"             int NOT NULL DEFAULT 0,
+    "intInboundKrt"         int NOT NULL DEFAULT 0,
+    "decPricePerPcs"        numeric(18,2) NULL,
+    "intAgingDays"          int NULL,
+    "intSellThroughPct"     int NULL,
+    "dtLastKulakan"         date NULL,
+    "txtLastStokisNama"     varchar(255) NULL,
+    "txtLastStokisKode"     varchar(50) NULL,
+    "dtUpdated"             timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtUpdatedBy"          varchar(100) NULL,
+    CONSTRAINT "tStokMotorisSaldo_pegawai_produk_uq" UNIQUE ("intPegawaiID", "txtKodeProduk"),
+    CONSTRAINT "tStokMotorisSaldo_pegawai_fk" FOREIGN KEY ("intPegawaiID") REFERENCES "mPegawai" ("intPegawaiID")
+);
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisSaldo_pegawai_idx" ON "tStokMotorisSaldo" ("intPegawaiID");
+
+CREATE TABLE IF NOT EXISTS "tStokMotorisMutasi" (
+    "intMutasiID"           serial PRIMARY KEY,
+    "txtTxId"               varchar(50) NULL,
+    "dtTanggal"             date NOT NULL,
+    "tmWaktu"               varchar(10) NULL,
+    "intPegawaiID"          int NOT NULL,
+    "txtSalesCode"          varchar(50) NULL,
+    "txtMotorisNama"        varchar(255) NULL,
+    "txtRegion"             varchar(100) NULL,
+    "txtArea"               varchar(100) NULL,
+    "txtTipe"               varchar(20) NOT NULL,
+    "txtKodeProduk"         varchar(50) NULL,
+    "txtNamaProduk"         varchar(255) NULL,
+    "txtUmbrella"           varchar(100) NULL,
+    "txtBrand"              varchar(100) NULL,
+    "decQty"                numeric(18,4) NOT NULL DEFAULT 0,
+    "txtQtyUnit"            varchar(20) NULL,
+    "decAmount"             numeric(18,2) NOT NULL DEFAULT 0,
+    "txtOutletNama"         varchar(255) NULL,
+    "bitGpsValid"           boolean NULL,
+    "txtGpsCoords"          varchar(80) NULL,
+    "txtGpsDetails"         varchar(500) NULL,
+    "bitNota"               boolean NULL,
+    "txtStatus"             varchar(30) NULL DEFAULT 'verified',
+    "txtPayloadJson"        text NULL,
+    "dtInserted"            timestamp without time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "txtInsertedBy"         varchar(100) NULL,
+    CONSTRAINT "tStokMotorisMutasi_pegawai_fk" FOREIGN KEY ("intPegawaiID") REFERENCES "mPegawai" ("intPegawaiID"),
+    CONSTRAINT "tStokMotorisMutasi_tipe_chk" CHECK ("txtTipe" IN ('inbound', 'outbound'))
+);
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_tanggal_idx" ON "tStokMotorisMutasi" ("dtTanggal");
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_pegawai_idx" ON "tStokMotorisMutasi" ("intPegawaiID");
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_tipe_idx" ON "tStokMotorisMutasi" ("txtTipe");
+```
+
+#### 7.4.3 Index Dashboard (Fase A)
+
+```sql
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_tanggal_tipe_idx"
+  ON "tStokMotorisMutasi" ("dtTanggal", "txtTipe");
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_pegawai_tanggal_tipe_idx"
+  ON "tStokMotorisMutasi" ("intPegawaiID", "dtTanggal", "txtTipe");
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_umbrella_tanggal_idx"
+  ON "tStokMotorisMutasi" ("txtUmbrella", "dtTanggal")
+  WHERE "txtUmbrella" IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisMutasi_region_tanggal_idx"
+  ON "tStokMotorisMutasi" ("txtRegion", "dtTanggal")
+  WHERE "txtRegion" IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS "tKunjunganHarian_pegawai_tanggal_eff_idx"
+  ON "tKunjunganHarian" ("intPegawaiID", "dtTanggal", "intEffCall");
+
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_pegawai_tanggal_idx"
+  ON "tPenjualanFaktur" ("intPegawaiID", "dtTanggalFaktur");
+
+CREATE INDEX IF NOT EXISTS "tPenjualanFaktur_status_tanggal_idx"
+  ON "tPenjualanFaktur" ("txtStatus", "dtTanggalFaktur");
+
+CREATE INDEX IF NOT EXISTS "tStokMotorisSaldo_pegawai_umbrella_idx"
+  ON "tStokMotorisSaldo" ("intPegawaiID", "txtUmbrella");
+```
 
 ---
 

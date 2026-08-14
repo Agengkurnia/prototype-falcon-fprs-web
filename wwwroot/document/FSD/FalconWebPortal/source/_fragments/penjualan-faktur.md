@@ -38,7 +38,7 @@ Modul **Faktur** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**
 |------------|-----------|------|-----------|---------|----------|------------|
 | Tanggal Faktur | `inpTanggalFaktur` | Text | Tidak | (kosong) | — | — |
 | Sales | `inpSalesman` | Dropdown | Tidak | (kosong) | — | — |
-| Gudang | `inpGudang` | Dropdown | Tidak | (kosong) | — | — |
+| Gudang / Stokis | `inpGudang` | Dropdown (read-only di web) | Tidak | nama `mStokis` | — | Snapshot stokis, bukan gudang terpisah |
 | Jangka Waktu Pembayaran | `inpWaktuBayar` | Dropdown | Tidak | (kosong) | — | — |
 | Tanggal Jatuh Tempo | `inpJatuhTempo` | Text (readonly) | Tidak | (kosong) | — | — |
 | Kode Transaksi | `inpKodeTrx` | Dropdown | Tidak | (kosong) | — | — |

@@ -86,7 +86,7 @@ def seed_faktur_storage(page, base_url: str) -> None:
         """async () => {
             const res = await fetch('/wwwroot/data/faktur.json');
             const data = await res.json();
-            localStorage.setItem('fprs_faktur', JSON.stringify(data));
+            localStorage.setItem('fprs_faktur_v4', JSON.stringify(data));
             return data.length;
         }"""
     )

@@ -88,12 +88,40 @@
         .gps-valid { background:#2E7D32; }
         .gps-invalid { background:#C62828; }
 
-        .filter-bar { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center; }
+        .filter-bar { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: flex-start; }
         .filter-bar select, .filter-bar input {
             border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.4rem 0.65rem;
             font-size: 0.82rem; color: #495057; background: #fff; transition: border-color 0.2s;
         }
         .filter-bar select:focus, .filter-bar input:focus { border-color: #005d41; outline: none; box-shadow: 0 0 0 3px rgba(0,93,65,0.1); }
+        .filter-bar .select2-container { min-width: 200px; max-width: 280px; }
+        .filter-bar .select2-container--default .select2-selection--multiple {
+            border: 1px solid #e2e8f0; border-radius: 8px; min-height: 36px;
+            padding: 2px 4px; background: #fff;
+        }
+        .filter-bar .select2-container--default.select2-container--focus .select2-selection--multiple,
+        .filter-bar .select2-container--default.select2-container--open .select2-selection--multiple {
+            border-color: #005d41; outline: none; box-shadow: 0 0 0 3px rgba(0,93,65,0.1);
+        }
+        .filter-bar .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background: #E8F5E9; border: 1px solid #C8E099; color: #005d41;
+            border-radius: 12px; font-size: 0.75rem; font-weight: 600; padding: 1px 6px;
+        }
+        .filter-bar .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #005d41; margin-right: 4px;
+        }
+        .filter-bar .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+            color: #C62828; background: transparent;
+        }
+        .filter-bar .select2-dropdown { border-color: #e2e8f0; }
+        .select2-container .select2-dropdown { z-index: 9999; }
+        .filter-bar .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+            background: #005d41;
+        }
+        .filter-date-wrap {
+            display: flex; align-items: center; gap: 0.4rem; background: #fff;
+            border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.1rem 0.5rem; min-height: 36px;
+        }
         .drilldown-btn {
             background: #f1f3f5; border: 1px solid #ced4da; border-radius: 6px; padding: 3px 8px;
             font-size: 0.75rem; font-weight: 600; cursor: pointer; display: none; align-items: center; gap: 4px;
@@ -404,23 +432,15 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-            <select id="filterRegion" onchange="onRegionChange()">
-                <option value="">Seluruh Indonesia (Nasional)</option>
-            </select>
-            <select id="filterArea" onchange="onAreaChange()">
-                <option value="">Semua Area</option>
-            </select>
-            <select id="filterSales" onchange="applyAllFilters()">
-                <option value="">Semua Motoris</option>
-            </select>
-            <select id="filterBrand" onchange="applyAllFilters()">
-                <option value="">Semua Umbrand</option>
-            </select>
-            <div class="d-flex align-items-center" style="gap: 0.4rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.1rem 0.5rem; height: 34px;">
+            <select id="filterRegion" multiple></select>
+            <select id="filterArea" multiple></select>
+            <select id="filterSales" multiple></select>
+            <select id="filterBrand" multiple></select>
+            <div class="filter-date-wrap">
                 <span style="font-size:0.75rem; font-weight:700; color:#64748b;"><i class="fas fa-calendar-alt me-1"></i> Dari:</span>
-                <input type="date" id="filterDateStart" value="2026-06-01" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
+                <input type="date" id="filterDateStart" value="2026-01-01" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
                 <span style="font-size:0.75rem; font-weight:700; color:#64748b; margin-left:4px;">S/D:</span>
-                <input type="date" id="filterDateEnd" value="2026-06-30" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
+                <input type="date" id="filterDateEnd" value="2026-12-31" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
             </div>
         </div>
 
@@ -553,7 +573,8 @@
                         <thead>
                             <tr>
                                 <th>Motoris</th>
-                                <th>Wilayah</th>
+                                <th>Provinsi</th>
+                                <th>Kota</th>
                                 <th style="text-align:right;">Nilai Kulakan</th>
                                 <th style="text-align:right;">Nilai Penjualan</th>
                                 <th style="text-align:right;">Nilai Saldo</th>
@@ -602,10 +623,16 @@
         { key: 'md_pegawai', verKey: 'md_pegawai_seed_ver', ver: 'real-jul2026-b', json: '../../../../wwwroot/data/pegawai.json' },
         { key: 'md_produk', verKey: 'md_produk_seed_ver', ver: 'umbrella7-jul2026', json: '../../../../wwwroot/data/produk.json' },
         { key: 'md_stokis', verKey: 'md_stokis_seed_ver', ver: 'mpp-jul2026-b', json: '../../../../wwwroot/data/stokis.json' },
-        { key: 'md_pelanggan', verKey: 'md_pelanggan_seed_ver', ver: 'mobile-jul2026-c', json: '../../../../wwwroot/data/pelanggan.json' }
+        { key: 'md_pelanggan', verKey: 'md_pelanggan_seed_ver', ver: 'dates-2026-full', json: '../../../../wwwroot/data/pelanggan.json' }
     ];
+    const TARGET_MOTORIS = 300;
+    const VISITS_PER_DAY_FLEET = 900;
+    const VISITS_PER_DAY = VISITS_PER_DAY_FLEET / TARGET_MOTORIS;
+    const VISIT_PERIOD_START = '2026-01-01';
+    const VISIT_PERIOD_END = '2026-12-31';
+    const EFF_CALL_PCT = 68;
     const STOR_KEY = 'md_stok_motoris';
-    const FAKTUR_STORAGE_KEY = 'fprs_faktur';
+    const FAKTUR_STORAGE_KEY = 'fprs_faktur_v6';
 
     let masterData = { pegawai: [], produk: [], stokis: [], pelanggan: [] };
     let masterFaktur = [];
@@ -653,8 +680,7 @@
         produkByKode = Object.fromEntries(masterData.produk.map(p => [p.kode, p]));
         masterUmbrellas = [...new Set(masterData.produk.map(p => p.umbrella).filter(Boolean))].sort();
         masterRegions = [...new Set(
-            masterData.stokis.map(s => s.region).filter(Boolean)
-                .concat(masterData.pegawai.map(p => p.region).filter(Boolean))
+            masterData.stokis.map(s => provinceOfCity(cityName(s.branch))).filter(Boolean)
         )].sort();
     }
 
@@ -677,23 +703,293 @@
     function formatRp(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
     function formatNum(n) { return n.toLocaleString('id-ID'); }
 
-    function pickStokisForMotoris(rnd, region) {
+    function prettyWilayah(value) {
+        const name = String(value || '').replace(/\s+\d+$/, '').trim();
+        return name || '';
+    }
+
+    function cityName(value) {
+        return prettyWilayah(value);
+    }
+
+    const CITY_PROVINCE = {
+        'jakarta': 'DKI Jakarta', 'jakarta pusat': 'DKI Jakarta', 'jakarta selatan': 'DKI Jakarta',
+        'jakarta utara': 'DKI Jakarta', 'jakarta barat': 'DKI Jakarta', 'jakarta timur': 'DKI Jakarta',
+        'bekasi': 'Jawa Barat', 'bogor': 'Jawa Barat', 'depok': 'Jawa Barat', 'bandung': 'Jawa Barat',
+        'indramayu': 'Jawa Barat', 'cirebon': 'Jawa Barat',
+        'tangerang': 'Banten', 'tangerang selatan': 'Banten',
+        'semarang': 'Jawa Tengah', 'tegal': 'Jawa Tengah', 'yogyakarta': 'DI Yogyakarta',
+        'surabaya': 'Jawa Timur',
+        'medan': 'Sumatera Utara', 'pematang siantar': 'Sumatera Utara',
+        'padang': 'Sumatera Barat', 'palembang': 'Sumatera Selatan', 'jambi': 'Jambi',
+        'makassar': 'Sulawesi Selatan', 'denpasar': 'Bali', 'balikpapan': 'Kalimantan Timur'
+    };
+
+    function provinceOfCity(city) {
+        const key = String(city || '').toLowerCase().replace(/\s+\d+$/, '').trim();
+        if (CITY_PROVINCE[key]) return CITY_PROVINCE[key];
+        if (key.startsWith('jakarta')) return 'DKI Jakarta';
+        return prettyWilayah(city) || 'Lainnya';
+    }
+
+    const LEAVE_RANGES = [
+        ['2026-01-01', '2026-01-02'],
+        ['2026-03-18', '2026-03-25'],
+        ['2026-12-24', '2026-12-26'],
+        ['2026-12-31', '2026-12-31']
+    ];
+    const BOOST_DAYS = new Set([
+        '2026-02-17', '2026-04-03', '2026-05-01', '2026-05-14',
+        '2026-05-27', '2026-06-01', '2026-06-16', '2026-08-17', '2026-08-25'
+    ]);
+
+    function inDateRange(dateStr, start, end) {
+        return dateStr >= start && dateStr <= end;
+    }
+
+    function isLeaveDay(dateStr) {
+        return LEAVE_RANGES.some(([a, b]) => inDateRange(dateStr, a, b));
+    }
+
+    function weekdayOf(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d).getDay();
+    }
+
+    function dayProfile(dateStr) {
+        if (isLeaveDay(dateStr)) return { off: true, mult: 0, label: 'libur' };
+        const wd = weekdayOf(dateStr);
+        if (wd === 0) return { off: true, mult: 0, label: 'minggu' };
+        if (BOOST_DAYS.has(dateStr)) return { off: false, mult: 1.75, label: 'libur-nasional' };
+        if (wd === 6) return { off: false, mult: 0.7, label: 'sabtu' };
+        const jitter = 0.88 + ((hashSeed(dateStr) % 25) / 100);
+        return { off: false, mult: jitter, label: 'kerja' };
+    }
+
+    function visitsOnDate(dateStr, basePerDay) {
+        const p = dayProfile(dateStr);
+        if (p.off) return 0;
+        return Math.max(0, Math.round((basePerDay || VISITS_PER_DAY) * p.mult));
+    }
+
+    function countWeightedVisits(start, end, basePerDay) {
+        return enumerateDates(start || VISIT_PERIOD_START, end || VISIT_PERIOD_END)
+            .reduce((sum, d) => sum + visitsOnDate(d, basePerDay), 0);
+    }
+
+    function pickSeasonalDate(rnd) {
+        for (let i = 0; i < 40; i++) {
+            const month = rnd(1, 12);
+            const maxDay = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
+            const dateStr = formatYmd(2026, month, rnd(1, maxDay));
+            const p = dayProfile(dateStr);
+            if (p.off) continue;
+            if (rnd(0, 100) < Math.round(p.mult * 55)) return dateStr;
+        }
+        return '2026-06-10';
+    }
+
+    function cityToken(value) {
+        let t = String(value || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+        t = t.replace(/\s+\d+$/, '');
+        t = t.replace(/jakarta (pusat|selatan|utara|timur|barat)/g, 'jakarta');
+        if (t.startsWith('kota ')) t = t.slice(5);
+        if (t.startsWith('kabupaten ')) t = t.slice(10);
+        const first = t.split(' ')[0] || '';
+        if (first === 'yogya' || first === 'jogja') return 'yogyakarta';
+        return first;
+    }
+
+    function pickStokisForMotoris(rnd, region, idx) {
+        const list = masterData.stokis;
+        if (!list.length) return null;
+        if (idx != null) return list[idx % list.length];
         const pool = region
-            ? masterData.stokis.filter(s => s.region === region)
-            : masterData.stokis;
-        const list = pool.length ? pool : masterData.stokis;
+            ? list.filter(s => s.region === region || provinceOfCity(cityName(s.branch)) === region)
+            : list;
+        const use = pool.length ? pool : list;
+        return use[rnd(0, use.length - 1)];
+    }
+
+    function pelangganMatchesToken(p, token) {
+        if (!token) return false;
+        const kota = cityToken(p.kota);
+        return kota === token ||
+            kota.includes(token) ||
+            token.includes(kota) ||
+            String(p.kota || '').toLowerCase().includes(token) ||
+            String(p.alamat || '').toLowerCase().includes(token);
+    }
+
+    function uniqueByKode(list) {
+        const seen = new Set();
+        return list.filter(p => {
+            const k = p.kode || String(p.id);
+            if (!k || seen.has(k)) return false;
+            seen.add(k);
+            return true;
+        });
+    }
+
+    function pelangganPoolForStokis(stokis) {
+        const MIN_OUTLETS = 10;
+        const token = cityToken(stokis?.branch || stokis?.nama || '');
+        let pool = uniqueByKode(masterData.pelanggan.filter(p => pelangganMatchesToken(p, token)));
+        if (pool.length < MIN_OUTLETS && stokis?.region) {
+            const regionStokis = masterData.stokis.filter(s => s.region === stokis.region);
+            const extraTokens = [...new Set(regionStokis.map(s => cityToken(s.branch)).filter(Boolean))];
+            extraTokens.forEach(t => {
+                if (pool.length >= MIN_OUTLETS) return;
+                pool = uniqueByKode(pool.concat(masterData.pelanggan.filter(p => pelangganMatchesToken(p, t))));
+            });
+        }
+        if (pool.length < MIN_OUTLETS) {
+            pool = uniqueByKode(pool.concat(masterData.pelanggan));
+        }
+        return pool.slice(0, Math.max(MIN_OUTLETS, Math.min(pool.length, 24)));
+    }
+
+    function shuffleCopy(rnd, arr) {
+        const list = arr.slice();
+        for (let i = list.length - 1; i > 0; i--) {
+            const j = rnd(0, i);
+            const tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
+        return list;
+    }
+
+    function pickUniqueOutlets(rnd, pool, count) {
+        const source = (pool && pool.length) ? pool : masterData.pelanggan;
+        if (!source.length) return [];
+        const shuffled = shuffleCopy(rnd, source);
+        const out = shuffled.slice(0, Math.min(count, shuffled.length));
+        while (out.length < count && shuffled.length) {
+            out.push(shuffled[out.length % shuffled.length]);
+        }
+        return out;
+    }
+
+    function pickPelangganForMotoris(rnd, pool) {
+        const list = (pool && pool.length) ? pool : masterData.pelanggan;
+        if (!list.length) return null;
         return list[rnd(0, list.length - 1)];
     }
 
-    function pickPelangganForMotoris(rnd) {
-        if (!masterData.pelanggan.length) return null;
-        return masterData.pelanggan[rnd(0, masterData.pelanggan.length - 1)];
+    function enumerateDates(start, end) {
+        const dates = [];
+        if (!start || !end) return dates;
+        const [ys, ms, ds] = start.split('-').map(Number);
+        const [ye, me, de] = end.split('-').map(Number);
+        const d = new Date(ys, ms - 1, ds);
+        const last = new Date(ye, me - 1, de);
+        if (Number.isNaN(d.getTime()) || Number.isNaN(last.getTime()) || d > last) return dates;
+        while (d <= last) {
+            dates.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+            d.setDate(d.getDate() + 1);
+        }
+        return dates;
+    }
+
+    function countVisitDays(start, end) {
+        return countWeightedVisits(start, end, 1);
+    }
+
+    function formatYmd(year, month, day) {
+        return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    function randomDateInYear(rnd) {
+        return pickSeasonalDate(rnd);
+    }
+
+    function buildMotorisRoster() {
+        const base = masterData.pegawai.filter(p =>
+            String(p.role || '').toLowerCase() === 'motoris'
+        );
+        if (!base.length) return [];
+        const first = ['ANDI','BAYU','CAHYO','DONI','EKO','FARHAN','GILANG','HENDRA','IRFAN','JOKO','KURNIA','LUKMAN','MUHAMMAD','NUGROHO','OKTA','PUTRA','RAFI','SATRIA','TONO','WAHYU','YUDI','ZAKI','ARIF','BAGUS','DIMAS'];
+        const last = ['PRATAMA','SAPUTRA','WIBOWO','SANTOSO','HIDAYAT','NUGRAHA','FIRMANSYAH','MAULANA','RAMADHAN','SETIAWAN','KURNIAWAN','GUNAWAN','PRASOJO','ANGGARA','SYAHPUTRA','HAKIM','FADILLAH','PURNAMA','LESAMANA','WIJAYA'];
+        const roster = [];
+        for (let i = 0; i < TARGET_MOTORIS; i++) {
+            if (i < base.length) {
+                roster.push({ ...base[i] });
+                continue;
+            }
+            const rnd = seededRandom(81000 + i);
+            roster.push({
+                id: 9000 + i,
+                kode: '26' + String(1000000 + i).slice(-7),
+                nama: first[rnd(0, first.length - 1)] + ' ' + last[rnd(0, last.length - 1)],
+                role: 'Motoris',
+                branch: '',
+                region: '',
+                status: 'Active'
+            });
+        }
+        return roster;
+    }
+
+    function compactOutlet(p) {
+        if (!p) return null;
+        return { kode: p.kode || '', nama: p.nama || 'Outlet', lat: p.lat, lng: p.lng, alamat: p.alamat || '' };
+    }
+
+    function buildOneVisit(rnd, m, date, seq, outlet) {
+        const hasTransaction = rnd(0, 100) < EFF_CALL_PCT;
+        const startMin = 8 * 60 + seq * 12;
+        const durationMin = hasTransaction ? rnd(8, 18) : rnd(5, 12);
+        const checkInHour = Math.floor(startMin / 60);
+        const checkInMin = startMin % 60;
+        const outTotal = startMin + durationMin;
+        const baseLat = outlet?.lat ?? (m.lastKulakan?.lat ?? -6.2);
+        const baseLng = outlet?.lng ?? (m.lastKulakan?.lng ?? 106.85);
+        const visit = {
+            date,
+            outlet: outlet?.nama || 'Outlet',
+            outletKode: outlet?.kode || '',
+            hasTransaction,
+            durationMin,
+            checkInTime: `${date}T${String(checkInHour).padStart(2, '0')}:${String(checkInMin).padStart(2, '0')}:${String(rnd(0, 59)).padStart(2, '0')}`,
+            checkOutTime: `${date}T${String(Math.floor(outTotal / 60) % 24).padStart(2, '0')}:${String(outTotal % 60).padStart(2, '0')}:${String(rnd(0, 59)).padStart(2, '0')}`,
+            lat: baseLat,
+            lng: baseLng
+        };
+        visit.checkInLat = parseFloat((baseLat + rnd(-25, 25) / 100000).toFixed(6));
+        visit.checkInLng = parseFloat((baseLng + rnd(-25, 25) / 100000).toFixed(6));
+        visit.checkOutLat = parseFloat((baseLat + rnd(-30, 30) / 100000).toFixed(6));
+        visit.checkOutLng = parseFloat((baseLng + rnd(-30, 30) / 100000).toFixed(6));
+        visit.distanceCheckInMeter = distanceMeters(baseLat, baseLng, visit.checkInLat, visit.checkInLng);
+        visit.distanceCheckOutMeter = distanceMeters(baseLat, baseLng, visit.checkOutLat, visit.checkOutLng);
+        if (hasTransaction && m.products?.length) {
+            const prod = m.products[rnd(0, m.products.length - 1)];
+            visit.product = prod.name;
+            visit.umbrella = prod.umbrella;
+            visit.amount = rnd(2, 24) * prod.pricePerPcs;
+        }
+        return visit;
+    }
+
+    function buildVisitsForMotoris(m, dateStart, dateEnd) {
+        const start = dateStart || m.visitStart || VISIT_PERIOD_START;
+        const end = dateEnd || m.visitEnd || VISIT_PERIOD_END;
+        const perDay = m.visitsPerDay || VISITS_PER_DAY;
+        const rnd = seededRandom(hashSeed((m.code || '') + '|visits'));
+        const pool = m.outletPoolCompact || [];
+        const visits = [];
+        enumerateDates(start, end).forEach(date => {
+            const n = visitsOnDate(date, perDay);
+            for (let seq = 0; seq < n; seq++) {
+                const outlet = pool.length ? pool[seq % pool.length] : null;
+                visits.push(buildOneVisit(rnd, m, date, seq, outlet));
+            }
+        });
+        return visits;
     }
 
     function generateMotorisData() {
-        const motorisList = masterData.pegawai.filter(p =>
-            String(p.role || '').toLowerCase() === 'motoris'
-        );
+        const motorisList = buildMotorisRoster();
         if (!motorisList.length || !masterData.produk.length) return [];
 
         const products = masterData.produk.map(p => ({
@@ -706,9 +1002,11 @@
 
         return motorisList.map((peg, idx) => {
             const rnd = seededRandom(hashSeed(peg.kode || String(peg.id) || String(idx)));
-            const stokisRef = pickStokisForMotoris(rnd, peg.region || '');
-            const region = peg.region || stokisRef?.region || masterRegions[idx % Math.max(masterRegions.length, 1)] || 'Nasional';
-            const area = peg.branch || stokisRef?.branch || '—';
+            const stokisRef = pickStokisForMotoris(rnd, peg.region || '', idx);
+            const kota = cityName(stokisRef?.branch) || 'Jakarta';
+            const region = provinceOfCity(kota);
+            const area = kota;
+            const outletPool = pelangganPoolForStokis(stokisRef);
 
             const numProds = rnd(3, Math.min(6, products.length));
             const selectedProds = [];
@@ -747,83 +1045,62 @@
             const aging = rnd(1, 18);
             const sellThrough = inboundKrt > 0 ? Math.round((soldPcs / (inboundKrt * 72)) * 100) : 0;
 
+            const salesMonths = [1, 2, 3, 4, 5, 6, 8, 9, 11, 12];
+            const salesOutlets = pickUniqueOutlets(rnd, outletPool, 10);
             const salesHistory = [];
             for (let i = 0; i < 10; i++) {
-                const day = rnd(1, 28);
-                const prod = selectedProds[rnd(0, selectedProds.length - 1)];
-                const qtyPcs = rnd(2, 24);
-                const outlet = pickPelangganForMotoris(rnd);
-                const lat = outlet?.lat ?? (-6.2 + (rnd(-30, 30) / 100));
-                const lng = outlet?.lng ?? (106.85 + (rnd(-40, 40) / 100));
+                const month = salesMonths[i];
+                const skuN = rnd(2, Math.min(5, selectedProds.length));
+                const usedP = new Set();
+                const histItems = [];
+                for (let s = 0; s < skuN; s++) {
+                    let pIdx;
+                    do { pIdx = rnd(0, selectedProds.length - 1); } while (usedP.has(pIdx) && usedP.size < selectedProds.length);
+                    usedP.add(pIdx);
+                    const prod = selectedProds[pIdx];
+                    const karton = rnd(0, 1) ? rnd(1, 3) : 0;
+                    const dus = rnd(0, 1) ? rnd(1, 6) : 0;
+                    const pcs = (!karton && !dus) ? rnd(2, 18) : rnd(0, 8);
+                    const linePcs = (karton * 72) + (dus * 6) + pcs;
+                    histItems.push({ name: prod.name, umbrella: prod.umbrella, brand: prod.brand, qtyPcs: linePcs, amount: linePcs * prod.pricePerPcs });
+                }
+                const outlet = salesOutlets[i] || pickPelangganForMotoris(rnd, outletPool);
+                const lat = outlet?.lat ?? (stokisRef?.lat ?? -6.2);
+                const lng = outlet?.lng ?? (stokisRef?.lng ?? 106.85);
+                const qtyPcs = histItems.reduce((sum, it) => sum + it.qtyPcs, 0);
+                const amount = histItems.reduce((sum, it) => sum + it.amount, 0);
+                const names = histItems.map(it => it.name);
                 salesHistory.push({
-                    date: `2026-06-${String(day).padStart(2, '0')}`,
+                    date: pickSeasonalDate(rnd),
                     outlet: outlet?.nama || 'Outlet',
                     outletKode: outlet?.kode || '',
-                    product: prod.name,
-                    umbrella: prod.umbrella,
-                    brand: prod.brand,
-                    umbrella: prod.umbrella,
+                    product: names.length > 1 ? names[0] + ' +' + (names.length - 1) + ' SKU' : names[0],
+                    umbrella: histItems[0].umbrella,
+                    brand: histItems[0].brand,
                     qtyPcs,
-                    amount: qtyPcs * prod.pricePerPcs,
+                    amount,
                     lat: parseFloat(Number(lat).toFixed(6)),
                     lng: parseFloat(Number(lng).toFixed(6))
                 });
             }
             salesHistory.sort((a, b) => b.date.localeCompare(a.date));
 
-            const visitHistory = [];
-            const numVisits = rnd(20, 38);
-            for (let i = 0; i < numVisits; i++) {
-                const day = rnd(1, 28);
-                const outlet = pickPelangganForMotoris(rnd);
-                const hasTransaction = rnd(0, 100) < 68;
-                const visit = {
-                    date: `2026-06-${String(day).padStart(2, '0')}`,
-                    outlet: outlet?.nama || 'Outlet',
-                    outletKode: outlet?.kode || '',
-                    hasTransaction
-                };
-                const baseLat = outlet?.lat ?? (-6.2 + rnd(-30, 30) / 100);
-                const baseLng = outlet?.lng ?? (106.85 + rnd(-40, 40) / 100);
-                const checkInHour = rnd(8, 16);
-                const checkInMin = rnd(0, 59);
-                const checkInSec = rnd(0, 59);
-                visit.durationMin = hasTransaction ? rnd(15, 50) : rnd(8, 25);
-                visit.checkInTime = `${visit.date}T${String(checkInHour).padStart(2, '0')}:${String(checkInMin).padStart(2, '0')}:${String(checkInSec).padStart(2, '0')}`;
-                const totalOutMin = checkInHour * 60 + checkInMin + visit.durationMin;
-                const outHour = Math.floor(totalOutMin / 60) % 24;
-                const outMin = totalOutMin % 60;
-                visit.checkOutTime = `${visit.date}T${String(outHour).padStart(2, '0')}:${String(outMin).padStart(2, '0')}:${String(rnd(0, 59)).padStart(2, '0')}`;
-                visit.checkInLat = parseFloat((baseLat + rnd(-25, 25) / 100000).toFixed(6));
-                visit.checkInLng = parseFloat((baseLng + rnd(-25, 25) / 100000).toFixed(6));
-                visit.checkOutLat = parseFloat((baseLat + rnd(-30, 30) / 100000).toFixed(6));
-                visit.checkOutLng = parseFloat((baseLng + rnd(-30, 30) / 100000).toFixed(6));
-                visit.lat = baseLat;
-                visit.lng = baseLng;
-                visit.distanceCheckInMeter = distanceMeters(baseLat, baseLng, visit.checkInLat, visit.checkInLng);
-                visit.distanceCheckOutMeter = distanceMeters(baseLat, baseLng, visit.checkOutLat, visit.checkOutLng);
-                if (hasTransaction) {
-                    const prod = selectedProds[rnd(0, selectedProds.length - 1)];
-                    visit.product = prod.name;
-                    visit.umbrella = prod.umbrella;
-                    visit.amount = rnd(2, 24) * prod.pricePerPcs;
-                }
-                visitHistory.push(visit);
-            }
-            visitHistory.sort((a, b) => b.date.localeCompare(a.date));
+            const visitOutlets = pickUniqueOutlets(rnd, outletPool, Math.max(10, Math.min(30, outletPool.length || 10)))
+                .map(compactOutlet).filter(Boolean);
 
             const registeredPelanggan = [];
             const regUsed = new Set();
-            const regCount = rnd(4, Math.min(12, masterData.pelanggan.length));
-            for (let i = 0; i < regCount; i++) {
-                const pel = pickPelangganForMotoris(rnd);
+            const regCount = Math.min(Math.max(10, rnd(10, 14)), outletPool.length || masterData.pelanggan.length);
+            const regOutlets = pickUniqueOutlets(rnd, outletPool, regCount);
+            for (let i = 0; i < regOutlets.length; i++) {
+                const pel = regOutlets[i];
                 if (!pel || regUsed.has(pel.kode)) continue;
                 regUsed.add(pel.kode);
                 registeredPelanggan.push({
                     id: pel.id,
                     kode: pel.kode,
                     nama: pel.nama,
-                    tanggalDaftar: `2026-06-${String(rnd(1, 28)).padStart(2, '0')}`
+                    tanggalDaftar: randomDateInYear(rnd)
                 });
             }
             registeredPelanggan.sort((a, b) => b.tanggalDaftar.localeCompare(a.tanggalDaftar));
@@ -831,15 +1108,14 @@
             const dailySales = [];
             for (let d = 7; d >= 1; d--) dailySales.push(rnd(50000, 450000));
 
-            const kulakanStokis = pickStokisForMotoris(rnd, region);
             const lastKulakan = {
-                date: `2026-06-${String(rnd(10, 25)).padStart(2, '0')}`,
-                stokis: kulakanStokis?.nama || 'Stokis',
-                stokisKode: kulakanStokis?.kode || '',
+                date: randomDateInYear(rnd),
+                stokis: stokisRef?.nama || 'Stokis',
+                stokisKode: stokisRef?.kode || '',
                 qty: rnd(3, 15),
                 gps: rnd(0, 100) > 15,
-                lat: kulakanStokis?.lat,
-                lng: kulakanStokis?.lng
+                lat: stokisRef?.lat,
+                lng: stokisRef?.lng
             };
 
             return {
@@ -856,7 +1132,10 @@
                 aging,
                 sellThrough,
                 salesHistory,
-                visitHistory,
+                outletPoolCompact: visitOutlets,
+                visitsPerDay: VISITS_PER_DAY,
+                visitStart: VISIT_PERIOD_START,
+                visitEnd: VISIT_PERIOD_END,
                 registeredPelanggan,
                 dailySales,
                 lastKulakan,
@@ -866,25 +1145,107 @@
     }
 
     function persistMotorisSnapshot() {
-        localStorage.setItem(STOR_KEY, JSON.stringify({
-            generatedAt: new Date().toISOString(),
-            source: 'master',
-            motoris: motorisData
-        }));
+        try {
+            localStorage.setItem(STOR_KEY, JSON.stringify({
+                generatedAt: new Date().toISOString(),
+                source: 'master',
+                motorisCount: motorisData.length,
+                visitsPerDay: VISITS_PER_DAY
+            }));
+        } catch (err) { /* ignore quota */ }
+    }
+
+    let suppressFilterChange = false;
+
+    function escapeAttr(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;');
+    }
+
+    function getSelectedValues(id) {
+        const $el = $('#' + id);
+        if ($el.data('select2')) {
+            const val = $el.val();
+            if (Array.isArray(val)) return val.filter(Boolean);
+            return val ? [val] : [];
+        }
+        const el = document.getElementById(id);
+        if (!el) return [];
+        return Array.from(el.selectedOptions || []).map(o => o.value).filter(Boolean);
+    }
+
+    function replaceSelectOptions(id, items) {
+        const prev = getSelectedValues(id);
+        const el = document.getElementById(id);
+        el.innerHTML = items.map(it =>
+            `<option value="${escapeAttr(it.value)}">${escapeAttr(it.label)}</option>`
+        ).join('');
+        const keep = prev.filter(v => items.some(it => it.value === v));
+        suppressFilterChange = true;
+        if ($(el).data('select2')) {
+            $(el).val(keep).trigger('change');
+        } else {
+            Array.from(el.options).forEach(o => { o.selected = keep.includes(o.value); });
+        }
+        suppressFilterChange = false;
+    }
+
+    function initFilterSelect2() {
+        if (!$.fn.select2) return;
+        const common = {
+            multiple: true,
+            closeOnSelect: false,
+            allowClear: true,
+            width: '220px',
+            dropdownParent: $(document.body),
+            language: { noResults: () => 'Tidak ditemukan' }
+        };
+        const configs = [
+            { id: '#filterRegion', placeholder: 'Provinsi (Wilayah)' },
+            { id: '#filterArea', placeholder: 'Kota (Area)' },
+            { id: '#filterSales', placeholder: 'Motoris' },
+            { id: '#filterBrand', placeholder: 'Umbrand' }
+        ];
+        configs.forEach(cfg => {
+            const $el = $(cfg.id);
+            if ($el.data('select2')) $el.select2('destroy');
+            $el.select2({ ...common, placeholder: cfg.placeholder });
+        });
+        $('#filterRegion').off('change.smFilter').on('change.smFilter', () => {
+            if (!suppressFilterChange) onRegionChange();
+        });
+        $('#filterArea').off('change.smFilter').on('change.smFilter', () => {
+            if (!suppressFilterChange) onAreaChange();
+        });
+        $('#filterSales, #filterBrand').off('change.smFilter').on('change.smFilter', () => {
+            if (!suppressFilterChange) applyAllFilters();
+        });
+    }
+
+    function populateAreaOptions() {
+        const regions = getSelectedValues('filterRegion');
+        let source = motorisData;
+        if (regions.length) source = source.filter(m => regions.includes(m.region));
+        const areas = [...new Set(source.map(m => m.area).filter(Boolean))].sort();
+        replaceSelectOptions('filterArea', areas.map(a => ({ value: a, label: a })));
+    }
+
+    function populateSalesOptions() {
+        const regions = getSelectedValues('filterRegion');
+        const areas = getSelectedValues('filterArea');
+        let source = motorisData;
+        if (regions.length) source = source.filter(m => regions.includes(m.region));
+        if (areas.length) source = source.filter(m => areas.includes(m.area));
+        replaceSelectOptions('filterSales', source.map(m => ({ value: m.code, label: m.name })));
     }
 
     function populateMasterFilters() {
-        const regionSelect = document.getElementById('filterRegion');
-        regionSelect.innerHTML = '<option value="">Seluruh Indonesia (Nasional)</option>';
-        masterRegions.forEach(r => {
-            regionSelect.innerHTML += `<option value="${r}">${r}</option>`;
-        });
-
-        const brandSelect = document.getElementById('filterBrand');
-        brandSelect.innerHTML = '<option value="">Semua Umbrand</option>';
-        masterUmbrellas.forEach(u => {
-            brandSelect.innerHTML += `<option value="${u}">${u}</option>`;
-        });
+        replaceSelectOptions('filterRegion', masterRegions.map(r => ({ value: r, label: r })));
+        replaceSelectOptions('filterBrand', masterUmbrellas.map(u => ({ value: u, label: u })));
+        populateAreaOptions();
+        populateSalesOptions();
     }
 
     // ===================== AUDIT TRAIL DATA =====================
@@ -892,25 +1253,45 @@
         const audits = [];
         let txCounter = 1;
         motorisData.forEach(m => {
-            // Inbound entries (in Krt)
-            const inProd = randomChoice(m.products);
-            const inQty = m.lastKulakan.qty;
-            const afterKrt = inProd.karton + inQty;
             const lat = Number(m.lastKulakan.lat ?? (-6.1 - Math.random() * 1.5)).toFixed(6);
             const lng = Number(m.lastKulakan.lng ?? (106.7 + Math.random() * 1.2)).toFixed(6);
-            const inAmount = inQty * 72 * inProd.pricePerPcs;
+            const inQty = Math.max(1, m.lastKulakan.qty || 1);
+            const bal = (m.products || []).map(p => ({
+                kode: p.kode, name: p.name, brand: p.brand, umbrella: p.umbrella,
+                pricePerPcs: p.pricePerPcs, krt: p.karton || 0, dus: p.dus || 0, pcs: p.pcs || 0
+            }));
+            const sellableUnits = p => [
+                { unit: 'Krt', val: p.krt }, { unit: 'Dus', val: p.dus }, { unit: 'Pcs', val: p.pcs }
+            ].filter(o => o.val > 0);
+            const unitKey = u => (u === 'Krt' ? 'krt' : u === 'Dus' ? 'dus' : 'pcs');
+            const pcsOf = (u, qty) => u === 'Krt' ? qty * 72 : u === 'Dus' ? qty * 6 : qty;
+            const inCount = randomInt(2, Math.min(4, Math.max(1, bal.length)));
+            const inUsed = new Set();
+            const inItems = [];
+            let inAmount = 0;
+            for (let i = 0; i < inCount && bal.length; i++) {
+                let prod;
+                do { prod = randomChoice(bal); } while (inUsed.has(prod.kode) && inUsed.size < bal.length);
+                inUsed.add(prod.kode);
+                const qtyKrt = i === 0 ? inQty : randomInt(1, 4);
+                const before = prod.krt;
+                prod.krt += qtyKrt;
+                inAmount += qtyKrt * 72 * prod.pricePerPcs;
+                inItems.push({ name: prod.name, before: `${before} Krt`, adjust: `+${qtyKrt} Krt`, after: `${prod.krt} Krt` });
+            }
+            const inLead = bal.find(p => p.name === inItems[0]?.name) || bal[0];
             audits.push({
-                id: `TX-IN-2606${String(randomInt(10,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
+                id: `TX-IN-${String(m.lastKulakan.date || '2026-01-01').replace(/-/g, '').slice(2)}-${String(txCounter++).padStart(3, '0')}`,
                 date: m.lastKulakan.date,
                 time: `0${randomInt(7,9)}:${String(randomInt(0,59)).padStart(2,'0')}`,
                 motoris: m.name,
                 salesCode: m.code,
-                region: regionLabel(m.region),
+                region: m.region,
                 area: m.area,
                 type: 'inbound',
-                product: inProd.name,
-                brand: inProd.brand,
-                umbrella: inProd.umbrella,
+                product: inItems.length > 1 ? inLead.name + ' +' + (inItems.length - 1) + ' SKU' : inLead.name,
+                brand: inLead.brand,
+                umbrella: inLead.umbrella,
                 qty: inQty,
                 qtyUnit: 'Krt',
                 amount: inAmount,
@@ -920,34 +1301,55 @@
                 gpsDetails: m.lastKulakan.gps ? `Akurat. Jarak ${randomInt(5,25)}m dari stokis.` : `PERINGATAN: Jarak ${(Math.random()*1.5+0.3).toFixed(1)} km dari stokis.`,
                 nota: true,
                 status: 'verified',
-                items: [{ name: inProd.name, before: `${inProd.karton} Krt`, adjust: `+${inQty} Krt`, after: `${afterKrt} Krt` }]
+                items: inItems
             });
-            // Outbound entries (in Pcs)
             const numOut = randomInt(2, 4);
             for (let i = 0; i < numOut; i++) {
-                const prod = randomChoice(m.products);
-                const qtyPcs = randomInt(6, 48);
-                const beforePcs = (prod.karton * 72) + (prod.dus * 6) + prod.pcs;
-                const afterPcs = beforePcs - qtyPcs;
+                const available = bal.filter(p => sellableUnits(p).length);
+                if (!available.length) break;
+                const skuN = randomInt(1, Math.min(5, available.length));
+                const usedP = new Set();
+                const outItems = [];
+                let outAmount = 0;
+                for (let s = 0; s < skuN; s++) {
+                    const pool = available.filter(p => !usedP.has(p.kode) && sellableUnits(p).length);
+                    if (!pool.length) break;
+                    const prod = randomChoice(pool);
+                    usedP.add(prod.kode);
+                    const pick = randomChoice(sellableUnits(prod));
+                    const qty = randomInt(1, pick.val);
+                    const beforeVal = pick.val;
+                    const afterVal = beforeVal - qty;
+                    prod[unitKey(pick.unit)] = afterVal;
+                    outAmount += pcsOf(pick.unit, qty) * prod.pricePerPcs;
+                    outItems.push({
+                        name: prod.name,
+                        before: `${beforeVal} ${pick.unit}`,
+                        adjust: `-${qty} ${pick.unit}`,
+                        after: `${afterVal} ${pick.unit}`
+                    });
+                }
+                if (!outItems.length) break;
                 const outlet = randomChoice(m.salesHistory);
                 const olat = outlet?.lat ?? (-6.1 - Math.random() * 1.5);
                 const olng = outlet?.lng ?? (106.7 + Math.random() * 1.2);
                 const gpsValid = Math.random() > 0.1;
-                const outAmount = qtyPcs * prod.pricePerPcs;
+                const outDate = outlet?.date || randomDateInYear(seededRandom(hashSeed(m.code + String(i))));
+                const lead = bal.find(p => p.name === outItems[0].name) || bal[0];
                 audits.push({
-                    id: `TX-OUT-2606${String(randomInt(12,28)).padStart(2,'0')}-${String(txCounter++).padStart(3,'0')}`,
-                    date: `2026-06-${String(randomInt(12, 28)).padStart(2, '0')}`,
+                    id: `TX-OUT-${String(outDate).replace(/-/g, '').slice(2)}-${String(txCounter++).padStart(3, '0')}`,
+                    date: outDate,
                     time: `${randomInt(9,16)}:${String(randomInt(0,59)).padStart(2,'0')}`,
                     motoris: m.name,
                     salesCode: m.code,
-                    region: regionLabel(m.region),
+                    region: m.region,
                     area: m.area,
                     type: 'outbound',
-                    product: prod.name,
-                    brand: prod.brand,
-                    umbrella: prod.umbrella,
-                    qty: qtyPcs,
-                    qtyUnit: 'Pcs',
+                    product: outItems.length > 1 ? outItems[0].name + ' +' + (outItems.length - 1) + ' SKU' : outItems[0].name,
+                    brand: lead.brand,
+                    umbrella: lead.umbrella,
+                    qty: outItems.length,
+                    qtyUnit: 'SKU',
                     amount: outAmount,
                     outlet: outlet?.outlet || 'Outlet',
                     gps: gpsValid,
@@ -955,7 +1357,7 @@
                     gpsDetails: gpsValid ? `Jarak ${randomInt(3,20)}m.` : `PERINGATAN: Jarak ${(Math.random()*1.2+0.2).toFixed(1)} km dari outlet.`,
                     nota: false,
                     status: Math.random() > 0.2 ? 'verified' : 'pending',
-                    items: [{ name: prod.name, before: `${beforePcs} Pcs`, adjust: `-${qtyPcs} Pcs`, after: `${Math.max(0, afterPcs)} Pcs` }]
+                    items: outItems
                 });
             }
         });
@@ -973,8 +1375,9 @@
     document.addEventListener('layoutReady', async function() {
         try {
             await loadAllMasterData();
-            populateMasterFilters();
             rebuildDashboardData();
+            populateMasterFilters();
+            initFilterSelect2();
             updateTimestamp();
             renderBalanceTable();
             renderAuditTable();
@@ -1009,9 +1412,9 @@
         let totalVisits = 0;
         let effectiveVisits = 0;
         motorisList.forEach(m => {
-            const visits = m.visitHistory || [];
-            totalVisits += visits.length;
-            effectiveVisits += visits.filter(v => v.hasTransaction).length;
+            const total = m.visitCount ?? (m.visitHistory || []).length;
+            totalVisits += total;
+            effectiveVisits += Math.round(total * EFF_CALL_PCT / 100);
         });
         const rate = totalVisits > 0 ? Math.round((effectiveVisits / totalVisits) * 100) : 0;
         const nonEffective = totalVisits - effectiveVisits;
@@ -1023,14 +1426,15 @@
         motorisList.forEach(m => {
             (m.registeredPelanggan || []).forEach(p => { if (p.kode) codes.add(p.kode); });
             (m.salesHistory || []).forEach(h => { if (h.outletKode) codes.add(h.outletKode); });
+            (m.outletPoolCompact || []).forEach(v => { if (v.kode) codes.add(v.kode); });
             (m.visitHistory || []).forEach(v => { if (v.outletKode) codes.add(v.outletKode); });
         });
         return codes;
     }
 
-    function fakturMatchesUmbrella(faktur, umbrella) {
-        if (!umbrella || !faktur.items?.length) return true;
-        return faktur.items.some(item => produkByKode[item.kode]?.umbrella === umbrella);
+    function fakturMatchesUmbrella(faktur, umbrellas) {
+        if (!umbrellas?.length || !faktur.items?.length) return !umbrellas?.length;
+        return faktur.items.some(item => umbrellas.includes(produkByKode[item.kode]?.umbrella));
     }
 
     function countFilteredPelanggan(motorisList, dateStart, dateEnd, umbrella) {
@@ -1039,9 +1443,9 @@
             (m.registeredPelanggan || []).forEach(p => {
                 if (dateStart && p.tanggalDaftar < dateStart) return;
                 if (dateEnd && p.tanggalDaftar > dateEnd) return;
-                if (umbrella) {
-                    const hasUmbrellaActivity = (m.visitHistory || []).some(v =>
-                        v.outletKode === p.kode && v.hasTransaction && v.umbrella === umbrella
+                if (umbrella.length) {
+                    const hasUmbrellaActivity = (m.salesHistory || []).some(v =>
+                        v.outletKode === p.kode && umbrella.includes(v.umbrella)
                     );
                     if (!hasUmbrellaActivity) return;
                 }
@@ -1064,7 +1468,7 @@
     }
 
     function countFilteredKunjungan(motorisList) {
-        return motorisList.reduce((sum, m) => sum + (m.visitHistory || []).length, 0);
+        return motorisList.reduce((sum, m) => sum + (m.visitCount ?? (m.visitHistory || []).length), 0);
     }
 
     // ===================== SUMMARY CARDS =====================
@@ -1072,7 +1476,7 @@
         const filtered = getFilteredMotoris();
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
-        const umbrella = document.getElementById('filterBrand').value;
+        const umbrella = getSelectedValues('filterBrand');
         const totalInboundRp = filtered.reduce((sum, m) => sum + calcInboundRp(m.products), 0);
         const totalSoldRp = filtered.reduce((sum, m) => sum + calcOutboundRp(m.salesHistory), 0);
         const totalNilai = filtered.reduce((s, m) => s + m.nilai, 0);
@@ -1101,40 +1505,37 @@
     // ===================== FILTER LOGIC =====================
     function getFilteredMotoris(options = {}) {
         const applyBrandFilter = options.applyBrandFilter !== false;
-        const region = document.getElementById('filterRegion').value;
-        const area = document.getElementById('filterArea').value;
-        const sales = document.getElementById('filterSales').value;
-        const umbrella = document.getElementById('filterBrand').value;
+        const regions = getSelectedValues('filterRegion');
+        const areas = getSelectedValues('filterArea');
+        const sales = getSelectedValues('filterSales');
+        const umbrellas = getSelectedValues('filterBrand');
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
 
         let data = motorisData;
-        if (region) data = data.filter(m => m.region === region);
-        if (area) data = data.filter(m => m.area === area);
-        if (sales) data = data.filter(m => m.code === sales);
-        if (umbrella && applyBrandFilter) {
-            data = data.filter(m => m.products.some(p => p.umbrella === umbrella));
+        if (regions.length) data = data.filter(m => regions.includes(m.region));
+        if (areas.length) data = data.filter(m => areas.includes(m.area));
+        if (sales.length) data = data.filter(m => sales.includes(m.code));
+        if (umbrellas.length && applyBrandFilter) {
+            data = data.filter(m => m.products.some(p => umbrellas.includes(p.umbrella)));
         }
 
         return data.map(m => {
             let products = m.products;
-            if (umbrella && applyBrandFilter) {
-                products = products.filter(p => p.umbrella === umbrella);
+            if (umbrellas.length && applyBrandFilter) {
+                products = products.filter(p => umbrellas.includes(p.umbrella));
             }
 
             let salesHistory = m.salesHistory;
-            if (umbrella && applyBrandFilter) {
-                salesHistory = salesHistory.filter(h => h.umbrella === umbrella);
+            if (umbrellas.length && applyBrandFilter) {
+                salesHistory = salesHistory.filter(h => umbrellas.includes(h.umbrella));
             }
             if (dateStart) salesHistory = salesHistory.filter(h => h.date >= dateStart);
             if (dateEnd) salesHistory = salesHistory.filter(h => h.date <= dateEnd);
 
-            let visitHistory = m.visitHistory || [];
-            if (dateStart) visitHistory = visitHistory.filter(v => v.date >= dateStart);
-            if (dateEnd) visitHistory = visitHistory.filter(v => v.date <= dateEnd);
-            if (umbrella && applyBrandFilter) {
-                visitHistory = visitHistory.filter(v => !v.hasTransaction || v.umbrella === umbrella);
-            }
+            const visitStart = dateStart || m.visitStart || VISIT_PERIOD_START;
+            const visitEnd = dateEnd || m.visitEnd || VISIT_PERIOD_END;
+            const visitCount = countWeightedVisits(visitStart, visitEnd, m.visitsPerDay || VISITS_PER_DAY);
 
             const soldPcs = salesHistory.reduce((sum, h) => sum + h.qtyPcs, 0);
             const inboundKrt = products.reduce((sum, p) => sum + (p.inboundKrt || (p.karton + 3)), 0);
@@ -1159,7 +1560,9 @@
                 ...m,
                 products,
                 salesHistory,
-                visitHistory,
+                visitCount,
+                visitStart,
+                visitEnd,
                 soldPcs,
                 totalKrt,
                 totalDus,
@@ -1175,29 +1578,13 @@
     }
 
     function onRegionChange() {
-        const region = document.getElementById('filterRegion').value;
-        const areaSelect = document.getElementById('filterArea');
-        const salesSelect = document.getElementById('filterSales');
-        areaSelect.innerHTML = '<option value="">Semua Area</option>';
-        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
-
-        if (region) {
-            const areas = [...new Set(motorisData.filter(m => m.region === region).map(m => m.area))];
-            areas.forEach(a => { areaSelect.innerHTML += `<option value="${a}">${a}</option>`; });
-        }
+        populateAreaOptions();
+        populateSalesOptions();
         applyAllFilters();
     }
 
     function onAreaChange() {
-        const region = document.getElementById('filterRegion').value;
-        const area = document.getElementById('filterArea').value;
-        const salesSelect = document.getElementById('filterSales');
-        salesSelect.innerHTML = '<option value="">Semua Motoris</option>';
-
-        let filtered = motorisData;
-        if (region) filtered = filtered.filter(m => m.region === region);
-        if (area) filtered = filtered.filter(m => m.area === area);
-        filtered.forEach(m => { salesSelect.innerHTML += `<option value="${m.code}">${m.name}</option>`; });
+        populateSalesOptions();
         applyAllFilters();
     }
 
@@ -1210,38 +1597,47 @@
     }
 
     function updateFilterChips() {
-        const region = document.getElementById('filterRegion');
-        const area = document.getElementById('filterArea');
-        const sales = document.getElementById('filterSales');
-        const brand = document.getElementById('filterBrand');
         const bar = document.getElementById('filterChipsBar');
         const list = document.getElementById('filterChipsList');
-        let chips = [];
-
-        if (region.value) chips.push({ label: region.options[region.selectedIndex].text, icon: 'fa-globe', field: 'filterRegion' });
-        if (area.value) chips.push({ label: area.options[area.selectedIndex].text, icon: 'fa-map-marker-alt', field: 'filterArea' });
-        if (sales.value) chips.push({ label: sales.options[sales.selectedIndex].text, icon: 'fa-user', field: 'filterSales' });
-        if (brand.value) chips.push({ label: 'Umbrand: ' + brand.options[brand.selectedIndex].text, icon: 'fa-tag', field: 'filterBrand' });
+        const chips = [];
+        const addChips = (id, icon, prefix) => {
+            const el = document.getElementById(id);
+            getSelectedValues(id).forEach(val => {
+                const opt = Array.from(el.options).find(o => o.value === val);
+                chips.push({ field: id, value: val, label: (prefix || '') + (opt ? opt.text : val), icon });
+            });
+        };
+        addChips('filterRegion', 'fa-globe');
+        addChips('filterArea', 'fa-map-marker-alt');
+        addChips('filterSales', 'fa-user');
+        addChips('filterBrand', 'fa-tag', 'Umbrand: ');
 
         if (chips.length === 0) { bar.classList.add('hidden'); return; }
         bar.classList.remove('hidden');
-        list.innerHTML = chips.map(c => `<span class="filter-chip"><i class="fas ${c.icon}"></i> ${c.label}<span class="chip-remove" onclick="clearFilter('${c.field}')"><i class="fas fa-times"></i></span></span>`).join('');
+        list.innerHTML = chips.map(c =>
+            `<span class="filter-chip"><i class="fas ${c.icon}"></i> ${escapeAttr(c.label)}` +
+            `<span class="chip-remove" data-field="${escapeAttr(c.field)}" data-value="${escapeAttr(c.value)}" onclick="clearFilter(this.dataset.field, this.dataset.value)"><i class="fas fa-times"></i></span></span>`
+        ).join('');
     }
 
-    function clearFilter(field) {
-        document.getElementById(field).value = '';
-        if (field === 'filterRegion') { onRegionChange(); }
-        else if (field === 'filterArea') { onAreaChange(); }
-        else { applyAllFilters(); }
+    function clearFilter(field, value) {
+        const next = getSelectedValues(field).filter(v => v !== value);
+        suppressFilterChange = true;
+        $('#' + field).val(next).trigger('change');
+        suppressFilterChange = false;
+        if (field === 'filterRegion') onRegionChange();
+        else if (field === 'filterArea') onAreaChange();
+        else applyAllFilters();
     }
 
     function resetAllFilters() {
-        document.getElementById('filterRegion').value = '';
-        document.getElementById('filterArea').value = '';
-        document.getElementById('filterSales').value = '';
-        document.getElementById('filterBrand').value = '';
-        document.getElementById('filterArea').innerHTML = '<option value="">Semua Area</option>';
-        document.getElementById('filterSales').innerHTML = '<option value="">Semua Motoris</option>';
+        suppressFilterChange = true;
+        $('#filterRegion, #filterArea, #filterSales, #filterBrand').val(null).trigger('change');
+        suppressFilterChange = false;
+        populateAreaOptions();
+        populateSalesOptions();
+        document.getElementById('filterDateStart').value = VISIT_PERIOD_START;
+        document.getElementById('filterDateEnd').value = VISIT_PERIOD_END;
         applyAllFilters();
     }
 
@@ -1254,14 +1650,15 @@
         const tbody = document.getElementById('balanceTableBody');
 
         if (filtered.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><div class="empty-state-title">Tidak ada data</div><div class="empty-state-desc">Tidak ditemukan data motoris sesuai filter yang dipilih.</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-inbox"></i></div><div class="empty-state-title">Tidak ada data</div><div class="empty-state-desc">Tidak ditemukan data motoris sesuai filter yang dipilih.</div></div></td></tr>`;
             return;
         }
 
         tbody.innerHTML = filtered.map(m => {
             return `<tr>
                 <td><a class="motoris-link" onclick="showMotorisDetail('${m.code}')">${m.name}</a><br><span style="font-size:0.7rem;color:#94a3b8;">${m.code}</span></td>
-                <td>${m.area}<br><span style="font-size:0.7rem;color:#94a3b8;">${regionLabel(m.region)}</span></td>
+                <td>${m.region}</td>
+                <td>${m.area}</td>
                 <td style="font-weight:600; text-align:right;" data-order="${m.inboundRp}">${formatRp(m.inboundRp)}</td>
                 <td style="font-weight:600; text-align:right; color:#2E7D32;" data-order="${m.outboundRp}">${formatRp(m.outboundRp)}</td>
                 <td style="font-size:0.82rem; font-weight:700; text-align:right; color:#005d41;" data-order="${m.nilai}">${formatRp(m.nilai)}</td>
@@ -1272,7 +1669,7 @@
         dtBalance = $('#balanceTable').DataTable({
             pageLength: 10,
             lengthMenu: [5, 10, 25, 50],
-            order: [[4, 'desc']],
+            order: [[5, 'desc']],
             language: {
                 search: 'Cari:',
                 lengthMenu: 'Tampilkan _MENU_ data',
@@ -1315,7 +1712,7 @@
         <div class="motoris-pop">
             <div class="motoris-pop-header">
                 <h3><i class="fas fa-motorcycle" style="margin-right:8px;"></i> ${m.name}</h3>
-                <div class="mp-sub">${m.code} &bull; ${m.area} &bull; ${regionLabel(m.region)}</div>
+                <div class="mp-sub">${m.code} &bull; ${m.region} · ${m.area}</div>
             </div>
             <div class="motoris-pop-grid">
                 <div class="motoris-pop-sect">
@@ -1452,9 +1849,9 @@
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
 
-        const umbrella = document.getElementById('filterBrand').value;
+        const umbrella = getSelectedValues('filterBrand');
         let filteredAudit = auditData.filter(a => names.has(a.motoris));
-        if (umbrella) filteredAudit = filteredAudit.filter(a => a.umbrella === umbrella);
+        if (umbrella.length) filteredAudit = filteredAudit.filter(a => umbrella.includes(a.umbrella));
         if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
         if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
 
@@ -1592,7 +1989,7 @@
                             <h4><i class="fas fa-user-tie"></i> Profil Sales & Informasi Lokasi</h4>
                             <table style="width:100%; font-size:0.78rem; border-collapse:collapse;">
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b; width:110px;">Motoris (Penjualan)</td><td style="padding:5px 0; color:#1e293b;">: <strong>${r.motoris || d.motoris}</strong> <span style="color:#64748b; font-size:0.72rem;">(${r.salesCode || d.salescode || ''})</span></td></tr>
-                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Wilayah Kerja</td><td style="padding:5px 0; color:#1e293b;">: ${r.region || ''} &mdash; <strong>${r.area || ''}</strong></td></tr>
+                                <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Wilayah Kerja</td><td style="padding:5px 0; color:#1e293b;">: <strong>${r.region || ''}</strong> · ${r.area || ''}</td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Jenis Transaksi</td><td style="padding:5px 0;">: ${typeBadgeHtml}</td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Partner Tujuan</td><td style="padding:5px 0; color:#1e293b;">: ${r.outlet || d.outlet}</td></tr>
                                 <tr><td style="font-weight:600; padding:5px 0; color:#64748b;">Waktu Unggah</td><td style="padding:5px 0; color:#1e293b;">: Hari ini, ${r.time || '09:00'} WIB</td></tr>
@@ -1784,10 +2181,10 @@
         const names = new Set(filtered.map(m => m.name));
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
-        const umbrella = document.getElementById('filterBrand').value;
+        const umbrella = getSelectedValues('filterBrand');
         
         let filteredAudit = auditData.filter(a => names.has(a.motoris));
-        if (umbrella) filteredAudit = filteredAudit.filter(a => a.umbrella === umbrella);
+        if (umbrella.length) filteredAudit = filteredAudit.filter(a => umbrella.includes(a.umbrella));
         if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
         if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
 
@@ -1826,27 +2223,7 @@
         }
 
         // 3. Update Daily Trend Chart
-        if (chartInstances.daily) {
-            const dayMap = {};
-            const startDay = dateStart ? parseInt(dateStart.split('-')[2]) : 1;
-            const endDay = dateEnd ? parseInt(dateEnd.split('-')[2]) : 30;
-            for (let d = startDay; d <= endDay; d++) {
-                dayMap[`${d} Jun`] = 0;
-            }
-            filtered.forEach(m => {
-                m.salesHistory.forEach(h => {
-                    const dayNum = parseInt(h.date.split('-')[2]);
-                    const key = `${dayNum} Jun`;
-                    if (key in dayMap) {
-                        dayMap[key] += h.amount;
-                    }
-                });
-            });
-            chartInstances.daily.data.labels = Object.keys(dayMap);
-            chartInstances.daily.data.datasets[0].label = 'Penjualan (Rp)';
-            chartInstances.daily.data.datasets[0].data = Object.values(dayMap);
-            chartInstances.daily.update();
-        }
+        updateDailyTrendChart();
 
         // 4. Update Brand Contribution Chart
         updateBrandContribChart();
@@ -1913,7 +2290,7 @@
     }
 
     function buildBrandChartView() {
-        const selectedUmbrella = document.getElementById('filterBrand').value;
+        const selectedUmbrellas = getSelectedValues('filterBrand');
         const baseData = getFilteredMotoris({ applyBrandFilter: false });
         const umbrellaMap = computeUmbrellaTotals(baseData);
         const labels = masterUmbrellas.slice();
@@ -1921,12 +2298,14 @@
         const total = rawValues.reduce((a, b) => a + b, 0);
         const percentages = rawValues.map(v => total > 0 ? (v / total) * 100 : 0);
         const palette = getBrandColorMap();
+        const hasFilter = selectedUmbrellas.length > 0;
+        const isActive = u => !hasFilter || selectedUmbrellas.includes(u);
 
-        const chartValues = selectedUmbrella
-            ? labels.map(u => (u === selectedUmbrella ? umbrellaMap[u] : 0))
+        const chartValues = hasFilter
+            ? labels.map(u => (isActive(u) ? umbrellaMap[u] : 0))
             : rawValues;
 
-        return { labels, chartValues, rawValues, percentages, total, selectedUmbrella, palette };
+        return { labels, chartValues, rawValues, percentages, total, selectedUmbrellas, hasFilter, isActive, palette };
     }
 
     function renderBrandChartCenter(view) {
@@ -1936,12 +2315,16 @@
             el.innerHTML = '<div class="bc-label">Tidak ada data</div>';
             return;
         }
-        if (view.selectedUmbrella) {
-            const idx = view.labels.indexOf(view.selectedUmbrella);
+        if (view.selectedUmbrellas.length === 1) {
+            const selected = view.selectedUmbrellas[0];
+            const idx = view.labels.indexOf(selected);
             const pct = view.percentages[idx].toFixed(1);
-            const val = view.rawValues[idx];
-            const valText = formatRp(val);
-            el.innerHTML = `<div class="bc-pct">${pct}%</div><div class="bc-label">${view.selectedUmbrella}</div><div class="bc-sub">${valText}</div>`;
+            const valText = formatRp(view.rawValues[idx]);
+            el.innerHTML = `<div class="bc-pct">${pct}%</div><div class="bc-label">${selected}</div><div class="bc-sub">${valText}</div>`;
+            return;
+        }
+        if (view.selectedUmbrellas.length > 1) {
+            el.innerHTML = `<div class="bc-pct">${view.selectedUmbrellas.length}</div><div class="bc-label">Umbrand terpilih</div><div class="bc-sub">${view.labels.length} total</div>`;
             return;
         }
         let maxI = 0;
@@ -1953,10 +2336,9 @@
         const el = document.getElementById('brandChartLegend');
         if (!el) return;
         el.innerHTML = view.labels.map((u, i) => {
-            const inactive = view.selectedUmbrella && u !== view.selectedUmbrella;
+            const inactive = view.hasFilter && !view.isActive(u);
             const pct = view.percentages[i].toFixed(1);
-            const val = view.rawValues[i];
-            const valText = formatRp(val);
+            const valText = formatRp(view.rawValues[i]);
             return `<span class="brand-chart-legend-item${inactive ? ' inactive' : ''}">
                 <span class="brand-chart-legend-dot" style="background:${inactive ? '#e2e8f0' : view.palette[u]}"></span>
                 ${u} <strong>${pct}%</strong> <span style="font-weight:500;">(${valText})</span>
@@ -1964,30 +2346,28 @@
         }).join('');
     }
 
-    function getBrandChartOptions(selectedUmbrella) {
+    function getBrandChartOptions() {
         return {
             responsive: true,
             maintainAspectRatio: false,
             cutout: '62%',
             plugins: {
                 legend: { display: false },
-                brandFilter: { selected: selectedUmbrella || '' },
                 tooltip: {
                     callbacks: {
                         label(context) {
                             const view = context.chart.$brandView;
                             const idx = context.dataIndex;
                             const pct = view ? view.percentages[idx].toFixed(1) : '0.0';
-                            const val = context.raw;
-                            const valText = formatRp(val);
-                            const inactive = view?.selectedUmbrella && context.label !== view.selectedUmbrella;
+                            const valText = formatRp(context.raw);
+                            const inactive = view?.hasFilter && !view.isActive(context.label);
                             const prefix = inactive ? '(difilter) ' : '';
                             return ` ${prefix}${context.label}: ${pct}% — ${valText}`;
                         },
                         filter(item) {
                             const view = item.chart.$brandView;
-                            if (!view?.selectedUmbrella) return item.raw > 0;
-                            return item.label === view.selectedUmbrella;
+                            if (!view?.hasFilter) return item.raw > 0;
+                            return view.isActive(item.label);
                         }
                     }
                 }
@@ -2011,14 +2391,14 @@
                     datasets: [{
                         data: view.chartValues,
                         backgroundColor: view.labels.map(u =>
-                            view.selectedUmbrella && u !== view.selectedUmbrella ? '#eef2f5' : view.palette[u]
+                            view.hasFilter && !view.isActive(u) ? '#eef2f5' : view.palette[u]
                         ),
                         borderWidth: 2,
                         borderColor: '#fff',
-                        spacing: view.selectedUmbrella ? 0 : 2
+                        spacing: view.hasFilter ? 0 : 2
                     }]
                 },
-                options: getBrandChartOptions(view.selectedUmbrella)
+                options: getBrandChartOptions()
             });
             chartInstances.brandContrib.$brandView = view;
             return;
@@ -2029,10 +2409,9 @@
         chart.data.labels = view.labels;
         chart.data.datasets[0].data = view.chartValues;
         chart.data.datasets[0].backgroundColor = view.labels.map(u =>
-            view.selectedUmbrella && u !== view.selectedUmbrella ? '#eef2f5' : view.palette[u]
+            view.hasFilter && !view.isActive(u) ? '#eef2f5' : view.palette[u]
         );
-        chart.data.datasets[0].spacing = view.selectedUmbrella ? 0 : 2;
-        chart.options.plugins.brandFilter = { selected: view.selectedUmbrella || '' };
+        chart.data.datasets[0].spacing = view.hasFilter ? 0 : 2;
         chart.update();
     }
 
@@ -2040,28 +2419,40 @@
         updateBrandContribChart();
     }
 
+    function dailyTrendSeries() {
+        const dateStart = document.getElementById('filterDateStart').value || VISIT_PERIOD_START;
+        const dateEnd = document.getElementById('filterDateEnd').value || VISIT_PERIOD_END;
+        const filtered = getFilteredMotoris();
+        const total = filtered.reduce((sum, m) => sum + calcOutboundRp(m.salesHistory), 0);
+        const dates = enumerateDates(dateStart, dateEnd);
+        const weights = dates.map(d => dayProfile(d).mult);
+        const wsum = weights.reduce((a, b) => a + b, 0) || 1;
+        const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+        const labels = dates.map(d => {
+            const [, m, day] = d.split('-');
+            return `${Number(day)} ${months[Number(m) - 1]}`;
+        });
+        const values = weights.map(w => Math.round(total * (w / wsum)));
+        return { labels, values };
+    }
+
     function initDailyTrendChart() {
         const ctx = document.getElementById('chartDailyTrend');
         if (!ctx) return;
-        const days = [];
-        const values = [];
-        for (let d = 1; d <= 28; d++) {
-            days.push(`${d} Jun`);
-            values.push(randomInt(500000, 2500000));
-        }
+        const series = dailyTrendSeries();
         chartInstances.daily = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: days,
+                labels: series.labels,
                 datasets: [{
                     label: 'Penjualan (Rp)',
-                    data: values,
+                    data: series.values,
                     borderColor: '#1565C0',
                     backgroundColor: 'rgba(21,101,192,0.06)',
                     borderWidth: 2,
-                    tension: 0.4,
+                    tension: 0.25,
                     fill: true,
-                    pointRadius: 2,
+                    pointRadius: 0,
                     pointBackgroundColor: '#1565C0'
                 }]
             },
@@ -2069,11 +2460,22 @@
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 14 } },
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 12 } },
                     y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
                 }
             }
         });
+    }
+
+    function updateDailyTrendChart() {
+        if (!chartInstances.daily) {
+            initDailyTrendChart();
+            return;
+        }
+        const series = dailyTrendSeries();
+        chartInstances.daily.data.labels = series.labels;
+        chartInstances.daily.data.datasets[0].data = series.values;
+        chartInstances.daily.update();
     }
 
     // ===================== COLLAPSIBLE SECTIONS =====================
@@ -2197,13 +2599,15 @@
         if (!outletKode) return null;
         return motorisList.find(m =>
             (m.salesHistory || []).some(h => h.outletKode === outletKode) ||
-            (m.visitHistory || []).some(v => v.outletKode === outletKode) ||
+            (m.outletPoolCompact || []).some(v => v.kode === outletKode) ||
             (m.registeredPelanggan || []).some(p => p.kode === outletKode)
         ) || null;
     }
 
     function warehouseCodeFromName(gudang) {
         if (!gudang) return '';
+        const hit = (masterData.stokis || []).find(s => s.nama === gudang);
+        if (hit?.kode) return hit.kode;
         const name = String(gudang).replace(/^Gudang\s+/i, '').trim().toUpperCase();
         return name.slice(0, 3) + '01';
     }
@@ -2211,7 +2615,7 @@
     function buildSalesInvoiceExportRows(filtered) {
         const dateStart = document.getElementById('filterDateStart').value;
         const dateEnd = document.getElementById('filterDateEnd').value;
-        const umbrella = document.getElementById('filterBrand').value;
+        const umbrella = getSelectedValues('filterBrand');
         const outletCodes = getMotorisOutletCodes(filtered);
         const pelMap = getPelangganMap();
         const rows = [];
@@ -2226,7 +2630,7 @@
             const pel = pelMap[f.pelangganKode] || {};
             const motoris = findMotorisForOutlet(filtered, f.pelangganKode);
             const items = (f.items || []).filter(item =>
-                !umbrella || produkByKode[item.kode]?.umbrella === umbrella
+                !umbrella.length || umbrella.includes(produkByKode[item.kode]?.umbrella)
             );
             if (!items.length) return;
 
@@ -2235,6 +2639,11 @@
                 const sellPrice = Number(item.hargaUnit) || 0;
                 const itemDiscount = Number(item.diskon) || 0;
                 const lineTotal = Math.round(qty * sellPrice - itemDiscount);
+                const uom = String(item.satuan || 'PCS').toUpperCase();
+                const qtyL = uom === 'KARTON' ? qty : '';
+                const qtyM = (uom === 'DUS' || uom === 'RENCENG') ? qty : '';
+                const qtyS = uom === 'PCS' ? qty : '';
+                const totalPcs = uom === 'KARTON' ? qty * 72 : (uom === 'DUS' || uom === 'RENCENG') ? qty * 6 : qty;
 
                 rows.push({
                     Date: fDate,
@@ -2255,13 +2664,13 @@
                     PaymentTermName: f.jangkaWaktuPembayaran || '',
                     ProductCode: item.kode || '',
                     ProductName: item.nama || '',
-                    QuantityL: '',
+                    QuantityL: qtyL,
                     UnitL: 'KARTON',
-                    QuantityM: '',
-                    UnitM: 'RENCENG',
-                    QuantityS: qty,
-                    UnitS: item.satuan || 'PCS',
-                    TotalQuantity: qty,
+                    QuantityM: qtyM,
+                    UnitM: 'DUS',
+                    QuantityS: qtyS,
+                    UnitS: 'PCS',
+                    TotalQuantity: totalPcs,
                     SellPrice: sellPrice,
                     TaxCode: item.pajak || 'NoPPN',
                     LineTotal: lineTotal,
@@ -2275,10 +2684,15 @@
 
     function buildDailyVisitExportRows(filtered) {
         const pelMap = getPelangganMap();
+        let dateStart = document.getElementById('filterDateStart').value || VISIT_PERIOD_START;
+        const dateEnd = document.getElementById('filterDateEnd').value || VISIT_PERIOD_END;
+        const estimated = filtered.length * countWeightedVisits(dateStart, dateEnd, VISITS_PER_DAY);
+        if (estimated > 20000) dateStart = dateEnd;
         const rows = [];
 
         filtered.forEach(m => {
-            (m.visitHistory || []).forEach((v, idx) => {
+            const visits = m.visitHistory || buildVisitsForMotoris(m, dateStart, dateEnd);
+            visits.forEach((v, idx) => {
                 const pel = pelMap[v.outletKode] || {};
                 const salesAmount = v.hasTransaction ? Math.round(Number(v.amount) || 0) : 0;
                 const custLat = pel.lat ?? v.lat ?? '';
@@ -2362,8 +2776,9 @@
         setTimeout(async () => {
             try {
                 await loadAllMasterData();
-                populateMasterFilters();
                 rebuildDashboardData();
+                populateMasterFilters();
+                initFilterSelect2();
                 updateTimestamp();
 
                 Object.values(chartInstances).forEach(c => { if (c && c.destroy) c.destroy(); });

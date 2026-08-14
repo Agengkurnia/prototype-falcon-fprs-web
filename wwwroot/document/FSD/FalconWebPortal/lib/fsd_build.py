@@ -74,7 +74,6 @@ def _render_mermaid_cli(
             '-b', 'white',
             '-s', str(scale),
         ]
-        # Windows: npx.cmd
         if os.name == 'nt':
             cmd = ['npx.cmd', '--yes', '@mermaid-js/mermaid-cli@11.4.0',
                    '-i', tmp_mmd, '-o', output_path, '-b', 'white', '-s', str(scale)]

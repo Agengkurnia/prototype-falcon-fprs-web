@@ -86,7 +86,7 @@ def seed_faktur_storage(page, base_url: str) -> None:
         """async () => {
             const res = await fetch('/wwwroot/data/faktur.json');
             const data = await res.json();
-            localStorage.setItem('fprs_faktur', JSON.stringify(data));
+            localStorage.setItem('fprs_faktur_v6', JSON.stringify(data));
             return data.length;
         }"""
     )
@@ -96,7 +96,7 @@ def navigate_faktur_detail(page, mod: dict, base_url: str) -> None:
     # Direct URL — lebih andal daripada klik baris DataTables
     detail_url = (
         base_url.rstrip('/')
-        + '/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2606146101'
+        + '/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612206217'
     )
     page.goto(detail_url, wait_until='domcontentloaded', timeout=30000)
     wait_ready(page)
@@ -120,9 +120,17 @@ def wait_stok_ready(page) -> None:
             "() => document.querySelectorAll('.dash-card').length >= 3",
             timeout=25000,
         )
+        page.wait_for_function(
+            """() => {
+                const info = document.querySelector('#balanceTable_info, .dataTables_info');
+                if (info && /300/.test(info.textContent || '')) return true;
+                return document.querySelectorAll('#balanceTableBody a.motoris-link').length >= 10;
+            }""",
+            timeout=60000,
+        )
     except Exception:
         pass
-    time.sleep(1.5)
+    time.sleep(2.0)
 
 
 def capture(base_url, only=None):

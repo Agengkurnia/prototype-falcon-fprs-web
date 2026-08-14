@@ -358,7 +358,7 @@
       "htmlPath": "Views/FPRS/Penjualan/Faktur/index.html",
       "formPath": "Views/FPRS/Penjualan/Faktur/detail.html",
       "apiEndpoint": "/api/v1/Invoice",
-      "storageKey": "fprs_faktur",
+      "storageKey": "fprs_faktur_v5",
       "screenshotDir": "wwwroot/document/FSD/FalconWebPortal/screenshots",
       "screenshots": [
         "ss_38_faktur_index.png",
