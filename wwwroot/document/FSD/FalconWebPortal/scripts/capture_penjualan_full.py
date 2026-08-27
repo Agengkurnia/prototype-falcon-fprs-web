@@ -96,7 +96,7 @@ def navigate_faktur_detail(page, mod: dict, base_url: str) -> None:
     # Direct URL — lebih andal daripada klik baris DataTables
     detail_url = (
         base_url.rstrip('/')
-        + '/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612206217'
+        + '/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612307503'
     )
     page.goto(detail_url, wait_until='domcontentloaded', timeout=30000)
     wait_ready(page)

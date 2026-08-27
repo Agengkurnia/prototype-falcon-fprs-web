@@ -266,16 +266,8 @@
                     <div class="val" id="infoSales">—</div>
                 </div>
                 <div class="info-field">
-                    <label><i class="fa fa-warehouse"></i> Stokis</label>
-                    <div class="val" id="infoGudang">—</div>
-                </div>
-                <div class="info-field">
                     <label><i class="fa fa-dollar-sign"></i> Jangka Waktu Bayar</label>
                     <div class="val" id="infoJangka">—</div>
-                </div>
-                <div class="info-field">
-                    <label><i class="fa fa-calendar-times"></i> Jatuh Tempo</label>
-                    <div class="val" id="infoJatuhTempo">—</div>
                 </div>
                 <div class="info-field">
                     <label><i class="fa fa-tag"></i> Kode Transaksi</label>
@@ -410,9 +402,7 @@ document.addEventListener('layoutReady', () => {
         /* Info Grid */
         document.getElementById('infoTglFaktur').textContent  = fmtDT(item.tanggalFaktur);
         document.getElementById('infoSales').textContent      = item.salesNama || '—';
-        document.getElementById('infoGudang').textContent     = item.gudang || '—';
         document.getElementById('infoJangka').textContent     = item.jangkaWaktuPembayaran || '—';
-        document.getElementById('infoJatuhTempo').textContent = fmtDT(item.tanggalJatuhTempo || item.tanggalJatuhTempo);
         document.getElementById('infoKodeTrx').textContent    = item.kodeTransaksi || '—';
 
         /* Catatan */

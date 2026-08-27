@@ -251,7 +251,6 @@ body {
             <table class="inv-meta-table">
                 <tr class="highlight"><td>FAKTUR #</td><td id="metaNoFaktur">—</td></tr>
                 <tr><td>TGL FAKTUR</td><td id="metaTglFaktur">—</td></tr>
-                <tr><td>JATUH TEMPO</td><td id="metaJatuhTempo">—</td></tr>
                 <tr><td>WAKTU PEMBAYARAN</td><td id="metaJangka">—</td></tr>
                 <tr><td>STATUS</td><td id="metaStatus">—</td></tr>
             </table>
@@ -395,7 +394,6 @@ body {
         document.getElementById('hdrGudang').textContent    = 'Stokis : ' + (item.gudang || '—');
         document.getElementById('metaNoFaktur').textContent = item.id;
         document.getElementById('metaTglFaktur').textContent   = fmtD(item.tanggalFaktur);
-        document.getElementById('metaJatuhTempo').textContent  = fmtD(item.tanggalJatuhTempo);
         document.getElementById('metaJangka').textContent      = item.jangkaWaktuPembayaran || '—';
         document.getElementById('metaStatus').textContent      = item.status || '—';
 

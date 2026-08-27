@@ -334,11 +334,11 @@
       "narrative": "Menampilkan halaman detail record terpilih (parameter URL terenkripsi)."
     },
     {
-      "file": "",
+      "file": "ss_btn_penjualan-faktur_cetak-faktur.png",
       "label": "Cetak Faktur",
-      "id": "cetakFaktur('SI-2606146101')",
+      "id": "cetakFaktur('SI-2609097335')",
       "style": "btn-outline-secondary",
-      "function": "cetakFaktur('SI-2606146101')",
+      "function": "cetakFaktur('SI-2609097335')",
       "narrative": "Menjalankan aksi terkait tombol Cetak Faktur."
     }
   ],
@@ -352,7 +352,7 @@
       "narrative": "Menjalankan aksi terkait tombol Export Excel."
     },
     {
-      "file": "",
+      "file": "ss_btn_penjualan-stok-motoris_refresh.png",
       "label": "Refresh",
       "id": "refreshDashboard()",
       "style": "btn-success",

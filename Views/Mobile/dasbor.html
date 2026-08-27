@@ -830,15 +830,57 @@
         }
 
         // ============================================================
-        // CHARTS
+        // CHARTS (tied to period filter + pager)
         // ============================================================
+        function parseLocalDate(ds) {
+            const parts = String(ds).split('-').map(Number);
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        function toLocalDateStr(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        }
+
+        function enumerateDates(from, to) {
+            const out = [];
+            const cur = parseLocalDate(from);
+            const end = parseLocalDate(to);
+            while (cur <= end) {
+                out.push(toLocalDateStr(cur));
+                cur.setDate(cur.getDate() + 1);
+            }
+            return out;
+        }
+
+        /** Daily buckets for charts, aligned with Harian / Mingguan / Bulanan. */
+        function buildChartDateKeys() {
+            const range = getPeriodRange();
+            if (currentPeriod === 'harian') {
+                const end = parseLocalDate(range.from);
+                const start = new Date(end);
+                start.setDate(end.getDate() - 6);
+                return enumerateDates(toLocalDateStr(start), toLocalDateStr(end));
+            }
+            return enumerateDates(range.from, range.to);
+        }
+
+        function dayLabel(ds) {
+            return parseLocalDate(ds).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+        }
+
         function initCharts() {
             const baseOpts = {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false }, ticks: { color: '#999', font: { size: 9 }, maxRotation: 45, minRotation: 30 } },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#999', font: { size: 9 }, maxRotation: 45, minRotation: 30, autoSkip: true, maxTicksLimit: 12 }
+                    },
                     y: {
                         position: 'right',
                         grid: { color: '#f5f5f5' },
@@ -868,37 +910,35 @@
 
         function refreshCharts() {
             if (!fakturChartInst || !pembayaranChartInst) return;
-            const today = new Date();
 
-            // Faktur chart: last 14 days line chart
-            const labels14 = [], data14 = [];
-            for (let i = 13; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const ds = d.toISOString().slice(0, 10);
-                const invs = SfaStore.getInvoices().filter(inv => inv.date === ds);
-                const total = invs.reduce((s, inv) => s + (inv.totalNet || inv.totalGross || 0), 0);
-                labels14.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
-                data14.push(Math.round(total / 1000));
-            }
-            fakturChartInst.data.labels = labels14;
-            fakturChartInst.data.datasets[0].data = data14;
-            fakturChartInst.update();
+            const dateKeys = buildChartDateKeys();
+            const labels = dateKeys.map(dayLabel);
+            const invoices = SfaStore.getInvoices ? SfaStore.getInvoices() : [];
 
-            // EC chart: last 14 days (% = faktur / kunjungan)
-            const labelsEf = [], dataEf = [];
-            for (let i = 13; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(today.getDate() - i);
-                const ds = d.toISOString().slice(0, 10);
+            const dataFaktur = dateKeys.map(ds => {
+                const total = invoices
+                    .filter(inv => inv.date === ds)
+                    .reduce((s, inv) => s + (inv.totalNet || inv.totalGross || 0), 0);
+                return Math.round(total / 1000);
+            });
+
+            const dataEf = dateKeys.map(ds => {
                 const dayKpi = SfaStore.getKpiByDate ? SfaStore.getKpiByDate(ds) : null;
                 const k = dayKpi ? dayKpi.kunjungan : 0;
                 const f = dayKpi ? (dayKpi.fakturCount != null ? dayKpi.fakturCount : dayKpi.efektif) : 0;
-                labelsEf.push(d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
-                dataEf.push(k > 0 ? Math.round((f / k) * 100) : 0);
-            }
-            pembayaranChartInst.data.labels = labelsEf;
+                return k > 0 ? Math.round((f / k) * 100) : 0;
+            });
+
+            const pointRadius = dateKeys.length > 14 ? 2 : 3;
+            fakturChartInst.data.labels = labels;
+            fakturChartInst.data.datasets[0].data = dataFaktur;
+            fakturChartInst.data.datasets[0].pointRadius = pointRadius;
+            fakturChartInst.options.scales.x.ticks.maxTicksLimit = currentPeriod === 'bulanan' ? 10 : 12;
+            fakturChartInst.update();
+
+            pembayaranChartInst.data.labels = labels;
             pembayaranChartInst.data.datasets[0].data = dataEf;
+            pembayaranChartInst.options.scales.x.ticks.maxTicksLimit = currentPeriod === 'bulanan' ? 10 : 12;
             pembayaranChartInst.update();
         }
 

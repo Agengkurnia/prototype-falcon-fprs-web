@@ -4,19 +4,19 @@ Modul **Faktur** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**
 
 | Aspek | Keterangan |
 |-------|------------|
-| **Tujuan Form** | Membuat dan memantau faktur penjualan dari order lapangan; mencatat header, item, diskon, dan status pembayaran untuk rekonsiliasi admin. |
-| **Pengguna** | Admin Sales, Supervisor, Finance (monitoring & koreksi). |
+| **Tujuan Form** | Memantau dan mencetak faktur penjualan dari order Mobile SFA. Web Admin bersifat view-only (list, detail, print). |
+| **Pengguna** | Admin Sales, Supervisor, Finance (monitoring). |
 
 
 > **Integrasi API (rencana):** `/api/v1/Invoice`
 
-> **localStorage key:** `md_faktur`
+> **localStorage key:** `fprs_faktur_v7`
 
 **Tampilan Penjualan — Faktur:**
 
 ![Penjualan — Faktur](screenshots/ss_38_faktur_index.png)
 
-![Tampilan tambahan Penjualan — Faktur](screenshots/ss_39_faktur_add.png)
+![Penjualan — Faktur — Detail](screenshots/ss_39_faktur_detail.png)
 
 #### 5.1.1 Kolom DataTable Index
 
@@ -27,21 +27,20 @@ Modul **Faktur** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**
 | NOMOR FAKTUR | `NomorFaktur` | Text | Ya | Kolom grid index |
 | PELANGGAN | `Pelanggan` | Text | Ya | Kolom grid index |
 | SALES | `Sales` | Text | Ya | Kolom grid index |
-| JATUH TEMPO | `JatuhTempo` | Text | Ya | Kolom grid index |
 | JUMLAH TAGIHAN | `JumlahTagihan` | Text | Ya | Kolom grid index |
 | BELUM DIBAYAR | `BelumDibayar` | Text | Ya | Kolom grid index |
 | STATUS | `Status` | Text | Ya | Kolom grid index |
 
-#### 5.1.2 Form Tambah/Ubah
+#### 5.1.2 Field Header Detail / Print (read-only)
 
 | Field Name | ID Elemen | Tipe | Mandatory | Default | Validasi | Keterangan |
 |------------|-----------|------|-----------|---------|----------|------------|
-| Tanggal Faktur | `inpTanggalFaktur` | Text | Tidak | (kosong) | — | — |
-| Sales | `inpSalesman` | Dropdown | Tidak | (kosong) | — | — |
-| Gudang / Stokis | `inpGudang` | Dropdown (read-only di web) | Tidak | nama `mStokis` | — | Snapshot stokis, bukan gudang terpisah |
-| Jangka Waktu Pembayaran | `inpWaktuBayar` | Dropdown | Tidak | (kosong) | — | — |
-| Tanggal Jatuh Tempo | `inpJatuhTempo` | Text (readonly) | Tidak | (kosong) | — | — |
-| Kode Transaksi | `inpKodeTrx` | Dropdown | Tidak | (kosong) | — | — |
+| Tanggal Faktur | `infoTglFaktur` | Text | Tidak | (kosong) | — | Detail |
+| Sales | `infoSales` | Text | Tidak | (kosong) | — | Detail |
+| Jangka Waktu Pembayaran | `infoJangka` | Text | Tidak | (kosong) | — | Detail / print |
+| Kode Transaksi | `infoKodeTrx` | Text | Tidak | (kosong) | — | Detail / print |
+
+> **Dihapus dari UI Web Admin (v1.9):** Stokis (`infoGudang` / print header) dan Jatuh Tempo (kolom list, detail, print). Kolom tetap ada di DB/seed.
 
 #### 5.1.3 Tombol Aksi
 
@@ -49,14 +48,11 @@ Modul **Faktur** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **page**
 |--------|--------------|-------------|---------------|--------|
 | Ekspor | `btnEkspor` | btn-secondary | — | — |
 | Reset | `btnResetFilter` | btn-secondary | — | — |
-| Tambah item lain | `btnAddItem` | btn-secondary | — | — |
-| Simpan Faktur | `btnSimpan` | btn-success | — | — |
+| Cetak Faktur | `btnCetak` / `cetakFaktur` | btn-cetak-faktur | — | Print |
 
 #### 5.1.5 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
-| **Create** | Klik Tambah → `add.html` | Admin | — |
-| **Read** | Index + `detail.html` | Semua role | — |
-| **Update** | Edit via `add.html?id=` | Admin | — |
-| **Delete** | Konfirmasi Swal di index | Admin | — |
+| **Read** | Index + `detail.html` + `print.html` | Semua role | View-only |
+| **Export** | Tombol Ekspor | Admin / Manager | — |

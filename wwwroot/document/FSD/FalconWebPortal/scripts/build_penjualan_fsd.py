@@ -41,9 +41,9 @@ def build() -> str:
                 'brd_no': '2026.SHP-FSD.0102',
                 'pid_no': '2026.SHP-PID.0101',
                 'prepared_by': 'Tim IT – Man Power GT',
-                'date': '14/08/2026',
-                'revision_date': '14 Agustus 2026',
-                'revision_desc': 'v1.8 – dummy 900 kunjungan/hari dari 300 motoris',
+                'date': '26/08/2026',
+                'revision_date': '26 Agustus 2026',
+                'revision_desc': 'v1.9 – Faktur UI: hapus Jatuh Tempo & Stokis (detail/list/print)',
             },
             plantuml_handlers=[
                 PlantumlHandler(

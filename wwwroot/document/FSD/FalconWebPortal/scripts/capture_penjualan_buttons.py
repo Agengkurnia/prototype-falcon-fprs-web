@@ -68,7 +68,7 @@ def capture_faktur(page) -> None:
     shot_loc(page, page.locator("#btnResetFilter"), "ss_btn_penjualan-faktur_reset.png", pad=2)
 
     # Detail page Cetak button (optional richer shot)
-    page.goto(f"{BASE}/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612206217", wait_until="domcontentloaded")
+    page.goto(f"{BASE}/Views/FPRS/Penjualan/Faktur/detail.html?id=SI-2612307503", wait_until="domcontentloaded")
     time.sleep(1.2)
     shot_loc(page, page.locator("#btnCetak, .btn-cetak-faktur"), "ss_btn_penjualan-faktur_cetak-detail.png", pad=2)
 

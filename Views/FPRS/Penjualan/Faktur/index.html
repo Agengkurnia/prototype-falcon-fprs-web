@@ -333,7 +333,6 @@
                                 <th>NOMOR FAKTUR</th>
                                 <th>PELANGGAN</th>
                                 <th>SALES</th>
-                                <th>JATUH TEMPO</th>
                                 <th style="text-align:right;">JUMLAH TAGIHAN</th>
                                 <th style="text-align:right;">BELUM DIBAYAR</th>
                                 <th style="width:110px;text-align:center;">STATUS</th>
@@ -349,7 +348,6 @@
                                         <option value="">Semua</option>
                                     </select>
                                 </th>
-                                <th></th>
                                 <th></th>
                                 <th></th>
                                 <th>
@@ -495,7 +493,6 @@
                     <td data-label="Nomor Faktur"><a href="detail.html?id=${item.id}" class="faktur-link">${item.id}</a></td>
                     <td data-label="Pelanggan"><span style="font-weight:500;">${item.pelangganNama}</span></td>
                     <td data-label="Sales"><span class="sales-badge">${item.salesNama}</span></td>
-                    <td data-label="Jatuh Tempo">${formatDateDisplay(item.tanggalJatuhTempo)}</td>
                     <td data-label="Jumlah Tagihan" class="text-currency">${fmt(item.jumlahTagihan)}</td>
                     <td data-label="Belum Dibayar" class="text-currency">${belumBayarDisplay}</td>
                     <td data-label="Status" style="text-align:center;">${badge}</td>
@@ -523,8 +520,8 @@
                 pageLength: 10,
                 order: [[1, 'desc']], // Sort by tanggal desc by default
                 columnDefs: [
-                    { orderable: false, targets: [0, 8, 9] },
-                    { type: 'num', targets: [6, 7] }
+                    { orderable: false, targets: [0, 7, 8] },
+                    { type: 'num', targets: [5, 6] }
                 ],
                 dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
             });

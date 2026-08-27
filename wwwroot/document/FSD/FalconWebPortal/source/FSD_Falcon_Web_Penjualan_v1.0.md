@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Penjualan (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.8
+### Versi Dokumen: 1.9
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Penjualan — Web Admin Man Power GT |
-| **Versi** | 1.8 |
-| **Tanggal** | 14 Agustus 2026 |
+| **Versi** | 1.9 |
+| **Tanggal** | 26 Agustus 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -28,7 +28,8 @@
 | 1.5 | 14 Agustus 2026 | Tim IT | ERD nama fisik MAVEN + `tStokMotorisSaldo`; DDL PostgreSQL lengkap (§7.4) |
 | 1.6 | 14 Agustus 2026 | Tim IT | Prototipe: gudang = nama stokis; sales = nama pegawai; history penjualan 1 kota/kecamatan; ERD kolom lengkap sesuai DDL |
 | 1.7 | 14 Agustus 2026 | Tim IT | Screenshot ulang Faktur + Stok Motoris; dummy 300 motoris × 30 kunjungan/hari; faktur seluruhnya Paid; wilayah nama kota |
-| **1.8** | **14 Agustus 2026** | **Tim IT** | Dummy Stok Motoris: **900 kunjungan/hari** dari **300 motoris** (3/motoris/hari); data tetap tersebar sepanjang 2026 |
+| 1.8 | 14 Agustus 2026 | Tim IT | Dummy Stok Motoris: **900 kunjungan/hari** dari **300 motoris** (3/motoris/hari); data tetap tersebar sepanjang 2026 |
+| **1.9** | **26 Agustus 2026** | **Tim IT** | Web Admin Faktur: hapus **Jatuh Tempo** (list/detail/print) dan **Stokis** (detail); screenshot ulang |
 
 ---
 
@@ -74,7 +75,7 @@ database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 |---------------|-----------------|
 | Faktur Penjualan (list, detail, print) | Modul Canvassing (belum ada UI aktif) |
 | Monitoring Stok Motoris (dashboard + export Excel) | Create/Edit/Hapus faktur di Web Admin |
-| Persistensi prototipe (`fprs_faktur_v5`, `md_stok_motoris`) + seed MAVEN | Mobile SFA (sumber order — disebut sebagai integrasi) |
+| Persistensi prototipe (`fprs_faktur_v7`, `md_stok_motoris`) + seed MAVEN | Mobile SFA (sumber order — disebut sebagai integrasi) |
 | RBAC Super Admin / Sales Manager / RSM | Approval multi-level transaksi |
 | Spesifikasi kolom report Excel/CSV | Modul Master Data & Kunjungan (dokumen terpisah) |
 | Tuning Fase A (agregasi SQL, index, seed 6 bulan) | Tuning Fase B (tabel agregat harian / partition — roadmap) |
@@ -100,7 +101,7 @@ database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
 | Arsitektur | Static MPA — satu `.html` per halaman | ASP.NET Core MVC + service layer |
 | UI Framework | Bootstrap 5.3, Vuexy Admin Theme | Vuexy + Razor Views |
 | JavaScript | jQuery, DataTables, Select2, SweetAlert2, Chart.js, Leaflet, SheetJS | Sama / setara (Chart.js 2.9 lokal) |
-| Persistensi | `fprs_faktur_v5`, `md_stok_motoris` + seed JSON | PostgreSQL: `tPenjualanFaktur`, `tKunjunganHarian`, `tStokMotorisSaldo`, `tStokMotorisMutasi` |
+| Persistensi | `fprs_faktur_v7`, `md_stok_motoris` + seed JSON | PostgreSQL: `tPenjualanFaktur`, `tKunjunganHarian`, `tStokMotorisSaldo`, `tStokMotorisMutasi` |
 | Auth / Menu | Tidak ada login | KNGlobal SSO + `mMenu` / `mRoleAccess` (`TSO`, `DMS`) |
 | Navigasi | `wwwroot/js/layout.js` | Menu dinamis dari KNGlobal |
 | Folder kode | `Views/FPRS/Penjualan/` | `Controllers/PowerGT/...`, `Views/PowerGT/...` |
@@ -159,7 +160,7 @@ Bab ini mendeskripsikan modul **Faktur** dan **Stok Motoris**: dashboard list / 
 
 Modul **Faktur** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/Faktur/index.html`; database: `/Transaction/SalesOrder`.
 
-Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) dan DataTable `#tblFaktur` dengan filter tanggal, pelanggan, sales, dan status. **Semua faktur dummy berstatus Paid** (`belumDibayar = 0`); tidak ada Unpaid/Draft. Data faktur bersumber dari aktivitas **Mobile SFA** (`localStorage` key `fprs_faktur_v5`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` menampilkan header pelanggan, item line, ringkasan pembayaran, dan tombol Cetak menuju `print.html`. Field UI **Stokis** (prototipe `gudang`) menampilkan nama stokis, bukan nama gudang fiktif. Filter Sales menampilkan **nama pegawai** (`mPegawai.txtNama`).
+Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) dan DataTable `#tblFaktur` dengan filter tanggal, pelanggan, sales, dan status. **Semua faktur dummy berstatus Paid** (`belumDibayar = 0`); tidak ada Unpaid/Draft. Data faktur bersumber dari aktivitas **Mobile SFA** (`localStorage` key `fprs_faktur_v7`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` menampilkan header pelanggan, item line, ringkasan pembayaran (Tanggal Faktur, Sales, Jangka Waktu Bayar, Kode Transaksi), dan tombol Cetak menuju `print.html`. **Tidak ada** field **Stokis** / **Jatuh Tempo** pada UI Web Admin Faktur (list, detail, print). Filter Sales menampilkan **nama pegawai** (`mPegawai.txtNama`).
 
 | Aspek | Keterangan |
 |-------|------------|
@@ -169,7 +170,7 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) da
 
 > **Integrasi API (rencana):** `/api/v1/Invoice`
 
-> **localStorage key:** `fprs_faktur_v5`
+> **localStorage key:** `fprs_faktur_v7`
 
 ![Penjualan — Faktur — Dashboard List](screenshots/ss_38_faktur_index.png)
 
@@ -183,7 +184,6 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) da
 | NOMOR FAKTUR | `NomorFaktur` | Text | Ya | Kolom grid dashboard list |
 | PELANGGAN | `Pelanggan` | Text | Ya | Kolom grid dashboard list |
 | SALES | `Sales` | Text | Ya | Kolom grid dashboard list |
-| JATUH TEMPO | `JatuhTempo` | Text | Ya | Kolom grid dashboard list |
 | JUMLAH TAGIHAN | `JumlahTagihan` | Text | Ya | Kolom grid dashboard list |
 | BELUM DIBAYAR | `BelumDibayar` | Text | Ya | Kolom grid dashboard list |
 | STATUS | `Status` | Text | Ya | Kolom grid dashboard list |
@@ -214,8 +214,8 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) da
 Tombol **Ekspor** pada dashboard list. Di prototipe masih **mock** (konfirmasi Swal tanpa file).
 Target database: Excel `.xlsx`, **1 baris = 1 faktur** (header-level), mengikuti filter list + scope RBAC region.
 
-> **Sumber database:** query atas `tPenjualanFaktur` dengan join `mPelanggan`, `mPegawai`. Field `txtGudang` / `txtWarehouseCode` adalah **snapshot stokis** (`mStokis.txtNama` / `mStokis.txtOutletId`), bukan gudang terpisah.
-> **Prototipe saat ini:** field denormalized di `fprs_faktur_v5` / `faktur.json` (belum persist ke MAVEN). `salesNama` memakai nama `mPegawai`; `gudang` memakai nama `mStokis`.
+> **Sumber database:** query atas `tPenjualanFaktur` dengan join `mPelanggan`, `mPegawai`. Snapshot stokis (`txtGudang` / `txtWarehouseCode`) dan `dtJatuhTempo` tetap ada di DB / seed; **tidak ditampilkan** pada UI Web Admin Faktur (list, detail, print) sejak v1.9.
+> **Prototipe saat ini:** field denormalized di `fprs_faktur_v7` / `faktur.json` (belum persist ke MAVEN). `salesNama` memakai nama `mPegawai`.
 
 | # | Nama kolom (rencana) | Keterangan | Tabel sumber | Kolom database |
 |---|----------------------|------------|--------------|----------------|
@@ -224,19 +224,18 @@ Target database: Excel `.xlsx`, **1 baris = 1 faktur** (header-level), mengikuti
 | 3 | Kode Pelanggan | Kode outlet | `mPelanggan` / snapshot | `txtKode` (FK `tPenjualanFaktur.intPelangganID`) atau `txtPelangganKode` |
 | 4 | Nama Pelanggan | Nama outlet | `mPelanggan` / snapshot | `txtNama` atau `txtPelangganNama` |
 | 5 | Sales | Nama / kode sales / motoris | `mPegawai` / snapshot | `txtNama` / `txtKode` (FK `intPegawaiID`) atau `txtSalesNama` / `txtSalesKode` |
-| 6 | Jatuh Tempo | Tanggal jatuh tempo | `tPenjualanFaktur` | `dtJatuhTempo` |
-| 7 | Jumlah Tagihan | Total tagihan | `tPenjualanFaktur` | `decJumlahTagihan` |
-| 8 | Belum Dibayar | Sisa piutang | `tPenjualanFaktur` | `decBelumDibayar` |
-| 9 | Status | Paid / Unpaid / Draft / dll. | `tPenjualanFaktur` | `txtStatus` |
+| 6 | Jumlah Tagihan | Total tagihan | `tPenjualanFaktur` | `decJumlahTagihan` |
+| 7 | Belum Dibayar | Sisa piutang | `tPenjualanFaktur` | `decBelumDibayar` |
+| 8 | Status | Paid / Unpaid / Draft / dll. | `tPenjualanFaktur` | `txtStatus` |
 
-Kolom opsional (belum di sheet v1, tersedia di DB): `tPenjualanFaktur.txtGudang` (nama stokis), `tPenjualanFaktur.txtTipe`, `tPenjualanFaktur.txtJangkaWaktuPembayaran`, `tPenjualanFaktur.txtCatatan`.
+Kolom opsional (tidak di sheet / UI Web Admin Faktur v1.9; tersedia di DB): `tPenjualanFaktur.dtJatuhTempo`, `tPenjualanFaktur.txtGudang` (nama stokis), `tPenjualanFaktur.txtTipe`, `tPenjualanFaktur.txtJangkaWaktuPembayaran`, `tPenjualanFaktur.txtCatatan`.
 
 
 ### 3.2 Stok Motoris
 
 Modul **Stok Motoris** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/StokMotoris/index.html`; database: `/Dashboard/MotorisStock`.
 
-Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur_v5`. Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** memuat ulang data master dan meregenerasi dashboard.
+Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur_v7`. Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** memuat ulang data master dan meregenerasi dashboard.
 
 **Asumsi dummy prototipe (v1.8):** **300 motoris**; **minimal 900 kunjungan per hari** secara nasional (300 × 3 kunjungan/motoris/hari). Filter tanggal default **1 Jan – 31 Des 2026** — kartu Kunjungan ≈ `900 × jumlah hari` pada rentang itu. Data faktur, kunjungan, penjualan, dan kulakan **tersebar sepanjang tahun 2026**. Wilayah memakai **nama kota** (Jakarta, Depok, Bekasi, …) tanpa angka. Satu motoris beroperasi di kota stokis yang sama. History penjualan menampilkan **10 toko berbeda**.
 
@@ -380,7 +379,7 @@ Baris mengikuti filter dashboard + motoris terfilter (scope region RBAC berlaku 
 
 > **Sumber database:** join `tPenjualanFaktur` + `tPenjualanFakturItem` + master (`mPelanggan`, `mPegawai`) untuk sheet **SalesInvoices** (kode/nama produk & pajak adalah snapshot di item);
 > sheet **DailyVisits** dari `tKunjunganHarian` + `mPegawai` + `mPelanggan`.
-> **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur_v5`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
+> **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur_v7`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
 
 ##### Sheet `SalesInvoices` (29 kolom — 1 baris per item faktur)
 
@@ -519,7 +518,7 @@ Monitoring penjualan Web Admin **tidak** memakai antrian approval. Kontrol = RBA
 
 | Key / file | Penggunaan |
 |------------|------------|
-| `fprs_faktur_v5` | List/detail/print Faktur; input sheet SalesInvoices |
+| `fprs_faktur_v7` | List/detail/print Faktur; input sheet SalesInvoices |
 | `md_stok_motoris` | Snapshot dashboard Stok Motoris + visitHistory |
 | `wwwroot/data/faktur.json` | Seed faktur |
 | `pegawai.json`, `produk.json`, `stokis.json`, `pelanggan.json` | Master untuk generate dashboard (nama asli motoris) |
@@ -773,10 +772,10 @@ erDiagram
 |--------------------------------|----------|
 | `id` (mis. `SI-2612086120`) | `tPenjualanFaktur.txtNomorFaktur` (+ `intFakturID` PK) |
 | `tanggalFaktur` | `tPenjualanFaktur.dtTanggalFaktur` |
-| `tanggalJatuhTempo` | `tPenjualanFaktur.dtJatuhTempo` |
+| `tanggalJatuhTempo` | `tPenjualanFaktur.dtJatuhTempo` (kolom DB; **tidak ditampilkan** di UI Web Admin Faktur v1.9) |
 | `pelangganKode` / `pelangganNama` | FK `intPelangganID` + snapshot `txtPelangganKode` / `txtPelangganNama` |
 | `salesNama` | FK `intPegawaiID` + snapshot `txtSalesNama` / `txtSalesKode` (nama pegawai, bukan kode kota) |
-| `gudang` (label UI **Stokis**) | snapshot `txtGudang` = `mStokis.txtNama`; `txtWarehouseCode` = `mStokis.txtOutletId` (bukan FK) |
+| `gudang` | snapshot `txtGudang` = `mStokis.txtNama`; `txtWarehouseCode` = `mStokis.txtOutletId` (bukan FK; **tidak ditampilkan** di detail/print Web Admin v1.9) |
 | `status` (Paid/Unpaid/Draft/…) | `tPenjualanFaktur.txtStatus` |
 | `tipe` (Canvass) | `tPenjualanFaktur.txtTipe` |
 | `jumlahTagihan` / `belumDibayar` | `decJumlahTagihan` / `decBelumDibayar` |
