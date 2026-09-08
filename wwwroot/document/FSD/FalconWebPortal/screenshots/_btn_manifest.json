@@ -344,7 +344,7 @@
   ],
   "penjualan-stok-motoris": [
     {
-      "file": "ss_btn_penjualan-stok-motoris_export-excel.png",
+      "file": "",
       "label": "Export Excel",
       "id": "exportToExcel()",
       "style": "btn-outline-secondary",
@@ -352,7 +352,7 @@
       "narrative": "Menjalankan aksi terkait tombol Export Excel."
     },
     {
-      "file": "ss_btn_penjualan-stok-motoris_refresh.png",
+      "file": "",
       "label": "Refresh",
       "id": "refreshDashboard()",
       "style": "btn-success",

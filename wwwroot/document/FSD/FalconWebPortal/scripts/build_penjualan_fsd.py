@@ -41,9 +41,9 @@ def build() -> str:
                 'brd_no': '2026.SHP-FSD.0102',
                 'pid_no': '2026.SHP-PID.0101',
                 'prepared_by': 'Tim IT – Man Power GT',
-                'date': '26/08/2026',
-                'revision_date': '26 Agustus 2026',
-                'revision_desc': 'v1.9 – Faktur UI: hapus Jatuh Tempo & Stokis (detail/list/print)',
+                'date': '08/09/2026',
+                'revision_date': '8 September 2026',
+                'revision_desc': 'v1.10 – Stok Motoris: filter Role (Motoris | SPG GT)',
             },
             plantuml_handlers=[
                 PlantumlHandler(

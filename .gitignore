@@ -1,2 +1,6 @@
 node_modules
 .env
+Testing/Web/automation/motoris-stock/.auth/
+Testing/Web/automation/motoris-stock/screenshots/
+Testing/Web/automation/motoris-stock/results.json
+Testing/Web/reports/*.docx

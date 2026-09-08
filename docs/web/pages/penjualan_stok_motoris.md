@@ -10,9 +10,10 @@ Monitoring stok barang di motoris / canvasser (read-only dashboard).
 **Penjualan** → Stok Motoris
 
 ## Fungsi
+- Filter: Region → Area → **Role** (Motoris | SPG GT) → Motoris/SPG → Umbrand → tanggal
 - 5 KPI + visualisasi alur stok
 - 4 chart (region bar + drill-down, top 10 sell-through, tren harian, kontribusi umbrand)
-- Tabel saldo per motoris + audit trail mutasi
+- Tabel saldo per motoris/SPG + audit trail mutasi
 - Modal detail motoris (mini chart, kulakan, Leaflet map, history)
 - Modal audit inbound/outbound (stepper, mock GPS, ledger, nota, cetak)
 - Export Excel 2 sheet (SalesInvoices + DailyVisits)

@@ -1,15 +1,15 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Penjualan (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.9
+### Versi Dokumen: 1.11
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Penjualan — Web Admin Man Power GT |
-| **Versi** | 1.9 |
-| **Tanggal** | 26 Agustus 2026 |
+| **Versi** | 1.11 |
+| **Tanggal** | 8 September 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
 | **Dibuat oleh** | Tim IT – Man Power GT |
@@ -29,7 +29,9 @@
 | 1.6 | 14 Agustus 2026 | Tim IT | Prototipe: gudang = nama stokis; sales = nama pegawai; history penjualan 1 kota/kecamatan; ERD kolom lengkap sesuai DDL |
 | 1.7 | 14 Agustus 2026 | Tim IT | Screenshot ulang Faktur + Stok Motoris; dummy 300 motoris × 30 kunjungan/hari; faktur seluruhnya Paid; wilayah nama kota |
 | 1.8 | 14 Agustus 2026 | Tim IT | Dummy Stok Motoris: **900 kunjungan/hari** dari **300 motoris** (3/motoris/hari); data tetap tersebar sepanjang 2026 |
-| **1.9** | **26 Agustus 2026** | **Tim IT** | Web Admin Faktur: hapus **Jatuh Tempo** (list/detail/print) dan **Stokis** (detail); screenshot ulang |
+| 1.9 | 26 Agustus 2026 | Tim IT | Web Admin Faktur: hapus **Jatuh Tempo** (list/detail/print) dan **Stokis** (detail); screenshot ulang |
+| 1.10 | 8 September 2026 | Tim IT | Stok Motoris: tambah filter **Role** (`Motoris` \| `SPG GT`) di kiri Motoris/SPG; cascade ke daftar sales; screenshot filter ulang |
+| **1.11** | **8 September 2026** | **Tim IT** | Rapikan narasi paragraf (kurang teknis/padat): latar belakang, Faktur, Stok Motoris, filter & pop-up |
 
 ---
 
@@ -52,33 +54,30 @@
 **Man Power GT** (*Man Power General Trade*) adalah sistem internal PT Kalbe
 Nutritionals untuk mengelola tenaga lapangan General Trade (motoris / canvasser),
 administrasi data master terkait, monitoring penjualan lapangan, dan pelacakan
-kunjungan sales. Dokumen ini memfokuskan lingkup pada **modul Penjualan** Web Admin
-— monitoring faktur dari Mobile SFA dan dashboard stok motoris.
+kunjungan sales.
 
-Prototipe Web Portal berupa *high-fidelity interactive prototype* berbasis HTML
-statis (MPA) bertema Vuexy/Bootstrap yang menggunakan **localStorage** dan file
-JSON seed di `wwwroot/data/` sebagai lapisan persistensi sisi klien. Implementasi
-database berada di **MAVEN** (ASP.NET Core + PostgreSQL) dengan route
-`/Transaction/SalesOrder` dan `/Dashboard/MotorisStock`.
+Dokumen ini memfokuskan lingkup pada **modul Penjualan** di Web Admin: memantau
+faktur yang dihasilkan dari Mobile SFA, serta memantau stok dan aktivitas motoris
+di lapangan.
 
 ### 1.2 Tujuan Dokumen
 
 1. Mendeskripsikan fungsionalitas **per halaman dan per komponen UI** modul Penjualan.
-2. Menjadi acuan pengembangan backend/API dan UAT untuk monitoring penjualan Man Power GT.
+2. Menjadi acuan pengembangan dan UAT untuk monitoring penjualan Man Power GT.
 3. Mendokumentasikan business rules, pola akses (RBAC + scope region), dan **spesifikasi kolom report Excel**.
-4. Menyelaraskan format dokumentasi dengan standar **FSD Generator Engine** (Kalbe Nutritionals).
-5. Mendokumentasikan **strategi skalabilitas & tuning dashboard Stok Motoris (Fase A)** termasuk seed data UAT dan index SQL.
+4. Menyelaraskan format dokumentasi dengan standar FSD Kalbe Nutritionals.
+5. Mendokumentasikan **strategi skalabilitas & tuning dashboard Stok Motoris (Fase A)**.
 
 ### 1.3 Ruang Lingkup
 
 | Dalam lingkup | Di luar lingkup |
 |---------------|-----------------|
-| Faktur Penjualan (list, detail, print) | Modul Canvassing (belum ada UI aktif) |
-| Monitoring Stok Motoris (dashboard + export Excel) | Create/Edit/Hapus faktur di Web Admin |
-| Persistensi prototipe (`fprs_faktur_v7`, `md_stok_motoris`) + seed MAVEN | Mobile SFA (sumber order — disebut sebagai integrasi) |
+| Faktur Penjualan (list, detail form, cetak) | Modul Canvassing (belum ada UI aktif) |
+| Monitoring Stok Motoris (dashboard + export Excel) | Tambah / edit / hapus faktur di Web Admin |
+| Data faktur & stok motoris di database | Mobile SFA sebagai sumber order (disebut sebagai integrasi) |
 | RBAC Super Admin / Sales Manager / RSM | Approval multi-level transaksi |
 | Spesifikasi kolom report Excel/CSV | Modul Master Data & Kunjungan (dokumen terpisah) |
-| Tuning Fase A (agregasi SQL, index, seed 6 bulan) | Tuning Fase B (tabel agregat harian / partition — roadmap) |
+| Tuning Fase A (agregasi, index, data UAT 6 bulan) | Tuning Fase B (agregat harian / partition — roadmap) |
 
 ### 1.4 Stakeholder
 
@@ -158,19 +157,18 @@ Bab ini mendeskripsikan modul **Faktur** dan **Stok Motoris**: dashboard list / 
 
 ### 3.1 Faktur
 
-Modul **Faktur** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/Faktur/index.html`; database: `/Transaction/SalesOrder`.
+Modul **Faktur** pada Web Admin **Man Power GT** digunakan untuk memantau dan mencetak faktur penjualan yang berasal dari aktivitas Mobile SFA.
 
-Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) dan DataTable `#tblFaktur` dengan filter tanggal, pelanggan, sales, dan status. **Semua faktur dummy berstatus Paid** (`belumDibayar = 0`); tidak ada Unpaid/Draft. Data faktur bersumber dari aktivitas **Mobile SFA** (`localStorage` key `fprs_faktur_v7`, seed `faktur.json`). Web Admin bersifat **view-only**: aksi baris adalah **lihat detail** dan **cetak**; tidak ada Tambah/Edit/Hapus di web. Halaman `detail.html` menampilkan header pelanggan, item line, ringkasan pembayaran (Tanggal Faktur, Sales, Jangka Waktu Bayar, Kode Transaksi), dan tombol Cetak menuju `print.html`. **Tidak ada** field **Stokis** / **Jatuh Tempo** pada UI Web Admin Faktur (list, detail, print). Filter Sales menampilkan **nama pegawai** (`mPegawai.txtNama`).
+Pada dashboard list, pengguna melihat ringkasan KPI (**Total**, **Paid**, **Total Tagihan**) beserta daftar faktur. Filter tersedia untuk tanggal, pelanggan, sales, dan status. Seluruh faktur yang ditampilkan berstatus **Paid**; tidak ada Unpaid atau Draft.
+
+Web Admin bersifat view-only: aksi pada baris adalah **lihat detail** dan **cetak**. Tidak ada tambah, edit, ataupun hapus pada web.
+
+Halaman detail form menampilkan data pelanggan, item line, dan ringkasan pembayaran (**Tanggal Faktur**, **Sales**, **Jangka Waktu Bayar**, **Kode Transaksi**), serta tombol **Cetak** menuju halaman cetak. Field **Stokis** dan **Jatuh Tempo** tidak ditampilkan pada list, detail form, maupun cetak. Filter Sales menampilkan nama pegawai.
 
 | Aspek | Keterangan |
 |-------|------------|
-| **Tujuan Form** | Memantau dan mencetak faktur penjualan yang dihasilkan dari order Mobile SFA. Web Admin bersifat view-only (list, detail, print); tidak membuat/mengubah faktur di portal. |
-| **Pengguna** | Super Admin, Sales Manager, RSM (lihat sesuai cakupan region); Finance (monitoring). |
-
-
-> **Integrasi API (rencana):** `/api/v1/Invoice`
-
-> **localStorage key:** `fprs_faktur_v7`
+| **Tujuan Form** | Memantau dan mencetak faktur penjualan dari order Mobile SFA. View-only (list, detail form, cetak); tidak membuat atau mengubah faktur di portal. |
+| **Pengguna** | Super Admin, Sales Manager, RSM (sesuai cakupan region); Finance (monitoring). |
 
 ![Penjualan — Faktur — Dashboard List](screenshots/ss_38_faktur_index.png)
 
@@ -193,9 +191,9 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) da
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
 | ![](screenshots/ss_btn_penjualan-faktur_ekspor.png) | Ekspor | `#btnEkspor` | btn-outline-secondary | Mengekspor daftar faktur (prototipe: mock Swal; database: Excel header-level mengikuti filter). |
-| ![](screenshots/ss_btn_penjualan-faktur_lihat-detail.png) | Lihat Detail | `a.btn-action-view` → `detail.html?id=…` | btn-action (ikon mata) | Membuka halaman detail faktur terpilih. |
-| ![](screenshots/ss_btn_penjualan-faktur_cetak-faktur.png) | Cetak Faktur (list) | `cetakFaktur(id)` | btn-action (ikon printer) | Mencetak faktur dari baris DataTable. |
-| ![](screenshots/ss_btn_penjualan-faktur_cetak-detail.png) | Cetak Faktur (detail) | `#btnCetak` | btn-cetak-faktur | Mencetak faktur dari halaman detail (`print.html`). |
+| ![](screenshots/ss_btn_penjualan-faktur_lihat-detail.png) | Lihat Detail | `a.btn-action-view` | btn-action (ikon mata) | Membuka halaman detail form faktur terpilih. |
+| ![](screenshots/ss_btn_penjualan-faktur_cetak-faktur.png) | Cetak Faktur (list) | `cetakFaktur(id)` | btn-action (ikon printer) | Mencetak faktur dari baris daftar. |
+| ![](screenshots/ss_btn_penjualan-faktur_cetak-detail.png) | Cetak Faktur (detail) | `#btnCetak` | btn-cetak-faktur | Mencetak faktur dari halaman detail form. |
 | ![](screenshots/ss_btn_penjualan-faktur_reset.png) | Reset | `#btnResetFilter` | btn-reset-filter | Mengembalikan seluruh filter list faktur ke kondisi awal. |
 
 ![Penjualan — Faktur — Halaman Detail](screenshots/ss_39_faktur_detail.png)
@@ -205,17 +203,15 @@ Halaman dashboard list menampilkan **KPI cards** (Total, Paid, Total Tagihan) da
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
-| **Read** | dashboard list + `detail.html` + `print.html` | Super Admin, Sales Manager, RSM | View-only; cakupan region sesuai RBAC |
-| **Export** | Tombol Ekspor (rencana Excel) | Super Admin, Sales Manager, RSM | Prototipe: mock Swal; database: file Excel header-level |
+| **Read** | Dashboard list + detail form + halaman cetak | Super Admin, Sales Manager, RSM | View-only; cakupan region sesuai RBAC |
+| **Export** | Tombol Ekspor (rencana Excel) | Super Admin, Sales Manager, RSM | File Excel tingkat header, mengikuti filter list |
 
 
 #### Report / Ekspor Faktur
 
-Tombol **Ekspor** pada dashboard list. Di prototipe masih **mock** (konfirmasi Swal tanpa file).
-Target database: Excel `.xlsx`, **1 baris = 1 faktur** (header-level), mengikuti filter list + scope RBAC region.
+Tombol **Ekspor** pada dashboard list menghasilkan Excel (satu baris per faktur), mengikuti filter daftar dan cakupan region pengguna.
 
-> **Sumber database:** query atas `tPenjualanFaktur` dengan join `mPelanggan`, `mPegawai`. Snapshot stokis (`txtGudang` / `txtWarehouseCode`) dan `dtJatuhTempo` tetap ada di DB / seed; **tidak ditampilkan** pada UI Web Admin Faktur (list, detail, print) sejak v1.9.
-> **Prototipe saat ini:** field denormalized di `fprs_faktur_v7` / `faktur.json` (belum persist ke MAVEN). `salesNama` memakai nama `mPegawai`.
+Field stokis dan jatuh tempo tetap dapat ada di database sebagai data pendukung, tetapi **tidak ditampilkan** pada UI Web Admin Faktur (list, detail form, cetak) sejak v1.9.
 
 | # | Nama kolom (rencana) | Keterangan | Tabel sumber | Kolom database |
 |---|----------------------|------------|--------------|----------------|
@@ -233,50 +229,49 @@ Kolom opsional (tidak di sheet / UI Web Admin Faktur v1.9; tersedia di DB): `tPe
 
 ### 3.2 Stok Motoris
 
-Modul **Stok Motoris** merupakan bagian dari Web Portal **Man Power GT**. Tipe UI: **page**. Sumber prototipe: `Views/FPRS/Penjualan/StokMotoris/index.html`; database: `/Dashboard/MotorisStock`.
+Modul **Stok Motoris** pada Web Admin **Man Power GT** digunakan untuk memantau stok yang dibawa motoris / SPG di lapangan beserta aktivitas terkait (kunjungan, kulakan, dan penjualan).
 
-Halaman **Monitoring Stok Motoris** adalah dashboard agregat (bukan CRUD): KPI cards, flow stok, Chart.js, peta Leaflet, grid saldo, dan audit trail. Snapshot disimpan di `md_stok_motoris` dan dibangun dari master (`md_pegawai`, `md_produk`, `md_stokis`, `md_pelanggan`) plus faktur `fprs_faktur_v7`. Tombol **Export Excel** menghasilkan file dua sheet (`SalesInvoices`, `DailyVisits`); **Refresh** memuat ulang data master dan meregenerasi dashboard.
+Halaman monitoring menampilkan ringkasan KPI, alur stok, grafik, peta sebaran, grid saldo, dan audit trail. Halaman ini bersifat read-only (bukan CRUD). Pengguna dapat **Export Excel** (dua sheet: SalesInvoices dan DailyVisits) serta **Refresh** untuk memuat ulang data dashboard.
 
-**Asumsi dummy prototipe (v1.8):** **300 motoris**; **minimal 900 kunjungan per hari** secara nasional (300 × 3 kunjungan/motoris/hari). Filter tanggal default **1 Jan – 31 Des 2026** — kartu Kunjungan ≈ `900 × jumlah hari` pada rentang itu. Data faktur, kunjungan, penjualan, dan kulakan **tersebar sepanjang tahun 2026**. Wilayah memakai **nama kota** (Jakarta, Depok, Bekasi, …) tanpa angka. Satu motoris beroperasi di kota stokis yang sama. History penjualan menampilkan **10 toko berbeda**.
+**Asumsi data contoh (v1.8):** sekitar **300 motoris** dengan **minimal 900 kunjungan per hari** secara nasional (rata-rata 3 kunjungan per motoris per hari). Rentang tanggal contoh memakai **1 Jan – 31 Des 2026**; data faktur, kunjungan, penjualan, dan kulakan tersebar sepanjang tahun tersebut. Wilayah memakai nama kota (Jakarta, Depok, Bekasi, dan seterusnya). Satu motoris beroperasi di kota stokis yang sama. History penjualan menampilkan **10 toko berbeda**.
 
 | Aspek | Keterangan |
 |-------|------------|
-| **Tujuan Form** | Memantau stok & aktivitas motoris (KPI, saldo, kunjungan, audit) serta mengekspor report Excel SalesInvoices / DailyVisits untuk analisis operasional. |
-| **Pengguna** | Super Admin, Sales Manager, RSM (lihat sesuai cakupan region); Admin Operations. |
-
-
-> **localStorage key:** `md_stok_motoris`
+| **Tujuan Form** | Memantau stok & aktivitas motoris (KPI, saldo, kunjungan, audit) serta mengekspor report Excel untuk analisis operasional. |
+| **Pengguna** | Super Admin, Sales Manager, RSM (sesuai cakupan region); Admin Operations. |
 
 ![Penjualan — Stok Motoris — Dashboard List](screenshots/ss_40_stok_motoris_index.png)
 
 
 #### 3.2.1 Filter Dashboard
 
-Panel filter di atas KPI/chart membatasi seluruh komponen dashboard (KPI, chart, grid saldo, audit trail, export). Perubahan nilai filter langsung memuat ulang data (tanpa tombol "Terapkan" terpisah).
+Panel filter di atas ringkasan dashboard membatasi seluruh tampilan: KPI, grafik, grid saldo, audit trail, dan export. Perubahan filter langsung memperbarui data (tanpa tombol Terapkan terpisah).
 
 ![Stok Motoris — Panel Filter & Chip Aktif](screenshots/ss_sm_filter.png)
 
-**Narasi UI:** Baris atas berisi dropdown **Region**, **Area**, **Motoris**, **Umbrand**, serta rentang tanggal **Dari / S/D**. Setelah user memilih nilai (contoh: Region 1 + Umbrand BENECOL), baris kedua menampilkan **Filter Aktif** sebagai chip yang bisa dihapus satu per satu, plus tombol **Reset Semua** untuk mengembalikan seluruh filter ke default.
+**Narasi UI:** Baris filter berisi **Region**, **Area**, **Role**, **Motoris / SPG**, **Umbrand**, serta rentang tanggal **Dari / S/D** (dalam urutan tersebut). Setelah nilai dipilih — misalnya Region Bandung, Role Motoris, dan Umbrand BENECOL — baris **Filter Aktif** menampilkan chip yang dapat dihapus satu per satu, disertai tombol **Reset Semua**.
 
 | Filter | Control ID | Default | Business Rule |
 |--------|------------|---------|---------------|
-| Region | `#filterRegion` | Kosong = Seluruh Indonesia (Nasional) | Cascading: mengubah Region mengosongkan/memfilter opsi Area & Motoris yang relevan. Scope RBAC: RSM hanya melihat region sendiri. |
-| Area | `#filterArea` | Kosong = Semua Area | Cascading dari Region; mengubah Area memfilter daftar Motoris. |
-| Motoris | `#filterSales` | Kosong = Semua Motoris | Opsi diisi dari master pegawai role Motoris yang cocok dengan Region/Area aktif. |
-| Umbrand | `#filterBrand` | Kosong = Semua Umbrand | Memfilter KPI/chart/saldo berdasarkan umbrella brand produk. Juga bisa di-toggle dari chart kontribusi brand. |
-| Tanggal Mulai | `#filterDateStart` | **Hari ini − 29 hari** (30 hari kalender) | Wajib untuk query agregasi. Server menerapkan fallback 30 hari terakhir bila kosong. |
+| Region | `#filterRegion` | Kosong = Seluruh Indonesia (Nasional) | Cascading: mengubah Region memfilter opsi Area & daftar Motoris/SPG yang relevan. Scope RBAC: RSM hanya melihat region sendiri. |
+| Area | `#filterArea` | Kosong = Semua Area | Cascading dari Region; mengubah Area memfilter daftar Motoris/SPG. |
+| Role | `#filterRole` | Kosong = Semua Role | Opsi tetap: **Motoris**, **SPG GT**. Mengubah Role memfilter daftar Motoris/SPG sesuai role yang dipilih (dalam Region/Area aktif). |
+| Motoris / SPG | `#filterSales` | Kosong = Semua | Diisi dari daftar sales (Motoris + SPG GT) yang cocok dengan Region, Area, dan Role aktif. |
+| Umbrand | `#filterBrand` | Kosong = Semua Umbrand | Memfilter KPI, grafik, dan saldo berdasarkan umbrella brand. Dapat juga dipilih dari grafik kontribusi brand. |
+| Tanggal Mulai | `#filterDateStart` | **Hari ini − 29 hari** (30 hari kalender) | Wajib untuk agregasi. Sistem memakai 30 hari terakhir bila kosong. |
 | Tanggal Akhir | `#filterDateEnd` | **Hari ini** | Harus ≥ Tanggal Mulai. |
-| Reset Filter | `#btnResetFilter` / `resetAllFilters()` | — | Mengembalikan Region/Area/Motoris/Umbrand ke kosong dan tanggal ke default 30 hari terakhir, lalu reload. |
+| Reset Filter | Reset Semua | — | Mengembalikan Region, Area, Role, Motoris/SPG, dan Umbrand ke kosong, serta tanggal ke default 30 hari terakhir, lalu memuat ulang. |
 
-**Chip filter aktif:** sistem menampilkan chip ringkas untuk setiap filter non-kosong; klik ikon ✕ pada chip menghapus filter terkait saja.
+**Chip filter aktif:** setiap filter yang terisi tampil sebagai chip; klik ✕ menghapus filter terkait saja.
 
 **Aturan filter terkait export:**
 
 | Rule | Keterangan |
 |------|------------|
-| BR-SM-F01 | Export Excel memakai **parameter filter yang sama** dengan dashboard (Region, Area, Motoris, Umbrand, rentang tanggal). |
-| BR-SM-F02 | Rentang tanggal export maksimal **31 hari** kalender; lebih lebar → ditolak (HTTP 400 + pesan jelas). |
-| BR-SM-F03 | Filter berlaku ke seluruh KPI, chart, DataTable saldo, dan audit trail — tidak ada komponen yang bypass filter. |
+| BR-SM-F01 | Export Excel memakai **parameter filter yang sama** dengan dashboard (Region, Area, Role, Motoris/SPG, Umbrand, rentang tanggal). |
+| BR-SM-F02 | Rentang tanggal export maksimal **31 hari** kalender; lebih lebar ditolak dengan pesan yang jelas. |
+| BR-SM-F03 | Filter berlaku ke seluruh KPI, grafik, daftar saldo, dan audit trail. |
+| BR-SM-F04 | Filter **Role** membatasi daftar Motoris/SPG dan agregasi dashboard ke **Motoris** dan/atau **SPG GT** sesuai pilihan; kosong = kedua role. |
 
 
 #### 3.2.2 Kolom DataTable Dashboard List
@@ -473,7 +468,7 @@ Rule ID memakai prefix `BR-PJ`. Sumber: pesan validasi / SweetAlert di HTML.
 | BR-PR-PJ08 | Stok Motoris | Default filter tanggal dashboard = **30 hari terakhir**; server menerapkan fallback yang sama bila rentang kosong. |
 | BR-PR-PJ09 | Stok Motoris | Export Excel dibatasi maksimal **31 hari** kalender; rentang lebih lebar ditolak dengan pesan jelas. |
 | BR-PR-PJ10 | Stok Motoris | KPI/chart/balance memakai **agregasi SQL** (`SUM`/`COUNT`/`GROUP BY`); raw mutasi hanya untuk audit trail berpaginasi. |
-| BR-SM-F01–F03 | Stok Motoris | Aturan filter dashboard — lihat §3.2.1. |
+| BR-SM-F01–F04 | Stok Motoris | Aturan filter dashboard (termasuk Role) — lihat §3.2.1. |
 | BR-SM-P01–P08 | Stok Motoris | Aturan pop-up Detail Motoris & Audit — lihat §3.2.4. |
 
 ---

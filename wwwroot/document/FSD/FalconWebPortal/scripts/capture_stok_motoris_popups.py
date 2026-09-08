@@ -65,18 +65,28 @@ def capture(base_url: str) -> None:
             # Set sample filter agar chip aktif terlihat
             page.evaluate(
                 """() => {
-                    const region = document.getElementById('filterRegion');
-                    if (region && region.options.length > 1) {
-                        region.selectedIndex = 1;
-                        if (typeof onRegionChange === 'function') onRegionChange();
-                        else region.dispatchEvent(new Event('change'));
-                    }
+                    const pickFirst = (id) => {
+                        const el = document.getElementById(id);
+                        if (!el || el.options.length < 1) return;
+                        const val = el.options[0].value;
+                        if (window.jQuery) {
+                            window.jQuery('#' + id).val([val]).trigger('change');
+                        } else {
+                            el.value = val;
+                            el.dispatchEvent(new Event('change'));
+                        }
+                    };
+                    pickFirst('filterRegion');
+                    if (typeof onRegionChange === 'function') onRegionChange();
+                    pickFirst('filterRole');
+                    if (typeof onRoleChange === 'function') onRoleChange();
                     const brand = document.getElementById('filterBrand');
-                    if (brand && brand.options.length > 1) {
-                        brand.selectedIndex = 1;
-                        if (typeof applyAllFilters === 'function') applyAllFilters();
-                        else brand.dispatchEvent(new Event('change'));
+                    if (brand && brand.options.length > 0) {
+                        const bval = brand.options[0].value;
+                        if (window.jQuery) window.jQuery('#filterBrand').val([bval]).trigger('change');
+                        else { brand.value = bval; brand.dispatchEvent(new Event('change')); }
                     }
+                    if (typeof applyAllFilters === 'function') applyAllFilters();
                 }"""
             )
             time.sleep(1.2)

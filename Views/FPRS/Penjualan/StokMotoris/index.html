@@ -434,6 +434,7 @@
         <div class="filter-bar">
             <select id="filterRegion" multiple></select>
             <select id="filterArea" multiple></select>
+            <select id="filterRole" multiple></select>
             <select id="filterSales" multiple></select>
             <select id="filterBrand" multiple></select>
             <div class="filter-date-wrap">
@@ -948,17 +949,23 @@
         return pickSeasonalDate(rnd);
     }
 
+    function normalizeSalesRole(role) {
+        const r = String(role || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        if (r === 'motoris') return 'Motoris';
+        if (r === 'spg gt' || r === 'spggt') return 'SPG GT';
+        return '';
+    }
+
     function buildMotorisRoster() {
-        const base = masterData.pegawai.filter(p =>
-            String(p.role || '').toLowerCase() === 'motoris'
-        );
-        if (!base.length) return [];
+        const motorisBase = masterData.pegawai.filter(p => normalizeSalesRole(p.role) === 'Motoris');
+        const spgBase = masterData.pegawai.filter(p => normalizeSalesRole(p.role) === 'SPG GT');
+        if (!motorisBase.length && !spgBase.length) return [];
         const first = ['ANDI','BAYU','CAHYO','DONI','EKO','FARHAN','GILANG','HENDRA','IRFAN','JOKO','KURNIA','LUKMAN','MUHAMMAD','NUGROHO','OKTA','PUTRA','RAFI','SATRIA','TONO','WAHYU','YUDI','ZAKI','ARIF','BAGUS','DIMAS'];
         const last = ['PRATAMA','SAPUTRA','WIBOWO','SANTOSO','HIDAYAT','NUGRAHA','FIRMANSYAH','MAULANA','RAMADHAN','SETIAWAN','KURNIAWAN','GUNAWAN','PRASOJO','ANGGARA','SYAHPUTRA','HAKIM','FADILLAH','PURNAMA','LESAMANA','WIJAYA'];
         const roster = [];
         for (let i = 0; i < TARGET_MOTORIS; i++) {
-            if (i < base.length) {
-                roster.push({ ...base[i] });
+            if (i < motorisBase.length) {
+                roster.push({ ...motorisBase[i], role: 'Motoris' });
                 continue;
             }
             const rnd = seededRandom(81000 + i);
@@ -972,6 +979,13 @@
                 status: 'Active'
             });
         }
+        spgBase.forEach((p, i) => {
+            roster.push({
+                ...p,
+                role: 'SPG GT',
+                kode: p.kode || ('SPG' + String(1000 + i))
+            });
+        });
         return roster;
     }
 
@@ -1166,6 +1180,7 @@
                 id: peg.id,
                 name: peg.nama,
                 code: peg.kode,
+                role: normalizeSalesRole(peg.role) || 'Motoris',
                 region,
                 area,
                 products: selectedProds,
@@ -1252,7 +1267,8 @@
         const configs = [
             { id: '#filterRegion', placeholder: 'Provinsi (Wilayah)' },
             { id: '#filterArea', placeholder: 'Kota (Area)' },
-            { id: '#filterSales', placeholder: 'Motoris' },
+            { id: '#filterRole', placeholder: 'Role' },
+            { id: '#filterSales', placeholder: 'Motoris / SPG' },
             { id: '#filterBrand', placeholder: 'Umbrand' }
         ];
         configs.forEach(cfg => {
@@ -1265,6 +1281,9 @@
         });
         $('#filterArea').off('change.smFilter').on('change.smFilter', () => {
             if (!suppressFilterChange) onAreaChange();
+        });
+        $('#filterRole').off('change.smFilter').on('change.smFilter', () => {
+            if (!suppressFilterChange) onRoleChange();
         });
         $('#filterSales, #filterBrand').off('change.smFilter').on('change.smFilter', () => {
             if (!suppressFilterChange) applyAllFilters();
@@ -1282,15 +1301,25 @@
     function populateSalesOptions() {
         const regions = getSelectedValues('filterRegion');
         const areas = getSelectedValues('filterArea');
+        const roles = getSelectedValues('filterRole');
         let source = motorisData;
         if (regions.length) source = source.filter(m => regions.includes(m.region));
         if (areas.length) source = source.filter(m => areas.includes(m.area));
+        if (roles.length) source = source.filter(m => roles.includes(m.role));
         replaceSelectOptions('filterSales', source.map(m => ({ value: m.code, label: m.name })));
+    }
+
+    function populateRoleOptions() {
+        replaceSelectOptions('filterRole', [
+            { value: 'Motoris', label: 'Motoris' },
+            { value: 'SPG GT', label: 'SPG GT' }
+        ]);
     }
 
     function populateMasterFilters() {
         replaceSelectOptions('filterRegion', masterRegions.map(r => ({ value: r, label: r })));
         replaceSelectOptions('filterBrand', masterUmbrellas.map(u => ({ value: u, label: u })));
+        populateRoleOptions();
         populateAreaOptions();
         populateSalesOptions();
     }
@@ -1543,6 +1572,7 @@
         const applyBrandFilter = options.applyBrandFilter !== false;
         const regions = getSelectedValues('filterRegion');
         const areas = getSelectedValues('filterArea');
+        const roles = getSelectedValues('filterRole');
         const sales = getSelectedValues('filterSales');
         const umbrellas = getSelectedValues('filterBrand');
         const dateStart = document.getElementById('filterDateStart').value;
@@ -1551,6 +1581,7 @@
         let data = motorisData;
         if (regions.length) data = data.filter(m => regions.includes(m.region));
         if (areas.length) data = data.filter(m => areas.includes(m.area));
+        if (roles.length) data = data.filter(m => roles.includes(m.role));
         if (sales.length) data = data.filter(m => sales.includes(m.code));
         if (umbrellas.length && applyBrandFilter) {
             data = data.filter(m => m.products.some(p => umbrellas.includes(p.umbrella)));
@@ -1624,6 +1655,11 @@
         applyAllFilters();
     }
 
+    function onRoleChange() {
+        populateSalesOptions();
+        applyAllFilters();
+    }
+
     function applyAllFilters() {
         updateFilterChips();
         updateSummaryCards();
@@ -1645,6 +1681,7 @@
         };
         addChips('filterRegion', 'fa-globe');
         addChips('filterArea', 'fa-map-marker-alt');
+        addChips('filterRole', 'fa-id-badge');
         addChips('filterSales', 'fa-user');
         addChips('filterBrand', 'fa-tag', 'Umbrand: ');
 
@@ -1663,12 +1700,13 @@
         suppressFilterChange = false;
         if (field === 'filterRegion') onRegionChange();
         else if (field === 'filterArea') onAreaChange();
+        else if (field === 'filterRole') onRoleChange();
         else applyAllFilters();
     }
 
     function resetAllFilters() {
         suppressFilterChange = true;
-        $('#filterRegion, #filterArea, #filterSales, #filterBrand').val(null).trigger('change');
+        $('#filterRegion, #filterArea, #filterRole, #filterSales, #filterBrand').val(null).trigger('change');
         suppressFilterChange = false;
         populateAreaOptions();
         populateSalesOptions();

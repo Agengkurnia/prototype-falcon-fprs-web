@@ -10,6 +10,8 @@ Modul **Stok Motoris** merupakan bagian dari Web Portal Falcon FPRS. Tipe UI: **
 
 > **localStorage key:** `md_stok_motoris`
 
+**Filter dashboard (urutan):** Region → Area → **Role** (`Motoris` \| `SPG GT`, `#filterRole`) → Motoris/SPG (`#filterSales`) → Umbrand → Dari/S/D. Role mem-cascade daftar sales. Detail & BR: FSD Penjualan §3.2.1.
+
 **Tampilan Penjualan — Stok Motoris:**
 
 ![Penjualan — Stok Motoris](screenshots/ss_40_stok_motoris_index.png)

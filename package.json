@@ -6,7 +6,10 @@
     "fsd:check": "node scripts/fsd-check.js",
     "fsd:clear-ratelimit": "node scripts/fsd-clear-ratelimit.js",
     "fsd:worker": "node scripts/fsd-worker-start.js",
-    "fsd:dev": "node scripts/fsd-dev.js"
+    "fsd:dev": "node scripts/fsd-dev.js",
+    "test:motoris-stock": "node Testing/Web/automation/motoris-stock/motoris-stock.test.js",
+    "report:motoris-stock": "node Testing/Web/automation/motoris-stock/generate-report.js",
+    "test:motoris-stock:report": "node Testing/Web/automation/motoris-stock/run-all.js"
   },
   "devDependencies": {
     "exceljs": "^4.4.0"
