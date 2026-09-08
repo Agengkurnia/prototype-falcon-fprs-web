@@ -1,14 +1,14 @@
 # FUNCTIONAL SPECIFICATION DOCUMENT (FSD)
 ## Modul: Man Power GT — Penjualan (Web Admin)
 ### Sistem: Man Power GT
-### Versi Dokumen: 1.11
+### Versi Dokumen: 1.12
 
 ---
 
 | Atribut | Keterangan |
 |---------|------------|
 | **Nama Dokumen** | FSD Modul Penjualan — Web Admin Man Power GT |
-| **Versi** | 1.11 |
+| **Versi** | 1.12 |
 | **Tanggal** | 8 September 2026 |
 | **Divisi** | IT / Business – Man Power GT |
 | **Status** | Draft |
@@ -31,7 +31,8 @@
 | 1.8 | 14 Agustus 2026 | Tim IT | Dummy Stok Motoris: **900 kunjungan/hari** dari **300 motoris** (3/motoris/hari); data tetap tersebar sepanjang 2026 |
 | 1.9 | 26 Agustus 2026 | Tim IT | Web Admin Faktur: hapus **Jatuh Tempo** (list/detail/print) dan **Stokis** (detail); screenshot ulang |
 | 1.10 | 8 September 2026 | Tim IT | Stok Motoris: tambah filter **Role** (`Motoris` \| `SPG GT`) di kiri Motoris/SPG; cascade ke daftar sales; screenshot filter ulang |
-| **1.11** | **8 September 2026** | **Tim IT** | Rapikan narasi paragraf (kurang teknis/padat): latar belakang, Faktur, Stok Motoris, filter & pop-up |
+| 1.11 | 8 September 2026 | Tim IT | Rapikan narasi paragraf (kurang teknis/padat): latar belakang, Faktur, Stok Motoris, filter & pop-up |
+| **1.12** | **8 September 2026** | **Tim IT** | Tambah **§1.5 Glosarium** untuk istilah teknis / domain agar mudah dipahami |
 
 ---
 
@@ -89,6 +90,46 @@ di lapangan.
 | Finance | Finance | Monitoring faktur / tagihan (read) |
 | Developer | IT | Implementasi API & UI database (MAVEN) |
 
+### 1.5 Glosarium
+
+Istilah yang sering muncul di dokumen ini, dijelaskan singkat untuk pembaca non-teknis.
+
+| Istilah | Arti sederhana |
+|---------|----------------|
+| **Area** | Wilayah kerja lebih kecil di dalam Region (biasanya setingkat kota). |
+| **Audit trail** | Catatan jejak transaksi (siapa, kapan, apa yang berubah) untuk dicek ulang. |
+| **Dashboard** | Halaman ringkasan: angka penting, grafik, dan daftar data dalam satu tampilan. |
+| **Dashboard list** | Tampilan daftar utama (bukan form input). |
+| **Detail form** | Halaman/tampilan yang menampilkan rincian satu data (misalnya satu faktur). |
+| **Drill-down** | Membuka detail lebih dalam dari ringkasan (misalnya klik nama motoris → pop-up detail). |
+| **Export / Ekspor** | Mengunduh data ke file (biasanya Excel) sesuai filter yang sedang aktif. |
+| **Faktur** | Bukti/tagihan penjualan. Di Web Admin dipakai untuk memantau & mencetak, bukan membuat order baru. |
+| **Filter** | Pilihan untuk mempersempit data yang ditampilkan (wilayah, orang, tanggal, brand, dan sebagainya). |
+| **Filter aktif (chip)** | Label kecil yang menampilkan filter yang sedang dipakai; bisa dihapus satu per satu. |
+| **GPS Match / Deviation** | Status apakah lokasi check-in motoris cocok dengan target (Match) atau menyimpang (Deviation). |
+| **Inbound / Kulakan** | Stok masuk ke motoris dari stokis (pengisian ulang barang). |
+| **KPI** | Angka ringkas di kartu atas halaman (contoh: total faktur, total tagihan, jumlah kunjungan). |
+| **Mobile SFA** | Aplikasi mobile sales lapangan tempat order/faktur dibuat. |
+| **Motoris** | Tenaga penjualan lapangan yang berkeliling dengan motor (canvasser). |
+| **Mutasi stok** | Perubahan stok (masuk atau keluar) pada suatu waktu. |
+| **Outbound / Penjualan** | Stok keluar dari motoris ke outlet/pelanggan (hasil penjualan). |
+| **Outlet / Pelanggan** | Toko atau pelanggan yang dikunjungi / dibeli oleh motoris. |
+| **Paid** | Status faktur sudah lunas. |
+| **Pop-up** | Jendela kecil di atas halaman untuk menampilkan detail tanpa pindah halaman penuh. |
+| **RBAC** | Pengaturan hak akses berdasarkan peran (siapa boleh melihat menu/data apa). |
+| **Read-only / view-only** | Hanya bisa melihat (dan biasanya cetak/export); tidak bisa menambah, mengubah, atau menghapus data. |
+| **Region** | Wilayah kerja lebih besar (setingkat cabang/provinsi di konteks filter dashboard). |
+| **Role (Motoris / SPG GT)** | Jenis peran lapangan yang dipakai untuk menyaring daftar sales di dashboard. |
+| **RSM** | *Regional Sales Manager* — manajer penjualan untuk region tertentu; biasanya hanya melihat data regionnya. |
+| **Saldo stok** | Sisa nilai/stok yang masih dibawa motoris setelah kulakan dan penjualan. |
+| **Scope region** | Batasan data sesuai wilayah kerja pengguna yang login. |
+| **SPG GT** | Tenaga lapangan *Sales Promotion Girl* pada kanal General Trade (selain Motoris). |
+| **Stok Motoris** | Modul pemantauan stok & aktivitas motoris/SPG di lapangan. |
+| **Stokis** | Distributor/gudang regional tempat motoris mengambil (kulakan) barang. |
+| **UAT** | Uji penerimaan oleh pengguna bisnis sebelum sistem dipakai penuh. |
+| **Umbrand** | *Umbrella brand* — kelompok merek produk (contoh: BENECOL). |
+| **Web Admin** | Portal web kantor untuk memantau data lapangan (bukan aplikasi mobile di lapangan). |
+
 ---
 
 ## 2. Arsitektur & Alur Penjualan
@@ -114,7 +155,7 @@ di lapangan.
 
 ### 2.3 Business Flow (Swimlane)
 
-Alur konseptual database: order dari Mobile → faktur terbaca di Web; stok motoris diagregasi untuk monitoring.
+Alur konseptual: order dari Mobile → faktur terbaca di Web Admin; stok motoris diagregasi untuk monitoring.
 
 **Lane (urutan kiri → kanan):**
 
@@ -190,7 +231,7 @@ Halaman detail form menampilkan data pelanggan, item line, dan ringkasan pembaya
 
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
-| ![](screenshots/ss_btn_penjualan-faktur_ekspor.png) | Ekspor | `#btnEkspor` | btn-outline-secondary | Mengekspor daftar faktur (prototipe: mock Swal; database: Excel header-level mengikuti filter). |
+| ![](screenshots/ss_btn_penjualan-faktur_ekspor.png) | Ekspor | `#btnEkspor` | btn-outline-secondary | Mengekspor daftar faktur ke Excel mengikuti filter yang aktif. |
 | ![](screenshots/ss_btn_penjualan-faktur_lihat-detail.png) | Lihat Detail | `a.btn-action-view` | btn-action (ikon mata) | Membuka halaman detail form faktur terpilih. |
 | ![](screenshots/ss_btn_penjualan-faktur_cetak-faktur.png) | Cetak Faktur (list) | `cetakFaktur(id)` | btn-action (ikon printer) | Mencetak faktur dari baris daftar. |
 | ![](screenshots/ss_btn_penjualan-faktur_cetak-detail.png) | Cetak Faktur (detail) | `#btnCetak` | btn-cetak-faktur | Mencetak faktur dari halaman detail form. |
@@ -224,14 +265,14 @@ Field stokis dan jatuh tempo tetap dapat ada di database sebagai data pendukung,
 | 7 | Belum Dibayar | Sisa piutang | `tPenjualanFaktur` | `decBelumDibayar` |
 | 8 | Status | Paid / Unpaid / Draft / dll. | `tPenjualanFaktur` | `txtStatus` |
 
-Kolom opsional (tidak di sheet / UI Web Admin Faktur v1.9; tersedia di DB): `tPenjualanFaktur.dtJatuhTempo`, `tPenjualanFaktur.txtGudang` (nama stokis), `tPenjualanFaktur.txtTipe`, `tPenjualanFaktur.txtJangkaWaktuPembayaran`, `tPenjualanFaktur.txtCatatan`.
+Kolom opsional yang **tidak ditampilkan** di sheet / UI Faktur v1.9 (tetap dapat tersimpan di database): Jatuh Tempo, nama stokis, tipe, jangka waktu pembayaran, catatan.
 
 
 ### 3.2 Stok Motoris
 
 Modul **Stok Motoris** pada Web Admin **Man Power GT** digunakan untuk memantau stok yang dibawa motoris / SPG di lapangan beserta aktivitas terkait (kunjungan, kulakan, dan penjualan).
 
-Halaman monitoring menampilkan ringkasan KPI, alur stok, grafik, peta sebaran, grid saldo, dan audit trail. Halaman ini bersifat read-only (bukan CRUD). Pengguna dapat **Export Excel** (dua sheet: SalesInvoices dan DailyVisits) serta **Refresh** untuk memuat ulang data dashboard.
+Halaman monitoring menampilkan ringkasan KPI, alur stok, grafik, peta sebaran, grid saldo, dan audit trail. Halaman ini bersifat **read-only**. Pengguna dapat **Export Excel** (dua sheet: SalesInvoices dan DailyVisits) serta **Refresh** untuk memuat ulang data dashboard.
 
 **Asumsi data contoh (v1.8):** sekitar **300 motoris** dengan **minimal 900 kunjungan per hari** secara nasional (rata-rata 3 kunjungan per motoris per hari). Rentang tanggal contoh memakai **1 Jan – 31 Des 2026**; data faktur, kunjungan, penjualan, dan kulakan tersebar sepanjang tahun tersebut. Wilayah memakai nama kota (Jakarta, Depok, Bekasi, dan seterusnya). Satu motoris beroperasi di kota stokis yang sama. History penjualan menampilkan **10 toko berbeda**.
 
@@ -288,57 +329,59 @@ Panel filter di atas ringkasan dashboard membatasi seluruh tampilan: KPI, grafik
 
 | Tampilan | Tombol | ID / Handler | Warna/Style | Fungsi |
 |----------|--------|--------------|-------------|--------|
-| ![](screenshots/ss_btn_penjualan-stok-motoris_export-excel.png) | Export Excel | `exportToExcel()` / `#btnEkspor` | btn-outline-secondary | Unduh Excel 2 sheet (`SalesInvoices` + `DailyVisits`) mengikuti filter aktif. |
-| ![](screenshots/ss_btn_penjualan-stok-motoris_refresh.png) | Refresh | `refreshDashboard()` / `#btnRefresh` | btn-success | Muat ulang seluruh data dashboard sesuai filter; tampilkan Swal sukses singkat. |
-| ![](screenshots/ss_btn_penjualan-stok-motoris_reset-semua.png) | Reset Semua | `resetAllFilters()` | filter-reset-btn | Reset filter ke default (lihat §3.2.1). |
-| ![](screenshots/ss_btn_penjualan-stok-motoris_cetak-pdf.png) | Cetak PDF | `printAuditPopup()` | btn (di header pop-up audit) | Cetak isi pop-up **ID Transaksi & Pergerakan Stok** (hanya aktif saat pop-up audit terbuka). |
+| ![](screenshots/ss_btn_penjualan-stok-motoris_export-excel.png) | Export Excel | `#btnEkspor` | btn-outline-secondary | Unduh Excel 2 sheet (SalesInvoices + DailyVisits) mengikuti filter aktif. |
+| ![](screenshots/ss_btn_penjualan-stok-motoris_refresh.png) | Refresh | `#btnRefresh` | btn-success | Muat ulang seluruh data dashboard sesuai filter. |
+| ![](screenshots/ss_btn_penjualan-stok-motoris_reset-semua.png) | Reset Semua | Reset Semua | filter-reset-btn | Reset filter ke default (lihat §3.2.1). |
+| ![](screenshots/ss_btn_penjualan-stok-motoris_cetak-pdf.png) | Cetak PDF | Cetak PDF | btn (di header pop-up audit) | Cetak isi pop-up **ID Transaksi & Pergerakan Stok** (saat pop-up audit terbuka). |
 
 #### 3.2.4 Pop-up Dashboard
 
-Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: **detail motoris** (termasuk sebaran outlet) dan **audit transaksi** (ID & pergerakan stok).
+Dashboard memiliki dua pop-up utama untuk drill-down operasional: **detail motoris** (termasuk sebaran outlet) dan **audit transaksi** (ID & pergerakan stok).
 
 ##### A. Pop-up Detail Motoris — *Sebaran Outlet Dikunjungi*
 
-**Pemicu:** klik nama motoris pada grid saldo (handler `showMotorisDetail`).
-
-**Endpoint database:** `GET /Dashboard/MotorisStock/GetMotorisDetail`
+**Pemicu:** klik nama motoris pada grid saldo.
 
 ![Stok Motoris — Pop-up Detail Motoris (Sebaran Outlet)](screenshots/ss_sm_popup_motoris.png)
 
-**Narasi UI:** Pop-up menampilkan profil motoris (nama, kode, area, region) di header hijau. Di kiri, tabel **Stok per SKU** menampilkan nilai saldo berjalan per produk plus baris TOTAL. Di kanan atas, mini chart **Penjualan 7 Hari Terakhir** (line Chart.js) dan kartu **Info Kulakan Terakhir** (tanggal, stokis, nilai, status GPS Valid/Invalid). Bagian bawah **Sebaran Outlet Dikunjungi** menampilkan peta Leaflet dengan marker bernomor untuk outlet yang dikunjungi pada periode terkait; caption di bawah peta menuliskan jumlah outlet (contoh: *10 outlet dalam 30 hari terakhir*). Scroll ke bawah pada pop-up (jika ada) menampilkan **History Penjualan Terakhir** hingga 10 transaksi — tanggal berurutan mundur, **10 toko berbeda** di kota/wilayah stokis motoris (bukan 1 toko berulang, bukan lintas pulau).
+**Narasi UI:** Pop-up menampilkan profil motoris (nama, kode, area, region) di header. Di kiri, tabel **Stok per SKU** menampilkan saldo berjalan per produk plus baris total. Di kanan atas terdapat grafik **Penjualan 7 Hari Terakhir** dan kartu **Info Kulakan Terakhir** (tanggal, stokis, nilai, status GPS Valid/Invalid).
+
+Bagian bawah **Sebaran Outlet Dikunjungi** menampilkan peta dengan marker outlet yang dikunjungi; caption di bawah peta menuliskan jumlah outlet (contoh: *10 outlet dalam 30 hari terakhir*). Di bawahnya, **History Penjualan Terakhir** menampilkan hingga 10 transaksi — tanggal berurutan mundur, dengan **10 toko berbeda** di kota/wilayah stokis motoris.
 
 **Isi pop-up:**
 
 | Bagian | Keterangan |
 |--------|------------|
 | Header | Nama motoris, kode, area, region |
-| Stok per SKU | Tabel produk + nilai Rp (saldo berjalan) + baris TOTAL |
-| Penjualan 7 Hari Terakhir | Mini chart line Chart.js (Rp per hari) |
+| Stok per SKU | Tabel produk + nilai Rp (saldo berjalan) + baris total |
+| Penjualan 7 Hari Terakhir | Grafik garis nilai penjualan per hari (7 hari) |
 | Info Kulakan Terakhir | Tanggal, nama stokis, nilai Rp, status GPS Valid/Invalid |
-| **Sebaran Outlet Dikunjungi** | Peta Leaflet: marker bernomor outlet dikunjungi; circle marker oranye untuk stokis kulakan terakhir; tooltip outlet; klik nama outlet di history mem-focus marker (`focusMotorisMapMarker`) |
-| History Penjualan Terakhir | Tabel hingga **10 transaksi** terakhir (1 hari 1 baris, mundur dari akhir periode): #, Tanggal, Outlet, Produk, Nilai (Rp). **Minimal 10 toko berbeda** di kota/wilayah stokis motoris. |
+| **Sebaran Outlet Dikunjungi** | Peta: marker outlet dikunjungi; penanda stokis kulakan terakhir; klik nama outlet di history memfokuskan marker terkait |
+| History Penjualan Terakhir | Hingga **10 transaksi** terakhir: #, Tanggal, Outlet, Produk, Nilai (Rp). **Minimal 10 toko berbeda** di kota/wilayah stokis motoris. |
 
 **Business rule pop-up:**
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-SM-P01 | Data detail mengikuti filter dashboard yang aktif (region/area/umbrand/tanggal). |
-| BR-SM-P02 | Marker peta hanya digambar jika outlet punya koordinat `lat`/`lng`; outlet tanpa GPS tetap tampil di tabel tanpa link peta. |
+| BR-SM-P01 | Data detail mengikuti filter dashboard yang aktif (region/area/role/umbrand/tanggal). |
+| BR-SM-P02 | Marker peta hanya digambar jika outlet punya koordinat; outlet tanpa GPS tetap tampil di tabel tanpa tautan peta. |
 | BR-SM-P03 | Pop-up **read-only** — tidak ada aksi ubah data; tutup via tombol close (✕). |
-| BR-SM-P08 | History penjualan, kunjungan, dan pelanggan terdaftar satu motoris berada di wilayah stokis yang sama (kota/region, bukan lintas pulau). Dummy: **minimal 10 toko berbeda** per motoris; kulakan inbound memakai stokis yang sama. |
+| BR-SM-P08 | History penjualan, kunjungan, dan pelanggan terdaftar satu motoris berada di wilayah stokis yang sama (kota/region, bukan lintas pulau). Contoh data: **minimal 10 toko berbeda** per motoris; kulakan inbound memakai stokis yang sama. |
 
 
 ##### B. Pop-up Audit — *ID Transaksi & Pergerakan Stok*
 
-**Pemicu:** klik ikon mata / aksi detail pada DataTable **Audit Trail** (handler `showAuditDetail`).
+**Pemicu:** klik aksi detail pada tabel **Audit Trail**.
 
-**Endpoint database:** `GET /Dashboard/MotorisStock/GetAuditDetail?id=…`
-
-**Judul header:** **ID Transaksi & Pergerakan Stok** + nomor transaksi (`txId`, contoh `TX-OUT-260628-053`) + tombol **Cetak PDF**.
+**Judul header:** **ID Transaksi & Pergerakan Stok** beserta nomor transaksi, plus tombol **Cetak PDF**.
 
 ![Stok Motoris — Pop-up ID Transaksi & Pergerakan Stok](screenshots/ss_sm_popup_audit.png)
 
-**Narasi UI:** Header menampilkan ID transaksi dan tombol **Cetak PDF**. Stepper tiga langkah (**Input Motoris → Validasi GPS → HO Synced**) menandai progres validasi. Panel kiri **Profil Sales & Informasi Lokasi** merinci motoris, wilayah, jenis transaksi (badge Kulakan Inbound / Penjualan Outbound), partner tujuan, dan waktu unggah. Panel kanan **Pemantauan Jarak & Akurasi GPS** menampilkan badge GPS Match/Deviation, jarak ke target, mock-map, dan koordinat. Di bawahnya, **Stock Ledger** menampilkan mutasi fisik (Sebelum / Mutasi / Sesudah) per SKU; panel **Dokumen Pendukung** menampilkan nota (jika ada) atau placeholder *Tidak Ada Bukti* untuk outbound warung. Tombol **Tutup** menutup pop-up.
+**Narasi UI:** Header menampilkan ID transaksi dan tombol **Cetak PDF**. Stepper tiga langkah (**Input Motoris → Validasi GPS → HO Synced**) menandai progres validasi.
+
+Panel kiri **Profil Sales & Informasi Lokasi** merinci motoris, wilayah, jenis transaksi (Kulakan Inbound / Penjualan Outbound), partner tujuan, dan waktu unggah. Panel kanan **Pemantauan Jarak & Akurasi GPS** menampilkan status GPS Match/Deviation, jarak ke target, peta lokasi, dan koordinat.
+
+Di bawahnya, **Stock Ledger** menampilkan mutasi fisik (Sebelum / Mutasi / Sesudah) per SKU. Panel **Dokumen Pendukung** menampilkan nota (jika ada) atau keterangan *Tidak Ada Bukti* untuk outbound warung. Tombol **Tutup** menutup pop-up.
 
 **Isi pop-up:**
 
@@ -346,35 +389,32 @@ Dashboard memiliki dua pop-up utama (SweetAlert2) untuk drill-down operasional: 
 |--------|------------|
 | Stepper status | 3 langkah: **Input Motoris** → **Validasi GPS** → **HO Synced** (aktif/warning sesuai hasil GPS & status verified) |
 | Profil Sales & Lokasi | Motoris (kode), wilayah kerja (region–area), jenis transaksi (Kulakan Inbound / Penjualan Outbound), partner tujuan (outlet/stokis), waktu unggah |
-| Pemantauan Jarak & GPS | Badge GPS Match / GPS Deviation, ringkasan jarak vs toleransi, mock-map pin motoris vs target outlet, koordinat |
+| Pemantauan Jarak & GPS | Badge GPS Match / GPS Deviation, ringkasan jarak vs toleransi, peta pin motoris vs target outlet, koordinat |
 | Stock Ledger | Tabel mutasi fisik: Nama SKU, Sebelum, Mutasi (+/−), Sesudah |
-| Dokumen Pendukung | Kartu nota belanja (jika ada) atau placeholder “Tidak Ada Bukti” (umum untuk outbound warung) |
+| Dokumen Pendukung | Kartu nota belanja (jika ada) atau “Tidak Ada Bukti” (umum untuk outbound warung) |
 
 **Business rule pop-up:**
 
 | Rule ID | Aturan |
 |---------|--------|
-| BR-SM-P04 | Satu pop-up = satu mutasi (`tStokMotorisMutasi`); raw detail di-paging di grid, detail penuh hanya saat dibuka. |
+| BR-SM-P04 | Satu pop-up = satu mutasi stok; daftar audit berpaginasi, detail penuh hanya saat dibuka. |
 | BR-SM-P05 | Tipe **inbound** = Kulakan (stok masuk dari stokis); **outbound** = Penjualan (stok keluar ke outlet). |
 | BR-SM-P06 | GPS Valid / Match jika jarak check-in dalam toleransi sistem; Deviation menandai potensi mismatch lokasi. |
-| BR-SM-P07 | **Cetak PDF** (`printAuditPopup`) mencetak konten pop-up yang sedang terbuka ke jendela print browser; tidak menyimpan file di server. |
+| BR-SM-P07 | **Cetak PDF** mencetak konten pop-up yang sedang terbuka; tidak menyimpan file di server. |
 
 #### 3.2.5 CRUD
 
 | Operasi | Cara | Role | Keterangan |
 |---------|------|------|------------|
 | **Read** | Buka dashboard monitoring | Super Admin, Sales Manager, RSM | Dashboard/monitoring read-only |
-| **Export** | Export Excel → `SalesInvoices` + `DailyVisits` | Super Admin, Sales Manager, RSM | Filter UI + scope region berlaku |
+| **Export** | Export Excel → SalesInvoices + DailyVisits | Super Admin, Sales Manager, RSM | Filter UI + scope region berlaku |
 
 
 #### Report Excel — Stok Motoris
 
-Tombol **Export Excel** memanggil `exportToExcel()` (SheetJS / endpoint MAVEN). File: `StokMotoris_Export_YYYY-MM-DD.xlsx`.
-Baris mengikuti filter dashboard + motoris terfilter (scope region RBAC berlaku di database).
+Tombol **Export Excel** menghasilkan file `StokMotoris_Export_YYYY-MM-DD.xlsx` dengan dua sheet. Baris mengikuti filter dashboard dan cakupan region pengguna.
 
-> **Sumber database:** join `tPenjualanFaktur` + `tPenjualanFakturItem` + master (`mPelanggan`, `mPegawai`) untuk sheet **SalesInvoices** (kode/nama produk & pajak adalah snapshot di item);
-> sheet **DailyVisits** dari `tKunjunganHarian` + `mPegawai` + `mPelanggan`.
-> **Prototipe:** `buildSalesInvoiceExportRows` / `buildDailyVisitExportRows` di `StokMotoris/index.html` membaca `fprs_faktur_v7`, `md_pelanggan`, snapshot `md_stok_motoris.visitHistory`.
+Sheet **SalesInvoices** berisi data faktur per item produk. Sheet **DailyVisits** berisi data kunjungan harian motoris.
 
 ##### Sheet `SalesInvoices` (29 kolom — 1 baris per item faktur)
 

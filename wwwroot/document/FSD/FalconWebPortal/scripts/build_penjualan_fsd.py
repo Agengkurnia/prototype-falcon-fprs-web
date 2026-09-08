@@ -43,7 +43,7 @@ def build() -> str:
                 'prepared_by': 'Tim IT – Man Power GT',
                 'date': '08/09/2026',
                 'revision_date': '8 September 2026',
-                'revision_desc': 'v1.10 – Stok Motoris: filter Role (Motoris | SPG GT)',
+                'revision_desc': 'v1.12 – Tambah §1.5 Glosarium istilah teknis/domain',
             },
             plantuml_handlers=[
                 PlantumlHandler(
