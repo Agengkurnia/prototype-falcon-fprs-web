@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
     <style>
         body { background: #f7f9fa; }
+        .offline-bar {
+            margin: 12px 16px 0;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #FFF3E0;
+            color: #E65100;
+            font-size: 12px;
+            font-weight: 600;
+        }
         .form-card { background: #fff; border: 1px solid var(--color-border); border-radius: 12px; margin: 12px 16px; padding: 16px; }
         .form-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
         .locked { background: #f3f4f6; }
@@ -20,115 +29,146 @@
             border-radius: 0 8px 8px 0;
         }
         .line-row:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
-        .line-row.is-changed {
-            border-left-color: #005D41;
-            background: #f3faf6;
-        }
+        .line-row.is-changed { border-left-color: #005D41; background: #f3faf6; }
         .line-name { font-weight: 700; font-size: 14px; color: #231F20; }
         .line-price { font-size: 12px; color: #6b7280; margin-top: 2px; }
         .qty-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; margin-top: 10px;
         }
         .qty-asli { font-size: 13px; color: #4b5563; white-space: nowrap; }
         .qty-asli strong { color: #231F20; }
         .qty-edit { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
         .stepper {
-            display: inline-flex;
-            align-items: center;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #fff;
+            display: inline-flex; align-items: center;
+            border: 1px solid #d1d5db; border-radius: 10px; overflow: hidden; background: #fff;
         }
         .stepper .qty-btn {
-            width: 44px;
-            height: 44px;
-            border: 0;
-            background: #f3f4f6;
-            color: #231F20;
-            font-size: 20px;
-            font-weight: 700;
-            line-height: 1;
-            padding: 0;
+            width: 44px; height: 44px; border: 0; background: #f3f4f6;
+            color: #231F20; font-size: 20px; font-weight: 700; line-height: 1; padding: 0;
         }
         .stepper .qty-btn:active { background: #e5e7eb; }
         .stepper .m-qty {
-            width: 56px;
-            height: 44px;
-            border: 0;
-            border-left: 1px solid #e5e7eb;
-            border-right: 1px solid #e5e7eb;
-            border-radius: 0;
-            text-align: center;
-            font-weight: 700;
-            font-size: 16px;
-            padding: 0;
-            box-shadow: none;
+            width: 56px; height: 44px; border: 0;
+            border-left: 1px solid #e5e7eb; border-right: 1px solid #e5e7eb;
+            border-radius: 0; text-align: center; font-weight: 700; font-size: 16px; padding: 0;
         }
-        .impact {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
+        .impact { font-size: 12px; font-weight: 600; margin-top: 8px; }
         .impact.is-zero { color: #9ca3af; font-weight: 500; }
         .impact.is-plus { color: #2E7D32; }
         .impact.is-minus { color: #E65100; }
         .reason-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
         .reason-chip {
-            border: 1px solid #cfe8dc;
-            background: #f3faf6;
-            color: #005D41;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 999px;
-            padding: 8px 12px;
-            line-height: 1.2;
+            border: 1px solid #cfe8dc; background: #f3faf6; color: #005D41;
+            font-size: 12px; font-weight: 600; border-radius: 999px; padding: 8px 12px;
         }
         .reason-chip.is-active { background: #005D41; color: #fff; border-color: #005D41; }
-        .empty-box { text-align: center; padding: 28px 12px; }
-        .empty-box p { color: #6b7280; font-size: 14px; margin: 0 0 16px; }
         .bottom-action {
-            position: sticky;
-            bottom: 0;
-            background: #fff;
-            border-top: 1px solid #E9EFEF;
-            padding: 14px 16px;
+            position: sticky; bottom: 0; background: #fff;
+            border-top: 1px solid #E9EFEF; padding: 14px 16px;
         }
         #btnSend {
-            background: #005D41;
-            color: #fff;
-            font-weight: 700;
-            height: 48px;
+            background: #005D41; color: #fff; font-weight: 700; height: 48px;
         }
         #btnSend:disabled { opacity: 0.45; }
+        /* LOV harus di dalam .mobile-wrapper (absolute), bukan fixed full-viewport */
+        .lov-overlay {
+            position: absolute; inset: 0; background: rgba(17, 24, 39, .48);
+            z-index: 40; display: none; align-items: flex-end;
+            justify-content: stretch;
+        }
+        .lov-overlay.is-on { display: flex; }
+        .lov-sheet {
+            background: #fff; width: 100%;
+            max-height: 78%;
+            min-height: 52%;
+            border-radius: 18px 18px 0 0;
+            padding: 0 0 12px;
+            display: flex; flex-direction: column;
+            box-shadow: 0 -8px 28px rgba(0,0,0,.12);
+        }
+        .lov-handle {
+            width: 40px; height: 4px; border-radius: 999px;
+            background: #d1d5db; margin: 10px auto 6px;
+        }
+        .lov-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 4px 16px 12px;
+            border-bottom: 1px solid #eef2f2;
+        }
+        .lov-head strong { font-size: 16px; color: #231F20; }
+        .lov-search-wrap { padding: 12px 16px 8px; }
+        .lov-search-wrap .form-control {
+            border-radius: 10px; border-color: #cfe8dc;
+            font-size: 14px; height: 42px;
+        }
+        .lov-search-wrap .form-control:focus {
+            border-color: #005D41; box-shadow: 0 0 0 .2rem rgba(0,93,65,.12);
+        }
+        .lov-list {
+            flex: 1; overflow-y: auto; padding: 4px 12px 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .lov-item {
+            display: flex; align-items: center; gap: 12px;
+            width: 100%; text-align: left;
+            border: 1px solid #e5e7eb; border-radius: 12px;
+            background: #fff; padding: 12px 14px; margin-bottom: 8px;
+            color: inherit;
+        }
+        .lov-item:active, .lov-item:hover {
+            border-color: #005D41; background: #f3faf6;
+        }
+        .lov-item .ico {
+            width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: #e8f5ef; color: #005D41; font-size: 15px;
+        }
+        .lov-item .body { flex: 1; min-width: 0; }
+        .lov-item .t { font-weight: 800; font-size: 14px; color: #231F20; }
+        .lov-item .s { font-size: 12px; color: #6b7280; margin-top: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .lov-item .chev { color: #9ca3af; font-size: 12px; flex-shrink: 0; }
+        .lov-empty {
+            text-align: center; color: #6b7280; font-size: 13px;
+            padding: 36px 16px;
+        }
     </style>
 </head>
 <body>
 <div class="mobile-wrapper">
     <div class="mobile-header">
-        <button class="header-action" type="button" onclick="history.back()" aria-label="Kembali"><i class="fas fa-arrow-left"></i></button>
+        <button class="header-action" type="button" id="btnBack" aria-label="Kembali"><i class="fas fa-arrow-left"></i></button>
         <span class="header-title">Ajukan Koreksi</span>
         <div style="width:36px;"></div>
     </div>
+    <div class="offline-bar d-none" id="offlineBar">Fitur ini membutuhkan koneksi.</div>
     <div class="mobile-content no-nav" style="padding-bottom:88px;">
-        <div class="form-card" id="docCard">
-            <div class="mb-2"><div class="form-label">Nomor dokumen</div><input class="form-control locked" id="sourceNo" disabled/></div>
-            <div class="mb-0"><div class="form-label">Outlet / Stokis</div><input class="form-control locked" id="party" disabled/></div>
+        <div class="form-card" id="sourceCard">
+            <p class="text-muted small mb-3">Online saja. Pilih tipe transaksi, lalu dokumen.</p>
+            <div class="mb-3">
+                <div class="form-label">Tipe transaksi</div>
+                <select class="form-select" id="sourceType">
+                    <option value="">Pilih tipe…</option>
+                    <option value="invoice">Sales invoice (Outbound)</option>
+                    <option value="kulakan">Kulakan (Inbound)</option>
+                </select>
+            </div>
+            <div class="mb-0">
+                <div class="form-label" id="lblDoc">Dokumen</div>
+                <div class="input-group">
+                    <button class="btn btn-outline-success" type="button" id="btnLov" disabled aria-label="Cari dokumen"><i class="fas fa-search"></i></button>
+                    <input class="form-control locked" id="docLabel" readonly placeholder="Pilih tipe dulu…" disabled/>
+                </div>
+                <div class="form-text d-none" id="docMeta"></div>
+            </div>
         </div>
-        <div class="form-card" id="linesCard">
+        <div class="form-card d-none" id="linesCard">
             <div class="form-label mb-2">Produk (pcs)</div>
             <div id="lines"></div>
             <div class="text-muted" style="font-size:12px;" id="hint"></div>
-            <div class="empty-box d-none" id="emptyBox">
-                <p id="emptyMsg">Dokumen tidak ditemukan.</p>
-                <button type="button" class="btn btn-outline-success" id="btnEmptyBack">Kembali</button>
-            </div>
         </div>
-        <div class="form-card" id="reasonCard">
+        <div class="form-card d-none" id="reasonCard">
             <div class="form-label">Alasan</div>
             <div class="reason-chips" id="reasonChips">
                 <button type="button" class="reason-chip" data-reason="Salah hitung">Salah hitung</button>
@@ -139,22 +179,38 @@
             <textarea class="form-control" id="reason" rows="3" placeholder="Kenapa qty berbeda?"></textarea>
         </div>
     </div>
-    <div class="bottom-action" id="sendBar">
+    <div class="bottom-action d-none" id="sendBar">
         <button class="btn w-100" id="btnSend" type="button" disabled>Kirim pengajuan</button>
+    </div>
+    <div class="lov-overlay" id="lovOverlay" aria-hidden="true">
+        <div class="lov-sheet" role="dialog" aria-modal="true" aria-labelledby="lovTitle">
+            <div class="lov-handle" aria-hidden="true"></div>
+            <div class="lov-head">
+                <strong id="lovTitle">Pilih dokumen</strong>
+                <button type="button" class="btn btn-link text-decoration-none p-0" id="btnLovClose" style="color:#005D41;font-weight:700;">Tutup</button>
+            </div>
+            <div class="lov-search-wrap">
+                <input type="search" class="form-control" id="lovSearch" placeholder="Cari nomor / outlet…" autocomplete="off"/>
+            </div>
+            <div class="lov-list" id="lovList"></div>
+            <div class="lov-empty d-none" id="lovEmpty">Tidak ada dokumen untuk motoris ini.</div>
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
-    const params = new URLSearchParams(location.search);
-    const source = params.get('source') === 'kulakan' ? 'kulakan' : 'invoice';
     let lines = [];
+    let sourceType = '';
     let sourceNo = '';
     let party = '';
-    let loadOk = false;
+    let salesCode = '';
+    let selectedDoc = null;
+    let kulakans = [];
     let sending = false;
 
+    function isOnline() { return navigator.onLine !== false; }
     function money(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
     function motorisName() {
         const u = SfaStore.getUser() || {};
@@ -162,6 +218,59 @@
     }
     function esc(s) {
         return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function fmtDate(iso) {
+        if (!iso) return '—';
+        try {
+            return new Date(String(iso).slice(0, 10) + 'T00:00:00').toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return String(iso); }
+    }
+    function syncOnlineUi() {
+        const on = isOnline();
+        $('#offlineBar').toggleClass('d-none', on);
+        $('#sourceType, #btnLov, #btnSend').prop('disabled', function () {
+            if (!on) return true;
+            if (this.id === 'btnLov') return !sourceType;
+            if (this.id === 'btnSend') return $(this).data('shouldDisable') !== false && $(this).prop('disabled');
+            return false;
+        });
+        if (!on) $('#btnSend').prop('disabled', true);
+        else refreshSend();
+    }
+    function clearDoc() {
+        selectedDoc = null;
+        sourceNo = '';
+        party = '';
+        salesCode = '';
+        lines = [];
+        $('#docLabel').val('');
+        $('#docMeta').addClass('d-none').text('');
+        $('#lines').empty();
+        $('#linesCard, #reasonCard, #sendBar').addClass('d-none');
+        $('#reason').val('');
+        $('.reason-chip').removeClass('is-active');
+        refreshSend();
+    }
+    function syncTypeUi() {
+        sourceType = String($('#sourceType').val() || '');
+        const ready = !!sourceType && isOnline();
+        $('#btnLov').prop('disabled', !ready);
+        $('#docLabel').prop('disabled', !ready);
+        if (sourceType === 'kulakan') {
+            $('#lblDoc').text('Kulakan');
+            $('#docLabel').attr('placeholder', 'Cari kulakan…');
+            $('#lovTitle').text('Pilih kulakan');
+        } else if (sourceType === 'invoice') {
+            $('#lblDoc').text('Invoice');
+            $('#docLabel').attr('placeholder', 'Cari invoice…');
+            $('#lovTitle').text('Pilih invoice');
+        } else {
+            $('#lblDoc').text('Dokumen');
+            $('#docLabel').attr('placeholder', 'Pilih tipe dulu…');
+            $('#lovTitle').text('Pilih dokumen');
+        }
     }
     function parseQty($row) {
         const raw = String($row.find('.m-qty').val() ?? '').trim();
@@ -187,9 +296,7 @@
         const value = delta * Number(ln.price || 0);
         const sign = delta > 0 ? '+' : '';
         $row.addClass('is-changed');
-        $impact
-            .addClass(delta > 0 ? 'is-plus' : 'is-minus')
-            .text(sign + delta + ' pcs · ' + money(value));
+        $impact.addClass(delta > 0 ? 'is-plus' : 'is-minus').text(sign + delta + ' pcs · ' + money(value));
     }
     function collectChanged() {
         const changed = [];
@@ -211,31 +318,14 @@
         return { changed: changed, bad: bad };
     }
     function refreshSend() {
-        if (!loadOk || !lines.length || sending) {
-            $('#btnSend').prop('disabled', true);
+        if (!isOnline() || !selectedDoc || !lines.length || sending) {
+            $('#btnSend').prop('disabled', true).data('shouldDisable', true);
             return;
         }
         const pack = collectChanged();
         const reasonOk = String($('#reason').val() || '').trim().length > 0;
-        $('#btnSend').prop('disabled', !!(pack.bad || !pack.changed.length || !reasonOk));
-    }
-    function showEmpty(message) {
-        loadOk = false;
-        $('#docCard').addClass('d-none');
-        $('#reasonCard').addClass('d-none');
-        $('#sendBar').addClass('d-none');
-        $('#lines').empty();
-        $('#hint').addClass('d-none').text('');
-        $('#emptyMsg').text(message);
-        $('#emptyBox').removeClass('d-none');
-        $('#linesCard .form-label').first().addClass('d-none');
-    }
-    function showForm() {
-        loadOk = true;
-        $('#docCard, #reasonCard, #sendBar').removeClass('d-none');
-        $('#emptyBox').addClass('d-none');
-        $('#hint').removeClass('d-none');
-        $('#linesCard .form-label').first().removeClass('d-none');
+        const disable = !!(pack.bad || !pack.changed.length || !reasonOk);
+        $('#btnSend').prop('disabled', disable).data('shouldDisable', disable);
     }
     function paintLines() {
         const $box = $('#lines').empty();
@@ -257,6 +347,7 @@
             );
         });
         $('#hint').text('Harga mengikuti baris asli. Ubah qty benar hanya untuk produk yang dikoreksi.');
+        $('#linesCard, #reasonCard, #sendBar').removeClass('d-none');
         refreshSend();
     }
     function setQty($row, qty) {
@@ -265,13 +356,7 @@
         paintImpact($row);
         refreshSend();
     }
-    function loadInvoice() {
-        const id = params.get('id');
-        if (!id) return { ok: false, message: 'Nomor faktur tidak ada. Kembali lalu buka dari detail faktur.' };
-        const inv = (SfaStore.getInvoices() || []).find(i => String(i.id) === String(id));
-        if (!inv) return { ok: false, message: 'Faktur tidak ditemukan. Kembali ke daftar atau detail faktur.' };
-        sourceNo = inv.invoiceNo || ('INV-' + inv.id);
-        party = inv.customerName || inv.customerId || '';
+    function linesFromInvoice(inv) {
         const grouped = {};
         (inv.items || []).forEach(item => {
             const pcs = Number(item.qtyPcs != null ? item.qtyPcs : (String(item.uom || 'PCS').toUpperCase() === 'PCS' ? item.qty : 0));
@@ -281,36 +366,124 @@
             grouped[key].qty += pcs;
             if (item.price) grouped[key].price = Number(item.price);
         });
-        lines = Object.values(grouped);
-        if (!lines.length) return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
-        return { ok: true };
+        return Object.values(grouped);
     }
-    function loadKulakan() {
-        const raw = JSON.parse(localStorage.getItem('temp_restock_adjustments') || '{}');
-        party = localStorage.getItem('temp_restock_grosir') || 'Stokis';
-        if (!localStorage.getItem('temp_restock_docno')) {
-            const day = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            localStorage.setItem('temp_restock_docno', 'KL-' + day);
-        }
-        sourceNo = localStorage.getItem('temp_restock_docno');
-        Object.keys(raw).forEach(code => {
-            const adj = raw[code] || {};
-            const pcs = Number(adj.addPcs || 0);
-            if (pcs <= 0) return;
-            const prod = SfaStore.getProductById(code) || {};
-            lines.push({ code: code, name: adj.name || prod.name || code, qty: pcs, price: Number(prod.pricePcs || prod.price || 0) });
+    function linesFromKulakan(doc) {
+        return (doc.items || []).map(it => ({
+            code: it.kode || '',
+            name: it.nama || it.kode || '',
+            qty: Number(it.qtyPcs || 0),
+            price: Number(it.harga || 0)
+        })).filter(ln => ln.qty > 0);
+    }
+    function invoicesForMe() {
+        const name = motorisName();
+        return (SfaStore.getInvoices() || []).filter(i => {
+            const sales = i.salesNama || i.salesName || i.motoris || '';
+            return !name || String(sales) === String(name) || String(i.createdBy || '') === String(name);
         });
-        if (!Object.keys(raw).length && !lines.length) {
-            return { ok: false, message: 'Data kulakan tidak ditemukan. Kembali dari review kulakan.' };
+    }
+    function nameMatch(a, b) {
+        const x = String(a || '').toUpperCase().trim();
+        const y = String(b || '').toUpperCase().trim();
+        if (!x || !y) return false;
+        return x === y || x.indexOf(y) >= 0 || y.indexOf(x) >= 0;
+    }
+    function kulakansForMe() {
+        const name = motorisName();
+        const list = kulakans.filter(d => nameMatch(d.motoris, name));
+        // Demo fallback: login belum pakai nama pegawai penuh → tetap tampilkan kulakan Yossy.
+        if (list.length) return list;
+        return kulakans.filter(d => /yossy/i.test(String(d.motoris || '')));
+    }
+    let lovDocs = [];
+    function closeLov() {
+        $('#lovOverlay').removeClass('is-on').attr('aria-hidden', 'true');
+        $('#lovSearch').val('');
+    }
+    function paintLovList(q) {
+        const needle = String(q || '').toUpperCase().trim();
+        const filtered = !needle ? lovDocs : lovDocs.filter(d => {
+            const hay = [d._no, d._party, d._day].join(' ').toUpperCase();
+            return hay.indexOf(needle) >= 0;
+        });
+        const $box = $('#lovList').empty();
+        $('#lovEmpty').toggleClass('d-none', filtered.length > 0)
+            .text(lovDocs.length ? 'Tidak ada hasil untuk pencarian ini.' : 'Tidak ada dokumen untuk motoris ini.');
+        const icon = sourceType === 'kulakan' ? 'fa-truck-loading' : 'fa-file-invoice';
+        filtered.forEach(d => {
+            $box.append(
+                '<button type="button" class="lov-item" data-id="' + esc(d.id) + '">' +
+                '<span class="ico"><i class="fas ' + icon + '"></i></span>' +
+                '<span class="body"><span class="t">' + esc(d._no) + '</span>' +
+                '<span class="s">' + esc(d._party || '—') + ' · ' + esc(fmtDate(d._day)) + '</span></span>' +
+                '<i class="fas fa-chevron-right chev" aria-hidden="true"></i></button>'
+            );
+        });
+    }
+    function openLov() {
+        if (!isOnline()) {
+            Swal.fire({ icon: 'warning', text: 'Fitur ini membutuhkan koneksi.', confirmButtonColor: '#005D41' });
+            return;
         }
-        if (!lines.length) return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
-        return { ok: true };
+        if (!sourceType) {
+            Swal.fire({ icon: 'warning', text: 'Pilih tipe transaksi dulu.', confirmButtonColor: '#005D41' });
+            return;
+        }
+        const raw = sourceType === 'kulakan' ? kulakansForMe() : invoicesForMe();
+        lovDocs = raw.map(d => ({
+            id: d.id,
+            _no: sourceType === 'kulakan' ? d.id : (d.invoiceNo || d.id),
+            _party: sourceType === 'kulakan' ? (d.stokis || '') : (d.customerName || d.pelangganNama || ''),
+            _day: sourceType === 'kulakan' ? d.date : (d.date || d.tanggalFaktur)
+        }));
+        $('#lovSearch').attr('placeholder', sourceType === 'kulakan' ? 'Cari nomor / stokis…' : 'Cari nomor / outlet…');
+        paintLovList('');
+        $('#lovOverlay').addClass('is-on').attr('aria-hidden', 'false');
+        setTimeout(function () { $('#lovSearch').trigger('focus'); }, 80);
+    }
+    function pickDoc(id) {
+        if (sourceType === 'kulakan') {
+            const doc = kulakans.find(d => String(d.id) === String(id));
+            if (!doc) return;
+            selectedDoc = doc;
+            sourceNo = doc.id;
+            party = doc.stokis || '';
+            salesCode = doc.salesCode || '';
+            lines = linesFromKulakan(doc);
+            $('#docLabel').val(doc.id + ' — ' + (doc.stokis || '') + ' — ' + fmtDate(doc.date));
+            $('#docMeta').removeClass('d-none').text((doc.stokis || '—') + ' · ' + fmtDate(doc.date));
+        } else {
+            const inv = (SfaStore.getInvoices() || []).find(i => String(i.id) === String(id));
+            if (!inv) return;
+            selectedDoc = inv;
+            sourceNo = inv.invoiceNo || ('INV-' + inv.id);
+            party = inv.customerName || inv.pelangganNama || inv.customerId || '';
+            salesCode = '';
+            lines = linesFromInvoice(inv);
+            $('#docLabel').val(sourceNo + ' — ' + party + ' — ' + fmtDate(inv.date || inv.tanggalFaktur));
+            $('#docMeta').removeClass('d-none').text(party + ' · ' + fmtDate(inv.date || inv.tanggalFaktur));
+        }
+        closeLov();
+        if (!lines.length) {
+            $('#linesCard, #reasonCard, #sendBar').addClass('d-none');
+            Swal.fire({ icon: 'warning', text: 'Dokumen ini tidak punya baris pcs.', confirmButtonColor: '#005D41' });
+            return;
+        }
+        paintLines();
     }
     function doSubmit(changed) {
+        if (!isOnline()) {
+            sending = false;
+            refreshSend();
+            Swal.fire({ icon: 'warning', text: 'Fitur ini membutuhkan koneksi.', confirmButtonColor: '#005D41' });
+            return;
+        }
         const result = SfaStore.submitMotorisCorrection({
-            sourceType: source,
+            sourceType: sourceType,
             sourceNo: sourceNo,
             motoris: motorisName(),
+            salesCode: salesCode,
             partyLabel: party,
             reason: $('#reason').val(),
             lines: changed
@@ -321,23 +494,61 @@
             Swal.fire({ icon: 'warning', text: result.message, confirmButtonColor: '#005D41' });
             return;
         }
-        Swal.fire({ icon: 'success', title: 'Pengajuan terkirim', text: 'Menunggu persetujuan HO. Saldo belum berubah.', confirmButtonColor: '#005D41' })
-            .then(() => { location.href = 'correction_list.html'; });
+        Swal.fire({
+            icon: 'success',
+            title: 'Pengajuan terkirim',
+            text: 'Menunggu persetujuan. Saldo belum berubah. (Online — bukan antrean upload)',
+            confirmButtonColor: '#005D41'
+        }).then(() => { location.href = 'correction_list.html'; });
+    }
+    function loadKulakanData() {
+        // Selalu ambil seed file (sumber kebenaran); cache lama fprs_kulakan_v1 sering usang.
+        return fetch('../../wwwroot/data/kulakan.json?_=' + Date.now())
+            .then(r => r.json())
+            .then(d => {
+                kulakans = d || [];
+                localStorage.setItem('fprs_kulakan_v2', JSON.stringify(kulakans));
+                try { localStorage.removeItem('fprs_kulakan_v1'); } catch (e) { /* ignore */ }
+            })
+            .catch(() => {
+                try {
+                    kulakans = JSON.parse(localStorage.getItem('fprs_kulakan_v2') || localStorage.getItem('fprs_kulakan_v1') || '[]') || [];
+                } catch (e2) { kulakans = []; }
+            });
     }
 
     $(function () {
-        const result = source === 'kulakan' ? loadKulakan() : loadInvoice();
-        if (!result.ok) {
-            showEmpty(result.message);
-        } else {
-            showForm();
-            $('#sourceNo').val(sourceNo);
-            $('#party').val(party);
-            paintLines();
+        // Ignore legacy ?source=&id= deep-links — entry only via hub Add.
+        if (location.search) {
+            history.replaceState({}, '', 'correction_form.html');
         }
+        loadKulakanData().then(function () {
+            syncTypeUi();
+            syncOnlineUi();
+        });
+        window.addEventListener('online', syncOnlineUi);
+        window.addEventListener('offline', syncOnlineUi);
 
-        $('#btnEmptyBack').on('click', function () { history.back(); });
-
+        $('#btnBack').on('click', function () { location.href = 'correction_list.html'; });
+        $('#sourceType').on('change', function () {
+            clearDoc();
+            syncTypeUi();
+            syncOnlineUi();
+        });
+        $('#btnLov, #docLabel').on('click', function () {
+            if ($(this).prop('disabled') || $('#btnLov').prop('disabled')) return;
+            openLov();
+        });
+        $('#btnLovClose').on('click', closeLov);
+        $('#lovOverlay').on('click', function (e) {
+            if (e.target === this) closeLov();
+        });
+        $('#lovSearch').on('input', function () {
+            paintLovList($(this).val());
+        });
+        $('#lovList').on('click', '.lov-item', function () {
+            pickDoc(String($(this).data('id')));
+        });
         $('#lines').on('click', '.qty-minus', function () {
             const $row = $(this).closest('.line-row');
             const qty = parseQty($row);
@@ -352,7 +563,6 @@
             paintImpact($(this).closest('.line-row'));
             refreshSend();
         });
-
         $('#reasonChips').on('click', '.reason-chip', function () {
             const text = String($(this).data('reason') || '');
             $('#reason').val(text);
@@ -367,8 +577,11 @@
             });
             refreshSend();
         });
-
         $('#btnSend').on('click', function () {
+            if (!isOnline()) {
+                Swal.fire({ icon: 'warning', text: 'Fitur ini membutuhkan koneksi.', confirmButtonColor: '#005D41' });
+                return;
+            }
             if (sending || $(this).prop('disabled')) return;
             const pack = collectChanged();
             if (pack.bad) {
@@ -387,7 +600,7 @@
             refreshSend();
             Swal.fire({
                 icon: 'question',
-                text: 'Kirim pengajuan koreksi? Menunggu persetujuan HO. Saldo belum berubah.',
+                text: 'Kirim pengajuan koreksi? Menunggu persetujuan. Saldo belum berubah.',
                 showCancelButton: true,
                 confirmButtonText: 'Kirim',
                 cancelButtonText: 'Batal',

@@ -1492,9 +1492,31 @@
             lines: lines,
             value: lines.reduce((s, ln) => s + Number(ln.value || 0), 0)
         };
+        // Online API path — never addToSyncQueue (koreksi wajib online, bukan push offline).
         list.push(rec);
         writeCorrections(list);
         return { ok: true, record: rec };
+    }
+
+    /** Motoris withdraw: hapus Waiting milik sendiri. Tidak masuk Riwayat / sync queue. */
+    function cancelMotorisCorrection(id, motorisName) {
+        const list = listCorrections();
+        const idx = list.findIndex(r => String(r.id) === String(id));
+        if (idx < 0) return { ok: false, message: 'Pengajuan tidak ditemukan.' };
+        const rec = list[idx];
+        if (rec.status !== 'Waiting') {
+            return { ok: false, message: 'Hanya pengajuan menunggu yang bisa dibatalkan.' };
+        }
+        if (rec.requester !== 'Motoris') {
+            return { ok: false, message: 'Pengajuan ini tidak bisa dibatalkan dari sini.' };
+        }
+        const mine = String(motorisName || '').trim();
+        if (mine && String(rec.motoris || '') !== mine) {
+            return { ok: false, message: 'Anda hanya bisa membatalkan pengajuan sendiri.' };
+        }
+        list.splice(idx, 1);
+        writeCorrections(list);
+        return { ok: true };
     }
 
     // =========================================================
@@ -1557,7 +1579,7 @@
         getSyncQueue, addToSyncQueue, clearSyncQueue, clearAllSyncQueue, processQueue, ensureDemoSyncQueue,
         getDownloadStatus, runDownloadFromServer, setLastDownload, ensureDemoDownloadStatus,
         isQueueItemDone, retryQueueItem, clearSuccessfulQueue,
-        listCorrections, writeCorrections, submitMotorisCorrection,
+        listCorrections, writeCorrections, submitMotorisCorrection, cancelMotorisCorrection,
         // KPI & Dashboard
         getTodayKpi, getKpiByDate, getKpiByRange, getKpiByMonth, getKpiByWeek,
         getTargetHarianVersions, getLimitTargets, getLimitByCode, getLimitByJabatan,

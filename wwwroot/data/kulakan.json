@@ -28,5 +28,39 @@
     "items": [
       { "kode": "ZRIZV", "nama": "ZEE SACHET VAN TWIST 37 G", "qtyPcs": 30, "harga": 3031 }
     ]
+  },
+  {
+    "id": "KL-2026-0011",
+    "date": "2026-10-18",
+    "motoris": "YOSSY PRADIPTA OKTAVIANTO",
+    "salesCode": "2511001269",
+    "stokis": "SUGENG MAKMUR",
+    "items": [
+      { "kode": "HNM01", "nama": "HC COCONUT MILKS", "qtyPcs": 36, "harga": 27027 },
+      { "kode": "ZRIZV", "nama": "ZEE SACHET VAN TWIST 37 G", "qtyPcs": 48, "harga": 3031 },
+      { "kode": "NBE41", "nama": "BENECOL LYCHEE 6X100ML", "qtyPcs": 12, "harga": 36800 }
+    ]
+  },
+  {
+    "id": "KL-2026-0025",
+    "date": "2026-10-21",
+    "motoris": "YOSSY PRADIPTA OKTAVIANTO",
+    "salesCode": "2511001269",
+    "stokis": "TOKO SUMBER REZEKI",
+    "items": [
+      { "kode": "NBE14", "nama": "BENECOL STRAW 100ML", "qtyPcs": 24, "harga": 6150 },
+      { "kode": "HNM01", "nama": "HC COCONUT MILKS", "qtyPcs": 18, "harga": 27027 }
+    ]
+  },
+  {
+    "id": "KL-2026-0026",
+    "date": "2026-10-24",
+    "motoris": "YOSSY PRADIPTA OKTAVIANTO",
+    "salesCode": "2511001269",
+    "stokis": "TOKO 6 SAUDARA",
+    "items": [
+      { "kode": "ZRIZV", "nama": "ZEE SACHET VAN TWIST 37 G", "qtyPcs": 60, "harga": 3031 },
+      { "kode": "NBE41", "nama": "BENECOL LYCHEE 6X100ML", "qtyPcs": 8, "harga": 36800 }
+    ]
   }
 ]

@@ -98,13 +98,25 @@ Create dari web langsung **Approved** (bukan Waiting) — tidak lewat antrean AB
 
 ---
 
+## Motoris withdraw vs ABM putusan
+
+| Aksi | Siapa | Di mana | Efek |
+|------|-------|---------|------|
+| **Batalkan** | Motoris (pemilik) | Hub `correction_list` (Menunggu) | Hapus record Waiting milik sendiri; **bukan** Rejected; tidak masuk Riwayat |
+| **Setujui / Tolak** | ABM / BHO | `correction_approve` | Status Approved/Rejected + jejak; saldo bergerak hanya jika Setujui |
+| **Approve / Reject** | HO | Web Stock Correction | Sama efek bisnis; tidak ada Batalkan Waiting orang lain di pass ini |
+
+Motoris **tidak** memutuskan Waiting orang lain. Approver **tidak** memakai Batalkan — pakai Tolak agar jejak Rejected tetap ada.
+
+---
+
 ## Matriks siapa boleh apa
 
-| Aktor | Ajukan Waiting | Approve/Reject Waiting | Create langsung Approved |
-|-------|----------------|------------------------|---------------------------|
-| Motoris (mobile) | Ya | Tidak (lihat saja di menu persetujuan) | Tidak |
-| ABM / BHO (mobile) | Tidak (prototipe) | Ya (antrian motoris) | Tidak |
-| HO (web) | — | Ya (semua Waiting) | Ya |
+| Aktor | Ajukan Waiting | Batalkan Waiting sendiri | Approve/Reject Waiting | Create langsung Approved |
+|-------|----------------|--------------------------|------------------------|---------------------------|
+| Motoris (mobile hub) | Ya (online) | Ya | Tidak | Tidak |
+| ABM / BHO (mobile) | Tidak (prototipe) | Tidak | Ya (antrian motoris) | Tidak |
+| HO (web) | — | Tidak (pass ini) | Ya (semua Waiting) | Ya |
 
 ---
 

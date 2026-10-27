@@ -44,8 +44,8 @@ Halaman yang diubah Juli 2026 memiliki tombol **info** (<i class="fas fa-circle-
 | `order_input.html` | [order_input.md](order_input.md) | Sales order dari visit |
 | `order_add.html` | [order_add.md](order_add.md) | Buat faktur standalone |
 | `invoice_list.html` | [invoice_list.md](invoice_list.md) | Daftar faktur |
-| `invoice_detail.html` | [invoice_detail.md](invoice_detail.md) | Detail faktur (+ Ajukan koreksi) |
-| `correction_form.html` / `correction_list.html` | [penjualan_koreksi.md](penjualan_koreksi.md) | Ajukan & daftar koreksi stok (Waiting → HO web) |
+| `invoice_detail.html` | [invoice_detail.md](invoice_detail.md) | Detail faktur (tanpa shortcut koreksi) |
+| `correction_list.html` / `correction_form.html` | [penjualan_koreksi.md](penjualan_koreksi.md) | Hub Koreksi Stok (Menunggu \| Riwayat + Add + Batalkan) + form type-first; online-only |
 | `correction_approve.html` | [penjualan_koreksi_persetujuan.md](penjualan_koreksi_persetujuan.md) | **Setujui / Tolak** ABM·BHO (list + detail); lihat juga [penjualan_koreksi.md](penjualan_koreksi.md) |
 | `collection_list.html` | [collection_list.md](collection_list.md) | Daftar piutang |
 | `collection_input.html` | [collection_input.md](collection_input.md) | Input pembayaran |
@@ -54,7 +54,7 @@ Halaman yang diubah Juli 2026 memiliki tombol **info** (<i class="fas fa-circle-
 
 | Halaman | Dokumen | Fungsi |
 |---------|---------|--------|
-| `sync_detail.html` | [sync_detail.md](sync_detail.md) | Antrean upload offline (+ indikator koreksi Waiting) |
+| `sync_detail.html` | [sync_detail.md](sync_detail.md) | Antrean upload offline (bukan koreksi stok) |
 
 ---
 

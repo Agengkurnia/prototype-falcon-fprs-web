@@ -157,19 +157,19 @@
 
     function renderQueue() {
         const queue = SfaStore.getSyncQueue();
-        const waitingCorrections = SfaStore.listCorrections().filter(c => c.status === 'Waiting' && c.requester === 'Motoris');
+        // Koreksi stok online-only — tidak masuk antrean upload / push.
         const container = $('#queueList');
         container.empty();
 
         // Update summary
-        const pending = queue.filter(q => q.status === 'pending').length + waitingCorrections.length;
+        const pending = queue.filter(q => q.status === 'pending').length;
         const success = queue.filter(q => SfaStore.isQueueItemDone(q)).length;
         const failed = queue.filter(q => q.status === 'failed').length;
         $('#kpiPending').text(pending);
         $('#kpiSuccess').text(success);
         $('#kpiFailed').text(failed);
 
-        if (queue.length === 0 && waitingCorrections.length === 0) {
+        if (queue.length === 0) {
             container.html(`<div class="empty-state">
                 <i class="fas fa-check-circle fs-1 mb-3 text-success d-block"></i>
                 <div style="font-size:15px; font-weight:700; margin-bottom:4px;">Semua Data Tersinkron</div>
@@ -219,19 +219,6 @@
                     </div>
                     ${retryBtn}
                     ${statusIconHtml}
-                </div>
-            `);
-        });
-
-        waitingCorrections.forEach(c => {
-            container.append(`
-                <div class="queue-item">
-                    <div class="queue-icon icon-correction"><i class="fas fa-pen"></i></div>
-                    <div class="queue-info">
-                        <div class="queue-type">Koreksi ${c.sourceNo || ''}</div>
-                        <div class="queue-time">${(Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0))} produk · menunggu persetujuan</div>
-                    </div>
-                    <i class="fas fa-clock status-icon si-pending"></i>
                 </div>
             `);
         });
@@ -291,19 +278,6 @@
                 timer: 1400,
                 showConfirmButton: false
             });
-        });
-
-        waitingCorrections.forEach(c => {
-            container.append(`
-                <div class="queue-item">
-                    <div class="queue-icon icon-correction"><i class="fas fa-pen"></i></div>
-                    <div class="queue-info">
-                        <div class="queue-type">Koreksi ${c.sourceNo || ''}</div>
-                        <div class="queue-time">${(Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0))} produk · menunggu persetujuan</div>
-                    </div>
-                    <i class="fas fa-clock status-icon si-pending"></i>
-                </div>
-            `);
         });
     }
 

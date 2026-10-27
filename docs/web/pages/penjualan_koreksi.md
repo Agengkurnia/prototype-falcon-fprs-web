@@ -11,6 +11,7 @@ Modul **Stock Correction** adalah transaksi koreksi stok motoris yang berdiri se
 | Model data | Header + `lines[]` (multi-produk) |
 | Satuan | **pcs** saja |
 | Efek saldo | Hanya saat status **Approved** (dibaca Motoris Stock & overlay Faktur) |
+| Koneksi | **Online admin** (bukan offline SFA / bukan sync queue) |
 
 ---
 
@@ -35,7 +36,7 @@ Modul **Stock Correction** adalah transaksi koreksi stok motoris yang berdiri se
 Halaman satu file, tiga mode tanpa reload penuh:
 
 ```text
-List ──Add──► Create (Invoice + Detail)
+List ──Add──► Create (Motoris → Type → LOV doc + Detail)
   ▲               │
   │◄──Back/Save───┘
   │
@@ -45,8 +46,10 @@ List ──Add──► Create (Invoice + Detail)
 | Mode | Kontainer | Tombol header |
 |------|-----------|---------------|
 | List | `#list` | **Add** |
-| Create | `#detail` | **Back**; **Save** hanya setelah invoice + ada baris pcs |
+| Create | `#detail` | **Back**; **Save** hanya setelah dokumen + ada baris pcs |
 | Review | `#review` | **Back**; **Approve** / **Reject** jika status Waiting |
+
+Pass ini: **tidak** ada Batalkan Waiting orang lain di web — HO tetap Approve/Reject saja.
 
 Konfirmasi Back / Save / Approve / Reject memakai SweetAlert2 (via `PrototypeSpa.confirm` atau Swal langsung untuk Save agar cancel membuka kembali tombol Save).
 
@@ -80,6 +83,7 @@ Klik kartu → satu kartu `is-filtered` + filter DataTables custom (`data[7]` = 
 | Checkbox | Hanya baris Waiting |
 | Date | `DD Mon YYYY` |
 | Correction No. | Link hijau tebal → Review |
+| **Type** | `Sales invoice` / `Kulakan` (dari `sourceType`) |
 | Source No. | Nomor faktur / kulakan |
 | Motoris | Nama motoris |
 | **Products** | Jumlah baris di `lines[]` |
@@ -87,7 +91,7 @@ Klik kartu → satu kartu `is-filtered` + filter DataTables custom (`data[7]` = 
 | Status | Badge (lihat bawah) |
 
 - Tidak ada kolom action terpisah; buka detail lewat nomor koreksi.
-- Search per kolom (Correction / Source / Motoris) + tombol search hijau; filter Status via select.
+- Search per kolom (Correction / Source / Motoris) + tombol search hijau; filter Type & Status via select.
 - Empty state: `PrototypeSpa.emptyHtml()` (`data_not_found.png` + *no data available in table*), tinggi area kosong dijaga agar tidak “loncat” saat filter 0 baris.
 
 ### Badge status
@@ -102,43 +106,43 @@ Klik kartu → satu kartu `is-filtered` + filter DataTables custom (`data[7]` = 
 
 ## 2. Create (HO)
 
-Create **invoice-first** (bukan kulakan di LOV create pass ini). Seed Waiting dari kulakan tetap bisa di-review/approve dari list.
+Create **type-first**: pilih **Transaction type** dulu, baru LOV dokumen sesuai tipe.
 
-### Kartu Invoice
+### Kartu Source document
 
-1. Hint: *Select a motoris, then search an invoice.*
+1. Hint: *Select a motoris and transaction type, then search a document.*
 2. **Motoris** — Select2 searchable.
-3. **Invoice no.** — readonly + tombol search → modal LOV.
-4. Placeholder: *Search invoice…*
-5. Setelah pilih invoice: meta ringkas di bawah field — `Outlet · Date` (`#invoiceMeta`).
+3. **Transaction type** — `Sales invoice (Outbound)` \| `Kulakan (Inbound)` (`#fSourceType`).
+4. **Document no.** — label/placeholder menyesuaikan tipe; readonly + tombol search → modal LOV (disabled sampai tipe dipilih).
+5. Setelah pilih dokumen: meta ringkas di bawah field — `Outlet/Stokis · Date` (`#invoiceMeta`).
 
-Ganti motoris → clear invoice, hide Detail, hide Save.
+Ganti motoris **atau** tipe → clear dokumen, hide Detail, hide Save.
 
-### LOV invoice (`#invModal`)
+### LOV dokumen (`#invModal`)
 
-| Aspek | Perilaku |
-|-------|----------|
-| Data | Faktur dengan `salesNama` = motoris terpilih (`fprs_faktur_v7` / `faktur.json`) |
-| Kolom | Select \| Invoice no. \| Outlet \| Date |
-| Select | Kolom sempit (~72px); tombol `Select` `btn-outline-success` (bukan full-width) |
-| Search | Per kolom; Enter tidak menutup modal |
-| Sort | Title row saja (`orderCellsTop` / stopPropagation di search row); default Date DESC |
-| Empty | *No invoice for this motoris.* |
+| Aspek | Sales invoice | Kulakan |
+|-------|---------------|---------|
+| Data | `salesNama` = motoris (`fprs_faktur_v7` / `faktur.json`) | `motoris` = motoris (`fprs_kulakan_v2` / `kulakan.json`, force-fresh) |
+| Kolom | Select \| Invoice no. \| Outlet \| Date | Select \| Kulakan no. \| Stokis \| Date |
+| Select | Kolom sempit (~72px); tombol `Select` `btn-outline-success` | Sama |
+| Empty | *No invoice for this motoris.* | *No kulakan for this motoris.* |
+
+Search per kolom; Enter tidak menutup modal; default Date DESC.
 
 ### Kartu Detail
 
-Setelah invoice terpilih:
+Setelah dokumen terpilih:
 
-- **Tidak** mengulang Invoice / Motoris / Outlet / Date sebagai input disabled (hindari duplikasi).
+- **Tidak** mengulang Document / Motoris / Outlet / Date sebagai input disabled (hindari duplikasi).
 - Tabel produk: Product, Original qty (pcs), Price, **Corrected qty (pcs)**, Delta (pcs), Value.
-- Hanya baris satuan **PCS** dari faktur (agregasi per kode produk).
-- Delta & Value dihitung live saat qty diubah: `delta = corrected − original`, `value = delta × price`.
+- Invoice: hanya baris **PCS** (agregasi per kode). Kulakan: baris `qtyPcs` dari dokumen.
+- Delta & Value dihitung live: `delta = corrected − original`, `value = delta × price`.
 - **Reason** wajib (textarea + placeholder *Why is this correction needed?*).
-- Invoice tanpa baris pcs: pesan *This invoice has no pcs line.* + Save tetap disembunyikan.
+- Dokumen tanpa baris pcs: pesan kosong + Save tetap disembunyikan.
 
 ### Save
 
-- Tombol **Save** di header: **hidden** sampai invoice terpilih **dan** ada baris pcs; lalu enabled.
+- Tombol **Save** di header: **hidden** sampai dokumen terpilih **dan** ada baris pcs; lalu enabled.
 - Guard double-click saat dialog confirm terbuka (`saving`).
 - Confirm: *Save this correction? Stock updates immediately for all changed products.*
 - Sukses: toast singkat *Correction saved.* (~1.2s) → kembali ke list; kartu Total/Approved ter-update.
@@ -248,7 +252,7 @@ Migrasi: record lama single-product (field flat di root) di-`normalize` menjadi 
 |-------|-----------|
 | **Motoris Stock** | `StokMotoris/index.html` — koreksi **Approved** masuk audit + penyesuaian nilai/saldo pcs |
 | **Sales Invoice (Faktur)** | `Faktur/index.html` / detail — riwayat koreksi terkait nomor faktur (overlay read) |
-| **Mobile** | `Views/Mobile/correction_form.html`, `correction_list.html`; queue di `sync_detail.html`; entry dari `invoice_detail.html` → Ajukan koreksi. Persist via `sfa-store.js` ke key yang sama |
+| **Mobile** | Hub `correction_list.html` (Menunggu \| Riwayat + Add + Batalkan) + form type-first `correction_form.html`. Online-only; **tidak** masuk sync/push. Persist via `sfa-store.js` → `fprs_koreksi_v1`. Docs: [../../mobile/pages/penjualan_koreksi.md](../../mobile/pages/penjualan_koreksi.md) |
 
 Efek arah saldo (konsep produk):
 
@@ -264,7 +268,7 @@ Efek arah saldo (konsep produk):
 Ringkas dari polish FE halaman ini:
 
 1. List scannable: Products + Net value, badge Rejected jelas.
-2. Create guided: hint → motoris → LOV → edit qty; Save hanya saat siap; tanpa header Detail duplikat.
+2. Create guided: hint → motoris → **transaction type** → LOV → edit qty; Save hanya saat siap; tanpa header Detail duplikat.
 3. LOV aman: Select sempit, empty copy jelas, Enter di search tidak menutup modal.
 4. Review yakin: Approve hijau, Reject outline danger, Net value di header, bulk confirm dengan jumlah.
 5. Microcopy English konsisten (*Corrected qty*, placeholder invoice, confirm Save).
@@ -289,7 +293,7 @@ Ringkas dari polish FE halaman ini:
 
 ## Batasan prototipe / belum di pass ini
 
-- Create LOV **belum** menyertakan kulakan (tetap bisa review Waiting kulakan dari seed/mobile).
+- ~~Create LOV belum menyertakan kulakan~~ — sudah: pilih Transaction type lalu LOV invoice / kulakan.
 - Tidak ada API / tabel MAVEN (`trGtKoreksi` dll.) — hanya kontrak UX + shape JSON untuk acuan implementasi nanti.
 - Route MAVEN final belum dikunci (jangan asumsikan path FSD prototype sebagai production URL).
 - Bahasa UI web English; mobile koreksi masih copy Indonesia (konteks lapangan).
@@ -299,8 +303,8 @@ Ringkas dari polish FE halaman ini:
 ## Smoke test manual
 
 1. Buka Stock Correction → kartu Total / Waiting terisi; kolom Products & Net value terlihat.
-2. **Add** → Save belum muncul; pilih motoris → LOV → Select invoice → meta outlet·date + tabel; Save muncul.
-3. Ubah Corrected qty ≥ 1 produk, isi Reason → Save → confirm → toast → list; Approved bertambah.
+2. **Add** → Save belum muncul; pilih motoris → **Transaction type** (invoice atau kulakan) → LOV → Select → meta + tabel; Save muncul.
+3. Ubah Corrected qty ≥ 1 produk, isi Reason → Save → confirm → toast → list; Approved bertambah (online admin, bukan sync queue).
 4. Buka baris Waiting → Net value + Approve/Reject outline-danger → Approve → Waiting turun.
 5. Centang 2 Waiting → Approve all → confirm *Approve 2 corrections?*.
 6. Filter kartu Rejected / Waiting = 0 → empty state tidak meruntuhkan tinggi grid.
@@ -314,4 +318,5 @@ Ringkas dari polish FE halaman ini:
 - Faktur: [penjualan_faktur.md](./penjualan_faktur.md)
 - Stok Motoris: [penjualan_stok_motoris.md](./penjualan_stok_motoris.md)
 - Approve/Reject (web + mobile ABM/BHO): [../../mobile/pages/penjualan_koreksi_persetujuan.md](../../mobile/pages/penjualan_koreksi_persetujuan.md)
+- Mobile hub motoris: [../../mobile/pages/penjualan_koreksi.md](../../mobile/pages/penjualan_koreksi.md)
 - Mobile SFA: [../../mobile/sfa_mobile_prototype.md](../../mobile/sfa_mobile_prototype.md)

@@ -42,8 +42,8 @@ Hub utama setelah login: KPI harian, unduh data master dari server, menu cepat, 
 Paket unduhan: Master Produk, Pelanggan, Stokis & Rute, Harga & Promo.
 
 ### Menu Utama (grid, by role)
-- **Motoris / MD:** Cek Stok, Faktur Penjualan, Antrean Upload
-- **ABM / BHO:** hanya **Persetujuan Koreksi** (`for ABM / BHO` + `New Feature`; badge Waiting) — tiga menu operasional motoris disembunyikan
+- **Motoris / MD:** Cek Stok, Faktur Penjualan, **Koreksi Stok** (`correction_list.html`), Antrean Upload — class `menu-for-motoris`
+- **ABM / BHO:** hanya **Persetujuan Koreksi** (`for ABM / BHO` + `New Feature`; badge Waiting) — menu operasional motoris (termasuk Koreksi Stok) disembunyikan
 
 ### Bottom Nav
 Dasbor | **Beranda** | Profil

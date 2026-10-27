@@ -36,24 +36,32 @@
 <button class="btn btn-outline-secondary" id="btnRejectAll" type="button">Reject all</button>
 </div>
 <div class="card"><div class="card-body"><table class="table table-bordered" id="tbl" style="width:100%"><thead>
-<tr><th><input type="checkbox" id="chkAll" aria-label="Select all waiting"></th><th>Date</th><th>Correction No.</th><th>Source No.</th><th>Motoris</th><th class="text-end">Products</th><th class="text-end">Net value</th><th>Status</th></tr>
+<tr><th><input type="checkbox" id="chkAll" aria-label="Select all waiting"></th><th>Date</th><th>Correction No.</th><th>Type</th><th>Source No.</th><th>Motoris</th><th class="text-end">Products</th><th class="text-end">Net value</th><th>Status</th></tr>
 <tr class="dt-col-search"><th></th><th></th>
 <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="2" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
-<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="3" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th><select class="form-select form-select-sm col-search" data-col="3"><option value="">All</option><option value="Sales invoice">Sales invoice</option><option value="Kulakan">Kulakan</option></select></th>
 <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="4" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="5" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
 <th></th><th></th>
-<th><select class="form-select form-select-sm col-search" data-col="7"><option value="">All</option><option>Waiting</option><option>Approved</option><option>Rejected</option></select></th>
+<th><select class="form-select form-select-sm col-search" data-col="8"><option value="">All</option><option>Waiting</option><option>Approved</option><option>Rejected</option></select></th>
 </tr></thead><tbody></tbody></table></div></div>
 </div>
 <div id="detail" class="d-none">
-<div class="card mb-3"><div class="card-header mpg-gradient">Invoice</div><div class="card-body">
-<p class="text-muted small mb-3" id="createHint">Select a motoris, then search an invoice.</p>
+<div class="card mb-3"><div class="card-header mpg-gradient">Source document</div><div class="card-body">
+<p class="text-muted small mb-3" id="createHint">Select a motoris and transaction type, then search a document.</p>
 <div class="row g-3">
-<div class="col-md-6"><label class="form-label" for="fMotoris">Motoris</label><select class="form-select" id="fMotoris"></select></div>
-<div class="col-md-6"><label class="form-label" for="fInvoiceLabel">Invoice no.</label>
+<div class="col-md-4"><label class="form-label" for="fMotoris">Motoris</label><select class="form-select" id="fMotoris"></select></div>
+<div class="col-md-4"><label class="form-label" for="fSourceType">Transaction type</label>
+<select class="form-select" id="fSourceType">
+<option value="">Select type…</option>
+<option value="invoice">Sales invoice (Outbound)</option>
+<option value="kulakan">Kulakan (Inbound)</option>
+</select>
+</div>
+<div class="col-md-4"><label class="form-label" for="fInvoiceLabel" id="lblDocNo">Document no.</label>
 <div class="input-group">
-<button class="btn btn-outline-success" id="btnInvLov" type="button" aria-label="Search invoice"><i class="fa fa-search"></i></button>
-<input class="form-control" id="fInvoiceLabel" readonly placeholder="Search invoice…"/>
+<button class="btn btn-outline-success" id="btnInvLov" type="button" aria-label="Search document" disabled><i class="fa fa-search"></i></button>
+<input class="form-control" id="fInvoiceLabel" readonly placeholder="Select type first…" disabled/>
 <input type="hidden" id="fInvoice" value=""/>
 </div>
 <div class="form-text d-none" id="invoiceMeta"></div>
@@ -61,7 +69,7 @@
 </div>
 </div></div>
 <div class="card d-none" id="linesCard"><div class="card-header mpg-gradient">Detail</div><div class="card-body">
-<p class="text-muted mb-0 d-none" id="mEmpty">This invoice has no pcs line.</p>
+<p class="text-muted mb-0 d-none" id="mEmpty">This document has no pcs line.</p>
 <div id="mTableWrap">
 <table class="table table-bordered" id="mLines" style="width:100%"><thead><tr><th>Product</th><th class="text-end">Original qty (pcs)</th><th class="text-end">Price</th><th class="text-end">Corrected qty (pcs)</th><th class="text-end">Delta (pcs)</th><th class="text-end">Value</th></tr></thead><tbody></tbody></table>
 </div>
@@ -70,11 +78,16 @@
 </div>
 <div class="modal fade" id="invModal" tabindex="-1" aria-hidden="true">
 <div class="modal-dialog modal-lg modal-dialog-scrollable"><div class="modal-content">
-<div class="modal-header mpg-gradient"><h5 class="modal-title text-white mb-0">Select invoice</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div>
+<div class="modal-header mpg-gradient"><h5 class="modal-title text-white mb-0" id="invModalTitle">Select document</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div>
 <div class="modal-body">
 <table class="table table-bordered" id="invTbl" style="width:100%">
 <thead>
-<tr><th style="width:72px">Select</th><th>Invoice no.</th><th>Outlet</th><th>Date</th></tr>
+<tr>
+<th style="width:72px">Select</th>
+<th id="invColDoc">Document no.</th>
+<th id="invColParty">Party</th>
+<th>Date</th>
+</tr>
 <tr class="dt-col-search">
 <th></th>
 <th><input class="form-control form-control-sm inv-col-search" data-col="1" placeholder="Search"/></th>
@@ -118,7 +131,7 @@
 <script>
 document.addEventListener("layoutReady", function () {
     const KEY = "fprs_koreksi_v1";
-    let rows = [], invoices = [], table, linesTable = null, invTable = null, reviewTable = null, filter = "", mode = "list", currentId = null, invModal = null, popupLines = [], saving = false;
+    let rows = [], invoices = [], kulakans = [], table, linesTable = null, invTable = null, reviewTable = null, filter = "", mode = "list", currentId = null, invModal = null, popupLines = [], saving = false;
     const money = n => "Rp " + Number(n || 0).toLocaleString("id-ID");
     const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     const badge = st => st === "Approved" ? "<span class='badge bg-success'>Approved</span>" : st === "Rejected" ? "<span class='badge badge-rejected'>Rejected</span>" : "<span class='badge bg-warning text-dark'>Waiting</span>";
@@ -285,12 +298,27 @@ document.addEventListener("layoutReady", function () {
         if (list.some(r => r.sourceNo === rec.sourceNo && r.status === "Waiting" && r.id !== rec.id)) return "This document already has a correction waiting for approval.";
         return "";
     }
+    function loadJson(storageKey, url, opts) {
+        const forceFresh = !!(opts && opts.forceFresh);
+        if (!forceFresh && localStorage.getItem(storageKey)) {
+            try { return Promise.resolve(JSON.parse(localStorage.getItem(storageKey))); } catch (e) { /* fall through */ }
+        }
+        const fetchUrl = forceFresh ? (url + (url.indexOf("?") >= 0 ? "&" : "?") + "_=" + Date.now()) : url;
+        return fetch(fetchUrl).then(r => r.json()).then(d => {
+            localStorage.setItem(storageKey, JSON.stringify(d));
+            return d;
+        }).catch(function () {
+            try { return JSON.parse(localStorage.getItem(storageKey) || "[]"); } catch (e2) { return []; }
+        });
+    }
     function load() {
-        const inv = localStorage.getItem("fprs_faktur_v7")
-            ? Promise.resolve(JSON.parse(localStorage.getItem("fprs_faktur_v7")))
-            : fetch("../../../../wwwroot/data/faktur.json").then(r => r.json()).then(d => { localStorage.setItem("fprs_faktur_v7", JSON.stringify(d)); return d; });
-        inv.then(function (data) {
-            invoices = data || [];
+        try { localStorage.removeItem("fprs_kulakan_v1"); } catch (e) { /* ignore */ }
+        Promise.all([
+            loadJson("fprs_faktur_v7", "../../../../wwwroot/data/faktur.json"),
+            loadJson("fprs_kulakan_v2", "../../../../wwwroot/data/kulakan.json", { forceFresh: true })
+        ]).then(function (pair) {
+            invoices = pair[0] || [];
+            kulakans = pair[1] || [];
             rows = seed(read());
             paint();
             bindSearch();
@@ -309,7 +337,8 @@ document.addEventListener("layoutReady", function () {
                 : "";
             const day = String(r.createdAt || "").slice(0, 10);
             const net = docNet(r);
-            body.append("<tr><td>" + box + "</td><td data-order='" + esc(day) + "'>" + PrototypeSpa.fmtDate(r.createdAt) + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + esc(r.id) + "'>" + esc(r.id) + "</a></td><td>" + esc(r.sourceNo) + "</td><td>" + esc(r.motoris) + "</td><td class='text-end' data-order='" + lineCount(r) + "'>" + lineCount(r) + "</td><td class='text-end' data-order='" + net + "'>" + money(net) + "</td><td>" + badge(r.status) + "</td></tr>");
+            const typeLabel = r.sourceType === "kulakan" ? "Kulakan" : "Sales invoice";
+            body.append("<tr><td>" + box + "</td><td data-order='" + esc(day) + "'>" + PrototypeSpa.fmtDate(r.createdAt) + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + esc(r.id) + "'>" + esc(r.id) + "</a></td><td>" + esc(typeLabel) + "</td><td>" + esc(r.sourceNo) + "</td><td>" + esc(r.motoris) + "</td><td class='text-end' data-order='" + lineCount(r) + "'>" + lineCount(r) + "</td><td class='text-end' data-order='" + net + "'>" + money(net) + "</td><td>" + badge(r.status) + "</td></tr>");
         });
         $("#chkAll").prop("checked", false);
         const lang = PrototypeSpa.dtLang();
@@ -323,13 +352,14 @@ document.addEventListener("layoutReady", function () {
         PrototypeSpa.bindColumnSearch(table, "#list");
         $("#list").off("change.kr").on("change.kr", "select.col-search", function () {
             const val = this.value || "";
-            const exact = val === "Waiting" || val === "Approved" || val === "Rejected";
+            const exact = val === "Waiting" || val === "Approved" || val === "Rejected"
+                || val === "Sales invoice" || val === "Kulakan";
             table.column(Number($(this).data("col"))).search(exact ? "^" + val + "$" : val, exact, false).draw();
         });
         $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._kr);
         const fn = function (settings, data) {
             if (settings.nTable.id !== "tbl" || !filter) return true;
-            return String(data[7]).indexOf(filter) >= 0;
+            return String(data[8]).indexOf(filter) >= 0;
         };
         fn._kr = true;
         $.fn.dataTable.ext.search.push(fn);
@@ -341,13 +371,51 @@ document.addEventListener("layoutReady", function () {
     function motorisOptions() {
         const names = new Set();
         invoices.forEach(d => { if (d.salesNama) names.add(d.salesNama); });
+        kulakans.forEach(d => { if (d.motoris) names.add(d.motoris); });
         return Array.from(names).filter(Boolean).sort();
+    }
+    function selectedSourceType() {
+        return String($("#fSourceType").val() || "");
     }
     function invoiceLabel(d) {
         return d.id + " — " + (d.pelangganNama || "") + " — " + PrototypeSpa.fmtDate(d.tanggalFaktur);
     }
+    function kulakanLabel(d) {
+        return d.id + " — " + (d.stokis || "") + " — " + PrototypeSpa.fmtDate(d.date);
+    }
     function invoicesForMotoris(motoris) {
         return invoices.filter(d => String(d.salesNama) === String(motoris || ""));
+    }
+    function kulakansForMotoris(motoris) {
+        return kulakans.filter(d => String(d.motoris) === String(motoris || ""));
+    }
+    function syncDocControls() {
+        const type = selectedSourceType();
+        const ready = !!type;
+        $("#btnInvLov").prop("disabled", !ready);
+        $("#fInvoiceLabel").prop("disabled", !ready);
+        if (type === "kulakan") {
+            $("#lblDocNo").text("Kulakan no.");
+            $("#fInvoiceLabel").attr("placeholder", "Search kulakan…");
+            $("#btnInvLov").attr("aria-label", "Search kulakan");
+            $("#invModalTitle").text("Select kulakan");
+            $("#invColDoc").text("Kulakan no.");
+            $("#invColParty").text("Stokis");
+        } else if (type === "invoice") {
+            $("#lblDocNo").text("Invoice no.");
+            $("#fInvoiceLabel").attr("placeholder", "Search invoice…");
+            $("#btnInvLov").attr("aria-label", "Search invoice");
+            $("#invModalTitle").text("Select invoice");
+            $("#invColDoc").text("Invoice no.");
+            $("#invColParty").text("Outlet");
+        } else {
+            $("#lblDocNo").text("Document no.");
+            $("#fInvoiceLabel").attr("placeholder", "Select type first…");
+            $("#btnInvLov").attr("aria-label", "Search document");
+            $("#invModalTitle").text("Select document");
+            $("#invColDoc").text("Document no.");
+            $("#invColParty").text("Party");
+        }
     }
     function destroyLinesTable() {
         if ($.fn.DataTable.isDataTable("#mLines")) $("#mLines").DataTable().destroy();
@@ -384,17 +452,24 @@ document.addEventListener("layoutReady", function () {
     function paintInvList() {
         destroyInvTable();
         const motoris = $("#fMotoris").val();
+        const type = selectedSourceType();
         const $body = $("#invList").empty();
-        const list = invoicesForMotoris(motoris);
+        syncDocControls();
+        const list = type === "kulakan" ? kulakansForMotoris(motoris) : invoicesForMotoris(motoris);
         list.forEach(function (d) {
+            const party = type === "kulakan" ? (d.stokis || "") : (d.pelangganNama || "");
+            const day = type === "kulakan" ? d.date : d.tanggalFaktur;
             $body.append(
                 "<tr><td class='text-center'><button type='button' class='btn btn-outline-success inv-pick' data-id='" + esc(d.id) + "'>Select</button></td>" +
-                "<td>" + esc(d.id) + "</td><td>" + esc(d.pelangganNama || "") + "</td><td data-order='" + esc(String(d.tanggalFaktur || "").slice(0, 10)) + "'>" + esc(PrototypeSpa.fmtDate(d.tanggalFaktur)) + "</td></tr>"
+                "<td>" + esc(d.id) + "</td><td>" + esc(party) + "</td><td data-order='" + esc(String(day || "").slice(0, 10)) + "'>" + esc(PrototypeSpa.fmtDate(day)) + "</td></tr>"
             );
         });
+        const emptyMsg = type === "kulakan"
+            ? "No kulakan for this motoris."
+            : "No invoice for this motoris.";
         const lang = PrototypeSpa.dtLang();
-        lang.emptyTable = "No invoice for this motoris.";
-        lang.zeroRecords = "No invoice for this motoris.";
+        lang.emptyTable = emptyMsg;
+        lang.zeroRecords = emptyMsg;
         invTable = $("#invTbl").DataTable(PrototypeSpa.dtOpts({
             language: lang,
             order: [[3, "desc"]],
@@ -417,6 +492,10 @@ document.addEventListener("layoutReady", function () {
             warn("Select a motoris first.");
             return;
         }
+        if (!selectedSourceType()) {
+            warn("Select a transaction type first.");
+            return;
+        }
         paintInvList();
         if (!invModal) invModal = bootstrap.Modal.getOrCreateInstance(document.getElementById("invModal"));
         invModal.show();
@@ -436,7 +515,9 @@ document.addEventListener("layoutReady", function () {
     function fillMotoris() {
         const $s = $("#fMotoris").empty().append("<option value=''></option>");
         motorisOptions().forEach(n => $s.append("<option value='" + esc(n) + "'>" + esc(n) + "</option>"));
+        $("#fSourceType").val("");
         clearInvoice();
+        syncDocControls();
         initMotorisSelect2();
     }
     function paintPopupRow($tr) {
@@ -448,13 +529,16 @@ document.addEventListener("layoutReady", function () {
         $tr.find(".m-delta").text(delta === null ? "" : String(delta));
         $tr.find(".m-value").text(delta ? money(delta * Number(ln.harga || 0)) : money(0));
     }
-    function openInvoice(id) {
-        const doc = invoices.find(d => String(d.id) === String(id));
-        if (!doc) return;
-        popupLines = pcsLines(doc, "invoice");
-        $("#invoiceMeta").removeClass("d-none").text(
-            (doc.pelangganNama || "—") + " · " + PrototypeSpa.fmtDate(doc.tanggalFaktur)
-        );
+    function openSourceDoc(id) {
+        const type = selectedSourceType();
+        const doc = type === "kulakan"
+            ? kulakans.find(d => String(d.id) === String(id))
+            : invoices.find(d => String(d.id) === String(id));
+        if (!doc || !type) return;
+        popupLines = pcsLines(doc, type);
+        const party = type === "kulakan" ? (doc.stokis || "—") : (doc.pelangganNama || "—");
+        const day = type === "kulakan" ? doc.date : doc.tanggalFaktur;
+        $("#invoiceMeta").removeClass("d-none").text(party + " · " + PrototypeSpa.fmtDate(day));
         $("#mReason").val("");
         destroyLinesTable();
         const $body = $("#mLines tbody").empty();
@@ -541,8 +625,13 @@ document.addEventListener("layoutReady", function () {
         $("#btnApprove,#btnReject").toggleClass("d-none", rec.status !== "Waiting");
     }
     function collectChanged() {
-        const doc = invoices.find(d => String(d.id) === String($("#fInvoice").val()));
+        const type = selectedSourceType();
+        const id = String($("#fInvoice").val() || "");
+        const doc = type === "kulakan"
+            ? kulakans.find(d => String(d.id) === id)
+            : invoices.find(d => String(d.id) === id);
         const reason = $("#mReason").val().trim();
+        if (!type) return { error: "Select a transaction type first." };
         if (!doc || !popupLines.length) return { error: "Choose a source document that has a pcs line." };
         const lines = [];
         let error = "";
@@ -568,11 +657,11 @@ document.addEventListener("layoutReady", function () {
         if (!lines.length) return { error: "Change at least one pcs qty." };
         const rec = normalize({
             id: nextId(rows),
-            sourceType: "invoice",
+            sourceType: type,
             sourceNo: doc.id,
-            motoris: doc.salesNama || $("#fMotoris").val() || "",
-            salesCode: "",
-            partyLabel: doc.pelangganNama || "",
+            motoris: (type === "kulakan" ? doc.motoris : doc.salesNama) || $("#fMotoris").val() || "",
+            salesCode: type === "kulakan" ? (doc.salesCode || "") : "",
+            partyLabel: type === "kulakan" ? (doc.stokis || "") : (doc.pelangganNama || ""),
             reason: reason,
             status: "Approved",
             requester: "HO",
@@ -606,6 +695,11 @@ document.addEventListener("layoutReady", function () {
         if (invModal) invModal.hide();
         clearInvoice();
     });
+    $("#fSourceType").on("change", function () {
+        if (invModal) invModal.hide();
+        clearInvoice();
+        syncDocControls();
+    });
     $("#btnInvLov").on("click", openInvLov);
     $("#invModal").on("input", ".inv-col-search", function () {
         if (!invTable) return;
@@ -613,12 +707,15 @@ document.addEventListener("layoutReady", function () {
     });
     $("#invList").on("click", ".inv-pick", function () {
         const id = String($(this).data("id") || "");
-        const doc = invoices.find(d => String(d.id) === id);
+        const type = selectedSourceType();
+        const doc = type === "kulakan"
+            ? kulakans.find(d => String(d.id) === id)
+            : invoices.find(d => String(d.id) === id);
         if (!doc) return;
         $("#fInvoice").val(doc.id);
-        $("#fInvoiceLabel").val(invoiceLabel(doc));
+        $("#fInvoiceLabel").val(type === "kulakan" ? kulakanLabel(doc) : invoiceLabel(doc));
         if (invModal) invModal.hide();
-        openInvoice(doc.id);
+        openSourceDoc(doc.id);
     });
     $("#linesCard").on("input", ".m-qty", function () { paintPopupRow($(this).closest("tr")); });
     $("#btnSave").on("click", function () {

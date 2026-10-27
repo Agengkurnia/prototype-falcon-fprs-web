@@ -17,7 +17,7 @@ Kelola antrean **unggah transaksi offline** ke server. Terpisah dari fitur unduh
 ## Komponen UI
 - KPI bar: Pending, Berhasil, Gagal
 - Daftar antrean per tipe (Invoice, Collection, Visit, GeoTag, Customer)
-- Item visual **Koreksi Waiting** (requester Motoris) dari `listCorrections()` — bukan item `processQueue`; lihat [penjualan_koreksi.md](penjualan_koreksi.md)
+- **Bukan** tempat koreksi stok — koreksi online-only di hub [penjualan_koreksi.md](penjualan_koreksi.md), tidak masuk `sfa_sync_queue`
 - Tombol **Retry** per item gagal
 - **Hapus Selesai** — hapus item sukses saja
 - **Kosongkan Semua** — hapus seluruh antrean (konfirmasi)

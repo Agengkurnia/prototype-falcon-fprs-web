@@ -3,51 +3,347 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <title>Koreksi Saya - Falcon SFA Mobile</title>
+    <title>Koreksi Stok - Falcon SFA Mobile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
     <style>
         body { background: #f7f9fa; }
-        .corr-card { background:#fff; border:1px solid var(--color-border); border-radius:12px; margin:0 16px 10px; padding:14px; }
-        .corr-no { font-weight:800; color:#231F20; }
-        .pill { font-size:11px; font-weight:700; border-radius:999px; padding:2px 8px; }
-        .pill-wait { background:#FFF3E0; color:#E65100; }
-        .pill-ok { background:#E8F5E9; color:#2E7D32; }
-        .pill-no { background:#ECEFF1; color:#546E7A; }
+        .offline-bar {
+            margin: 0 16px 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #FFF3E0;
+            color: #E65100;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .online-chip {
+            margin: 0 16px 8px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .seg {
+            display: flex;
+            gap: 8px;
+            margin: 0 16px 10px;
+        }
+        .seg-btn {
+            flex: 1;
+            border: 1px solid #cfe8dc;
+            background: #fff;
+            color: #005D41;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 999px;
+            padding: 10px 12px;
+        }
+        .seg-btn.is-active { background: #005D41; color: #fff; border-color: #005D41; }
+        .list-count { margin: 0 16px 8px; font-size: 12px; color: #6b7280; font-weight: 600; }
+        .corr-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin: 0 16px 10px;
+            padding: 14px;
+        }
+        .corr-no { font-size: 12px; color: #6b7280; font-weight: 600; }
+        .corr-motoris { font-size: 15px; font-weight: 800; color: #231F20; margin-top: 4px; }
+        .corr-meta { font-size: 12px; color: #6b7280; margin-top: 2px; }
+        .corr-net { font-size: 13px; font-weight: 800; color: #231F20; margin-top: 6px; }
+        .corr-reason {
+            font-size: 12px; color: #6b7280; margin-top: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .corr-hint { font-size: 11px; color: #9ca3af; margin-top: 8px; }
+        .corr-actions { display: flex; gap: 8px; margin-top: 12px; }
+        .corr-actions .btn { flex: 1; font-weight: 700; height: 44px; }
+        .btn-cancel-wait {
+            background: #fff; color: #C62828; border: 1px solid #EF9A9A;
+        }
+        .btn-cancel-wait:disabled { opacity: 0.45; }
+        .pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
+        .pill-wait { background: #FFF3E0; color: #E65100; }
+        .pill-ok { background: #E8F5E9; color: #2E7D32; }
+        .pill-no { background: #FFEBEE; color: #C62828; }
+        .empty-box {
+            text-align: center; padding: 40px 24px; color: #9ca3af; font-size: 14px;
+        }
+        .empty-box i { display: block; font-size: 28px; margin-bottom: 10px; }
+        .detail-card {
+            background: #fff; border: 1px solid var(--color-border);
+            border-radius: 12px; margin: 12px 16px; padding: 16px;
+        }
+        .detail-label { font-size: 12px; color: #6b7280; margin-bottom: 2px; }
+        .detail-value { font-size: 14px; font-weight: 700; color: #231F20; margin-bottom: 12px; }
+        .line-row {
+            display: flex; justify-content: space-between; gap: 12px;
+            padding: 10px 0; border-top: 1px solid #eef2f2;
+        }
+        .line-row:first-child { border-top: 0; padding-top: 0; }
+        .line-name { font-weight: 700; font-size: 13px; }
+        .line-sub { font-size: 12px; color: #6b7280; }
+        .delta-plus { color: #2E7D32; font-weight: 700; }
+        .delta-minus { color: #E65100; font-weight: 700; }
+        .header-add {
+            width: 36px; height: 36px; border: 0; background: transparent;
+            color: #fff; font-size: 18px;
+        }
+        .header-add:disabled { opacity: 0.4; }
     </style>
 </head>
 <body>
 <div class="mobile-wrapper">
     <div class="mobile-header">
-        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
-        <span class="header-title">Koreksi Saya</span>
-        <div style="width:36px;"></div>
+        <button class="header-action" type="button" id="btnHeaderBack" aria-label="Kembali"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title" id="headerTitle">Koreksi Stok</span>
+        <button class="header-add" type="button" id="btnAdd" aria-label="Tambah koreksi"><i class="fas fa-plus"></i></button>
     </div>
-    <div class="mobile-content no-nav" id="list" style="padding-top:12px;"></div>
+    <div class="mobile-content no-nav" id="listView" style="padding-bottom:24px;">
+        <div class="online-chip">Online saja — tidak masuk antrean upload.</div>
+        <div class="offline-bar d-none" id="offlineBar">Fitur ini membutuhkan koneksi.</div>
+        <div class="seg">
+            <button type="button" class="seg-btn is-active" data-tab="waiting">Menunggu</button>
+            <button type="button" class="seg-btn" data-tab="history">Riwayat</button>
+        </div>
+        <div class="list-count" id="listCount">0 menunggu</div>
+        <div id="list"></div>
+    </div>
+    <div class="mobile-content no-nav d-none" id="detailView">
+        <div class="detail-card" id="detailHeader"></div>
+        <div class="detail-card">
+            <div class="form-label" style="font-size:12px;color:#6b7280;font-weight:600;margin-bottom:8px;">Produk</div>
+            <div id="detailLines"></div>
+        </div>
+        <div class="px-3 pb-3 d-none" id="detailCancelWrap">
+            <button type="button" class="btn btn-cancel-wait w-100" id="btnDetailCancel">Batalkan pengajuan</button>
+        </div>
+    </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="../../wwwroot/js/sfa-store.js"></script>
 <script>
     const user = SfaStore.getUser() || {};
-    const name = user.name || user.username || '';
-    const mine = SfaStore.listCorrections().filter(c => c.requester === 'Motoris' && (!name || c.motoris === name));
-    const $list = $('#list');
-    if (!mine.length) {
-        $list.html('<div class="text-center text-muted" style="padding:48px 24px;">Belum ada pengajuan koreksi.</div>');
-    } else {
-        mine.slice().reverse().forEach(c => {
-            const pill = c.status === 'Approved' ? 'pill-ok' : c.status === 'Rejected' ? 'pill-no' : 'pill-wait';
-            const label = c.status === 'Approved' ? 'Disetujui' : c.status === 'Rejected' ? 'Ditolak' : 'Menunggu';
-            const n = Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0);
+    const myName = user.name || user.username || '';
+    let tab = 'waiting';
+    let currentId = null;
+    let cancelling = false;
+
+    function isOnline() { return navigator.onLine !== false; }
+    function money(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+    function esc(s) {
+        return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function fmtDate(iso) {
+        if (!iso) return '—';
+        try {
+            return new Date(iso + (String(iso).length <= 10 ? 'T00:00:00' : '')).toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'short', year: 'numeric'
+            });
+        } catch (e) { return String(iso); }
+    }
+    function linesOf(c) { return Array.isArray(c.lines) ? c.lines : []; }
+    function docNet(c) { return linesOf(c).reduce((s, ln) => s + Number(ln.value || 0), 0); }
+    function lineCount(c) { return linesOf(c).length; }
+    function statusPill(st) {
+        if (st === 'Approved') return '<span class="pill pill-ok">Disetujui</span>';
+        if (st === 'Rejected') return '<span class="pill pill-no">Ditolak</span>';
+        return '<span class="pill pill-wait">Menunggu</span>';
+    }
+    function mineAll() {
+        return (SfaStore.listCorrections() || []).filter(c =>
+            c.requester === 'Motoris' && (!myName || c.motoris === myName)
+        );
+    }
+    function waitingRows() {
+        return mineAll().filter(c => c.status === 'Waiting')
+            .slice().sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    }
+    function historyRows() {
+        return mineAll().filter(c => c.status === 'Approved' || c.status === 'Rejected')
+            .slice()
+            .sort((a, b) => String(b.decidedAt || b.createdAt || '').localeCompare(String(a.decidedAt || a.createdAt || '')))
+            .slice(0, 20);
+    }
+    function syncOnlineUi() {
+        const on = isOnline();
+        $('#offlineBar').toggleClass('d-none', on);
+        $('#btnAdd').prop('disabled', !on);
+        $('.btn-cancel-wait').prop('disabled', !on || cancelling);
+        $('#btnDetailCancel').prop('disabled', !on || cancelling);
+    }
+    function paintList() {
+        syncOnlineUi();
+        const rows = tab === 'waiting' ? waitingRows() : historyRows();
+        if (tab === 'waiting') $('#listCount').text(rows.length + ' menunggu');
+        else $('#listCount').text(rows.length ? 'Riwayat terbaru' : 'Belum ada riwayat');
+        const $list = $('#list').empty();
+        if (!rows.length) {
+            const msg = tab === 'waiting' ? 'Tidak ada koreksi menunggu.' : 'Belum ada riwayat putusan.';
+            $list.html('<div class="empty-box"><i class="fas fa-inbox"></i>' + msg + '</div>');
+            return;
+        }
+        rows.forEach(c => {
+            const typeLabel = c.sourceType === 'kulakan' ? 'Kulakan' : 'Invoice';
+            const cancelBtn = (tab === 'waiting' && isOnline())
+                ? '<div class="corr-actions"><button type="button" class="btn btn-cancel-wait btn-card-cancel">Batalkan</button></div>'
+                : '';
             $list.append(
-                '<div class="corr-card"><div class="d-flex justify-content-between"><span class="corr-no">' + c.id + '</span><span class="pill ' + pill + '">' + label + '</span></div>' +
-                '<div style="font-size:13px;margin-top:6px;">' + (c.sourceNo || '') + '</div>' +
-                '<div style="font-size:13px;font-weight:700;margin-top:4px;">' + n + ' produk</div>' +
-                '<div class="text-muted" style="font-size:12px;margin-top:4px;">' + (c.reason || '') + '</div></div>'
+                '<div class="corr-card" data-id="' + esc(c.id) + '">' +
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<span class="corr-no">' + esc(c.id) + '</span>' + statusPill(c.status) + '</div>' +
+                '<div class="corr-motoris">' + esc(typeLabel) + ' · ' + esc(c.sourceNo || '') + '</div>' +
+                '<div class="corr-meta">' + esc(c.partyLabel || '—') + '</div>' +
+                '<div class="corr-net">' + lineCount(c) + ' produk · ' + money(docNet(c)) + '</div>' +
+                (c.reason ? '<div class="corr-reason">' + esc(c.reason) + '</div>' : '') +
+                '<div class="corr-hint">Ketuk kartu untuk detail ›</div>' +
+                cancelBtn +
+                '</div>'
             );
         });
     }
+    function showList() {
+        currentId = null;
+        cancelling = false;
+        $('#detailView').addClass('d-none');
+        $('#listView').removeClass('d-none');
+        $('#headerTitle').text('Koreksi Stok');
+        $('#btnAdd').removeClass('d-none');
+        paintList();
+    }
+    function showDetail(id) {
+        const rec = (SfaStore.listCorrections() || []).find(r => r.id === id);
+        if (!rec) {
+            Swal.fire({ icon: 'warning', text: 'Pengajuan tidak ditemukan.', confirmButtonColor: '#005D41' });
+            showList();
+            return;
+        }
+        currentId = id;
+        $('#listView').addClass('d-none');
+        $('#detailView').removeClass('d-none');
+        $('#btnAdd').addClass('d-none');
+        $('#headerTitle').text(rec.id);
+        const typeLabel = rec.sourceType === 'kulakan' ? 'Kulakan' : 'Sales invoice';
+        let decidedHtml = '';
+        if (rec.decidedBy || rec.decidedAt) {
+            decidedHtml =
+                '<div class="detail-label">Diputuskan</div>' +
+                '<div class="detail-value mb-0">' + esc(rec.decidedBy || '—') +
+                (rec.decidedRole ? ' (' + esc(String(rec.decidedRole).toUpperCase()) + ')' : '') +
+                ' · ' + esc(fmtDate(rec.decidedAt)) + '</div>';
+        }
+        $('#detailHeader').html(
+            '<div class="d-flex justify-content-between align-items-center mb-3">' +
+            statusPill(rec.status) +
+            '<span class="corr-meta mb-0">' + esc(fmtDate(rec.createdAt)) + '</span></div>' +
+            '<div class="detail-label">Tipe</div><div class="detail-value">' + esc(typeLabel) + '</div>' +
+            '<div class="detail-label">Sumber</div><div class="detail-value">' + esc(rec.sourceNo || '') + '</div>' +
+            '<div class="detail-label">Outlet / Stokis</div><div class="detail-value">' + esc(rec.partyLabel || '—') + '</div>' +
+            '<div class="detail-label">Alasan</div><div class="detail-value">' + esc(rec.reason || '—') + '</div>' +
+            '<div class="detail-label">Net value</div><div class="detail-value' + (decidedHtml ? '' : ' mb-0') + '">' + money(docNet(rec)) + '</div>' +
+            decidedHtml
+        );
+        const $lines = $('#detailLines').empty();
+        const lines = linesOf(rec);
+        if (!lines.length) {
+            $lines.html('<div class="text-muted" style="font-size:13px;">Tidak ada baris produk.</div>');
+        } else {
+            lines.forEach(ln => {
+                const d = Number(ln.deltaPcs || 0);
+                const cls = d > 0 ? 'delta-plus' : 'delta-minus';
+                const sign = d > 0 ? '+' : '';
+                const val = ln.value != null ? Number(ln.value) : d * Number(ln.price || 0);
+                $lines.append(
+                    '<div class="line-row">' +
+                    '<div><div class="line-name">' + esc(ln.productName || '') + '</div>' +
+                    '<div class="line-sub">Asli: ' + Number(ln.originalQty || 0) + ' pcs</div></div>' +
+                    '<div class="text-end"><div class="' + cls + '">' + sign + d + ' pcs</div>' +
+                    '<div class="line-sub">' + money(val) + '</div></div></div>'
+                );
+            });
+        }
+        const canCancel = rec.status === 'Waiting' && isOnline();
+        $('#detailCancelWrap').toggleClass('d-none', !canCancel);
+        syncOnlineUi();
+    }
+    function doCancel(id) {
+        if (!isOnline()) {
+            Swal.fire({ icon: 'warning', text: 'Fitur ini membutuhkan koneksi.', confirmButtonColor: '#005D41' });
+            return;
+        }
+        if (cancelling) return;
+        cancelling = true;
+        syncOnlineUi();
+        Swal.fire({
+            icon: 'question',
+            text: 'Batalkan pengajuan koreksi ini? Pengajuan akan dihapus.',
+            showCancelButton: true,
+            confirmButtonText: 'Batalkan',
+            cancelButtonText: 'Tidak',
+            confirmButtonColor: '#C62828'
+        }).then(function (r) {
+            if (!r.isConfirmed) {
+                cancelling = false;
+                syncOnlineUi();
+                return;
+            }
+            const res = SfaStore.cancelMotorisCorrection(id, myName);
+            if (!res.ok) {
+                cancelling = false;
+                syncOnlineUi();
+                Swal.fire({ icon: 'warning', text: res.message || 'Gagal membatalkan.', confirmButtonColor: '#005D41' });
+                return;
+            }
+            Swal.fire({
+                icon: 'success',
+                text: 'Pengajuan dibatalkan.',
+                timer: 1200,
+                showConfirmButton: false
+            }).then(function () {
+                cancelling = false;
+                tab = 'waiting';
+                $('.seg-btn').removeClass('is-active');
+                $('.seg-btn[data-tab="waiting"]').addClass('is-active');
+                showList();
+            });
+        });
+    }
+
+    $(function () {
+        paintList();
+        window.addEventListener('online', syncOnlineUi);
+        window.addEventListener('offline', syncOnlineUi);
+        $('.seg-btn').on('click', function () {
+            tab = $(this).data('tab');
+            $('.seg-btn').removeClass('is-active');
+            $(this).addClass('is-active');
+            paintList();
+        });
+        $('#btnAdd').on('click', function () {
+            if (!isOnline()) {
+                Swal.fire({ icon: 'warning', text: 'Fitur ini membutuhkan koneksi.', confirmButtonColor: '#005D41' });
+                return;
+            }
+            location.href = 'correction_form.html';
+        });
+        $('#list').on('click', '.corr-card', function (e) {
+            if ($(e.target).closest('.corr-actions').length) return;
+            showDetail(String($(this).data('id')));
+        });
+        $('#list').on('click', '.btn-card-cancel', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            doCancel(String($(this).closest('.corr-card').data('id')));
+        });
+        $('#btnDetailCancel').on('click', function () {
+            if (currentId) doCancel(currentId);
+        });
+        $('#btnHeaderBack').on('click', function () {
+            if (!$('#detailView').hasClass('d-none')) showList();
+            else location.href = 'home.html';
+        });
+    });
 </script>
 </body>
 </html>
