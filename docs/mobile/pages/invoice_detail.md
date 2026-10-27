@@ -20,3 +20,7 @@ Tampilan read-only detail faktur penjualan.
 
 ## Navigasi
 `history.back()`
+
+## Koreksi stok
+Tombol **Ajukan koreksi** → `correction_form.html?source=invoice&id={id}`.  
+Modul lengkap: [penjualan_koreksi.md](penjualan_koreksi.md).

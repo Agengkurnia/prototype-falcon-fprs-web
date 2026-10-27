@@ -1,0 +1,32 @@
+[
+  {
+    "id": "KL-2026-0001",
+    "date": "2026-10-01",
+    "motoris": "GALIH ANDRIAN EKA PUTRA",
+    "salesCode": "2507000744",
+    "stokis": "SUGENG MAKMUR",
+    "items": [
+      { "kode": "HNM01", "nama": "HC COCONUT MILKS", "qtyPcs": 24, "harga": 27027 }
+    ]
+  },
+  {
+    "id": "KL-2026-0002",
+    "date": "2026-10-08",
+    "motoris": "RESTI ANGGERAINI",
+    "salesCode": "2507000595",
+    "stokis": "TOKO SUMBER REZEKI",
+    "items": [
+      { "kode": "NBE14", "nama": "BENECOL STRAW 100ML", "qtyPcs": 18, "harga": 6150 }
+    ]
+  },
+  {
+    "id": "KL-2026-0003",
+    "date": "2026-10-15",
+    "motoris": "RUSTONO WIBOWO",
+    "salesCode": "2507000566",
+    "stokis": "SUGENG MAKMUR",
+    "items": [
+      { "kode": "ZRIZV", "nama": "ZEE SACHET VAN TWIST 37 G", "qtyPcs": 30, "harga": 3031 }
+    ]
+  }
+]

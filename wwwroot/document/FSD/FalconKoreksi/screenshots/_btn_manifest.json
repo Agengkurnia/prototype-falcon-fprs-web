@@ -1,0 +1,15 @@
+﻿{"module":"koreksi","buttons":[
+{"label":"Add","file":"ss_btn_koreksi_add.png"},
+{"label":"Approve all","file":"ss_btn_koreksi_approve-all.png"},
+{"label":"Reject all","file":"ss_btn_koreksi_reject-all.png"},
+{"label":"Back","file":"ss_btn_koreksi_back.png"},
+{"label":"Search invoice","file":"ss_btn_koreksi_search-invoice.png"},
+{"label":"Save","file":"ss_btn_koreksi_save.png"},
+{"label":"Approve","file":"ss_btn_koreksi_approve.png"},
+{"label":"Reject","file":"ss_btn_koreksi_reject.png"},
+{"label":"Kirim pengajuan","file":"ss_btn_koreksi_kirim-pengajuan.png"},
+{"label":"Setujui","file":"ss_btn_koreksi_setujui.png"},
+{"label":"Tolak","file":"ss_btn_koreksi_tolak.png"},
+{"label":"Menunggu","file":"ss_btn_koreksi_menunggu.png"},
+{"label":"Riwayat","file":"ss_btn_koreksi_riwayat.png"}
+]}

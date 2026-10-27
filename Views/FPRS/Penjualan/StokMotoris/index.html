@@ -81,6 +81,7 @@
         .badge-sm { padding: 3px 6px; border-radius: 5px; font-size: 0.7rem; font-weight: 700; display: inline-flex; align-items: center; gap: 3px; }
         .badge-inbound { background: #E8F5E9; color: #2E7D32; }
         .badge-outbound { background: #FFEBEE; color: #C62828; }
+        .badge-correction { background: #FFF3E0; color: #E65100; }
         .badge-verified { background: #E3F2FD; color: #1565C0; }
         .badge-pending { background: #FFF8E1; color: #F57F17; }
 
@@ -411,12 +412,12 @@
         <!-- Header -->
         <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap; gap:0.75rem;">
             <div>
-                <h2 class="title-page mb-1">Monitoring Stok Motoris</h2>
+                <h2 class="title-page mb-1">Motoris Stock</h2>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
-                        <li class="breadcrumb-item"><a href="#" class="a-breadcrumb">Penjualan</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Stok Motoris</li>
+                        <li class="breadcrumb-item"><a href="#" class="a-breadcrumb">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Motoris Stock</li>
                     </ol>
                 </nav>
             </div>
@@ -432,43 +433,43 @@
 
         <!-- Filter Bar -->
         <div class="filter-bar">
-            <select id="filterRegion" multiple></select>
-            <select id="filterArea" multiple></select>
-            <select id="filterRole" multiple></select>
-            <select id="filterSales" multiple></select>
-            <select id="filterBrand" multiple></select>
+            <select id="filterRegion"></select>
+            <select id="filterArea"></select>
+            <select id="filterRole"></select>
+            <select id="filterSales"></select>
+            <select id="filterBrand"></select>
             <div class="filter-date-wrap">
-                <span style="font-size:0.75rem; font-weight:700; color:#64748b;"><i class="fas fa-calendar-alt me-1"></i> Dari:</span>
+                <span style="font-size:0.75rem; font-weight:700; color:#64748b;"><i class="fas fa-calendar-alt me-1"></i> From:</span>
                 <input type="date" id="filterDateStart" value="2026-01-01" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
-                <span style="font-size:0.75rem; font-weight:700; color:#64748b; margin-left:4px;">S/D:</span>
+                <span style="font-size:0.75rem; font-weight:700; color:#64748b; margin-left:4px;">To:</span>
                 <input type="date" id="filterDateEnd" value="2026-12-31" style="border:none; padding:2px; font-size:0.8rem; outline:none; box-shadow:none;" onchange="applyAllFilters()"/>
             </div>
         </div>
 
         <!-- Active Filter Chips -->
         <div class="filter-chips-bar hidden" id="filterChipsBar">
-            <span class="filter-chips-label"><i class="fas fa-filter me-1"></i> Filter Aktif:</span>
+            <span class="filter-chips-label"><i class="fas fa-filter me-1"></i> Active filters:</span>
             <div id="filterChipsList"></div>
-            <button class="filter-reset-btn" onclick="resetAllFilters()"><i class="fas fa-times-circle"></i> Reset Semua</button>
+            <button class="filter-reset-btn" onclick="resetAllFilters()"><i class="fas fa-times-circle"></i> Reset All</button>
         </div>
 
         <!-- Summary Cards -->
         <div class="dash-grid">
             <div class="dash-card" style="--stripe-color:#005d41;">
                 <div class="dc-icon" style="background:rgba(0,93,65,0.08); color:#005d41;"><i class="fas fa-motorcycle"></i></div>
-                <div class="dc-label">Armada Motoris Aktif</div>
+                <div class="dc-label">Active Motorist Fleet</div>
                 <div class="dc-value" id="cardActiveMotoris">342</div>
                 <div class="dc-sub">tersebar di seluruh Indonesia</div>
             </div>
             <div class="dash-card" style="--stripe-color:#1565C0;">
                 <div class="dc-icon" style="background:rgba(21,101,192,0.08); color:#1565C0;"><i class="fas fa-users"></i></div>
-                <div class="dc-label">Pelanggan</div>
+                <div class="dc-label">Customers</div>
                 <div class="dc-value" id="cardPelanggan">0</div>
                 <div class="dc-sub" id="cardPelangganSub">terdaftar oleh motoris terfilter</div>
             </div>
             <div class="dash-card" style="--stripe-color:#2E7D32;">
                 <div class="dc-icon" style="background:rgba(46,125,50,0.08); color:#2E7D32;"><i class="fas fa-file-invoice-dollar"></i></div>
-                <div class="dc-label">Faktur Penjualan</div>
+                <div class="dc-label">Sales Invoices</div>
                 <div class="dc-value" id="cardFaktur">0</div>
                 <div class="dc-sub" id="cardFakturSub">dalam periode terpilih</div>
             </div>
@@ -494,21 +495,21 @@
             <div class="flow-visual">
                 <div class="flow-node" style="background:#E8F5E9;">
                     <div class="fn-icon" style="background:#C8E6C9; color:#2E7D32;"><i class="fas fa-warehouse"></i></div>
-                    <div class="fn-label">Stokis / Grosir Resmi</div>
+                    <div class="fn-label">Stokis / Official Wholesaler</div>
                     <div class="fn-value" id="flowStokis">Rp 0</div>
                     <div style="font-size:0.72rem; color:#6c757d;" id="flowStokisSub">Nilai Pembelian Masuk</div>
                 </div>
                 <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
                 <div class="flow-node" style="background:#E3F2FD;">
                     <div class="fn-icon" style="background:#BBDEFB; color:#1565C0;"><i class="fas fa-motorcycle"></i></div>
-                    <div class="fn-label">Motoris (Penjualan)</div>
+                    <div class="fn-label">Motoris</div>
                     <div class="fn-value" id="flowMotoris">Rp 0</div>
                     <div style="font-size:0.72rem; color:#6c757d;" id="flowMotorisSub">Nilai Stok di Motoris</div>
                 </div>
                 <div class="flow-arrow"><i class="fas fa-chevron-right"></i></div>
                 <div class="flow-node" style="background:#FFF8E1;">
                     <div class="fn-icon" style="background:#FFE082; color:#F57F17;"><i class="fas fa-home"></i></div>
-                    <div class="fn-label">Outlet Kelontong</div>
+                    <div class="fn-label">Grocery Outlet</div>
                     <div class="fn-value" id="flowWarung">Rp 0</div>
                     <div style="font-size:0.72rem; color:#6c757d;" id="flowWarungSub">Nilai Penjualan Keluar</div>
                 </div>
@@ -573,12 +574,12 @@
                     <table class="balance-table" id="balanceTable">
                         <thead>
                             <tr>
+                                <th>No</th>
                                 <th>Motoris</th>
-                                <th>Provinsi</th>
-                                <th>Kota</th>
-                                <th style="text-align:right;">Nilai Kulakan</th>
-                                <th style="text-align:right;">Nilai Penjualan</th>
-                                <th style="text-align:right;">Nilai Saldo</th>
+                                <th>Region</th>
+                                <th style="text-align:right;">Purchase Value</th>
+                                <th style="text-align:right;">Sales Value</th>
+                                <th style="text-align:right;">Balance Value</th>
                             </tr>
                         </thead>
                         <tbody id="balanceTableBody"></tbody>
@@ -600,13 +601,14 @@
                     <table class="audit-table" id="auditTable">
                         <thead>
                             <tr>
-                                <th>Tanggal</th>
+                                <th>No</th>
+                                <th>Date</th>
+                                <th>Transaction Number</th>
                                 <th>Motoris</th>
-                                <th>Tipe</th>
-                                <th>Produk</th>
-                                <th>Nilai (Rp)</th>
+                                <th>Type</th>
+                                <th>Product</th>
+                                <th>Value</th>
                                 <th>Outlet / Stokis</th>
-                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="auditTableBody"></tbody>
@@ -642,6 +644,68 @@
     let masterUmbrellas = [];
     let motorisData = [];
     let auditData = [];
+    let koreksiAuditRows = [];
+
+    function koreksiLinesOf(c) {
+        if (Array.isArray(c.lines) && c.lines.length) return c.lines;
+        if (c.productName || c.deltaPcs != null) {
+            return [{
+                productCode: c.productCode || '',
+                productName: c.productName || '',
+                originalQty: Number(c.originalQty || 0),
+                price: Number(c.price || 0),
+                deltaPcs: Number(c.deltaPcs || 0),
+                value: c.value != null ? Number(c.value) : Number(c.deltaPcs || 0) * Number(c.price || 0)
+            }];
+        }
+        return [];
+    }
+
+    function flattenApprovedKoreksi() {
+        try {
+            return JSON.parse(localStorage.getItem('fprs_koreksi_v1') || '[]')
+                .filter(c => c.status === 'Approved')
+                .flatMap(c => {
+                    const lines = koreksiLinesOf(c);
+                    return lines.map((ln, i) => ({
+                        id: lines.length > 1 ? (c.id + '-' + (i + 1)) : c.id,
+                        sourceType: c.sourceType,
+                        sourceNo: c.sourceNo,
+                        motoris: c.motoris,
+                        salesCode: c.salesCode || '',
+                        createdAt: c.createdAt,
+                        productName: ln.productName || '',
+                        price: Number(ln.price || 0),
+                        deltaPcs: Number(ln.deltaPcs || 0),
+                        value: ln.value != null ? Number(ln.value) : Number(ln.deltaPcs || 0) * Number(ln.price || 0)
+                    }));
+                });
+        } catch (e) { return []; }
+    }
+
+    function readApprovedKoreksi() {
+        return flattenApprovedKoreksi();
+    }
+
+    function koreksiForMotoris(name) {
+        const key = String(name || '').toUpperCase();
+        return readApprovedKoreksi().filter(c => String(c.motoris || '').toUpperCase() === key);
+    }
+
+    function koreksiMoney(list) {
+        let purchase = 0, sales = 0;
+        list.forEach(c => {
+            const value = Number(c.value != null ? c.value : Number(c.deltaPcs || 0) * Number(c.price || 0));
+            if (c.sourceType === 'kulakan') purchase += value;
+            else sales += value;
+        });
+        return { purchase, sales };
+    }
+
+    function stockPcsEffect(c) {
+        const delta = Number(c.deltaPcs || 0);
+        return c.sourceType === 'kulakan' ? delta : -delta;
+    }
     let chartInstances = {};
     let dtBalance = null;
     let dtAudit = null;
@@ -1241,13 +1305,13 @@
         const sorted = [...items].sort((a, b) =>
             String(a.label || a.value || '').localeCompare(String(b.label || b.value || ''), 'id', { sensitivity: 'base' })
         );
-        el.innerHTML = sorted.map(it =>
+        el.innerHTML = '<option value=""></option>' + sorted.map(it =>
             `<option value="${escapeAttr(it.value)}">${escapeAttr(it.label)}</option>`
         ).join('');
         const keep = prev.filter(v => sorted.some(it => it.value === v));
         suppressFilterChange = true;
         if ($(el).data('select2')) {
-            $(el).val(keep).trigger('change');
+            $(el).val(keep[0] || null).trigger('change');
         } else {
             Array.from(el.options).forEach(o => { o.selected = keep.includes(o.value); });
         }
@@ -1257,19 +1321,19 @@
     function initFilterSelect2() {
         if (!$.fn.select2) return;
         const common = {
-            multiple: true,
-            closeOnSelect: false,
+            multiple: false,
+            closeOnSelect: true,
             allowClear: true,
             width: '220px',
             dropdownParent: $(document.body),
-            language: { noResults: () => 'Tidak ditemukan' }
+            language: { noResults: () => 'No results' }
         };
         const configs = [
-            { id: '#filterRegion', placeholder: 'Provinsi (Wilayah)' },
-            { id: '#filterArea', placeholder: 'Kota (Area)' },
+            { id: '#filterRegion', placeholder: 'Region' },
+            { id: '#filterArea', placeholder: 'Area' },
             { id: '#filterRole', placeholder: 'Role' },
-            { id: '#filterSales', placeholder: 'Motoris / SPG' },
-            { id: '#filterBrand', placeholder: 'Umbrand' }
+            { id: '#filterSales', placeholder: 'Sales' },
+            { id: '#filterBrand', placeholder: 'Umbrella Brand' }
         ];
         configs.forEach(cfg => {
             const $el = $(cfg.id);
@@ -1728,14 +1792,18 @@
             return;
         }
 
-        tbody.innerHTML = filtered.map(m => {
+        tbody.innerHTML = filtered.map((m, i) => {
+            const adj = koreksiMoney(koreksiForMotoris(m.name));
+            const inboundRp = (m.inboundRp || 0) + adj.purchase;
+            const outboundRp = (m.outboundRp || 0) + adj.sales;
+            const nilai = (m.nilai || 0) + adj.purchase - adj.sales;
             return `<tr>
-                <td><a class="motoris-link" onclick="showMotorisDetail('${m.code}')">${m.name}</a><br><span style="font-size:0.7rem;color:#94a3b8;">${m.code}</span></td>
+                <td>${i + 1}</td>
+                <td><a class="motoris-link text-success fw-bold" onclick="showMotorisDetail('${m.code}')">${m.name}</a><br><span style="font-size:0.7rem;color:#94a3b8;">${m.code}</span></td>
                 <td>${m.region}</td>
-                <td>${m.area}</td>
-                <td style="font-weight:600; text-align:right;" data-order="${m.inboundRp}">${formatRp(m.inboundRp)}</td>
-                <td style="font-weight:600; text-align:right; color:#2E7D32;" data-order="${m.outboundRp}">${formatRp(m.outboundRp)}</td>
-                <td style="font-size:0.82rem; font-weight:700; text-align:right; color:#005d41;" data-order="${m.nilai}">${formatRp(m.nilai)}</td>
+                <td style="font-weight:600; text-align:right;" data-order="${inboundRp}">${formatRp(inboundRp)}</td>
+                <td style="font-weight:600; text-align:right; color:#2E7D32;" data-order="${outboundRp}">${formatRp(outboundRp)}</td>
+                <td style="font-size:0.82rem; font-weight:700; text-align:right; color:#005d41;" data-order="${nilai}">${formatRp(nilai)}</td>
             </tr>`;
         }).join('');
 
@@ -1770,15 +1838,27 @@
         const m = motorisData.find(x => x.code === code);
         if (!m) return;
 
-        const stokRows = m.products.map(p => {
-            const nilaiProd = ((p.karton * 72) + (p.dus * 6) + p.pcs) * p.pricePerPcs;
-            return `<tr><td>${p.name}</td><td style="text-align:right; font-weight:600;">${formatRp(nilaiProd)}</td></tr>`;
-        }).join('');
+            const matchedNames = new Set();
+            const mine = koreksiForMotoris(m.name);
+            const stokRows = m.products.map(p => {
+            const key = String(p.name || '').toUpperCase();
+            const extra = mine
+                .filter(c => String(c.productName || '').toUpperCase() === key)
+                .reduce((sum, c) => sum + stockPcsEffect(c), 0);
+            if (mine.some(c => String(c.productName || '').toUpperCase() === key)) matchedNames.add(key);
+            const qty = (p.karton * 72) + (p.dus * 6) + p.pcs + extra;
+            return `<tr><td>${p.name}</td><td style="text-align:right; font-weight:600;">${qty} pcs</td></tr>`;
+        }).join('') + mine
+            .filter(c => !matchedNames.has(String(c.productName || '').toUpperCase()))
+            .map(c => `<tr><td>${c.productName}</td><td style="text-align:right; font-weight:600;">${stockPcsEffect(c)} pcs</td></tr>`)
+            .join('');
 
         const historyRows = m.salesHistory.map((h, idx) => {
             return `<tr><td style="text-align:center; font-weight:700; color:#005d41;">${idx + 1}</td><td>${h.date}</td><td><a href="#" class="motoris-link" onclick="event.preventDefault(); focusMapMarker(${idx})">${h.outlet}</a></td><td style="font-size:0.72rem;">${h.product}</td><td style="text-align:right; font-weight:600;">${formatRp(h.amount)}</td></tr>`;
         }).join('');
 
+        const adj = koreksiMoney(koreksiForMotoris(m.name));
+        const nilaiShown = (m.nilai || 0) + adj.purchase - adj.sales;
         const gpsIcon = m.lastKulakan.gps ? '<span class="gps-dot gps-valid"></span> Valid' : '<span class="gps-dot gps-invalid"></span> Invalid';
         const kulakanRp = m.lastKulakan.qty * 72 * (m.products[0]?.pricePerPcs || 0);
 
@@ -1792,9 +1872,9 @@
                 <div class="motoris-pop-sect">
                     <h4><i class="fas fa-boxes-stacked"></i> Stok per SKU</h4>
                     <table>
-                        <thead><tr><th>Produk</th><th style="text-align:right;">Nilai (Rp)</th></tr></thead>
+                        <thead><tr><th>Product</th><th style="text-align:right;">Qty</th></tr></thead>
                         <tbody>${stokRows}</tbody>
-                        <tfoot><tr style="font-weight:700;border-top:2px solid #005d41;"><td>TOTAL</td><td style="text-align:right;">${formatRp(m.nilai)}</td></tr></tfoot>
+                        <tfoot><tr style="font-weight:700;border-top:2px solid #005d41;"><td>TOTAL</td><td style="text-align:right;">${formatRp(nilaiShown)}</td></tr></tfoot>
                     </table>
                 </div>
                 <div>
@@ -1817,7 +1897,7 @@
             </div>
             <div class="motoris-pop-sect" style="margin-bottom:1rem;">
                 <h4><i class="fas fa-map-marked-alt"></i> Sebaran Outlet Dikunjungi</h4>
-                <div id="miniMapContainer" style="height:150px; border-radius:8px; overflow:hidden; border:1px solid #e2e8f0;"></div>
+                <div id="miniMapContainer" style="height:320px; border-radius:8px; overflow:hidden; border:1px solid #e2e8f0;"></div>
                 <span style="font-size:0.68rem; color:#8a92a6; display:block; margin-top:4px;">${m.salesHistory.length} outlet dalam 30 hari terakhir</span>
             </div>
             <div class="motoris-pop-sect">
@@ -1833,7 +1913,7 @@
 
         Swal.fire({
             html: html,
-            width: 900,
+            width: 1100,
             showConfirmButton: false,
             showCloseButton: true,
             customClass: { popup: 'swal-motoris-popup' },
@@ -1929,27 +2009,59 @@
         if (dateStart) filteredAudit = filteredAudit.filter(a => a.date >= dateStart);
         if (dateEnd) filteredAudit = filteredAudit.filter(a => a.date <= dateEnd);
 
+        const namesUpper = new Set(filtered.map(m => String(m.name || '').toUpperCase()));
+        koreksiAuditRows = readApprovedKoreksi()
+            .filter(c => namesUpper.has(String(c.motoris || '').toUpperCase()))
+            .filter(c => {
+                const day = String(c.createdAt || '').slice(0, 10);
+                if (dateStart && day < dateStart) return false;
+                if (dateEnd && day > dateEnd) return false;
+                if (umbrella.length) return false;
+                return true;
+            })
+            .map(c => ({
+                id: c.id,
+                date: String(c.createdAt || '').slice(0, 10),
+                motoris: c.motoris,
+                salesCode: c.salesCode || '',
+                type: 'correction',
+                product: c.productName,
+                qty: c.deltaPcs,
+                qtyUnit: 'Pcs',
+                amount: stockPcsEffect(c) * Number(c.price || 0),
+                outlet: c.sourceNo,
+                gps: false,
+                status: 'verified',
+                reference: c.sourceNo
+            }));
+        filteredAudit = filteredAudit.concat(koreksiAuditRows);
+
         const tbody = document.getElementById('auditTableBody');
 
         if (filteredAudit.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clipboard"></i></div><div class="empty-state-title">Belum ada transaksi</div><div class="empty-state-desc">Audit trail kosong untuk filter yang dipilih.</div></div></td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clipboard"></i></div><div class="empty-state-title">No movements</div><div class="empty-state-desc">No stock movements match the selected filters.</div></div></td></tr>`;
             return;
         }
 
-        tbody.innerHTML = filteredAudit.map(a => {
+        tbody.innerHTML = filteredAudit.map((a, i) => {
             const typeBadge = a.type === 'inbound'
                 ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-down"></i> Inbound</span>'
+                : a.type === 'correction'
+                ? '<span class="badge-sm badge-correction"><i class="fas fa-pen"></i> Correction</span>'
                 : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-up"></i> Outbound</span>';
             const amountDisplay = formatRp(a.amount || 0);
-            const amountColor = a.type === 'inbound' ? 'color:#2E7D32;' : 'color:#C62828;';
+            const amountColor = a.type === 'correction'
+                ? (Number(a.amount) >= 0 ? 'color:#2E7D32;' : 'color:#C62828;')
+                : (a.type === 'inbound' ? 'color:#2E7D32;' : 'color:#C62828;');
             return `<tr>
+                <td>${i + 1}</td>
                 <td>${a.date}</td>
+                <td><a href="#" class="text-success fw-bold" onclick="showAuditDetail(this);return false;" data-id="${a.id}" data-motoris="${a.motoris}" data-salescode="${a.salesCode}" data-date="${a.date}" data-type="${a.type}" data-product="${a.product}" data-qty="${a.qty}" data-unit="${a.qtyUnit}" data-outlet="${a.outlet}" data-gps="${a.gps}" data-status="${a.status}">${a.id}</a></td>
                 <td>${a.motoris}</td>
                 <td>${typeBadge}</td>
                 <td style="font-size:0.78rem;">${a.product}</td>
                 <td style="font-weight:700; ${amountColor}">${amountDisplay}</td>
                 <td>${a.outlet}</td>
-                <td><button class="btn btn-sm btn-outline-secondary" style="font-size:0.7rem; padding:2px 8px;" onclick="showAuditDetail(this)" data-id="${a.id}" data-motoris="${a.motoris}" data-salescode="${a.salesCode}" data-date="${a.date}" data-type="${a.type}" data-product="${a.product}" data-qty="${a.qty}" data-unit="${a.qtyUnit}" data-outlet="${a.outlet}" data-gps="${a.gps}" data-status="${a.status}"><i class="fas fa-eye"></i></button></td>
             </tr>`;
         }).join('');
 
@@ -1957,7 +2069,7 @@
         dtAudit = $('#auditTable').DataTable({
             pageLength: 10,
             lengthMenu: [10, 25, 50, 100],
-            order: [[0, 'desc']],
+            order: [[1, 'desc']],
             language: {
                 search: 'Cari:',
                 lengthMenu: 'Tampilkan _MENU_ data',
@@ -1977,10 +2089,13 @@
         const isInbound = d.type === 'inbound';
 
         // Find full audit record
-        const record = auditData.find(a => a.id === d.id);
+        const record = auditData.find(a => a.id === d.id) || koreksiAuditRows.find(a => a.id === d.id);
         const r = record || d;
+        const isCorrection = d.type === 'correction' || (r && r.type === 'correction');
 
-        const typeBadgeHtml = isInbound
+        const typeBadgeHtml = isCorrection
+            ? '<span class="badge-sm badge-correction"><i class="fas fa-pen me-1"></i> Correction</span>'
+            : isInbound
             ? '<span class="badge-sm badge-inbound"><i class="fas fa-arrow-alt-circle-down me-1"></i> Kulakan (Inbound)</span>'
             : '<span class="badge-sm badge-outbound"><i class="fas fa-arrow-alt-circle-up me-1"></i> Penjualan (Outbound)</span>';
 
@@ -2008,24 +2123,21 @@
 
         // Nota section
         const notaHtml = (r.nota === true)
-            ? `<div class="nota-attach-card">
+            ? `<div class="audit-pop-sect" style="display:flex; flex-direction:column;">
+                <h4><i class="fas fa-file-invoice"></i> Receipt</h4>
+                <div class="nota-attach-card">
                 <i class="fas fa-file-invoice-dollar fa-2x" style="color:#005d41; margin-bottom:2px;"></i>
-                <span style="font-size:0.75rem; font-weight:700; color:#005d41; display:block;">Nota Belanja Terlampir</span>
-                <span style="font-size:0.65rem; color:#64748b; display:block; margin-top:2px;">Klik untuk Pratinjau</span>
+                <span style="font-size:0.75rem; font-weight:700; color:#005d41; display:block;">Receipt attached</span>
                 <div class="nota-barcode"></div>
-            </div>`
-            : `<div class="nota-attach-card" style="border-color:#cbd5e1; cursor:default;">
-                <i class="fas fa-image fa-2x" style="color:#94a3b8; margin-bottom:5px; opacity:0.5;"></i>
-                <span style="font-size:0.75rem; font-weight:600; color:#64748b;">Tidak Ada Bukti</span>
-                <span style="font-size:0.65rem; color:#94a3b8;">Outbound Warung</span>
-            </div>`;
+            </div></div>`
+            : '';
 
         const statusVerified = (r.status === 'verified');
 
         Swal.fire({
-            width: '780px',
+            width: '980px',
             confirmButtonColor: '#005d41',
-            confirmButtonText: 'Tutup',
+            confirmButtonText: 'Close',
             showCancelButton: false,
             customClass: { popup: 'swal-audit-popup' },
             html: `
@@ -2079,41 +2191,40 @@
                             <p style="font-size:0.75rem; margin:2px 0 6px 0; line-height:1.35; font-weight:600; color:${gpsValid ? '#2e7d32' : '#C62828'}">
                                 <i class="fas ${gpsValid ? 'fa-check-circle' : 'fa-times-circle'} me-1"></i> ${gpsDetail}
                             </p>
-                            <div class="mock-map">
-                                <div class="mock-map-grid"></div>
-                                <div class="mock-map-road" style="width:160px; height:8px; top:35px; left:-20px; transform:rotate(8deg);"></div>
-                                <div class="mock-map-road" style="width:100px; height:8px; top:15px; left:140px; transform:rotate(-45deg);"></div>
-                                <div class="mock-map-center" title="Target Outlet"></div>
-                                <div class="mock-map-pulse"></div>
-                                <div class="mock-map-pin" style="${gpsValid ? '' : 'top:20%; left:22%;'}" title="Lokasi Sales">
-                                    <i class="fas fa-motorcycle"></i>
-                                </div>
-                            </div>
+                            <div id="auditLeaflet" style="height:220px;border-radius:8px;"></div>
                             <span style="font-size:0.7rem; color:#8a92a6; display:block; margin-top:4px; font-family:monospace; text-align:center;">Koordinat: ${gpsCoords}</span>
                         </div>
                     </div>
 
-                    <div class="audit-pop-grid" style="grid-template-columns: 1.7fr 1.1fr; margin-bottom: 0;">
+                    <div class="audit-pop-grid" style="grid-template-columns: ${r.nota === true ? '1.7fr 1.1fr' : '1fr'}; margin-bottom: 0;">
                         <div class="audit-pop-sect">
-                            <h4><i class="fas fa-boxes"></i> Log Mutasi Fisik Persediaan (Stock Ledger)</h4>
+                            <h4><i class="fas fa-boxes"></i> Stock ledger</h4>
                             <table class="audit-pop-table">
                                <thead><tr>
-                                   <th>Nama SKU Produk Kalbe</th>
-                                   <th style="text-align:center; width:60px;">Sebelum</th>
-                                   <th style="text-align:center; width:95px;">Mutasi</th>
-                                   <th style="text-align:center; width:60px;">Sesudah</th>
+                                   <th>Product</th>
+                                   <th style="text-align:center; width:60px;">Before</th>
+                                   <th style="text-align:center; width:95px;">Change</th>
+                                   <th style="text-align:center; width:60px;">After</th>
                                </tr></thead>
                                <tbody>${itemsHtml}</tbody>
                             </table>
                         </div>
-                        <div class="audit-pop-sect" style="display:flex; flex-direction:column; justify-content:space-between;">
-                            <h4><i class="fas fa-file-invoice"></i> Dokumen Pendukung (Bukti)</h4>
-                            ${notaHtml}
-                            <span style="font-size:0.68rem; color:#8a92a6; text-align:center; display:block; margin-top:6px;"><i class="fas fa-lock"></i> Tanda tangan elektronik tersimpan aman</span>
-                        </div>
+                        ${notaHtml}
                     </div>
                 </div>
-            `
+            `,
+            didOpen: () => {
+                const el = document.getElementById('auditLeaflet');
+                if (!el || !window.L) return;
+                const parts = String(gpsCoords).split(',');
+                const lat = Number(parts[0]);
+                const lng = Number(parts[1]);
+                if (!isFinite(lat) || !isFinite(lng)) return;
+                const auditMap = L.map(el, { attributionControl: false }).setView([lat, lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(auditMap);
+                L.marker([lat, lng]).addTo(auditMap);
+                setTimeout(() => auditMap.invalidateSize(), 200);
+            }
         });
     }
 

@@ -246,6 +246,7 @@
     <!-- JS Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../../wwwroot/js/sfa-store.js"></script>
     <script src="../../wwwroot/js/prototype-page-doc.js"></script>
     <script>
         function togglePasswordVisibility() {
@@ -290,10 +291,15 @@
             // Simulate server authentication delay
             setTimeout(() => {
                 // Save user info in localStorage for personalization
+                const role = (window.SfaStore && SfaStore.resolveLoginRole)
+                    ? SfaStore.resolveLoginRole(username)
+                    : (/^(md|moderntrade|modern\.?trade)/i.test(username.replace(/\s+/g, '')) ? 'md'
+                        : (/^abm/i.test(username.replace(/\s+/g, '')) ? 'abm'
+                            : (/^bho/i.test(username.replace(/\s+/g, '')) ? 'bho' : 'motoris')));
                 localStorage.setItem('sfa_user', JSON.stringify({
                     username: username,
                     name: username,
-                    role: /^(md|moderntrade|modern.trade)/i.test(username.replace(/\s+/g, '')) ? 'md' : 'motoris',
+                    role: role,
                     branch: 'Jakarta Pusat',
                     loginTime: new Date().toISOString()
                 }));

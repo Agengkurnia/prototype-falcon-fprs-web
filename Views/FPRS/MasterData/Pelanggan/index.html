@@ -1,88 +1,228 @@
-﻿<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Master Pelanggan – Master Data | Falcon FPRS</title>
+    <title>Customer | Falcon FPRS</title>
     <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
-    <style>
-@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-</style>
+    <link rel="stylesheet" href="../../../../wwwroot/css/filter-stat-cards.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
-    <div id="app-content">
-
-            <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-                <div><h2 class="title-page mb-1">Master Pelanggan</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Master Pelanggan</li></ol></nav></div>
-                <span class="badge bg-label-info align-self-center"><i class="fa fa-mobile-screen me-1"></i> Data pelanggan diinput dari aplikasi mobile</span>
-            </div>
-            <!-- Summary -->
-            <div class="row g-3 mb-3">
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-primary" id="cntTotal">0</div><div class="small text-muted">Total Pelanggan</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-success" id="cntActive">0</div><div class="small text-muted">Active</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-warning" id="cntUnverified">0</div><div class="small text-muted">Unverified</div></div></div></div>
-                <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-danger" id="cntInactive">0</div><div class="small text-muted">Inactive</div></div></div></div>
-            </div>
-            <div class="card"><div class="card-body"><div class="table-responsive">
-                <table class="table table-bordered table-hover" id="tbl">
-                    <thead>
-                        <tr><th style="width:50px;">NO</th><th title="Source : mPelanggan | txtKode">KODE</th><th title="Source : mPelanggan | txtNama">PELANGGAN</th><th title="Source : mPelanggan | txtAlamat">ALAMAT</th><th title="Source : mPelanggan | txtTelepon">TELEPON</th><th title="Source : mPelanggan | intSalesmanID (FK mPegawai)">SALESMAN</th><th title="Source : mPelanggan | dtKunjunganTerakhir">KUNJUNGAN TERAKHIR</th><th style="width:110px;" title="Source : mPelanggan | bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
-                        <tr class="filter-row">
-                            <th></th><th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Nama..."></th>
-                            <th></th><th></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Salesman..."></th>
-                            <th></th>
-                            <th><select class="form-select form-select-sm"><option value="">Semua</option><option>Active</option><option>Unverified</option><option>Inactive</option></select></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblBody"></tbody>
-                </table>
-            </div></div></div>
+<div id="app-content">
+    <div class="card mb-3">
+        <div class="card-body d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <h4 class="mb-0">Customer</h4>
+            <button type="button" id="btnBackToList" class="btn btn-outline-secondary d-none"><i class="fa fa-arrow-left me-1"></i>Back</button>
+        </div>
     </div>
-    <script src="../../../../wwwroot/js/layout.js"></script>
-    <script>
-        document.addEventListener('layoutReady', () => {
 
-const KEY='md_pelanggan';
-const SEED_VER_KEY='md_pelanggan_seed_ver';
-const SEED_VER='mobile-jul2026-c';
-function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
-function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
-function loadData(){
-    const needSeed=!localStorage.getItem(KEY)||localStorage.getItem(SEED_VER_KEY)!==SEED_VER;
-    if(needSeed){fetch('../../../../wwwroot/data/pelanggan.json').then(r=>r.json()).then(d=>{saveData(d);localStorage.setItem(SEED_VER_KEY,SEED_VER);render();});}else{render();}
-}
-let table;
-function badgeStatus(s){const m={Active:'badge-active',Unverified:'badge-unverified',Inactive:'badge-inactive'};return `<span class="badge-status ${m[s]||'badge-inactive'}">${s}</span>`;}
-function render(){
-    if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
-    const data=getData();$('#tblBody').empty();
-    $('#cntTotal').text(data.length);$('#cntActive').text(data.filter(d=>d.status==='Active').length);
-    $('#cntUnverified').text(data.filter(d=>d.status==='Unverified').length);$('#cntInactive').text(data.filter(d=>d.status==='Inactive').length);
-    data.forEach((item,i)=>{
-        $('#tblBody').append(`<tr>
-            <td>${i+1}</td>
-            <td><small class="text-muted">${item.kode}</small></td>
-            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a>${item.grupPelanggan?'<br><small class="text-muted">'+item.grupPelanggan+'</small>':''}</td>
-            <td><small>${item.alamat||'-'}</small></td>
-            <td>${item.telepon||'-'}</td>
-            <td>${item.employee||'-'}</td>
-            <td><small>${item.kunjunganTerakhir||'-'}</small></td>
-            <td>${badgeStatus(item.status)}</td>
-            <td><div class="row-actions">
-                <a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="btn-action btn-action-view" title="Detail"><i class="fa fa-eye"></i></a>
-            </div></td>
-        </tr>`);
-    });
-    table=$('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari global...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[3,4,6,8]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
-    $('.filter-row input').on('keyup change',function(){table.column($(this).closest('th').index()).search(this.value).draw();});
-    $('.filter-row select').on('change',function(){table.column($(this).closest('th').index()).search(this.value).draw();});
-    $('.filter-row input,.filter-row select').on('click',function(e){e.stopPropagation();});
-}
-$(document).ready(loadData);
+    <div id="customerListContainer">
+        <div class="row g-3 mb-3" id="customerCards">
+            <div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-total is-filtered" data-filter="" role="button"><span class="mpg-stat-badge"><i class="fa fa-check"></i> Filtered</span><div class="mpg-stat-icon"><i class="fa fa-list"></i></div><div class="mpg-stat-watermark"><i class="fa fa-list"></i></div><div class="mpg-stat-value" id="cntTotal">0</div><div class="mpg-stat-label">Total</div></div></div>
+            <div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-active" data-filter="active" role="button"><span class="mpg-stat-badge"><i class="fa fa-check"></i> Filtered</span><div class="mpg-stat-icon"><i class="fa fa-check-circle"></i></div><div class="mpg-stat-watermark"><i class="fa fa-check-circle"></i></div><div class="mpg-stat-value" id="cntActive">0</div><div class="mpg-stat-label">Active</div></div></div>
+            <div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-inactive" data-filter="inactive" role="button"><span class="mpg-stat-badge"><i class="fa fa-check"></i> Filtered</span><div class="mpg-stat-icon"><i class="fa fa-times-circle"></i></div><div class="mpg-stat-watermark"><i class="fa fa-times-circle"></i></div><div class="mpg-stat-value" id="cntInactive">0</div><div class="mpg-stat-label">Inactive</div></div></div>
+            <div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-gps" data-filter="gps" role="button"><span class="mpg-stat-badge"><i class="fa fa-check"></i> Filtered</span><div class="mpg-stat-icon"><i class="fa fa-map-marker-alt"></i></div><div class="mpg-stat-watermark"><i class="fa fa-map-marker-alt"></i></div><div class="mpg-stat-value" id="cntGps">0</div><div class="mpg-stat-label">With GPS</div></div></div>
+        </div>
+        <div class="card"><div class="card-body"><div class="table-responsive">
+            <table class="table" id="tbl" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="text-center">No</th>
+                        <th class="text-center">Code</th>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">City</th>
+                        <th class="text-center">Channel</th>
+                        <th class="text-center">Recent Salesman</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                    <tr class="dt-col-search">
+                        <th></th>
+                        <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="1" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                        <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="2" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                        <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="3" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                        <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="4" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                        <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="5" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                        <th><select class="form-select form-select-sm col-search" data-col="6"><option value="">All</option><option value="Active">Active</option><option value="Inactive">Inactive</option></select></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div></div></div>
+    </div>
+
+    <div id="customerDetailContainer" class="d-none">
+        <div class="card mb-3 border-0 mpg-gradient"><div class="card-body">
+            <h3 class="mb-1 fw-bold text-white" id="dNama"></h3>
+            <span class="badge bg-light text-success fw-bold" id="dKode"></span>
+            <span class="badge bg-secondary" id="dStatus"></span>
+        </div></div>
+        <div class="row g-3">
+            <div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Store &amp; Contact</div><div class="card-body mt-3">
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Owner Name</label><div class="col-sm-8"><input class="form-control" id="dPemilik" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Phone</label><div class="col-sm-8"><input class="form-control" id="dTelepon" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">NPWP</label><div class="col-sm-8"><input class="form-control" id="dNpwp" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Channel</label><div class="col-sm-8"><input class="form-control" id="dChannel" disabled/></div></div>
+                <div class="row mb-0"><label class="col-sm-4 col-form-label text-muted">Outlet Type</label><div class="col-sm-8"><input class="form-control" id="dOutlet" disabled/></div></div>
+            </div></div></div>
+            <div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Address</div><div class="card-body mt-3">
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Address</label><div class="col-sm-8"><textarea class="form-control" id="dAlamat" rows="2" disabled></textarea></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">RT / RW</label><div class="col-sm-8"><input class="form-control" id="dRt" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Village</label><div class="col-sm-8"><input class="form-control" id="dKel" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">District</label><div class="col-sm-8"><input class="form-control" id="dKec" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">City</label><div class="col-sm-8"><input class="form-control" id="dKota" disabled/></div></div>
+                <div class="row mb-0"><label class="col-sm-4 col-form-label text-muted">GPS</label><div class="col-sm-8"><div class="input-group"><input class="form-control" id="dGps" disabled/><a id="dMaps" class="btn btn-outline-success d-none" target="_blank" rel="noopener">Maps</a></div></div></div>
+            </div></div></div>
+            <div class="col-12"><div class="card"><div class="card-header mpg-gradient">Location Map</div><div class="card-body p-0"><div id="customerMap" style="height:320px;"></div><div id="customerMapEmpty" class="text-muted text-center py-5 d-none">No valid coordinates to show on the map</div></div></div></div>
+            <div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Sales &amp; Transactions</div><div class="card-body mt-3">
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Salesman</label><div class="col-sm-8"><input class="form-control" id="dSales" disabled/></div></div>
+                <div class="row mb-3"><label class="col-sm-4 col-form-label text-muted">Last Visit</label><div class="col-sm-8"><input class="form-control" id="dVisit" disabled/></div></div>
+                <div class="row mb-0"><label class="col-sm-4 col-form-label text-muted">Last Transaction</label><div class="col-sm-8"><input class="form-control" id="dTrx" disabled/></div></div>
+            </div></div></div>
+            <div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Store Photo</div><div class="card-body text-center" id="dPhoto">No photo available</div></div></div>
+        </div>
+    </div>
+</div>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script src="../../../../wwwroot/js/prototype-spa.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener("layoutReady", function () {
+    const KEY = "md_pelanggan";
+    const VER = "mobile-jul2026-c";
+    let rows = [];
+    let table;
+    let cardFilter = "";
+    let map;
+
+    function isActive(r) { return r.status === "Active"; }
+    function hasGps(r) { return r.hasGps === true || (r.lat != null && r.lng != null && r.lat !== "" && r.lng !== ""); }
+    function salesman(r) { return r.salesman || r.employee || "—"; }
+
+    function load() {
+        const need = !localStorage.getItem(KEY) || localStorage.getItem("md_pelanggan_seed_ver") !== VER;
+        if (need) {
+            fetch("../../../../wwwroot/data/pelanggan.json").then(r => r.json()).then(function (d) {
+                localStorage.setItem(KEY, JSON.stringify(d));
+                localStorage.setItem("md_pelanggan_seed_ver", VER);
+                rows = d;
+                paint();
+            });
+        } else {
+            rows = JSON.parse(localStorage.getItem(KEY) || "[]");
+            paint();
+        }
+    }
+
+    function paint() {
+        $("#cntTotal").text(rows.length);
+        $("#cntActive").text(rows.filter(isActive).length);
+        $("#cntInactive").text(rows.filter(r => !isActive(r)).length);
+        $("#cntGps").text(rows.filter(hasGps).length);
+        if ($.fn.DataTable.isDataTable("#tbl")) $("#tbl").DataTable().destroy();
+        const body = $("#tbl tbody").empty();
+        rows.forEach(function (item, i) {
+            const active = isActive(item);
+            body.append("<tr>" +
+                "<td class='text-center'>" + (i + 1) + "</td>" +
+                "<td class='text-center'>" + (item.kode || "") + "</td>" +
+                "<td class='text-center'><a href='#' class='text-success fw-bold open-detail' data-id='" + item.id + "'>" + (item.nama || "") + "</a></td>" +
+                "<td class='text-center'>" + (item.kota || "—") + "</td>" +
+                "<td class='text-center'>" + (item.channel || "—") + "</td>" +
+                "<td class='text-center'>" + salesman(item) + "</td>" +
+                "<td class='text-center' data-search='" + (active ? "Active" : "Inactive") + "'>" + PrototypeSpa.statusBadge(active) + "</td>" +
+                "<td class='d-none'>" + (hasGps(item) ? "gps" : "") + "</td>" +
+                "</tr>");
         });
-    </script>
+        table = $("#tbl").DataTable(PrototypeSpa.dtOpts({
+            order: [[2, "asc"]],
+            columnDefs: [{ targets: 7, visible: false, searchable: true }]
+        }));
+        PrototypeSpa.bindColumnSearch(table, "#customerListContainer");
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(function (fn) { return !fn._customerCard; });
+        const cardFn = function (settings, data, idx) {
+            if (settings.nTable.id !== "tbl" || !cardFilter) return true;
+            const node = table.row(idx).node();
+            if (!node) return true;
+            if (cardFilter === "active") return $(node).find("td").eq(6).attr("data-search") === "Active";
+            if (cardFilter === "inactive") return $(node).find("td").eq(6).attr("data-search") === "Inactive";
+            if (cardFilter === "gps") return ($(node).find("td").eq(7).text() || "") === "gps";
+            return true;
+        };
+        cardFn._customerCard = true;
+        $.fn.dataTable.ext.search.push(cardFn);
+        const hash = (location.hash || "").replace("#id=", "");
+        if (hash) openDetail(hash);
+    }
+
+    function showList() {
+        $("#customerDetailContainer").addClass("d-none");
+        $("#customerListContainer").removeClass("d-none");
+        $("#btnBackToList").addClass("d-none");
+        if (map) { map.remove(); map = null; }
+    }
+    function showDetail() {
+        $("#customerListContainer").addClass("d-none");
+        $("#customerDetailContainer").removeClass("d-none");
+        $("#btnBackToList").removeClass("d-none");
+    }
+    function openDetail(id) {
+        const item = rows.find(r => String(r.id) === String(id));
+        if (!item) return;
+        const active = isActive(item);
+        $("#dNama").text(item.nama || "");
+        $("#dKode").text(item.kode || "");
+        $("#dStatus").attr("class", "badge " + (active ? "bg-success" : "bg-secondary")).text(active ? "Active" : "Inactive");
+        $("#dPemilik").val(item.pemilik || "");
+        $("#dTelepon").val(item.telepon || "");
+        $("#dNpwp").val(item.npwp || "");
+        $("#dChannel").val(item.channel || "");
+        $("#dOutlet").val(item.outletType || "");
+        $("#dAlamat").val(item.alamat || "");
+        $("#dRt").val(item.rtrw || "");
+        $("#dKel").val(item.kelurahan || "");
+        $("#dKec").val(item.kecamatan || "");
+        $("#dKota").val(item.kota || "");
+        const gpsOk = hasGps(item) && item.lat != null && item.lng != null && item.lat !== "";
+        $("#dGps").val(gpsOk ? (item.lat + ", " + item.lng) : "");
+        if (gpsOk) {
+            $("#dMaps").removeClass("d-none").attr("href", "https://www.google.com/maps?q=" + item.lat + "," + item.lng);
+        } else {
+            $("#dMaps").addClass("d-none");
+        }
+        $("#dSales").val(salesman(item));
+        $("#dVisit").val(PrototypeSpa.fmtDate(item.kunjunganTerakhir));
+        $("#dTrx").val(PrototypeSpa.fmtDate(item.transaksiTerakhir));
+        $("#dPhoto").text("No photo available");
+        showDetail();
+        if (map) { map.remove(); map = null; }
+        if (gpsOk && window.L) {
+            $("#customerMap").removeClass("d-none");
+            $("#customerMapEmpty").addClass("d-none");
+            map = L.map("customerMap").setView([Number(item.lat), Number(item.lng)], 15);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(map);
+            L.marker([Number(item.lat), Number(item.lng)]).addTo(map);
+            setTimeout(function () { map.invalidateSize(); }, 200);
+        } else {
+            $("#customerMap").addClass("d-none");
+            $("#customerMapEmpty").removeClass("d-none");
+        }
+    }
+
+    $("#customerCards").on("click", ".mpg-stat-card", function () {
+        cardFilter = $(this).data("filter") || "";
+        PrototypeSpa.setFilteredCard("#customerCards", cardFilter);
+        if (table) table.draw();
+    });
+    $("#tbl").on("click", ".open-detail", function (e) {
+        e.preventDefault();
+        openDetail($(this).data("id"));
+    });
+    $("#btnBackToList").on("click", function () {
+        PrototypeSpa.confirm("Back to customer list?", showList);
+    });
+    load();
+});
+</script>
 </body>
 </html>

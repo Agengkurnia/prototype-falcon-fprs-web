@@ -251,11 +251,12 @@
         $('#avatarCircle').text(initials);
         $('#profileName').text(name.toUpperCase());
         $('#profileBranch').text(`Cabang ${user.branch || 'Jakarta'}`);
-        $('#profileRole').text(user.role || 'Motoris');
+        const roleLabel = String(user.role || 'motoris').toUpperCase();
+        $('#profileRole').text(roleLabel);
 
         // Info items
         $('#infoUsername').text(user.username || user.name || '-');
-        $('#infoRole').text(user.role || 'Motoris');
+        $('#infoRole').text(roleLabel);
         $('#infoBranch').text(user.branch || 'Jakarta');
         $('#infoLoginTime').text(user.loginTime ? SfaStore.formatDate(user.loginTime) : '-');
         $('#infoSalesPeriod').text(SfaStore.getActiveSalesPeriod().label);

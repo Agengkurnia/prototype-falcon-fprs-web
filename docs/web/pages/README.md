@@ -26,6 +26,7 @@ Pola umum Master Data: [master_data_pola.md](master_data_pola.md)
 | Modul | Path | Dokumen |
 |-------|------|---------|
 | Faktur | `Penjualan/Faktur/` | [penjualan_faktur.md](penjualan_faktur.md) |
+| **Stock Correction** | `Penjualan/Koreksi/` | [penjualan_koreksi.md](penjualan_koreksi.md) — koreksi stok (header+lines); pasangan mobile [../../mobile/pages/penjualan_koreksi.md](../../mobile/pages/penjualan_koreksi.md) |
 | Stok Motoris | `Penjualan/StokMotoris/` | [penjualan_stok_motoris.md](penjualan_stok_motoris.md) |
 
 ## Canvassing & Kunjungan

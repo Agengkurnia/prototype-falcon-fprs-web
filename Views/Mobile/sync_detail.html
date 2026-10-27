@@ -36,6 +36,7 @@
         .icon-visit { background: #EDE7F6; color: #5E35B1; }
         .icon-geotag { background: #E8F5E9; color: #43A047; }
         .icon-customer { background: #E3F2FD; color: #1E88E5; }
+        .icon-correction { background: #FFF3E0; color: #E65100; }
 
         .queue-info { flex: 1; min-width: 0; }
         .queue-type { font-size: 13px; font-weight: 700; color: var(--color-black); }
@@ -156,18 +157,19 @@
 
     function renderQueue() {
         const queue = SfaStore.getSyncQueue();
+        const waitingCorrections = SfaStore.listCorrections().filter(c => c.status === 'Waiting' && c.requester === 'Motoris');
         const container = $('#queueList');
         container.empty();
 
         // Update summary
-        const pending = queue.filter(q => q.status === 'pending').length;
+        const pending = queue.filter(q => q.status === 'pending').length + waitingCorrections.length;
         const success = queue.filter(q => SfaStore.isQueueItemDone(q)).length;
         const failed = queue.filter(q => q.status === 'failed').length;
         $('#kpiPending').text(pending);
         $('#kpiSuccess').text(success);
         $('#kpiFailed').text(failed);
 
-        if (queue.length === 0) {
+        if (queue.length === 0 && waitingCorrections.length === 0) {
             container.html(`<div class="empty-state">
                 <i class="fas fa-check-circle fs-1 mb-3 text-success d-block"></i>
                 <div style="font-size:15px; font-weight:700; margin-bottom:4px;">Semua Data Tersinkron</div>
@@ -217,6 +219,19 @@
                     </div>
                     ${retryBtn}
                     ${statusIconHtml}
+                </div>
+            `);
+        });
+
+        waitingCorrections.forEach(c => {
+            container.append(`
+                <div class="queue-item">
+                    <div class="queue-icon icon-correction"><i class="fas fa-pen"></i></div>
+                    <div class="queue-info">
+                        <div class="queue-type">Koreksi ${c.sourceNo || ''}</div>
+                        <div class="queue-time">${(Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0))} produk · menunggu persetujuan</div>
+                    </div>
+                    <i class="fas fa-clock status-icon si-pending"></i>
                 </div>
             `);
         });
@@ -276,6 +291,19 @@
                 timer: 1400,
                 showConfirmButton: false
             });
+        });
+
+        waitingCorrections.forEach(c => {
+            container.append(`
+                <div class="queue-item">
+                    <div class="queue-icon icon-correction"><i class="fas fa-pen"></i></div>
+                    <div class="queue-info">
+                        <div class="queue-type">Koreksi ${c.sourceNo || ''}</div>
+                        <div class="queue-time">${(Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0))} produk · menunggu persetujuan</div>
+                    </div>
+                    <i class="fas fa-clock status-icon si-pending"></i>
+                </div>
+            `);
         });
     }
 

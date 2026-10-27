@@ -430,6 +430,30 @@
             word-wrap: break-word;
             max-width: 100%;
         }
+        .menu-role-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            background: #E3F2FD;
+            color: #1565C0;
+            border: 1px solid #BBDEFB;
+            line-height: 1.2;
+        }
+        .menu-new-badge {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 700;
+            background: #E8F5E9;
+            color: #2E7D32;
+            border: 1px solid #C8E6C9;
+            line-height: 1.2;
+        }
 
         /* ===== Bottom Nav (override) ===== */
         .mobile-nav-item svg {
@@ -619,26 +643,37 @@
                 <h2 id="menuHeading" class="section-heading">Menu Utama</h2>
                 <div class="menu-circle-grid" role="list">
 
-                    <a href="product_catalog.html" class="menu-circle-card" role="listitem" aria-label="Cek Stok dan Belanja Stokis">
+                    <a href="product_catalog.html" class="menu-circle-card menu-for-motoris" role="listitem" aria-label="Cek Stok dan Belanja Stokis">
                         <div class="circle-icon-wrapper" style="background-color: #EBF8F4; border-color: #C2ECE0;">
                             <i class="fas fa-warehouse" style="color: #009E73;" aria-hidden="true"></i>
                         </div>
                         <span class="circle-menu-label">Cek Stok dan Belanja Stokis</span>
                     </a>
 
-                    <a href="invoice_list.html?backTo=home" class="menu-circle-card" role="listitem" aria-label="Faktur Penjualan">
+                    <a href="invoice_list.html?backTo=home" class="menu-circle-card menu-for-motoris" role="listitem" aria-label="Faktur Penjualan">
                         <div class="circle-icon-wrapper" style="background-color: #E6F2ED; border-color: #C6E2D6;">
                             <i class="fas fa-file-invoice-dollar" style="color: #005D41;" aria-hidden="true"></i>
                         </div>
                         <span class="circle-menu-label">Faktur Penjualan</span>
                     </a>
 
-                    <a href="sync_detail.html" class="menu-circle-card" role="listitem" aria-label="Antrean Upload">
+                    <a href="sync_detail.html" class="menu-circle-card menu-for-motoris" role="listitem" aria-label="Antrean Upload">
                         <span class="sync-menu-dot d-none" id="syncMenuBadge" aria-hidden="true"></span>
                         <div class="circle-icon-wrapper" style="background-color: #EAF1FB; border-color: #B7CFEE;">
                             <i class="fas fa-cloud-upload-alt" style="color: #1F4E79;" aria-hidden="true"></i>
                         </div>
                         <span class="circle-menu-label">Antrean Upload</span>
+                    </a>
+
+                    <!-- Persetujuan Koreksi — ABM / BHO -->
+                    <a href="correction_approve.html" class="menu-circle-card menu-for-approver" role="listitem" aria-label="Persetujuan Koreksi for ABM and BHO">
+                        <span class="sync-menu-dot d-none" id="corrApproveBadge" aria-hidden="true"></span>
+                        <div class="circle-icon-wrapper" style="background-color: #FFF3E0; border-color: #FFE0B2;">
+                            <i class="fas fa-clipboard-check" style="color: #E65100;" aria-hidden="true"></i>
+                        </div>
+                        <span class="circle-menu-label">Persetujuan Koreksi</span>
+                        <span class="menu-role-badge">for ABM / BHO</span>
+                        <span class="menu-new-badge">New Feature</span>
                     </a>
 
                 </div>
@@ -699,7 +734,16 @@
         function renderUserSession() {
             const user = SfaStore.getUser() || { name: 'Pengguna', role: 'motoris' };
             $('#userName').text((user.name || 'Pengguna').toUpperCase());
-            $('#userRole').text(user.role || 'motoris');
+            $('#userRole').text(String(user.role || 'motoris').toUpperCase());
+            applyHomeMenuByRole(user);
+        }
+
+        function applyHomeMenuByRole(user) {
+            const isApprover = !!(SfaStore.isCorrectionApprover && SfaStore.isCorrectionApprover(user));
+            // ABM / BHO: tanpa menu operasional motoris (stok / faktur / antrean)
+            $('.menu-for-motoris').toggleClass('d-none', isApprover);
+            // Persetujuan Koreksi hanya untuk approver
+            $('.menu-for-approver').toggleClass('d-none', !isApprover);
         }
 
         function renderDateAndGreeting() {
@@ -807,6 +851,15 @@
                 }
             } else {
                 $menuBadge.addClass('d-none');
+            }
+
+            const waitingCorr = (SfaStore.listCorrections || function () { return []; })()
+                .filter(c => c.status === 'Waiting' && c.requester === 'Motoris').length;
+            const $corrBadge = $('#corrApproveBadge');
+            if (waitingCorr > 0) {
+                $corrBadge.removeClass('d-none').addClass('pending-only').text(waitingCorr > 9 ? '9+' : waitingCorr);
+            } else {
+                $corrBadge.addClass('d-none');
             }
         }
 

@@ -1,0 +1,215 @@
+/* ManPowerGT interactive filter stat cards (Customer / Channel Index) */
+.mpg-stat-card {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 0.75rem;
+    box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.06);
+    padding: 1rem 1.1rem 0.9rem;
+    min-height: 7.25rem;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+}
+
+.mpg-stat-card:hover {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.mpg-stat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: var(--mpg-stat-soft, #eef0f2);
+    color: var(--mpg-stat-accent, #6c757d);
+    font-size: 1.15rem;
+    line-height: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.mpg-stat-watermark {
+    position: absolute;
+    right: -1rem;
+    bottom: -1.25rem;
+    top: auto;
+    transform: none;
+    font-size: 9rem;
+    line-height: 1;
+    color: var(--mpg-stat-accent, #6c757d);
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.mpg-stat-watermark i,
+.mpg-stat-watermark i::before {
+    display: block;
+    font-size: 9rem !important;
+    line-height: 1 !important;
+    width: 1em;
+    height: 1em;
+}
+
+
+.mpg-stat-value {
+    position: relative;
+    z-index: 1;
+    margin-top: 1.15rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #2f3349;
+}
+
+.mpg-stat-label {
+    position: relative;
+    z-index: 1;
+    margin-top: 0.15rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #8a8d93;
+}
+
+.mpg-stat-badge {
+    display: none;
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    z-index: 2;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--mpg-stat-active-bg, #2f3349);
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1.2;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.08);
+}
+
+.mpg-stat-badge i {
+    font-size: 0.85rem;
+}
+
+/* Per-status accents */
+.mpg-stat-total {
+    --mpg-stat-accent: #6c757d;
+    --mpg-stat-soft: #eef0f2;
+    --mpg-stat-active-bg: #2f3349;
+}
+
+.mpg-stat-active {
+    --mpg-stat-accent: #28c76f;
+    --mpg-stat-soft: #e8f8ef;
+    --mpg-stat-active-bg: #28c76f;
+}
+
+.mpg-stat-inactive {
+    --mpg-stat-accent: #82868b;
+    --mpg-stat-soft: #f0f1f2;
+    --mpg-stat-active-bg: #6c757d;
+}
+
+.mpg-stat-gps {
+    --mpg-stat-accent: #7367f0;
+    --mpg-stat-soft: #eeedfd;
+    --mpg-stat-active-bg: #7367f0;
+}
+
+.mpg-stat-umbrella {
+    --mpg-stat-accent: #ff9f43;
+    --mpg-stat-soft: #fff3e8;
+    --mpg-stat-active-bg: #ff9f43;
+}
+
+.mpg-stat-motoris {
+    --mpg-stat-accent: #28c76f;
+    --mpg-stat-soft: #e8f8ef;
+    --mpg-stat-active-bg: #28c76f;
+}
+
+.mpg-stat-spg {
+    --mpg-stat-accent: #7367f0;
+    --mpg-stat-soft: #eeedfd;
+    --mpg-stat-active-bg: #7367f0;
+}
+
+.mpg-stat-paid {
+    --mpg-stat-accent: #28c76f;
+    --mpg-stat-soft: #e8f8ef;
+    --mpg-stat-active-bg: #28c76f;
+}
+
+.mpg-stat-unpaid {
+    --mpg-stat-accent: #ea5455;
+    --mpg-stat-soft: #fdeced;
+    --mpg-stat-active-bg: #ea5455;
+}
+
+.mpg-stat-nilai {
+    --mpg-stat-accent: #7367f0;
+    --mpg-stat-soft: #eeedfd;
+    --mpg-stat-active-bg: #7367f0;
+}
+
+.mpg-stat-return {
+    --mpg-stat-accent: #ff9f43;
+    --mpg-stat-soft: #fff3e8;
+    --mpg-stat-active-bg: #ff9f43;
+}
+
+.mpg-stat-visit {
+    --mpg-stat-accent: #696cff;
+    --mpg-stat-soft: #eae9ff;
+    --mpg-stat-active-bg: #696cff;
+}
+
+.mpg-stat-order {
+    --mpg-stat-accent: #28c76f;
+    --mpg-stat-soft: #e8f8ef;
+    --mpg-stat-active-bg: #28c76f;
+}
+
+/* Non-interactive KPI card sharing the same shell (e.g. a monetary total, not a filter) */
+.mpg-stat-card.mpg-stat-static {
+    cursor: default;
+}
+
+/* Selected / filtered */
+.mpg-stat-card.is-filtered {
+    background: var(--mpg-stat-active-bg);
+    border-color: transparent;
+    box-shadow: 0 0.35rem 0.85rem rgba(0, 0, 0, 0.14);
+}
+
+.mpg-stat-card.is-filtered .mpg-stat-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.mpg-stat-card.is-filtered .mpg-stat-watermark {
+    color: #fff;
+    opacity: 0.22;
+}
+
+.mpg-stat-card.is-filtered .mpg-stat-value,
+.mpg-stat-card.is-filtered .mpg-stat-label {
+    color: #fff;
+}
+
+.mpg-stat-card.is-filtered .mpg-stat-badge {
+    display: inline-flex;
+}
+
+.mpg-gradient {
+    background: linear-gradient(72.47deg, rgba(30, 125, 55) 22.16%, rgba(40, 199, 111) 76.47%);
+    color: #fff;
+}

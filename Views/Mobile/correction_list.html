@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Koreksi Saya - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        body { background: #f7f9fa; }
+        .corr-card { background:#fff; border:1px solid var(--color-border); border-radius:12px; margin:0 16px 10px; padding:14px; }
+        .corr-no { font-weight:800; color:#231F20; }
+        .pill { font-size:11px; font-weight:700; border-radius:999px; padding:2px 8px; }
+        .pill-wait { background:#FFF3E0; color:#E65100; }
+        .pill-ok { background:#E8F5E9; color:#2E7D32; }
+        .pill-no { background:#ECEFF1; color:#546E7A; }
+    </style>
+</head>
+<body>
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Koreksi Saya</span>
+        <div style="width:36px;"></div>
+    </div>
+    <div class="mobile-content no-nav" id="list" style="padding-top:12px;"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    const user = SfaStore.getUser() || {};
+    const name = user.name || user.username || '';
+    const mine = SfaStore.listCorrections().filter(c => c.requester === 'Motoris' && (!name || c.motoris === name));
+    const $list = $('#list');
+    if (!mine.length) {
+        $list.html('<div class="text-center text-muted" style="padding:48px 24px;">Belum ada pengajuan koreksi.</div>');
+    } else {
+        mine.slice().reverse().forEach(c => {
+            const pill = c.status === 'Approved' ? 'pill-ok' : c.status === 'Rejected' ? 'pill-no' : 'pill-wait';
+            const label = c.status === 'Approved' ? 'Disetujui' : c.status === 'Rejected' ? 'Ditolak' : 'Menunggu';
+            const n = Array.isArray(c.lines) && c.lines.length ? c.lines.length : (c.productName || c.deltaPcs != null ? 1 : 0);
+            $list.append(
+                '<div class="corr-card"><div class="d-flex justify-content-between"><span class="corr-no">' + c.id + '</span><span class="pill ' + pill + '">' + label + '</span></div>' +
+                '<div style="font-size:13px;margin-top:6px;">' + (c.sourceNo || '') + '</div>' +
+                '<div style="font-size:13px;font-weight:700;margin-top:4px;">' + n + ' produk</div>' +
+                '<div class="text-muted" style="font-size:12px;margin-top:4px;">' + (c.reason || '') + '</div></div>'
+            );
+        });
+    }
+</script>
+</body>
+</html>

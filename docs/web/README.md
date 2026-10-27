@@ -31,6 +31,7 @@ Views/FPRS/
 │   └── ... (Pajak, Alasan, LimitTargetHarian)
 ├── Penjualan/
 │   ├── Faktur/          # Daftar & form faktur penjualan
+│   ├── Koreksi/         # Stock Correction (HO create/approve)
 │   └── StokMotoris/     # Stok motoris / canvasser
 ├── Canvassing/          # Transaksi canvassing desktop
 ├── Kunjungan/
@@ -52,7 +53,7 @@ Menu dirender oleh `layout.js` ke dalam struktur bertingkat:
 | **Data Master** *(item langsung)* | Master Produk, Master Pegawai, Pajak |
 | **Data Master → Pelanggan** | Master Pelanggan, Channel |
 | **Data Master → Lainnya** | Alasan, **Limit**, **Stokis / Grosir** |
-| **Penjualan** | Faktur, Canvassing, Stok Motoris |
+| **Penjualan** | Faktur, Stock Correction *(New Feature)*, Stok Motoris |
 
 > Subgroup ber-child tunggal (Produk, Pegawai, Keuangan) dinaikkan menjadi item langsung di bawah **Data Master**; hanya subgroup ber-child ≥ 2 (Pelanggan, Lainnya) yang tetap bertingkat.
 | **Kunjungan** | Informasi Kunjungan, Geografis Kunjungan, Management Rute |

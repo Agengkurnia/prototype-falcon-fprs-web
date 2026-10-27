@@ -1,292 +1,120 @@
 <!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Master Pegawai – Master Data | Falcon FPRS</title>
-    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
-    <style>
-@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-</style>
+<html lang="en">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Employee | Falcon FPRS</title>
+<link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+<link rel="stylesheet" href="../../../../wwwroot/css/filter-stat-cards.css"/>
 </head>
 <body>
-    <div id="app-content">
-
-        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-            <div>
-                <h2 class="title-page mb-1">Master Pegawai</h2>
-                <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Master Pegawai</li></ol></nav>
-            </div>
-            <div class="d-flex flex-wrap gap-2 align-items-center">
-                <button type="button" class="btn btn-outline-primary" onclick="downloadPegawai()"><i class="fa fa-download me-1"></i> Download Data</button>
-                <button type="button" class="btn btn-outline-secondary" onclick="triggerUploadPegawai()"><i class="fa fa-upload me-1"></i> Upload Data</button>
-                <input type="file" id="uploadPegawaiInput" accept=".csv,text/csv" class="d-none" onchange="handleUploadPegawai(event)"/>
-            </div>
-        </div>
-
-        <!-- Summary cards -->
-        <div class="row g-3 mb-3">
-            <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-primary" id="cntTotal">0</div><div class="small text-muted">Total Pegawai</div></div></div></div>
-            <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-info" id="cntMotoris">0</div><div class="small text-muted">Motoris</div></div></div></div>
-            <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-warning" id="cntSpg">0</div><div class="small text-muted">SPG GT</div></div></div></div>
-            <div class="col-6 col-md-3"><div class="card text-center border-0 shadow-sm"><div class="card-body py-3"><div class="fs-4 fw-bold text-success" id="cntActive">0</div><div class="small text-muted">Aktif</div></div></div></div>
-        </div>
-
-        <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-            <i class="fa fa-users me-2 text-info"></i>
-            Master <strong>Pegawai</strong> dibagi per <strong>Role</strong> (Motoris &amp; SPG GT) dan disinkronkan ke aplikasi mobile via <code>md_pegawai</code>.
-            Input &amp; perubahan data <strong>hanya via Upload Data</strong> — gunakan <strong>Download Data</strong> untuk ekspor CSV, edit di Excel, lalu upload kembali.
-            File wajib memuat kolom <strong>NIK</strong> sebagai identitas.
-            Saat upload: NIK yang <strong>ada di file</strong> akan berstatus <strong>Active</strong>; pegawai lama yang <strong>tidak ada di file</strong> otomatis menjadi <strong>Inactive</strong>.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-
-        <div class="card"><div class="card-body"><div class="table-responsive">
-            <table class="table table-bordered table-hover" id="tbl">
-                <thead>
-                    <tr><th style="width:50px;">NO</th><th title="Source : mPegawai | txtKode (NIK)">NIK</th><th title="Source : mPegawai | txtNama">NAMA</th><th style="width:110px;" title="Source : mPegawai | txtRole">ROLE</th><th title="Source : mPegawai | txtBranch">BRANCH</th><th title="Source : mPegawai | txtRegion">REGION</th><th style="width:100px;" title="Source : mPegawai | bitActive">STATUS</th><th style="width:80px;text-align:center;">AKSI</th></tr>
-                    <tr class="filter-row">
-                        <th></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter NIK..."></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter nama..."></th>
-                        <th><select class="form-select form-select-sm"><option value="">Semua</option><option>Motoris</option><option>SPG GT</option></select></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter branch..."></th>
-                        <th><input type="text" class="form-control form-control-sm" placeholder="Filter region..."></th>
-                        <th><select class="form-select form-select-sm"><option value="">Semua</option><option>Active</option><option>Inactive</option></select></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="tblBody"></tbody>
-            </table>
-        </div></div></div>
-    </div>
-    <script src="../../../../wwwroot/js/layout.js"></script>
-    <script>
-        document.addEventListener('layoutReady', () => {
-            const KEY = 'md_pegawai';
-            const STATUS_KEY = 'md_pegawai_status_hist';
-            const SEED_VER_KEY = 'md_pegawai_seed_ver';
-            const SEED_VER = 'real-jul2026-b';
-
-            function getData() { return JSON.parse(localStorage.getItem(KEY) || '[]'); }
-            function saveData(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
-            function getStatusStore() { return JSON.parse(localStorage.getItem(STATUS_KEY) || '{}'); }
-            function setStatusStore(s) { localStorage.setItem(STATUS_KEY, JSON.stringify(s)); }
-
-            function loadData() {
-                const needSeed = !localStorage.getItem(KEY) || localStorage.getItem(SEED_VER_KEY) !== SEED_VER;
-                if (needSeed) {
-                    fetch('../../../../wwwroot/data/pegawai.json').then(r => r.json()).then(d => {
-                        saveData(d);
-                        localStorage.setItem(SEED_VER_KEY, SEED_VER);
-                        render();
-                    });
-                } else { render(); }
-            }
-
-            let table;
-            function render() {
-                if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
-                const data = getData(); $('#tblBody').empty();
-                const active = data.filter(d => d.status === 'Active').length;
-                $('#cntTotal').text(data.length);
-                $('#cntMotoris').text(data.filter(d => d.role === 'Motoris').length);
-                $('#cntSpg').text(data.filter(d => d.role === 'SPG GT').length);
-                $('#cntActive').text(active);
-                data.forEach((item, i) => {
-                    const badge = item.status === 'Active'
-                        ? '<span class="badge-status badge-active">Active</span>'
-                        : '<span class="badge-status badge-inactive">Inactive</span>';
-                    const roleBadge = item.role === 'Motoris'
-                        ? '<span class="badge bg-label-info">Motoris</span>'
-                        : (item.role === 'SPG GT' ? '<span class="badge bg-label-warning">SPG GT</span>' : (item.role || '-'));
-                    $('#tblBody').append(`<tr>
-                        <td>${i + 1}</td>
-                        <td><small class="text-muted">${item.kode || '-'}</small></td>
-                        <td><strong>${item.nama}</strong></td>
-                        <td>${roleBadge}</td>
-                        <td>${item.branch || '-'}</td>
-                        <td>${item.region || '-'}</td>
-                        <td>${badge}</td>
-                        <td><div class="row-actions"><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="btn-action btn-action-view" title="Lihat Detail"><i class="fa fa-eye"></i></a></div></td>
-                    </tr>`);
-                });
-                table = $('#tbl').DataTable({ language: { search: '', searchPlaceholder: 'Cari global...', lengthMenu: '_MENU_ entri', info: '_START_-_END_ dari _TOTAL_', paginate: { previous: '‹', next: '›' }, zeroRecords: 'Tidak ada data' }, pageLength: 10, columnDefs: [{ orderable: false, targets: [7] }], dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>' });
-                $('.filter-row input').on('keyup change', function() { table.column($(this).closest('th').index()).search(this.value).draw(); });
-                $('.filter-row select').on('change', function() { table.column($(this).closest('th').index()).search(this.value).draw(); });
-                $('.filter-row input,.filter-row select').on('click', function(e) { e.stopPropagation(); });
-            }
-
-            const CSV_HEADERS = ['nik', 'nama', 'role', 'telepon', 'branch', 'region', 'status'];
-
-            function csvValueFor(item, header) {
-                if (header === 'nik') return item.kode;
-                return item[header];
-            }
-
-            function csvEscape(val) {
-                const s = val == null ? '' : String(val);
-                return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-            }
-
-            function splitCsvLine(line) {
-                const out = []; let cur = ''; let inQuotes = false;
-                for (let i = 0; i < line.length; i++) {
-                    const ch = line[i];
-                    if (ch === '"') { if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; } else inQuotes = !inQuotes; }
-                    else if (ch === ',' && !inQuotes) { out.push(cur); cur = ''; }
-                    else { cur += ch; }
-                }
-                out.push(cur); return out;
-            }
-
-            function parseCsv(text) {
-                const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim());
-                if (!lines.length) return [];
-                if (lines[0].toLowerCase().startsWith('sep=')) lines.shift();
-                const header = splitCsvLine(lines[0]).map(h => h.trim().toLowerCase());
-                const rows = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const cols = splitCsvLine(lines[i]);
-                    if (!cols.some(c => c.trim())) continue;
-                    const row = {};
-                    header.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
-                    rows.push(row);
-                }
-                return rows;
-            }
-
-            function downloadPegawai() {
-                const data = getData();
-                let csv = 'sep=,\n' + CSV_HEADERS.join(',') + '\n';
-                data.forEach(item => { csv += CSV_HEADERS.map(h => csvEscape(csvValueFor(item, h))).join(',') + '\n'; });
-                const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = 'pegawai_' + new Date().toISOString().slice(0, 10) + '.csv'; a.click();
-                URL.revokeObjectURL(url);
-                Swal.fire({ icon: 'success', title: 'Download Berhasil', text: `${data.length} baris data pegawai diunduh.`, timer: 2000, showConfirmButton: false });
-            }
-
-            function triggerUploadPegawai() {
-                document.getElementById('uploadPegawaiInput').value = '';
-                document.getElementById('uploadPegawaiInput').click();
-            }
-
-            function handleUploadPegawai(event) {
-                const file = event.target.files && event.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try { importPegawaiCsv(e.target.result, file.name); }
-                    catch (err) { Swal.fire('Gagal', 'File tidak dapat dibaca: ' + err.message, 'error'); }
-                };
-                reader.readAsText(file, 'UTF-8');
-            }
-
-            function importPegawaiCsv(text, fileName) {
-                const rows = parseCsv(text);
-                if (!rows.length) { Swal.fire('Peringatan', 'File kosong atau format header tidak dikenali.', 'warning'); return; }
-
-                const data = getData();
-                const uploadTime = new Date().toISOString();
-                const statusStore = getStatusStore();
-                function logStatus(kode, status, aksi) {
-                    if (!statusStore[kode]) statusStore[kode] = [];
-                    statusStore[kode].push({ waktu: uploadTime, status, aksi, file: fileName });
-                }
-                const byKode = new Map(data.filter(d => d.kode).map(d => [String(d.kode), d]));
-
-                const uploadedIds = new Set();
-                const invalid = [];
-                let inserted = 0; let updated = 0;
-
-                rows.forEach((row, idx) => {
-                    const lineNo = idx + 2;
-                    const kode = (row.nik || row.kode_pegawai || row['kode pegawai'] || row.kode || '').trim();
-                    const nama = (row.nama || '').trim();
-                    if (!kode) { invalid.push({ lineNo, reason: 'NIK wajib diisi' }); return; }
-                    if (!nama) { invalid.push({ lineNo, reason: 'Nama wajib diisi' }); return; }
-
-                    uploadedIds.add(kode);
-                    const existing = byKode.get(kode);
-                    if (existing) {
-                        const prevStatus = existing.status;
-                        existing.nama = nama;
-                        existing.role = (row.role || existing.role || '').trim();
-                        existing.telepon = (row.telepon || '').trim();
-                        existing.branch = (row.branch || '').trim();
-                        existing.region = (row.region || '').trim();
-                        existing.status = 'Active';
-                        if (prevStatus !== 'Active') {
-                            logStatus(kode, 'Active', prevStatus === 'Inactive' ? 'Diaktifkan kembali (ada di file upload)' : 'Diperbarui (ada di file upload)');
-                        }
-                        updated++;
-                    } else {
-                        const rec = {
-                            id: Date.now() + inserted,
-                            kode,
-                            nama,
-                            role: (row.role || '').trim(),
-                            telepon: (row.telepon || '').trim(),
-                            branch: (row.branch || '').trim(),
-                            region: (row.region || '').trim(),
-                            keterangan: '',
-                            status: 'Active'
-                        };
-                        data.push(rec);
-                        byKode.set(kode, rec);
-                        logStatus(kode, 'Active', 'Ditambahkan (ada di file upload)');
-                        inserted++;
-                    }
-                });
-
-                let deactivated = 0;
-                if (uploadedIds.size) {
-                    data.forEach(d => {
-                        if (d.kode && !uploadedIds.has(String(d.kode)) && d.status !== 'Inactive') {
-                            d.status = 'Inactive';
-                            logStatus(d.kode, 'Inactive', 'Tidak ada di file upload → dinonaktifkan');
-                            deactivated++;
-                        }
-                    });
-                }
-
-                if (!inserted && !updated && !invalid.length) {
-                    Swal.fire('Peringatan', 'Tidak ada baris data yang dapat diproses.', 'warning'); return;
-                }
-
-                if (inserted || updated || deactivated) {
-                    saveData(data);
-                    setStatusStore(statusStore);
-                    render();
-                }
-
-                const detailLines = [];
-                if (inserted) detailLines.push(`<li><strong>${inserted}</strong> NIK baru ditambahkan (Active)</li>`);
-                if (updated) detailLines.push(`<li><strong>${updated}</strong> NIK diperbarui (Active)</li>`);
-                if (deactivated) detailLines.push(`<li><strong>${deactivated}</strong> pegawai tidak ada di file → di-nonaktifkan (Inactive)</li>`);
-                if (invalid.length) {
-                    detailLines.push(`<li><strong>${invalid.length}</strong> baris tidak valid</li>`);
-                    invalid.slice(0, 3).forEach(s => { detailLines.push(`<li class="text-muted" style="font-size:12px;">Baris ${s.lineNo}: ${s.reason}</li>`); });
-                }
-
-                const ok = inserted || updated;
-                Swal.fire({
-                    icon: ok ? 'success' : 'warning',
-                    title: ok ? 'Upload Selesai' : 'Tidak Ada Perubahan Data',
-                    html: `<div style="text-align:left;font-size:13px;"><ul style="margin:0;padding-left:18px;">${detailLines.join('')}</ul><p class="text-muted mb-0 mt-2" style="font-size:11px;">File: ${fileName}</p></div>`,
-                    confirmButtonColor: '#005D41'
-                });
-            }
-
-            $(document).ready(loadData);
-            window.downloadPegawai = downloadPegawai;
-            window.triggerUploadPegawai = triggerUploadPegawai;
-            window.handleUploadPegawai = handleUploadPegawai;
+<div id="app-content">
+<div class="card mb-3"><div class="card-body d-flex justify-content-between flex-wrap gap-2"><h4 class="mb-0">Employee</h4>
+<div class="d-flex gap-2">
+<button class="btn btn-outline-secondary d-none" id="btnBack" type="button">Back</button>
+<label class="btn btn-success mb-0">Upload Data<input type="file" id="fileX" accept=".xlsx,.csv" hidden/></label>
+</div></div></div>
+<div id="editor" class="card mb-3 d-none"><div class="card-header mpg-gradient d-flex justify-content-between"><span>Spreadsheet preview</span><button class="btn btn-light" id="btnApply" type="button">Apply rows</button></div>
+<div class="card-body table-responsive"><table class="table" id="grid"><thead><tr><th>NIK</th><th>Name</th><th>Position</th><th>Position Type</th><th>Branch</th><th>Region</th><th>Phone</th><th>Notes</th><th>Status</th></tr></thead><tbody></tbody></table></div></div>
+<div id="list">
+<div class="row g-3 mb-3" id="cards">
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-total is-filtered" data-filter=""><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cT">0</div><div class="mpg-stat-label">Total</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-motoris" data-filter="motoris"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cM">0</div><div class="mpg-stat-label">Motoris</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-spg" data-filter="spg"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cS">0</div><div class="mpg-stat-label">SPG GT</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-active" data-filter="active"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cA">0</div><div class="mpg-stat-label">Active</div></div></div>
+</div>
+<div class="card"><div class="card-body"><table class="table" id="tbl" style="width:100%"><thead>
+<tr><th>No</th><th>NIK</th><th>Name</th><th>Position</th><th>Branch</th><th>Region</th><th>Status</th></tr>
+<tr class="dt-col-search"><th></th>
+<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="1" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="2" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th></th><th></th><th></th>
+<th><select class="form-select form-select-sm col-search" data-col="6"><option value="">All</option><option>Active</option><option>Inactive</option></select></th>
+</tr></thead><tbody></tbody></table></div></div>
+</div>
+<div id="detail" class="d-none"><div class="row g-3">
+<div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Profile</div><div class="card-body">
+<div class="row mb-2"><label class="col-4 text-muted">NIK</label><div class="col-8"><input class="form-control" id="dNik" disabled/></div></div>
+<div class="row mb-2"><label class="col-4 text-muted">Name</label><div class="col-8"><input class="form-control" id="dNama" disabled/></div></div>
+<div class="row mb-2"><label class="col-4 text-muted">Position</label><div class="col-8"><input class="form-control" id="dPos" disabled/></div></div>
+<div class="row mb-2"><label class="col-4 text-muted">Position Type</label><div class="col-8"><input class="form-control" id="dType" disabled/></div></div>
+<div class="row mb-2"><label class="col-4 text-muted">Phone</label><div class="col-8"><input class="form-control" id="dTel" disabled/></div></div>
+<div class="row"><label class="col-4 text-muted">Status</label><div class="col-8"><input class="form-control" id="dStat" disabled/></div></div>
+</div></div></div>
+<div class="col-md-6"><div class="card h-100"><div class="card-header mpg-gradient">Assignment</div><div class="card-body">
+<div class="row mb-2"><label class="col-4 text-muted">Branch</label><div class="col-8"><input class="form-control" id="dBr" disabled/></div></div>
+<div class="row mb-2"><label class="col-4 text-muted">Region</label><div class="col-8"><input class="form-control" id="dRg" disabled/></div></div>
+<div class="row"><label class="col-4 text-muted">Notes</label><div class="col-8"><textarea class="form-control" id="dNote" disabled></textarea></div></div>
+</div></div></div>
+<div class="col-12"><div class="card"><div class="card-header mpg-gradient">Status History</div><div class="card-body p-0"><table class="table mb-0"><thead><tr><th>Date</th><th>Status</th><th>Source</th><th>Notes</th><th>By</th></tr></thead><tbody id="hist"></tbody></table></div></div></div>
+</div></div>
+</div>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script src="../../../../wwwroot/js/prototype-spa.js"></script>
+<script>
+document.addEventListener("layoutReady", function () {
+    const KEY = "md_pegawai", VER = "real-jul2026-b";
+    let rows = [], table, filter = "";
+    const active = r => r.status === "Active";
+    const role = r => (r.role || "").toLowerCase();
+    function load() {
+        const need = !localStorage.getItem(KEY) || localStorage.getItem("md_pegawai_seed_ver") !== VER;
+        const done = d => { rows = d; paint(); };
+        if (need) fetch("../../../../wwwroot/data/pegawai.json").then(r => r.json()).then(d => { localStorage.setItem(KEY, JSON.stringify(d)); localStorage.setItem("md_pegawai_seed_ver", VER); done(d); });
+        else done(JSON.parse(localStorage.getItem(KEY)));
+    }
+    function paint() {
+        $("#cT").text(rows.length);
+        $("#cM").text(rows.filter(r => role(r).indexOf("motor") >= 0).length);
+        $("#cS").text(rows.filter(r => role(r).indexOf("spg") >= 0).length);
+        $("#cA").text(rows.filter(active).length);
+        if ($.fn.DataTable.isDataTable("#tbl")) $("#tbl").DataTable().destroy();
+        const b = $("#tbl tbody").empty();
+        rows.forEach((r, i) => b.append("<tr><td>" + (i+1) + "</td><td>" + r.kode + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + r.id + "'>" + r.nama + "</a></td><td>" + (r.role||"") + "</td><td>" + (r.branch||"—") + "</td><td>" + (r.region||"—") + "</td><td>" + PrototypeSpa.statusBadge(active(r)) + "</td></tr>"));
+        table = $("#tbl").DataTable(PrototypeSpa.dtOpts());
+        PrototypeSpa.bindColumnSearch(table, "#list");
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._pg);
+        const fn = function (settings, data) {
+            if (settings.nTable.id !== "tbl" || !filter) return true;
+            if (filter === "motoris") return String(data[3]).toLowerCase().indexOf("motor") >= 0;
+            if (filter === "spg") return String(data[3]).toLowerCase().indexOf("spg") >= 0;
+            const on = String(data[6]).indexOf("Inactive") < 0;
+            return filter === "active" ? on : true;
+        };
+        fn._pg = true; $.fn.dataTable.ext.search.push(fn);
+    }
+    function showList() { $("#detail").addClass("d-none"); $("#list,#cards").removeClass("d-none"); $("#btnBack").addClass("d-none"); }
+    $("#cards").on("click", ".mpg-stat-card", function () { filter = $(this).data("filter") || ""; PrototypeSpa.setFilteredCard("#cards", filter); if (table) table.draw(); });
+    $("#tbl").on("click", ".open", function (e) {
+        e.preventDefault();
+        const r = rows.find(x => String(x.id) === String($(this).data("id")));
+        if (!r) return;
+        $("#dNik").val(r.kode); $("#dNama").val(r.nama); $("#dPos").val(r.role||""); $("#dType").val(r.positionType || r.keterangan || "");
+        $("#dTel").val(r.telepon||""); $("#dStat").val(r.status||""); $("#dBr").val(r.branch||""); $("#dRg").val(r.region||""); $("#dNote").val(r.keterangan||"");
+        $("#hist").html("<tr><td>" + PrototypeSpa.fmtDate(r.updated || "") + "</td><td>" + (r.status||"") + "</td><td>Seed</td><td>" + (r.keterangan||"") + "</td><td>System</td></tr>");
+        $("#list").addClass("d-none"); $("#detail").removeClass("d-none"); $("#btnBack").removeClass("d-none");
+    });
+    $("#btnBack").on("click", function () { PrototypeSpa.confirm("Back to employee list?", showList); });
+    $("#fileX").on("change", function () {
+        const body = $("#grid tbody").empty();
+        rows.slice(0, 8).forEach(r => body.append("<tr><td contenteditable>" + r.kode + "</td><td contenteditable>" + r.nama + "</td><td contenteditable>" + (r.role||"") + "</td><td contenteditable>" + (r.positionType||"") + "</td><td contenteditable>" + (r.branch||"") + "</td><td contenteditable>" + (r.region||"") + "</td><td contenteditable>" + (r.telepon||"") + "</td><td contenteditable>" + (r.keterangan||"") + "</td><td contenteditable>" + (r.status||"Active") + "</td></tr>"));
+        $("#editor").removeClass("d-none");
+        this.value = "";
+    });
+    $("#btnApply").on("click", function () {
+        PrototypeSpa.confirm("Apply the spreadsheet rows?", function () {
+            $("#grid tbody tr").each(function () {
+                const c = $(this).children();
+                const nik = $(c[0]).text().trim();
+                let r = rows.find(x => x.kode === nik);
+                if (!r) { r = { id: Date.now() + Math.random(), kode: nik }; rows.push(r); }
+                r.nama = $(c[1]).text().trim(); r.role = $(c[2]).text().trim(); r.positionType = $(c[3]).text().trim();
+                r.branch = $(c[4]).text().trim(); r.region = $(c[5]).text().trim(); r.telepon = $(c[6]).text().trim();
+                r.keterangan = $(c[7]).text().trim(); r.status = $(c[8]).text().trim() || "Active";
+            });
+            localStorage.setItem(KEY, JSON.stringify(rows));
+            $("#editor").addClass("d-none");
+            paint();
         });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</body>
-</html>
+    });
+    load();
+});
+</script>
+</body></html>

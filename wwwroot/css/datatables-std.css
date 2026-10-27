@@ -1,0 +1,71 @@
+/* =============================================
+   DataTables standard — Falcon FPRS Prototype
+   Bordered grid for index / LOV / detail tables
+   ============================================= */
+
+div.dataTables_wrapper table.table,
+table.table.dt-std,
+table.table.table-bordered {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border: 1px solid #d9dee3 !important;
+}
+
+div.dataTables_wrapper table.table > :not(caption) > * > *,
+table.table.dt-std > :not(caption) > * > *,
+table.table.table-bordered > :not(caption) > * > * {
+    border-top: 1px solid #d9dee3 !important;
+    border-bottom: 1px solid #d9dee3 !important;
+    border-left: 1px solid #d9dee3 !important;
+    border-right: 1px solid #d9dee3 !important;
+}
+
+div.dataTables_wrapper table.table thead th,
+table.table.dt-std thead th,
+table.table.table-bordered thead th {
+    vertical-align: middle;
+    background: #f8faf9;
+    color: #5e6e63;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+div.dataTables_wrapper table.table tbody td,
+table.table.dt-std tbody td,
+table.table.table-bordered tbody td {
+    vertical-align: middle;
+}
+
+div.dataTables_wrapper table.table tr.dt-col-search th,
+table.table.dt-std tr.dt-col-search th,
+table.table.table-bordered tr.dt-col-search th {
+    background: #fff;
+    padding: 0.45rem 0.5rem;
+    text-transform: none;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+div.dataTables_wrapper .dataTables_length,
+div.dataTables_wrapper .dataTables_info {
+    padding-left: 0.25rem;
+}
+
+div.dataTables_wrapper .dataTables_paginate {
+    padding-right: 0.25rem;
+}
+
+/* Sort only on the title header row — filter row is not clickable for order */
+table.dataTable thead tr.dt-col-search th {
+    cursor: default !important;
+    background-image: none !important;
+}
+
+table.dataTable thead tr.dt-col-search .dt-column-order,
+table.dataTable thead tr.dt-col-search span.dt-column-order,
+table.dataTable thead tr.dt-col-search:before,
+table.dataTable thead tr.dt-col-search:after {
+    display: none !important;
+}

@@ -757,13 +757,32 @@
     // =========================================================
     // AUTH
     // =========================================================
+    function resolveLoginRole(username) {
+        const key = String(username || '').replace(/\s+/g, '').toLowerCase();
+        if (/^(md|moderntrade|modern\.?trade)/i.test(key)) return 'md';
+        if (/^abm/i.test(key)) return 'abm';
+        if (/^bho/i.test(key)) return 'bho';
+        return 'motoris';
+    }
+    function isCorrectionApprover(user) {
+        const u = user || getUser() || {};
+        const role = String(u.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+        if (role === 'abm' || role === 'bho') return true;
+        // Fallback: username prefix (session lama yang masih role motoris)
+        const inferred = resolveLoginRole(u.username || u.name || '');
+        return inferred === 'abm' || inferred === 'bho';
+    }
     function getUser() {
         const u = read(KEYS.USER);
         if (!u) return u;
-        const role = String(u.role || '').toLowerCase().replace(/[\s-]+/g, '_');
+        let role = String(u.role || '').toLowerCase().replace(/[\s-]+/g, '_');
         // Prototype default: Motoris (migrate legacy canvasser)
-        if (!role || role === 'canvasser' || role === 'sales') {
-            u.role = 'motoris';
+        if (!role || role === 'canvasser' || role === 'sales') role = 'motoris';
+        // Username prefix wins (ABM1 / BHO* / MD*) — perbaiki session lama yang stuck motoris
+        const inferred = resolveLoginRole(u.username || u.name || '');
+        if (inferred === 'abm' || inferred === 'bho' || inferred === 'md') role = inferred;
+        if (u.role !== role) {
+            u.role = role;
             write(KEYS.USER, u);
         }
         return u;
@@ -1406,6 +1425,78 @@
         return removed;
     }
 
+    function listCorrections() {
+        try { return JSON.parse(localStorage.getItem('fprs_koreksi_v1') || '[]'); }
+        catch (e) { return []; }
+    }
+
+    function writeCorrections(list) {
+        localStorage.setItem('fprs_koreksi_v1', JSON.stringify(list));
+    }
+
+    function nextCorrectionId(list) {
+        const n = list.reduce((m, r) => Math.max(m, parseInt(String(r.id || '').split('-').pop(), 10) || 0), 0) + 1;
+        return 'KR-2026-' + String(n).padStart(4, '0');
+    }
+
+    function submitMotorisCorrection(input) {
+        if (!input || !input.sourceNo) {
+            return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
+        }
+        let lines = Array.isArray(input.lines) ? input.lines.slice() : [];
+        if (!lines.length && input.productName) {
+            lines = [{
+                productCode: input.productCode || '',
+                productName: input.productName,
+                originalQty: Number(input.originalQty || 0),
+                price: Number(input.price || 0),
+                deltaPcs: Number(input.deltaPcs || 0)
+            }];
+        }
+        lines = lines.map(ln => {
+            const delta = Number(ln.deltaPcs || 0);
+            const price = Number(ln.price || 0);
+            return {
+                productCode: ln.productCode || '',
+                productName: ln.productName || '',
+                originalQty: Number(ln.originalQty || 0),
+                price: price,
+                deltaPcs: delta,
+                value: delta * price
+            };
+        }).filter(ln => ln.deltaPcs);
+        if (!lines.length) return { ok: false, message: 'Ubah minimal satu qty pcs.' };
+        for (let i = 0; i < lines.length; i++) {
+            const ln = lines[i];
+            if (!ln.productName) return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
+            if (ln.deltaPcs < 0 && Math.abs(ln.deltaPcs) > ln.originalQty) {
+                return { ok: false, message: 'Minus tidak boleh lebih besar dari qty asli.' };
+            }
+        }
+        if (!String(input.reason || '').trim()) return { ok: false, message: 'Alasan wajib diisi.' };
+        const list = listCorrections();
+        if (list.some(r => r.sourceNo === input.sourceNo && r.status === 'Waiting')) {
+            return { ok: false, message: 'Dokumen ini sudah punya koreksi yang menunggu.' };
+        }
+        const rec = {
+            id: nextCorrectionId(list),
+            sourceType: input.sourceType,
+            sourceNo: input.sourceNo,
+            motoris: input.motoris || '',
+            salesCode: input.salesCode || '',
+            partyLabel: input.partyLabel || '',
+            reason: String(input.reason).trim(),
+            status: 'Waiting',
+            requester: 'Motoris',
+            createdAt: new Date().toISOString().slice(0, 10),
+            lines: lines,
+            value: lines.reduce((s, ln) => s + Number(ln.value || 0), 0)
+        };
+        list.push(rec);
+        writeCorrections(list);
+        return { ok: true, record: rec };
+    }
+
     // =========================================================
     // DEV TOOLS
     // =========================================================
@@ -1443,7 +1534,7 @@
 
     window.SfaStore = {
         // Auth
-        getUser, saveUser, clearUser,
+        getUser, saveUser, clearUser, resolveLoginRole, isCorrectionApprover,
         // Customers
         getCustomers, getCustomerById, saveCustomer, updateCustomerGps,
         // Products
@@ -1466,6 +1557,7 @@
         getSyncQueue, addToSyncQueue, clearSyncQueue, clearAllSyncQueue, processQueue, ensureDemoSyncQueue,
         getDownloadStatus, runDownloadFromServer, setLastDownload, ensureDemoDownloadStatus,
         isQueueItemDone, retryQueueItem, clearSuccessfulQueue,
+        listCorrections, writeCorrections, submitMotorisCorrection,
         // KPI & Dashboard
         getTodayKpi, getKpiByDate, getKpiByRange, getKpiByMonth, getKpiByWeek,
         getTargetHarianVersions, getLimitTargets, getLimitByCode, getLimitByJabatan,

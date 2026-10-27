@@ -1,151 +1,198 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Limit – Master Data | Falcon FPRS</title>
+    <title>Limit | Falcon FPRS</title>
     <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
-    <style>
-@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-.badge-status{display:inline-block;padding:.25rem .6rem;border-radius:12px;font-size:.75rem;font-weight:600}
-.badge-active{background:#e6f4ea;color:#1e7e34}
-.badge-inactive{background:#f8d7da;color:#842029}
-.row-actions{display:flex;flex-direction:row;align-items:center;gap:6px;justify-content:center;flex-wrap:nowrap;white-space:nowrap}
-</style>
+    <link rel="stylesheet" href="../../../../wwwroot/css/filter-stat-cards.css"/>
 </head>
 <body>
-    <div id="app-content">
-
-            <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-                <div>
-                    <h2 class="title-page mb-1">Limit</h2>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
-                            <li class="breadcrumb-item">Data Master</li>
-                            <li class="breadcrumb-item active">Limit</li>
-                        </ol>
-                    </nav>
-                    <div class="text-muted small">LIMIT VISIT</div>
-                </div>
-                <a href="detail.html?mode=create" class="btn btn-success"><i class="fa fa-plus me-1"></i> Create</a>
-            </div>
-
-            <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-                <i class="fa fa-link me-2 text-info"></i>
-                <strong>Integrasi Master Data API:</strong>
-                LOV <strong>Jabatan</strong> / <strong>Type Jabatan</strong> pada form Create/Detail bersumber
-                <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Position</code></a>.
-                Hover kolom grid / label form untuk tooltip <code>Source : …</code>.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <div class="card"><div class="card-body"><div class="table-responsive">
-                <table class="table table-bordered table-hover" id="tbl">
-                    <thead>
-                        <tr>
-                            <th title="Source : mLimitTargetHarian.txtNama">NAMA</th>
-                            <th title="Source : Master Data API /api/v1/Position | mJabatan.txtJabatanName → mLimitTargetHarian.txtJabatan">JABATAN</th>
-                            <th title="Source : Master Data API /api/v1/Position | tipe jabatan → mLimitTargetHarian.txtTypeJabatan">TYPE JABATAN</th>
-                            <th class="text-end" title="Source : mLimitTargetHarianVer | intMinimalHarian">MIN HARIAN</th>
-                            <th class="text-end" title="Source : mLimitTargetHarianVer | intMaximalHarian">MAX HARIAN</th>
-                            <th class="text-center" title="Source : mLimitTargetHarianVer | bitActive (versi berlaku hari ini)">ACTIVE</th>
-                            <th style="width:200px;text-align:center;">AKSI</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblBody"></tbody>
-                </table>
-            </div></div></div>
-
+<div id="app-content">
+    <div class="card mb-3"><div class="card-body d-flex justify-content-between flex-wrap gap-2">
+        <div><h4 class="mb-1">Limit</h4><p class="text-muted mb-0">Master Data / Limit</p></div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary d-none" id="btnBack">Back</button>
+            <button type="button" class="btn btn-success" id="btnAdd">Add Limit</button>
+            <button type="button" class="btn btn-success d-none" id="btnSave">Save Limit</button>
+        </div>
+    </div></div>
+    <div id="list">
+        <div class="row g-3 mb-3" id="cards">
+            <div class="col-6 col-md-4"><div class="mpg-stat-card mpg-stat-total is-filtered" data-filter=""><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cntTotal">0</div><div class="mpg-stat-label">Total</div></div></div>
+            <div class="col-6 col-md-4"><div class="mpg-stat-card mpg-stat-active" data-filter="active"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cntActive">0</div><div class="mpg-stat-label">Active</div></div></div>
+            <div class="col-6 col-md-4"><div class="mpg-stat-card mpg-stat-inactive" data-filter="inactive"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cntInactive">0</div><div class="mpg-stat-label">Inactive</div></div></div>
+        </div>
+        <div class="card"><div class="card-body"><table class="table" id="tbl" style="width:100%"><thead>
+            <tr><th>No</th><th>Limit Name</th><th>Jabatan</th><th>Daily Min</th><th>Daily Max</th><th>Status</th></tr>
+            <tr class="dt-col-search"><th></th>
+                <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="1" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                <th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="2" placeholder="Search"/><button type="button" class="btn btn-outline-success btn-col-search"><i class="fa fa-search"></i></button></div></th>
+                <th></th><th></th>
+                <th><select class="form-select form-select-sm col-search" data-col="5"><option value="">All</option><option>Active</option><option>Inactive</option></select></th>
+            </tr>
+        </thead><tbody></tbody></table></div></div>
     </div>
-    <script src="../../../../wwwroot/js/layout.js"></script>
-    <script src="../../../../wwwroot/js/master-data-param.js"></script>
-    <script>
-        document.addEventListener('layoutReady', () => {
+    <div id="detail" class="d-none">
+        <div class="row g-3">
+            <div class="col-lg-8">
+                <div class="card mb-3"><div class="card-header mpg-gradient">Limit</div><div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label fw-semibold">Limit Name <span class="text-muted">*</span></label><input class="form-control" id="fNama"/></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Jabatan <span class="text-muted">*</span></label><select class="form-select" id="fJabatan"><option value="">Select Jabatan...</option><option>MD</option><option>Motoris</option><option>SPG GT</option></select></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold">Type Jabatan</label><input class="form-control" id="fType" placeholder="Optional"/></div>
+                        <div class="col-md-6"><label class="form-label fw-semibold d-block">Status</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="fActive" checked/><label class="form-check-label" for="fActive">Active</label></div></div>
+                    </div>
+                </div></div>
+                <div class="card"><div class="card-header mpg-gradient">Version Period</div><div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Daily Min</label><input type="number" class="form-control" id="fMin"/></div>
+                        <div class="col-md-6"><label class="form-label">Daily Max</label><input type="number" class="form-control" id="fMax"/></div>
+                        <div class="col-md-6"><label class="form-label">Weekly HKE</label><input type="number" class="form-control" id="fHke"/></div>
+                        <div class="col-md-6"><label class="form-label">Monthly HKE</label><input type="number" class="form-control" id="fHkeM"/></div>
+                        <div class="col-md-6"><label class="form-label">Effective Call Count</label><input type="number" class="form-control" id="fEc"/></div>
+                        <div class="col-md-6"><label class="form-label">Effective Call Percentage (%)</label><input type="number" class="form-control" id="fEcp"/></div>
+                        <div class="col-md-6"><label class="form-label">Start Date</label><input type="date" class="form-control" id="fStart"/></div>
+                        <div class="col-md-6"><label class="form-label">End Date</label><input class="form-control" value="Ongoing" disabled/></div>
+                    </div>
+                </div></div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card"><div class="card-header mpg-gradient">Version History</div><div class="card-body">
+                    <div id="histList" class="list-group mb-3"></div>
+                    <div id="histDetail" class="d-none small border-top pt-3">
+                        <div class="mb-1"><span class="text-muted">Daily Min</span> <span id="hMin" class="float-end"></span></div>
+                        <div class="mb-1"><span class="text-muted">Daily Max</span> <span id="hMax" class="float-end"></span></div>
+                        <div class="mb-1"><span class="text-muted">Effective Call Count</span> <span id="hEc" class="float-end"></span></div>
+                        <div><span class="text-muted">Period</span> <span id="hPer" class="float-end"></span></div>
+                    </div>
+                </div></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script src="../../../../wwwroot/js/prototype-spa.js"></script>
+<script>
+document.addEventListener("layoutReady", function () {
+    const KEY = "md_limit";
+    let rows = [];
+    let table;
+    let cardFilter = "";
+    let editing = null;
 
-const KEY = 'md_limit_target';
-const SEED_VER_KEY = 'md_limit_target_seed_ver';
-const SEED_VER = '5';
+    function current(item) {
+        const vs = (item.versions || []).slice().sort((a, b) => String(b.tanggalMulai).localeCompare(String(a.tanggalMulai)));
+        return vs.find(v => v.active) || vs[0] || {};
+    }
+    function isActive(item) { return current(item).active !== false && item.active !== false; }
 
-function getData(){ return JSON.parse(localStorage.getItem(KEY) || '[]'); }
-function saveData(d){ localStorage.setItem(KEY, JSON.stringify(d)); }
-function todayStr(){ return new Date().toISOString().slice(0, 10); }
-
-function ensureVersions(item){
-    if (Array.isArray(item.versions) && item.versions.length) return item.versions;
-    return [];
-}
-
-function currentVersion(item){
-    const today = todayStr();
-    const versions = ensureVersions(item).filter(v => v && v.active !== false);
-    return versions.find(v => v.tanggalMulai && v.tanggalSelesai && today >= v.tanggalMulai && today <= v.tanggalSelesai)
-        || versions.slice().sort((a,b) => String(b.tanggalMulai||'').localeCompare(String(a.tanggalMulai||'')))[0]
-        || null;
-}
-
-function isActiveToday(item){
-    const today = todayStr();
-    return ensureVersions(item).some(v =>
-        v && v.active !== false && v.tanggalMulai && v.tanggalSelesai &&
-        today >= v.tanggalMulai && today <= v.tanggalSelesai
-    );
-}
-
-function loadData(){
-    const ver = localStorage.getItem(SEED_VER_KEY);
-    const existing = getData();
-    if (ver === SEED_VER && existing.length) { render(); return; }
-    fetch('../../../../wwwroot/data/limit-target.json')
-        .then(r => r.json())
-        .then(d => {
-            saveData(Array.isArray(d) ? d : []);
-            localStorage.setItem(SEED_VER_KEY, SEED_VER);
-            localStorage.removeItem('md_target_harian');
-            localStorage.removeItem('md_target_harian_seed_ver');
-            render();
-        })
-        .catch(() => { if (!existing.length) { saveData([]); localStorage.setItem(SEED_VER_KEY, SEED_VER); } render(); });
-}
-
-function render(){
-    if ($.fn.DataTable.isDataTable('#tbl')) $('#tbl').DataTable().destroy();
-    $('#tblBody').empty();
-    const rows = getData().slice().sort((a,b) =>
-        String(a.nama||'').localeCompare(String(b.nama||''))
-        || String(a.jabatan||'').localeCompare(String(b.jabatan||''))
-        || String(a.typeJabatan||'').localeCompare(String(b.typeJabatan||''))
-    );
-    rows.forEach((item) => {
-        const ver = currentVersion(item);
-        const active = isActiveToday(item);
-        const detailHref = MasterDataParam.editUrl('detail.html', item.id);
-        const historyHref = MasterDataParam.editUrl('history.html', item.id);
-        $('#tblBody').append(`<tr>
-            <td><strong>${item.nama || '-'}</strong></td>
-            <td>${item.jabatan || '-'}</td>
-            <td>${item.typeJabatan || '-'}</td>
-            <td class="text-end">${ver ? ver.minimalHarian : '-'}</td>
-            <td class="text-end">${ver ? ver.maximalHarian : '-'}</td>
-            <td class="text-center">${active
-                ? '<span class="badge-status badge-active">Active</span>'
-                : '<span class="badge-status badge-inactive">Inactive</span>'}</td>
-            <td><div class="row-actions">
-                <a href="${detailHref}" class="btn btn-success btn-sm" title="Detail"><i class="fa fa-eye me-1"></i>Detail</a>
-                <a href="${historyHref}" class="btn btn-secondary btn-sm" title="History"><i class="fa fa-history me-1"></i>History</a>
-            </div></td>
-        </tr>`);
-    });
-    $('#tbl').DataTable({
-        language:{ search:'', searchPlaceholder:'Search...', lengthMenu:'_MENU_ entries', info:'_START_-_END_ of _TOTAL_', paginate:{ previous:'‹', next:'›' }, zeroRecords:'Tidak ada data' },
-        pageLength:10,
-        columnDefs:[{ orderable:false, targets:[6] }],
-        dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
-    });
-}
-
-$(document).ready(loadData);
+    function load() {
+        if (!localStorage.getItem(KEY)) {
+            fetch("../../../../wwwroot/data/limit-target.json").then(r => r.json()).then(function (d) {
+                localStorage.setItem(KEY, JSON.stringify(d));
+                rows = d; paint();
+            });
+        } else { rows = JSON.parse(localStorage.getItem(KEY)); paint(); }
+    }
+    function paint() {
+        $("#cntTotal").text(rows.length);
+        $("#cntActive").text(rows.filter(isActive).length);
+        $("#cntInactive").text(rows.filter(r => !isActive(r)).length);
+        if ($.fn.DataTable.isDataTable("#tbl")) $("#tbl").DataTable().destroy();
+        const body = $("#tbl tbody").empty();
+        rows.forEach(function (item, i) {
+            const v = current(item);
+            body.append("<tr><td>" + (i + 1) + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + item.id + "'>" + item.nama + "</a></td><td>" + (item.jabatan || "") + "</td><td>" + (v.minimalHarian ?? "") + "</td><td>" + (v.maximalHarian ?? "") + "</td><td>" + PrototypeSpa.statusBadge(isActive(item)) + "</td></tr>");
         });
-    </script>
+        table = $("#tbl").DataTable(PrototypeSpa.dtOpts());
+        PrototypeSpa.bindColumnSearch(table, "#list");
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._lim);
+        const fn = function (settings, data) {
+            if (settings.nTable.id !== "tbl" || !cardFilter) return true;
+            const active = String(data[5]).indexOf("Active") >= 0 && String(data[5]).indexOf("Inactive") < 0;
+            return cardFilter === "active" ? active : !active;
+        };
+        fn._lim = true;
+        $.fn.dataTable.ext.search.push(fn);
+    }
+    function showList() {
+        $("#detail").addClass("d-none"); $("#list").removeClass("d-none");
+        $("#btnBack,#btnSave").addClass("d-none"); $("#btnAdd").removeClass("d-none");
+    }
+    function openForm(item) {
+        editing = item;
+        const v = item ? current(item) : {};
+        $("#fNama").val(item ? item.nama : "");
+        $("#fJabatan").val(item ? item.jabatan : "");
+        $("#fType").val(item ? (item.typeJabatan || "") : "");
+        $("#fActive").prop("checked", item ? isActive(item) : true);
+        $("#fMin").val(v.minimalHarian ?? "");
+        $("#fMax").val(v.maximalHarian ?? "");
+        $("#fHke").val(v.targetHke ?? "");
+        $("#fHkeM").val(v.targetHkeBulanan ?? "");
+        $("#fEc").val(v.effectiveCallCount ?? "");
+        $("#fEcp").val(v.effectiveCallPercentage ?? "");
+        $("#fStart").val((v.tanggalMulai || new Date().toISOString().slice(0, 10)));
+        const list = $("#histList").empty();
+        (item && item.versions ? item.versions : []).forEach(function (ver) {
+            list.append("<button type='button' class='list-group-item list-group-item-action hist' data-id='" + ver.id + "'>" + PrototypeSpa.fmtDate(ver.tanggalMulai) + " – " + (ver.tanggalSelesai && ver.tanggalSelesai !== "Ongoing" ? PrototypeSpa.fmtDate(ver.tanggalSelesai) : "Ongoing") + "</button>");
+        });
+        $("#histDetail").addClass("d-none");
+        $("#list").addClass("d-none"); $("#detail").removeClass("d-none");
+        $("#btnAdd").addClass("d-none"); $("#btnBack,#btnSave").removeClass("d-none");
+    }
+    $("#cards").on("click", ".mpg-stat-card", function () {
+        cardFilter = $(this).data("filter") || "";
+        PrototypeSpa.setFilteredCard("#cards", cardFilter);
+        if (table) table.draw();
+    });
+    $("#tbl").on("click", ".open", function (e) { e.preventDefault(); openForm(rows.find(r => String(r.id) === String($(this).data("id")))); });
+    $("#btnAdd").on("click", function () { openForm(null); });
+    $("#btnBack").on("click", function () { PrototypeSpa.confirm("Leave this form?", showList); });
+    $("#histList").on("click", ".hist", function () {
+        if (!editing) return;
+        const ver = (editing.versions || []).find(v => String(v.id) === String($(this).data("id")));
+        if (!ver) return;
+        $("#hMin").text(ver.minimalHarian ?? "—");
+        $("#hMax").text(ver.maximalHarian ?? "—");
+        $("#hEc").text(ver.effectiveCallCount ?? "—");
+        $("#hPer").text(PrototypeSpa.fmtDate(ver.tanggalMulai) + " – " + (ver.active ? "Ongoing" : PrototypeSpa.fmtDate(ver.tanggalSelesai)));
+        $("#histDetail").removeClass("d-none");
+    });
+    $("#btnSave").on("click", function () {
+        if (!$("#fNama").val() || !$("#fJabatan").val()) { PrototypeSpa.confirm("Limit name and jabatan are required.", function () {}); return; }
+        PrototypeSpa.confirm("Save this limit?", function () {
+            const ver = {
+                id: "v" + Date.now(),
+                minimalHarian: Number($("#fMin").val() || 0),
+                maximalHarian: Number($("#fMax").val() || 0),
+                targetHke: Number($("#fHke").val() || 0),
+                targetHkeBulanan: Number($("#fHkeM").val() || 0),
+                effectiveCallCount: Number($("#fEc").val() || 0),
+                effectiveCallPercentage: Number($("#fEcp").val() || 0),
+                tanggalMulai: $("#fStart").val(),
+                tanggalSelesai: null,
+                active: true
+            };
+            if (!editing) {
+                rows.push({ id: Date.now(), nama: $("#fNama").val(), jabatan: $("#fJabatan").val(), typeJabatan: $("#fType").val(), active: $("#fActive").is(":checked"), versions: [ver] });
+            } else {
+                editing.nama = $("#fNama").val();
+                editing.jabatan = $("#fJabatan").val();
+                editing.typeJabatan = $("#fType").val();
+                editing.active = $("#fActive").is(":checked");
+                (editing.versions || []).forEach(function (old) { if (old.active) { old.active = false; old.tanggalSelesai = ver.tanggalMulai; } });
+                editing.versions = editing.versions || [];
+                editing.versions.push(ver);
+            }
+            localStorage.setItem(KEY, JSON.stringify(rows));
+            paint();
+            showList();
+        });
+    });
+    load();
+});
+</script>
 </body>
 </html>

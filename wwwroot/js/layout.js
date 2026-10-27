@@ -43,6 +43,7 @@ class Layout {
             'wwwroot/lib/vuexy/vendor/libs/sweetalert2/sweetalert2.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-bs5/datatables.bootstrap5.css',
             'wwwroot/lib/vuexy/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css',
+            'wwwroot/css/datatables-std.css',
             'wwwroot/css/styles-vuexy.css',
             'wwwroot/css/prototype-chat.css'
         ];
@@ -159,6 +160,19 @@ class Layout {
             }
             .menu-item.menu-prototype-item > .menu-link:hover {
                 opacity: 1;
+            }
+            .menu-new-feature {
+                display: inline-block;
+                margin-left: 0.45rem;
+                padding: 0.1rem 0.45rem;
+                border-radius: 999px;
+                background: #ff9f43;
+                color: #fff;
+                font-size: 0.62rem;
+                font-weight: 700;
+                letter-spacing: 0.02em;
+                line-height: 1.4;
+                vertical-align: middle;
             }
 
             /* ===== Layout and Transitions ===== */
@@ -306,26 +320,26 @@ class Layout {
                             <div data-i18n="Data Master">Data Master</div>
                         </a>
                         <ul class="menu-sub">
-                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Master Produk">Master Produk</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Produk/index.html" class="menu-link"><div data-i18n="Product">Product</div></a></li>
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <div data-i18n="Pelanggan">Pelanggan</div>
+                                    <div data-i18n="Customer">Customer</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Master Pelanggan">Master Pelanggan</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div><span class="badge bg-label-secondary ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">View-only</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pelanggan/index.html" class="menu-link"><div data-i18n="Customer">Customer</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Channel/index.html" class="menu-link"><div data-i18n="Channel">Channel</div></a></li>
                                 </ul>
                             </li>
-                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Master Pegawai">Master Pegawai</div></a></li>
-                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pajak/index.html" class="menu-link"><div data-i18n="Pajak">Pajak</div></a></li>
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pegawai/index.html" class="menu-link"><div data-i18n="Employee">Employee</div></a></li>
+                            <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Pajak/index.html" class="menu-link"><div data-i18n="Tax">Tax</div></a></li>
                             <li class="menu-item">
                                 <a href="javascript:void(0);" class="menu-link menu-toggle">
-                                    <div data-i18n="Lainnya">Lainnya</div>
+                                    <div data-i18n="Other">Other</div>
                                 </a>
                                 <ul class="menu-sub">
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Alasan">Alasan</div><span class="badge bg-label-success ms-auto" style="font-size: 0.6rem; padding: 2px 6px;">Master Data API</span></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Alasan/index.html" class="menu-link"><div data-i18n="Reason">Reason</div></a></li>
                                     <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/LimitTargetHarian/index.html" class="menu-link"><div data-i18n="Limit">Limit</div></a></li>
-                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Stokis/index.html" class="menu-link"><div data-i18n="Stokis">Stokis / Grosir</div></a></li>
+                                    <li class="menu-item"><a href="${this.basePath}Views/FPRS/MasterData/Stokis/index.html" class="menu-link"><div data-i18n="Stokis">Stokis</div></a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -340,12 +354,17 @@ class Layout {
                         <ul class="menu-sub">
                             <li class="menu-item">
                                 <a href="${this.basePath}Views/FPRS/Penjualan/Faktur/index.html" class="menu-link">
-                                    <div data-i18n="Faktur">Faktur</div>
+                                    <div data-i18n="Sales Invoice">Sales Invoice</div>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="${this.basePath}Views/FPRS/Penjualan/Koreksi/index.html" class="menu-link">
+                                    <div data-i18n="Stock Correction">Stock Correction <span class="menu-new-feature">New Feature</span></div>
                                 </a>
                             </li>
                             <li class="menu-item">
                                 <a href="${this.basePath}Views/FPRS/Penjualan/StokMotoris/index.html" class="menu-link">
-                                    <div data-i18n="Stok Motoris">Stok Motoris</div>
+                                    <div data-i18n="Motoris Stock">Motoris Stock</div>
                                 </a>
                             </li>
                         </ul>

@@ -1,162 +1,123 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Master Produk – Master Data | Falcon FPRS</title>
-    <link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
-    <style>
-@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-.produk-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;border:1px solid #e9ecef;flex-shrink:0;}
-.produk-thumb-ph{width:36px;height:36px;border-radius:6px;background:#f1f3f5;border:1px solid #e9ecef;display:inline-flex;align-items:center;justify-content:center;color:#adb5bd;font-size:.75rem;flex-shrink:0;}
-</style>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Product | Falcon FPRS</title>
+<link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+<link rel="stylesheet" href="../../../../wwwroot/css/filter-stat-cards.css"/>
 </head>
 <body>
-    <div id="app-content">
-
-            <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-                <div><h2 class="title-page mb-1">Master Produk</h2><nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li><li class="breadcrumb-item">Data Master</li><li class="breadcrumb-item active">Master Produk</li></ol></nav></div>
-                <a href="detail.html" class="btn btn-success"><i class="fa fa-plus me-1"></i> Tambah Produk</a>
-            </div>
-            <div class="row g-3 mb-3">
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #1565c0 !important; background: linear-gradient(135deg, #fff 60%, #e7f1ff 100%);">
-                        <div class="card-body py-3 d-flex align-items-center gap-3">
-                            <div style="width:48px;height:48px;border-radius:12px;background:#e7f1ff;color:#1565c0;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-boxes"></i></div>
-                            <div class="flex-grow-1 min-w-0">
-                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Total Produk</div>
-                                <div class="fs-3 fw-bold text-dark mb-0" id="cntTotal">0</div>
-                                <div class="small text-muted" style="font-size:0.7rem;" id="cntCategoryNote">— umbrella brand</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #2b8a3e !important; background: linear-gradient(135deg, #fff 60%, #e7f5ee 100%);">
-                        <div class="card-body py-3 d-flex align-items-center gap-3">
-                            <div style="width:48px;height:48px;border-radius:12px;background:#e7f5ee;color:#2b8a3e;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-check-circle"></i></div>
-                            <div class="flex-grow-1 min-w-0">
-                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Produk Aktif</div>
-                                <div class="fs-3 fw-bold text-dark mb-0" id="cntActive">0</div>
-                                <div class="small" style="font-size:0.7rem;color:#2b8a3e;" id="cntActivePct">0% dari total</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #c92a2a !important; background: linear-gradient(135deg, #fff 60%, #fdecea 100%);">
-                        <div class="card-body py-3 d-flex align-items-center gap-3">
-                            <div style="width:48px;height:48px;border-radius:12px;background:#fdecea;color:#c92a2a;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-pause-circle"></i></div>
-                            <div class="flex-grow-1 min-w-0">
-                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Nonaktif</div>
-                                <div class="fs-3 fw-bold text-dark mb-0" id="cntInactive">0</div>
-                                <div class="small text-muted" style="font-size:0.7rem;" id="cntInactivePct">Perlu review</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 shadow-sm h-100" style="border-left: 4px solid #7b2cbf !important; background: linear-gradient(135deg, #fff 60%, #f3e8ff 100%);">
-                        <div class="card-body py-3 d-flex align-items-center gap-3">
-                            <div style="width:48px;height:48px;border-radius:12px;background:#f3e8ff;color:#7b2cbf;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;"><i class="fa fa-umbrella"></i></div>
-                            <div class="flex-grow-1 min-w-0">
-                                <div class="small text-muted" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.4px;font-weight:600;">Umbrella Brand</div>
-                                <div class="fs-3 fw-bold text-dark mb-0" id="cntUmbrella">0</div>
-                                <div class="small text-muted" style="font-size:0.7rem;" id="cntBrand">0 brand</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="alert alert-info alert-dismissible fade show border-0 shadow-sm mb-3" role="alert">
-                <i class="fa fa-link me-2 text-info"></i>
-                <strong>Integrasi Master Data API:</strong> Modul ini terintegrasi dengan API: 
-                <a href="https://master-datadev.kalbenutritionals.web.id/swagger/index.html" target="_blank" class="alert-link text-decoration-underline"><code>/api/v1/Sku</code></a>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-            <div class="card"><div class="card-body"><div class="table-responsive">
-                <table class="table table-bordered table-hover" id="tbl">
-                    <thead>
-                        <tr><th style="width:50px;">NO</th><th style="width:52px;">FOTO</th><th title="Source : mProduk | txtKode">KODE</th><th title="Source : mProduk | txtNama">PRODUK</th><th title="Source : Master Data API /api/v1/Param | paramCode=PRODUCT_CATEGORY_GT">CATEGORY</th><th title="Source : mProduk | txtUmbrella">UMBRELLA BRAND</th><th title="Source : mProduk | intBrandID (FK mBrand.BrandName)">BRAND</th><th title="Source : mProduk | intUnitID (FK mUnit.txtNama)">UNIT</th><th style="text-align:right;" title="Source : mProduk | decHargaJual">HARGA JUAL</th><th title="Source : mProduk | intPajakID (FK mPajak.txtNamaPajak)">PAJAK</th><th style="width:80px;" title="Source : mProduk | bitActive">STATUS</th><th style="width:100px;text-align:center;">AKSI</th></tr>
-                        <tr class="filter-row">
-                            <th></th>
-                            <th></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Kode..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Nama..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Category..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Umbrella Brand..."></th>
-                            <th><input type="text" class="form-control form-control-sm" placeholder="Brand..."></th>
-                            <th></th><th></th><th></th>
-                            <th><select class="form-select form-select-sm"><option value="">Semua</option><option value="active">Active</option><option value="inactive">Inactive</option></select></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tblBody"></tbody>
-                </table>
-            </div></div></div>
-    </div>
-    <script src="../../../../wwwroot/js/layout.js"></script>
-    <script>
-        document.addEventListener('layoutReady', () => {
-
-const KEY='md_produk';
-const SEED_VER_KEY='md_produk_seed_ver';
-const SEED_VER='umbrella7-jul2026';
-const fmt=v=>new Intl.NumberFormat('id-ID').format(v);
-function getData(){return JSON.parse(localStorage.getItem(KEY)||'[]');}
-function saveData(d){localStorage.setItem(KEY,JSON.stringify(d));}
-function loadData(){
-    const needSeed = !localStorage.getItem(KEY) || localStorage.getItem(SEED_VER_KEY)!==SEED_VER;
-    if(needSeed){fetch('../../../../wwwroot/data/produk.json').then(r=>r.json()).then(d=>{saveData(d);localStorage.setItem(SEED_VER_KEY,SEED_VER);render();});}else{render();}
-}
-let table;
-function render(){
-    if($.fn.DataTable.isDataTable('#tbl'))$('#tbl').DataTable().destroy();
-    const data=getData();$('#tblBody').empty();
-    const brands=[...new Set(data.map(d=>d.brand).filter(Boolean))];
-    const umbrellas=[...new Set(data.map(d=>d.umbrella).filter(Boolean))];
-    const activeCount = data.filter(d=>d.status==='active').length;
-    const inactiveCount = data.filter(d=>d.status!=='active').length;
-    const activePct = data.length > 0 ? Math.round(activeCount/data.length*100) : 0;
-    
-    $('#cntTotal').text(data.length);
-    $('#cntCategoryNote').text(umbrellas.length + ' umbrella brand');
-    $('#cntActive').text(activeCount);
-    $('#cntActivePct').text(activePct + '% dari total');
-    $('#cntInactive').text(inactiveCount);
-    $('#cntInactivePct').text(inactiveCount > 0 ? 'Perlu review' : 'Semua aktif ✓');
-    $('#cntUmbrella').text(umbrellas.length);
-    $('#cntBrand').text(brands.length + ' brand');
-    data.forEach((item,i)=>{
-        const badge=item.status==='active'?'<span class="badge-status badge-active">Active</span>':'<span class="badge-status badge-inactive">Inactive</span>';
-        const foto=item.foto
-            ? `<img src="${item.foto}" class="produk-thumb" alt=""/>`
-            : `<span class="produk-thumb-ph"><i class="fa fa-image"></i></span>`;
-        $('#tblBody').append(`<tr>
-            <td>${i+1}</td>
-            <td class="text-center">${foto}</td>
-            <td><code>${item.kode}</code></td>
-            <td><a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="fw-bold text-decoration-none">${item.nama}</a></td>
-            <td>${item.kategori||'-'}</td>
-            <td>${item.umbrella||'-'}</td>
-            <td>${item.brand||'-'}</td>
-            <td><small>${item.unitNama||'-'}</small></td>
-            <td class="text-end"><strong>Rp ${fmt(item.hargaJual)}</strong></td>
-            <td><small>${item.namaPajak||'-'}</small></td>
-            <td>${badge}</td>
-            <td><div class="row-actions">
-                <a href="${MasterDataParam.editUrl('detail.html', item.id)}" class="btn-action btn-action-view" title="Detail / Ubah"><i class="fa fa-eye"></i></a>
-            </div></td>
-        </tr>`);
-    });
-    table=$('#tbl').DataTable({language:{search:'',searchPlaceholder:'Cari global...',lengthMenu:'_MENU_ entri',info:'_START_-_END_ dari _TOTAL_',paginate:{previous:'‹',next:'›'},zeroRecords:'Tidak ada data'},pageLength:10,columnDefs:[{orderable:false,targets:[1,7,8,9,11]}],dom:'<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'});
-    $('.filter-row input').on('keyup change',function(){table.column($(this).closest('th').index()).search(this.value).draw();});
-    $('.filter-row select').on('change',function(){table.column($(this).closest('th').index()).search(this.value).draw();});
-    $('.filter-row input,.filter-row select').on('click',function(e){e.stopPropagation();});
-}
-$(document).ready(loadData);
+<div id="app-content">
+<div class="card mb-3"><div class="card-body d-flex justify-content-between"><h4 class="mb-0">Product</h4>
+<div><button class="btn btn-outline-secondary d-none" id="btnBack" type="button">Back</button>
+<button class="btn btn-success" id="btnAdd" type="button">Add Product</button>
+<button class="btn btn-success d-none" id="btnSave" type="button">Save</button></div></div></div>
+<div id="list">
+<div class="row g-3 mb-3" id="cards">
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-total is-filtered" data-filter=""><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cT">0</div><div class="mpg-stat-label">Total</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-active" data-filter="active"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cA">0</div><div class="mpg-stat-label">Active</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-inactive" data-filter="inactive"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cI">0</div><div class="mpg-stat-label">Inactive</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-umbrella" data-filter="missing"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cM">0</div><div class="mpg-stat-label">Missing Brand Mapping</div></div></div>
+</div>
+<div class="card"><div class="card-body"><table class="table" id="tbl" style="width:100%"><thead>
+<tr><th>No</th><th>Code</th><th>Product</th><th>Category</th><th>Umbrella Brand</th><th>Brand</th><th>Unit</th><th class="text-end">Selling Price</th><th>Status</th></tr>
+<tr class="dt-col-search"><th></th>
+<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="1" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th><div class="input-group input-group-sm"><input class="form-control col-search" data-col="2" placeholder="Search"/><button class="btn btn-outline-success btn-col-search" type="button"><i class="fa fa-search"></i></button></div></th>
+<th></th><th></th><th></th><th></th><th></th>
+<th><select class="form-select form-select-sm col-search" data-col="8"><option value="">All</option><option>Active</option><option>Inactive</option></select></th>
+</tr></thead><tbody></tbody></table></div></div>
+</div>
+<div id="detail" class="d-none">
+<div class="card mb-3"><div class="card-header mpg-gradient">Product</div><div class="card-body"><div class="row g-3">
+<div class="col-md-4"><label class="form-label">SKU</label><div class="input-group"><input class="form-control" id="fKode" readonly/><button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#skuModal">Select</button></div></div>
+<div class="col-md-8"><label class="form-label">Product Name <span class="text-muted">*</span></label><input class="form-control" id="fNama"/></div>
+<div class="col-md-4"><label class="form-label">Category</label><input class="form-control" id="fCat"/></div>
+<div class="col-md-4"><label class="form-label">Umbrella Brand</label><input class="form-control" id="fUmb"/></div>
+<div class="col-md-4"><label class="form-label">Brand</label><input class="form-control" id="fBrand"/></div>
+<div class="col-md-4"><label class="form-label">Unit</label><input class="form-control" id="fUnit"/></div>
+<div class="col-md-4"><label class="form-label">Selling Price</label><input type="number" class="form-control" id="fPrice"/></div>
+<div class="col-md-4"><label class="form-label">Tax</label><input class="form-control" value="0%" disabled/></div>
+<div class="col-md-4"><label class="form-label d-block">Status</label><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="fActive" checked/><label class="form-check-label" for="fActive">Active</label></div></div>
+</div></div></div>
+</div>
+<div class="modal fade" id="skuModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content">
+<div class="modal-header"><h5 class="modal-title">Select SKU</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+<div class="modal-body"><input class="form-control mb-2" id="skuQ" placeholder="Search code or name"/><div class="list-group" id="skuList" style="max-height:360px;overflow:auto"></div></div>
+</div></div></div>
+</div>
+<script src="../../../../wwwroot/js/layout.js"></script>
+<script src="../../../../wwwroot/js/prototype-spa.js"></script>
+<script>
+document.addEventListener("layoutReady", function () {
+    const KEY = "md_produk", VER = "umbrella7-jul2026";
+    let rows = [], table, filter = "", editing = null;
+    const on = r => String(r.status).toLowerCase() === "active";
+    const missing = r => !r.brand || !r.umbrella;
+    function load() {
+        const need = !localStorage.getItem(KEY) || localStorage.getItem("md_produk_seed_ver") !== VER;
+        const done = function (d) { rows = d; paint(); };
+        if (need) fetch("../../../../wwwroot/data/produk.json").then(r => r.json()).then(function (d) { localStorage.setItem(KEY, JSON.stringify(d)); localStorage.setItem("md_produk_seed_ver", VER); done(d); });
+        else done(JSON.parse(localStorage.getItem(KEY)));
+    }
+    function paint() {
+        $("#cT").text(rows.length); $("#cA").text(rows.filter(on).length); $("#cI").text(rows.filter(r => !on(r)).length); $("#cM").text(rows.filter(missing).length);
+        if ($.fn.DataTable.isDataTable("#tbl")) $("#tbl").DataTable().destroy();
+        const b = $("#tbl tbody").empty();
+        rows.forEach(function (r, i) {
+            b.append("<tr><td>" + (i + 1) + "</td><td>" + r.kode + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + r.id + "'>" + r.nama + "</a></td><td>" + (r.divisi || "") + "</td><td>" + (r.umbrella || "") + "</td><td>" + (r.brand || "") + "</td><td>" + (r.unitNama || "") + "</td><td class='text-end'>" + Number(r.hargaJual || 0).toLocaleString("id-ID") + "</td><td>" + PrototypeSpa.statusBadge(on(r)) + "</td><td class='d-none'>" + (missing(r) ? "missing" : "") + "</td></tr>");
         });
-    </script>
-</body>
-</html>
+        table = $("#tbl").DataTable(PrototypeSpa.dtOpts({ columnDefs: [{ targets: 9, visible: false }] }));
+        PrototypeSpa.bindColumnSearch(table, "#list");
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._prd);
+        const fn = function (settings, data, idx) {
+            if (settings.nTable.id !== "tbl" || !filter) return true;
+            const node = table.row(idx).node();
+            if (filter === "missing") return $(node).find("td").last().text() === "missing";
+            const active = $(node).find("td").eq(8).text().indexOf("Inactive") < 0;
+            return filter === "active" ? active : !active;
+        };
+        fn._prd = true; $.fn.dataTable.ext.search.push(fn);
+    }
+    function showList() { $("#detail").addClass("d-none"); $("#list").removeClass("d-none"); $("#btnBack,#btnSave").addClass("d-none"); $("#btnAdd").removeClass("d-none"); }
+    function open(item) {
+        editing = item;
+        $("#fKode").val(item ? item.kode : ""); $("#fNama").val(item ? item.nama : ""); $("#fCat").val(item ? item.divisi : "");
+        $("#fUmb").val(item ? item.umbrella : ""); $("#fBrand").val(item ? item.brand : ""); $("#fUnit").val(item ? item.unitNama : "PCS");
+        $("#fPrice").val(item ? item.hargaJual : ""); $("#fActive").prop("checked", item ? on(item) : true);
+        $("#list").addClass("d-none"); $("#detail").removeClass("d-none"); $("#btnAdd").addClass("d-none"); $("#btnBack,#btnSave").removeClass("d-none");
+    }
+    function skuList() {
+        const q = ($("#skuQ").val() || "").toLowerCase();
+        const box = $("#skuList").empty();
+        rows.filter(r => !q || (r.kode + r.nama).toLowerCase().indexOf(q) >= 0).slice(0, 40).forEach(function (r) {
+            box.append("<button type='button' class='list-group-item list-group-item-action sku' data-id='" + r.id + "'><strong>" + r.kode + "</strong> " + r.nama + "</button>");
+        });
+    }
+    $("#cards").on("click", ".mpg-stat-card", function () { filter = $(this).data("filter") || ""; PrototypeSpa.setFilteredCard("#cards", filter); if (table) table.draw(); });
+    $("#tbl").on("click", ".open", function (e) { e.preventDefault(); open(rows.find(r => String(r.id) === String($(this).data("id")))); });
+    $("#btnAdd").on("click", function () { open(null); });
+    $("#btnBack").on("click", function () { PrototypeSpa.confirm("Back to product list?", showList); });
+    $("#skuQ").on("input", skuList);
+    $("#skuModal").on("show.bs.modal", skuList);
+    $("#skuList").on("click", ".sku", function () {
+        const r = rows.find(x => String(x.id) === String($(this).data("id")));
+        if (!r) return;
+        $("#fKode").val(r.kode); $("#fNama").val(r.nama); $("#fUmb").val(r.umbrella || ""); $("#fBrand").val(r.brand || "");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("skuModal")).hide();
+    });
+    $("#btnSave").on("click", function () {
+        if (!$("#fNama").val()) return;
+        PrototypeSpa.confirm("Save this product?", function () {
+            const rec = editing || { id: Date.now() };
+            rec.kode = $("#fKode").val(); rec.nama = $("#fNama").val(); rec.divisi = $("#fCat").val(); rec.umbrella = $("#fUmb").val();
+            rec.brand = $("#fBrand").val(); rec.unitNama = $("#fUnit").val(); rec.hargaJual = Number($("#fPrice").val() || 0);
+            rec.namaPajak = "0%"; rec.status = $("#fActive").is(":checked") ? "active" : "inactive";
+            if (!editing) rows.push(rec);
+            localStorage.setItem(KEY, JSON.stringify(rows)); paint(); showList();
+        });
+    });
+    load();
+});
+</script>
+</body></html>

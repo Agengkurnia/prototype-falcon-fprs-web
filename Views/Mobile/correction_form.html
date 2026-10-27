@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Ajukan Koreksi - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        body { background: #f7f9fa; }
+        .form-card { background: #fff; border: 1px solid var(--color-border); border-radius: 12px; margin: 12px 16px; padding: 16px; }
+        .form-label { font-size: 12px; color: #6b7280; margin-bottom: 4px; }
+        .locked { background: #f3f4f6; }
+        .line-row {
+            border-top: 1px solid #eef2f2;
+            padding: 12px 0 12px 10px;
+            margin-top: 4px;
+            border-left: 3px solid transparent;
+            border-radius: 0 8px 8px 0;
+        }
+        .line-row:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+        .line-row.is-changed {
+            border-left-color: #005D41;
+            background: #f3faf6;
+        }
+        .line-name { font-weight: 700; font-size: 14px; color: #231F20; }
+        .line-price { font-size: 12px; color: #6b7280; margin-top: 2px; }
+        .qty-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .qty-asli { font-size: 13px; color: #4b5563; white-space: nowrap; }
+        .qty-asli strong { color: #231F20; }
+        .qty-edit { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .stepper {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .stepper .qty-btn {
+            width: 44px;
+            height: 44px;
+            border: 0;
+            background: #f3f4f6;
+            color: #231F20;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 0;
+        }
+        .stepper .qty-btn:active { background: #e5e7eb; }
+        .stepper .m-qty {
+            width: 56px;
+            height: 44px;
+            border: 0;
+            border-left: 1px solid #e5e7eb;
+            border-right: 1px solid #e5e7eb;
+            border-radius: 0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 0;
+            box-shadow: none;
+        }
+        .impact {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .impact.is-zero { color: #9ca3af; font-weight: 500; }
+        .impact.is-plus { color: #2E7D32; }
+        .impact.is-minus { color: #E65100; }
+        .reason-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .reason-chip {
+            border: 1px solid #cfe8dc;
+            background: #f3faf6;
+            color: #005D41;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 999px;
+            padding: 8px 12px;
+            line-height: 1.2;
+        }
+        .reason-chip.is-active { background: #005D41; color: #fff; border-color: #005D41; }
+        .empty-box { text-align: center; padding: 28px 12px; }
+        .empty-box p { color: #6b7280; font-size: 14px; margin: 0 0 16px; }
+        .bottom-action {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid #E9EFEF;
+            padding: 14px 16px;
+        }
+        #btnSend {
+            background: #005D41;
+            color: #fff;
+            font-weight: 700;
+            height: 48px;
+        }
+        #btnSend:disabled { opacity: 0.45; }
+    </style>
+</head>
+<body>
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" type="button" onclick="history.back()" aria-label="Kembali"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title">Ajukan Koreksi</span>
+        <div style="width:36px;"></div>
+    </div>
+    <div class="mobile-content no-nav" style="padding-bottom:88px;">
+        <div class="form-card" id="docCard">
+            <div class="mb-2"><div class="form-label">Nomor dokumen</div><input class="form-control locked" id="sourceNo" disabled/></div>
+            <div class="mb-0"><div class="form-label">Outlet / Stokis</div><input class="form-control locked" id="party" disabled/></div>
+        </div>
+        <div class="form-card" id="linesCard">
+            <div class="form-label mb-2">Produk (pcs)</div>
+            <div id="lines"></div>
+            <div class="text-muted" style="font-size:12px;" id="hint"></div>
+            <div class="empty-box d-none" id="emptyBox">
+                <p id="emptyMsg">Dokumen tidak ditemukan.</p>
+                <button type="button" class="btn btn-outline-success" id="btnEmptyBack">Kembali</button>
+            </div>
+        </div>
+        <div class="form-card" id="reasonCard">
+            <div class="form-label">Alasan</div>
+            <div class="reason-chips" id="reasonChips">
+                <button type="button" class="reason-chip" data-reason="Salah hitung">Salah hitung</button>
+                <button type="button" class="reason-chip" data-reason="Kurang kirim">Kurang kirim</button>
+                <button type="button" class="reason-chip" data-reason="Lebih kirim">Lebih kirim</button>
+                <button type="button" class="reason-chip" data-reason="Retur di tempat">Retur di tempat</button>
+            </div>
+            <textarea class="form-control" id="reason" rows="3" placeholder="Kenapa qty berbeda?"></textarea>
+        </div>
+    </div>
+    <div class="bottom-action" id="sendBar">
+        <button class="btn w-100" id="btnSend" type="button" disabled>Kirim pengajuan</button>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    const params = new URLSearchParams(location.search);
+    const source = params.get('source') === 'kulakan' ? 'kulakan' : 'invoice';
+    let lines = [];
+    let sourceNo = '';
+    let party = '';
+    let loadOk = false;
+    let sending = false;
+
+    function money(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+    function motorisName() {
+        const u = SfaStore.getUser() || {};
+        return u.name || u.username || 'Motoris';
+    }
+    function esc(s) {
+        return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function parseQty($row) {
+        const raw = String($row.find('.m-qty').val() ?? '').trim();
+        const qty = Number(raw);
+        if (!/^-?\d+$/.test(raw) || qty < 0) return null;
+        return qty;
+    }
+    function paintImpact($row) {
+        const ln = lines[Number($row.data('i'))];
+        const qty = parseQty($row);
+        const $impact = $row.find('.m-impact');
+        $row.removeClass('is-changed');
+        $impact.removeClass('is-zero is-plus is-minus');
+        if (qty === null) {
+            $impact.addClass('is-zero').text('Qty tidak valid');
+            return;
+        }
+        const delta = qty - Number(ln.qty || 0);
+        if (!delta) {
+            $impact.addClass('is-zero').text('Tidak diubah');
+            return;
+        }
+        const value = delta * Number(ln.price || 0);
+        const sign = delta > 0 ? '+' : '';
+        $row.addClass('is-changed');
+        $impact
+            .addClass(delta > 0 ? 'is-plus' : 'is-minus')
+            .text(sign + delta + ' pcs · ' + money(value));
+    }
+    function collectChanged() {
+        const changed = [];
+        let bad = '';
+        $('#lines .line-row').each(function () {
+            const ln = lines[Number($(this).data('i'))];
+            const qty = parseQty($(this));
+            if (qty === null) { bad = 'Qty benar harus bilangan bulat dan tidak boleh minus.'; return false; }
+            const delta = qty - Number(ln.qty || 0);
+            if (!delta) return;
+            changed.push({
+                productCode: ln.code || '',
+                productName: ln.name || '',
+                originalQty: Number(ln.qty || 0),
+                price: Number(ln.price || 0),
+                deltaPcs: delta
+            });
+        });
+        return { changed: changed, bad: bad };
+    }
+    function refreshSend() {
+        if (!loadOk || !lines.length || sending) {
+            $('#btnSend').prop('disabled', true);
+            return;
+        }
+        const pack = collectChanged();
+        const reasonOk = String($('#reason').val() || '').trim().length > 0;
+        $('#btnSend').prop('disabled', !!(pack.bad || !pack.changed.length || !reasonOk));
+    }
+    function showEmpty(message) {
+        loadOk = false;
+        $('#docCard').addClass('d-none');
+        $('#reasonCard').addClass('d-none');
+        $('#sendBar').addClass('d-none');
+        $('#lines').empty();
+        $('#hint').addClass('d-none').text('');
+        $('#emptyMsg').text(message);
+        $('#emptyBox').removeClass('d-none');
+        $('#linesCard .form-label').first().addClass('d-none');
+    }
+    function showForm() {
+        loadOk = true;
+        $('#docCard, #reasonCard, #sendBar').removeClass('d-none');
+        $('#emptyBox').addClass('d-none');
+        $('#hint').removeClass('d-none');
+        $('#linesCard .form-label').first().removeClass('d-none');
+    }
+    function paintLines() {
+        const $box = $('#lines').empty();
+        lines.forEach((ln, i) => {
+            $box.append(
+                '<div class="line-row" data-i="' + i + '">' +
+                '<div class="line-name">' + esc(ln.name) + '</div>' +
+                '<div class="line-price">' + money(ln.price) + '</div>' +
+                '<div class="qty-row">' +
+                '<div class="qty-asli">Asli: <strong>' + Number(ln.qty || 0) + '</strong></div>' +
+                '<div class="qty-edit">' +
+                '<div class="form-label mb-0">Qty benar</div>' +
+                '<div class="stepper">' +
+                '<button type="button" class="qty-btn qty-minus" aria-label="Kurangi qty">−</button>' +
+                '<input class="form-control m-qty" type="number" min="0" step="1" inputmode="numeric" value="' + Number(ln.qty || 0) + '" aria-label="Qty benar ' + esc(ln.name) + '"/>' +
+                '<button type="button" class="qty-btn qty-plus" aria-label="Tambah qty">+</button>' +
+                '</div></div></div>' +
+                '<div class="impact m-impact is-zero">Tidak diubah</div></div>'
+            );
+        });
+        $('#hint').text('Harga mengikuti baris asli. Ubah qty benar hanya untuk produk yang dikoreksi.');
+        refreshSend();
+    }
+    function setQty($row, qty) {
+        const next = Math.max(0, Math.floor(Number(qty) || 0));
+        $row.find('.m-qty').val(String(next));
+        paintImpact($row);
+        refreshSend();
+    }
+    function loadInvoice() {
+        const id = params.get('id');
+        if (!id) return { ok: false, message: 'Nomor faktur tidak ada. Kembali lalu buka dari detail faktur.' };
+        const inv = (SfaStore.getInvoices() || []).find(i => String(i.id) === String(id));
+        if (!inv) return { ok: false, message: 'Faktur tidak ditemukan. Kembali ke daftar atau detail faktur.' };
+        sourceNo = inv.invoiceNo || ('INV-' + inv.id);
+        party = inv.customerName || inv.customerId || '';
+        const grouped = {};
+        (inv.items || []).forEach(item => {
+            const pcs = Number(item.qtyPcs != null ? item.qtyPcs : (String(item.uom || 'PCS').toUpperCase() === 'PCS' ? item.qty : 0));
+            if (pcs <= 0) return;
+            const key = item.code || item.name;
+            if (!grouped[key]) grouped[key] = { code: item.code || '', name: item.name || key, qty: 0, price: Number(item.price || 0) };
+            grouped[key].qty += pcs;
+            if (item.price) grouped[key].price = Number(item.price);
+        });
+        lines = Object.values(grouped);
+        if (!lines.length) return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
+        return { ok: true };
+    }
+    function loadKulakan() {
+        const raw = JSON.parse(localStorage.getItem('temp_restock_adjustments') || '{}');
+        party = localStorage.getItem('temp_restock_grosir') || 'Stokis';
+        if (!localStorage.getItem('temp_restock_docno')) {
+            const day = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            localStorage.setItem('temp_restock_docno', 'KL-' + day);
+        }
+        sourceNo = localStorage.getItem('temp_restock_docno');
+        Object.keys(raw).forEach(code => {
+            const adj = raw[code] || {};
+            const pcs = Number(adj.addPcs || 0);
+            if (pcs <= 0) return;
+            const prod = SfaStore.getProductById(code) || {};
+            lines.push({ code: code, name: adj.name || prod.name || code, qty: pcs, price: Number(prod.pricePcs || prod.price || 0) });
+        });
+        if (!Object.keys(raw).length && !lines.length) {
+            return { ok: false, message: 'Data kulakan tidak ditemukan. Kembali dari review kulakan.' };
+        }
+        if (!lines.length) return { ok: false, message: 'Dokumen ini tidak punya baris pcs.' };
+        return { ok: true };
+    }
+    function doSubmit(changed) {
+        const result = SfaStore.submitMotorisCorrection({
+            sourceType: source,
+            sourceNo: sourceNo,
+            motoris: motorisName(),
+            partyLabel: party,
+            reason: $('#reason').val(),
+            lines: changed
+        });
+        if (!result.ok) {
+            sending = false;
+            refreshSend();
+            Swal.fire({ icon: 'warning', text: result.message, confirmButtonColor: '#005D41' });
+            return;
+        }
+        Swal.fire({ icon: 'success', title: 'Pengajuan terkirim', text: 'Menunggu persetujuan HO. Saldo belum berubah.', confirmButtonColor: '#005D41' })
+            .then(() => { location.href = 'correction_list.html'; });
+    }
+
+    $(function () {
+        const result = source === 'kulakan' ? loadKulakan() : loadInvoice();
+        if (!result.ok) {
+            showEmpty(result.message);
+        } else {
+            showForm();
+            $('#sourceNo').val(sourceNo);
+            $('#party').val(party);
+            paintLines();
+        }
+
+        $('#btnEmptyBack').on('click', function () { history.back(); });
+
+        $('#lines').on('click', '.qty-minus', function () {
+            const $row = $(this).closest('.line-row');
+            const qty = parseQty($row);
+            setQty($row, (qty === null ? 0 : qty) - 1);
+        });
+        $('#lines').on('click', '.qty-plus', function () {
+            const $row = $(this).closest('.line-row');
+            const qty = parseQty($row);
+            setQty($row, (qty === null ? 0 : qty) + 1);
+        });
+        $('#lines').on('input', '.m-qty', function () {
+            paintImpact($(this).closest('.line-row'));
+            refreshSend();
+        });
+
+        $('#reasonChips').on('click', '.reason-chip', function () {
+            const text = String($(this).data('reason') || '');
+            $('#reason').val(text);
+            $('.reason-chip').removeClass('is-active');
+            $(this).addClass('is-active');
+            refreshSend();
+        });
+        $('#reason').on('input', function () {
+            const val = String($(this).val() || '').trim();
+            $('.reason-chip').each(function () {
+                $(this).toggleClass('is-active', String($(this).data('reason')) === val);
+            });
+            refreshSend();
+        });
+
+        $('#btnSend').on('click', function () {
+            if (sending || $(this).prop('disabled')) return;
+            const pack = collectChanged();
+            if (pack.bad) {
+                Swal.fire({ icon: 'warning', text: pack.bad, confirmButtonColor: '#005D41' });
+                return;
+            }
+            if (!pack.changed.length) {
+                Swal.fire({ icon: 'warning', text: 'Ubah minimal satu qty pcs.', confirmButtonColor: '#005D41' });
+                return;
+            }
+            if (!String($('#reason').val() || '').trim()) {
+                Swal.fire({ icon: 'warning', text: 'Alasan wajib diisi.', confirmButtonColor: '#005D41' });
+                return;
+            }
+            sending = true;
+            refreshSend();
+            Swal.fire({
+                icon: 'question',
+                text: 'Kirim pengajuan koreksi? Menunggu persetujuan HO. Saldo belum berubah.',
+                showCancelButton: true,
+                confirmButtonText: 'Kirim',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#005D41'
+            }).then(function (r) {
+                if (r.isConfirmed) doSubmit(pack.changed);
+                else {
+                    sending = false;
+                    refreshSend();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

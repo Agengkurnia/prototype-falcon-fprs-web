@@ -297,6 +297,9 @@
                 <span class="overview-value" id="ovTax">0</span>
             </div>
         </div>
+        <div class="detail-card">
+            <button type="button" class="btn w-100" style="background:#005D41;color:#fff;font-weight:700;" onclick="ajukanKoreksi()">Ajukan koreksi</button>
+        </div>
     </div>
 
     <!-- Bottom Total -->
@@ -313,6 +316,7 @@
     $(document).ready(function() {
         const params = new URLSearchParams(window.location.search);
         const invId = params.get('id');
+        window._corrInvId = invId;
 
         if (!invId) { history.back(); return; }
 
@@ -408,6 +412,11 @@
         $('#ovTax').text(fmt(Math.max(0, tax)));
         $('#totalValue').text(fmtRp(total));
     });
+
+    function ajukanKoreksi() {
+        if (!window._corrInvId) return;
+        location.href = 'correction_form.html?source=invoice&id=' + encodeURIComponent(window._corrInvId);
+    }
 
     function printInvoice() {
         Swal.fire({ title: 'Cetak Faktur', text: 'Fitur cetak via Bluetooth printer akan tersedia.', icon: 'info', confirmButtonColor: '#005D41' });

@@ -1,684 +1,165 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>Faktur Penjualan – Penjualan | Falcon FPRS</title>
-    <meta name="description" content="Daftar faktur penjualan dari aktivitas canvassing salesman di lapangan."/>
-    <link rel="stylesheet" href="../../../../wwwroot/css/canvassing-v2.css"/>
-    <style>
-@font-face{font-family:'Kalbe Geometric';font-weight:400;src:url('../../../../wwwroot/fonts/KalbeGeometric/KalbeGeometric-Regular.woff2')format('woff2')}
-
-/* ---- FAKTUR-SPECIFIC OVERRIDES ---- */
-
-@media (min-width: 993px) {
-    .summary-cards-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* KPI Card: Paid */
-.summary-card.paid .summary-card-icon {
-    background-color: rgba(40, 199, 111, 0.12);
-    color: #1a9956;
-}
-.summary-card.paid::before { background: linear-gradient(90deg, #1a9956, #52d68a); }
-.summary-card.paid.active-filter { border-color: #1a9956; }
-
-/* KPI Card: Unpaid */
-.summary-card.unpaid .summary-card-icon {
-    background-color: rgba(234, 84, 85, 0.12);
-    color: #c0392b;
-}
-.summary-card.unpaid::before { background: linear-gradient(90deg, #c0392b, #e74c3c); }
-.summary-card.unpaid.active-filter { border-color: #c0392b; }
-
-/* KPI Card: Draft */
-.summary-card.draft-card .summary-card-icon {
-    background-color: rgba(255, 159, 67, 0.12);
-    color: #d68910;
-}
-.summary-card.draft-card::before { background: linear-gradient(90deg, #d68910, #f39c12); }
-.summary-card.draft-card.active-filter { border-color: #d68910; }
-
-/* KPI Card: Total Nilai */
-.summary-card.nilai .summary-card-icon {
-    background-color: rgba(115, 103, 240, 0.12);
-    color: #5f4fcf;
-}
-.summary-card.nilai::before { background: linear-gradient(90deg, #5f4fcf, #9b86f5); }
-
-/* Badge Status Faktur */
-.badge-paid {
-    background-color: #E8F5E9;
-    color: #1a9956;
-    border: 1px solid #A5D6A7;
-}
-.badge-unpaid {
-    background-color: #FFEBEE;
-    color: #c0392b;
-    border: 1px solid #EF9A9A;
-}
-.badge-draft {
-    background-color: #FFF8E1;
-    color: #d68910;
-    border: 1px solid #FFE082;
-}
-.badge-approved {
-    background-color: #E3F2FD;
-    color: #1565C0;
-    border: 1px solid #90CAF9;
-}
-
-/* Nomor Faktur link */
-.faktur-link {
-    font-weight: 700;
-    color: #005d41;
-    text-decoration: none;
-    font-family: 'Kalbe Geometric', sans-serif;
-    letter-spacing: 0.02em;
-}
-.faktur-link:hover { color: #1a9956; text-decoration: underline; }
-
-/* Currency align right */
-.text-currency {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    font-weight: 600;
-}
-.text-currency.unpaid-amount { color: #c0392b; }
-
-/* Belum Dibayar zero */
-.text-zero { color: #adb5bd; font-weight: 400; }
-
-/* Filter top-bar (above DataTable) */
-.filter-topbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #edf2f7;
-    background: #f8fafc;
-}
-.filter-topbar label {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #4a5568;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-}
-.filter-topbar .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-.filter-topbar select, .filter-topbar input[type="date"] {
-    font-size: 0.85rem;
-    padding: 0.45rem 0.75rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    color: #334155;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.filter-topbar select:focus, .filter-topbar input[type="date"]:focus {
-    outline: none;
-    border-color: #005d41;
-    box-shadow: 0 0 0 3px rgba(0, 93, 65, 0.15);
-}
-.filter-topbar .btn-reset-filter {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: #475569;
-    padding: 0.45rem 1rem;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-}
-.filter-topbar .btn-reset-filter:hover {
-    background: #f1f5f9;
-    color: #1e293b;
-    border-color: #94a3b8;
-    transform: translateY(-1px);
-}
-.filter-topbar .btn-reset-filter:active {
-    transform: translateY(0);
-}
-
-/* Select2 overrides for premium styling */
-.filter-topbar .select2-container--default .select2-selection--single {
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    height: 36px;
-    padding: 3px 6px;
-    font-size: 0.85rem;
-    background-color: #ffffff;
-}
-.filter-topbar .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 34px;
-}
-.filter-topbar .select2-container {
-    min-width: 180px;
-}
-
-/* Seller display in table */
-.sales-badge {
-    display: inline-block;
-    background: rgba(0, 93, 65, 0.06);
-    color: #005d41;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    letter-spacing: 0.02em;
-}
-
-/* Mobile: stack table as cards */
-@media (max-width: 768px) {
-    #tblFaktur, #tblFaktur tbody, #tblFaktur tr, #tblFaktur td {
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    #tblFaktur thead { display: none !important; }
-    #tblFaktur tr {
-        background: #ffffff;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 12px;
-        margin-bottom: 1.25rem;
-        padding: 1rem 1.25rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-        position: relative;
-    }
-    #tblFaktur tr::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: #005d41;
-        border-radius: 12px 0 0 12px;
-    }
-    #tblFaktur td {
-        border: none !important;
-        padding: 0.5rem 0 !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        text-align: right !important;
-        min-height: 34px;
-        border-bottom: 1px dashed #f1f5f9 !important;
-    }
-    #tblFaktur td:last-child {
-        border-bottom: none !important;
-    }
-    #tblFaktur td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        color: #64748b;
-        font-size: 0.72rem;
-        text-transform: uppercase;
-        text-align: left;
-        margin-right: 1.5rem;
-        flex-shrink: 0;
-        letter-spacing: 0.04em;
-    }
-    .filter-row { display: none !important; }
-    .filter-topbar { flex-direction: column; align-items: stretch; gap: 0.75rem; padding: 1rem; }
-    .filter-topbar .filter-group { flex-direction: column; align-items: stretch; gap: 0.25rem; }
-    .filter-topbar select, .filter-topbar input[type="date"], .filter-topbar .select2-container { width: 100% !important; }
-}
-    </style>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Sales Invoice | Falcon FPRS</title>
+<link rel="stylesheet" href="../../../../wwwroot/css/master-data.css"/>
+<link rel="stylesheet" href="../../../../wwwroot/css/filter-stat-cards.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
     <div id="app-content">
-
-        <!-- ===== PAGE HEADER ===== -->
-        <div class="d-flex align-items-start justify-content-between mb-3" style="flex-wrap:wrap;gap:.75rem;">
-            <div>
-                <h1 class="title-page mb-1" style="font-size:1.5rem;">Faktur Penjualan</h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="../../../../index.html" class="a-breadcrumb">Home</a></li>
-                        <li class="breadcrumb-item">Penjualan</li>
-                        <li class="breadcrumb-item active" aria-current="page">Faktur</li>
-                    </ol>
-                </nav>
+<div class="card mb-3"><div class="card-body d-flex justify-content-between"><h4 class="mb-0">Sales Invoice</h4>
+<button class="btn btn-outline-secondary d-none" id="btnBack" type="button">Back</button></div></div>
+<div id="list">
+<div class="row g-3 mb-3" id="cards">
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-total is-filtered" data-filter=""><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cT">0</div><div class="mpg-stat-label">Total Invoice</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-motoris" data-filter="motorist"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cM">0</div><div class="mpg-stat-label">Motorist Transaction</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-spg" data-filter="spg"><span class="mpg-stat-badge">Filtered</span><div class="mpg-stat-value" id="cS">0</div><div class="mpg-stat-label">SPG GT Transaction</div></div></div>
+<div class="col-6 col-md-3"><div class="mpg-stat-card mpg-stat-nilai mpg-stat-static"><div class="mpg-stat-value" id="cB">0</div><div class="mpg-stat-label">Total Billed</div></div></div>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary btn-sm" id="btnEkspor" title="Ekspor ke Excel">
-                    <i class="fa fa-file-export me-1"></i> Ekspor
-                </button>
+<div class="card"><div class="card-body">
+<div class="d-flex gap-2 align-items-end mb-3">
+<div><label class="form-label">From</label><input type="date" class="form-control" id="dFrom"/></div>
+<div><label class="form-label">To</label><input type="date" class="form-control" id="dTo"/></div>
             </div>
+<table class="table" id="tbl" style="width:100%"><thead>
+<tr><th>No</th><th>Date</th><th>Invoice No.</th><th>Customer</th><th>Sales Name</th><th>Total Billed</th><th>Status</th><th>Action</th></tr>
+</thead><tbody></tbody></table>
+</div></div>
         </div>
-
-        <!-- ===== KPI SUMMARY CARDS ===== -->
-        <div class="summary-cards-grid" id="summaryCards">
-            <!-- Total Faktur -->
-            <div class="summary-card total active-filter" data-filter="" title="Tampilkan semua faktur" id="cardTotal">
-                <div class="summary-card-icon"><i class="fa fa-file-invoice"></i></div>
-                <div class="stat-title">Total Faktur</div>
-                <div class="stat-value" id="valTotal">0</div>
-                <div class="stat-desc">Tahun 2026</div>
-            </div>
-            <!-- Paid -->
-            <div class="summary-card paid" data-filter="Paid" title="Filter: Faktur Lunas" id="cardPaid">
-                <div class="summary-card-icon"><i class="fa fa-check-circle"></i></div>
-                <div class="stat-title">Paid</div>
-                <div class="stat-value" id="valPaid">0</div>
-                <div class="stat-desc">Sudah lunas</div>
-            </div>
-            <!-- Total Nilai -->
-            <div class="summary-card nilai" title="Total nilai tagihan" id="cardNilai">
-                <div class="summary-card-icon"><i class="fa fa-coins"></i></div>
-                <div class="stat-title">Total Tagihan</div>
-                <div class="stat-value" id="valNilai" style="font-size:1.4rem;">Rp0</div>
-                <div class="stat-desc">Keseluruhan nilai</div>
-            </div>
+<div id="detail" class="d-none">
+<div class="d-flex justify-content-end mb-2"><a class="btn btn-success" id="btnPrint" target="_blank">Print Invoice</a></div>
+<div class="row g-3">
+<div class="col-md-6"><div class="card"><div class="card-header mpg-gradient">Customer</div><div class="card-body">
+<div class="fw-bold" id="dCust"></div><div class="text-muted" id="dAddr"></div><div class="mt-2">Sales: <span id="dSales"></span></div>
+</div></div></div>
+<div class="col-md-6"><div class="card"><div class="card-header mpg-gradient">Invoice</div><div class="card-body">
+<div>Invoice Date <div class="fw-semibold" id="dDate"></div></div>
+<div class="mt-2">Status <div id="dStat"></div></div>
+</div></div></div>
+<div class="col-12"><div class="card"><div class="card-header mpg-gradient">Location Map</div><div class="card-body p-0"><div id="map" style="height:240px"></div><div id="mapEmpty" class="text-muted text-center py-4 d-none">No valid coordinates to show on the map</div></div></div></div>
+<div class="col-12"><div class="card"><div class="card-header mpg-gradient">Invoice Items</div><div class="card-body p-0"><table class="table mb-0"><thead><tr><th>Product</th><th class="text-end">Qty</th><th class="text-end">Price</th><th class="text-end">Amount</th></tr></thead><tbody id="items"></tbody></table>
+<div class="p-3 text-end"><div>Sub Total <span id="sub"></span></div><div>PPN <span id="ppn"></span></div><div class="fw-bold">Total <span id="grand"></span></div></div>
+</div></div></div>
+<div class="col-12"><div class="card"><div class="card-header mpg-gradient">Corrections</div><div class="card-body p-0"><table class="table mb-0"><thead><tr><th>Correction No.</th><th>Date</th><th class="text-end">Lines</th><th class="text-end">Value</th><th>Status</th></tr></thead><tbody id="corr"></tbody></table></div></div></div>
+</div></div>
         </div>
-
-        <!-- ===== LIST CARD ===== -->
-        <div class="card" style="border:none;box-shadow:0 2px 12px rgba(0,0,0,0.04);border-radius:12px;overflow:hidden;">
-
-            <!-- Filter Top Bar -->
-            <div class="filter-topbar" id="filterTopbar">
-                <div class="filter-group">
-                    <label for="filterTglMulai"><i class="fa fa-calendar-alt me-1"></i> Dari:</label>
-                    <input type="date" id="filterTglMulai" value="2026-01-01"/>
-                </div>
-                <div class="filter-group">
-                    <label for="filterTglAkhir">s/d:</label>
-                    <input type="date" id="filterTglAkhir" value="2026-12-31"/>
-                </div>
-                <div class="filter-group">
-                    <label for="filterPelanggan"><i class="fa fa-store me-1"></i></label>
-                    <select id="filterPelanggan">
-                        <option value="">Pelanggan: Semua</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="filterSales"><i class="fa fa-user-tie me-1"></i></label>
-                    <select id="filterSales">
-                        <option value="">Sales: Semua</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="filterStatus"><i class="fa fa-tag me-1"></i></label>
-                    <select id="filterStatus">
-                        <option value="">Status: Semua</option>
-                        <option value="Paid">Paid</option>
-                    </select>
-                </div>
-                <button class="btn-reset-filter" id="btnResetFilter" title="Reset semua filter">
-                    <i class="fa fa-undo"></i> Reset
-                </button>
-            </div>
-
-            <div class="card-body" style="padding:1.25rem;">
-                <div class="table-responsive">
-                    <table class="table table-hover" id="tblFaktur" style="width:100%;">
-                        <thead>
-                            <tr>
-                                <th style="width:50px;">NO</th>
-                                <th>TANGGAL FAKTUR</th>
-                                <th>NOMOR FAKTUR</th>
-                                <th>PELANGGAN</th>
-                                <th>SALES</th>
-                                <th style="text-align:right;">JUMLAH TAGIHAN</th>
-                                <th style="text-align:right;">BELUM DIBAYAR</th>
-                                <th style="width:110px;text-align:center;">STATUS</th>
-                                <th style="width:80px;text-align:center;">AKSI</th>
-                            </tr>
-                            <tr class="filter-row">
-                                <th></th>
-                                <th></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder="No. Faktur..."></th>
-                                <th><input type="text" class="form-control form-control-sm" placeholder="Pelanggan..."></th>
-                                <th>
-                                    <select class="form-select form-select-sm" id="filterSalesCol">
-                                        <option value="">Semua</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                                <th></th>
-                                <th>
-                                    <select class="form-select form-select-sm" id="filterStatusCol">
-                                        <option value="">Semua</option>
-                                        <option>Paid</option>
-                                    </select>
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="tblBody">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div><!-- /#app-content -->
-
     <script src="../../../../wwwroot/js/layout.js"></script>
+<script src="../../../../wwwroot/js/prototype-spa.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-    document.addEventListener('layoutReady', () => {
-
-        /* =========================================
-           DATA & STATE
-        ========================================= */
-        const STORAGE_KEY = 'fprs_faktur_v7';
-        const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
-
-        let allData = [];
-        let table;
-
-        // Load from localStorage or fetch JSON
-        function loadData() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                allData = JSON.parse(stored);
-                init();
-            } else {
-                fetch('../../../../wwwroot/data/faktur.json')
-                    .then(r => r.json())
-                    .then(d => {
-                        allData = d;
-                        localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
-                        init();
-                    });
+document.addEventListener("layoutReady", function () {
+    const KEY = "fprs_faktur_v7";
+    let rows = [], table, filter = "", map, customers = [];
+    const money = n => "Rp " + Number(n || 0).toLocaleString("id-ID");
+    const roleOf = r => (String(r.tipe || "") + String(r.salesNama || "")).toLowerCase().indexOf("spg") >= 0 ? "spg" : "motorist";
+    function load() {
+        const faktur = localStorage.getItem(KEY)
+            ? Promise.resolve(JSON.parse(localStorage.getItem(KEY)))
+            : fetch("../../../../wwwroot/data/faktur.json").then(r => r.json()).then(d => { localStorage.setItem(KEY, JSON.stringify(d)); return d; });
+        const cust = localStorage.getItem("md_pelanggan")
+            ? Promise.resolve(JSON.parse(localStorage.getItem("md_pelanggan")))
+            : fetch("../../../../wwwroot/data/pelanggan.json").then(r => r.json()).catch(() => []);
+        Promise.all([faktur, cust]).then(function (pair) {
+            rows = pair[0] || [];
+            customers = pair[1] || [];
+            const now = new Date();
+            const pad = n => String(n).padStart(2, "0");
+            const iso = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+            $("#dFrom").val(iso(new Date(now.getFullYear(), now.getMonth(), 1)));
+            $("#dTo").val(iso(new Date(now.getFullYear(), now.getMonth() + 1, 0)));
+            if (!inRange(rows).length && rows.length) {
+                const dates = rows.map(r => String(r.tanggalFaktur || "").slice(0, 10)).filter(Boolean).sort();
+                $("#dFrom").val(dates[0]);
+                $("#dTo").val(dates[dates.length - 1]);
             }
-        }
-
-        /* =========================================
-           HELPERS
-        ========================================= */
-        const fmt = v => 'Rp ' + new Intl.NumberFormat('id-ID').format(v);
-        const fmtShort = v => {
-            if (v >= 1000000) return 'Rp ' + (v / 1000000).toFixed(1).replace('.', ',') + ' Jt';
-            if (v >= 1000) return 'Rp ' + (v / 1000).toFixed(0) + ' Rb';
-            return 'Rp ' + v;
+            paint();
+        });
+    }
+    function inRange(list) {
+        const a = $("#dFrom").val(), b = $("#dTo").val();
+        return list.filter(r => {
+            const d = String(r.tanggalFaktur || "").slice(0, 10);
+            return (!a || d >= a) && (!b || d <= b);
+        });
+    }
+    function paint() {
+        const view = inRange(rows);
+        $("#cT").text(view.length);
+        $("#cM").text(view.filter(r => roleOf(r) === "motorist").length);
+        $("#cS").text(view.filter(r => roleOf(r) === "spg").length);
+        $("#cB").text(money(view.reduce((s, r) => s + Number(r.jumlahTagihan || 0), 0)));
+        if ($.fn.DataTable.isDataTable("#tbl")) $("#tbl").DataTable().destroy();
+        const body = $("#tbl tbody").empty();
+        view.forEach(function (r, i) {
+            const paid = r.status === "Paid";
+            body.append("<tr><td>" + (i + 1) + "</td><td>" + PrototypeSpa.fmtDate(r.tanggalFaktur) + "</td><td><a href='#' class='text-success fw-bold open' data-id='" + r.id + "'>" + r.id + "</a></td><td>" + (r.pelangganNama || "") + "</td><td>" + (r.salesNama || "") + "</td><td>" + money(r.jumlahTagihan) + "</td><td>" + (paid ? "<span class='badge bg-success'>Paid</span>" : "<span class='badge bg-warning text-dark'>" + (r.status || "Open") + "</span>") + "</td><td class='text-center'><a class='text-success' href='print.html?id=" + encodeURIComponent(r.id) + "' title='Print'><i class='fa fa-print'></i></a><span class='d-none'>" + roleOf(r) + "</span></td></tr>");
+        });
+        table = $("#tbl").DataTable({ language: PrototypeSpa.dtLang(), pageLength: 10, order: [[1, "desc"]], dom: "lrtip" });
+        $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(fn => !fn._fk);
+        const fn = function (settings, data) {
+            if (settings.nTable.id !== "tbl" || !filter) return true;
+            return String(data[7]).indexOf(filter) >= 0;
         };
-
-        function formatDateDisplay(dateStr) {
-            if (!dateStr) return '-';
-            const d = new Date(dateStr);
-            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-        }
-        function formatDateTime(dateStr) {
-            if (!dateStr) return '-';
-            const d = new Date(dateStr);
-            const hh = String(d.getHours()).padStart(2,'0');
-            const mm = String(d.getMinutes()).padStart(2,'0');
-            return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear() + ' ' + hh + ':' + mm;
-        }
-
-        const STATUS_BADGE = {
-            'Paid':     '<span class="badge-status badge-paid"><i class="fa fa-check"></i> Paid</span>',
-            'Unpaid':   '<span class="badge-status badge-unpaid"><i class="fa fa-clock"></i> Unpaid</span>',
-            'Draft':    '<span class="badge-status badge-draft"><i class="fa fa-file-alt"></i> Draft</span>',
-            'Approved': '<span class="badge-status badge-approved"><i class="fa fa-thumbs-up"></i> Approved</span>'
-        };
-
-        /* =========================================
-           POPULATE FILTER DROPDOWNS
-        ========================================= */
-        function populateFilters(data) {
-            const pelList = [...new Set(data.map(d => d.pelangganNama))].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
-            const salesList = [...new Set(data.map(d => d.salesNama))].sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));
-
-            const pelSel = document.getElementById('filterPelanggan');
-            pelList.forEach(p => {
-                const o = document.createElement('option'); o.value = p; o.textContent = p;
-                pelSel.appendChild(o);
-            });
-
-            const salesSel = document.getElementById('filterSales');
-            const salesColSel = document.getElementById('filterSalesCol');
-            salesList.forEach(s => {
-                let o = document.createElement('option'); o.value = s; o.textContent = s;
-                salesSel.appendChild(o);
-                o = document.createElement('option'); o.value = s; o.textContent = s;
-                salesColSel.appendChild(o);
-            });
-        }
-
-        /* =========================================
-           KPI SUMMARY CARDS
-        ========================================= */
-        function updateSummaryCards(data) {
-            const total = data.length;
-            const paid = data.filter(d => d.status === 'Paid').length;
-            const totalNilai = data.reduce((a, d) => a + (d.jumlahTagihan || 0), 0);
-
-            document.getElementById('valTotal').textContent = total;
-            document.getElementById('valPaid').textContent = paid;
-            document.getElementById('valNilai').textContent = fmtShort(totalNilai);
-        }
-
-        /* =========================================
-           RENDER TABLE
-        ========================================= */
-        function renderTable(data) {
-            const tbody = document.getElementById('tblBody');
-            tbody.innerHTML = '';
-
-            data.forEach((item, idx) => {
-                const i = idx + 1;
-                const badge = STATUS_BADGE[item.status] || `<span class="badge-status badge-draft">${item.status}</span>`;
-                const belumBayarVal = item.belumDibayar || 0;
-                const belumBayarDisplay = belumBayarVal > 0
-                    ? `<span class="unpaid-amount">${fmt(belumBayarVal)}</span>`
-                    : `<span class="text-zero">0</span>`;
-
-                const act = `
-                    <div class="row-actions" style="justify-content:center;">
-                        <a href="detail.html?id=${item.id}" class="btn-action btn-action-view" title="Lihat Detail"><i class="fa fa-eye"></i></a>
-                        <button class="btn-action" style="color:#adb5bd;" title="Cetak Faktur" onclick="cetakFaktur('${item.id}')"><i class="fa fa-print"></i></button>
-                    </div>`;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="No">${i}</td>
-                    <td data-label="Tanggal">${formatDateTime(item.tanggalFaktur)}</td>
-                    <td data-label="Nomor Faktur"><a href="detail.html?id=${item.id}" class="faktur-link">${item.id}</a></td>
-                    <td data-label="Pelanggan"><span style="font-weight:500;">${item.pelangganNama}</span></td>
-                    <td data-label="Sales"><span class="sales-badge">${item.salesNama}</span></td>
-                    <td data-label="Jumlah Tagihan" class="text-currency">${fmt(item.jumlahTagihan)}</td>
-                    <td data-label="Belum Dibayar" class="text-currency">${belumBayarDisplay}</td>
-                    <td data-label="Status" style="text-align:center;">${badge}</td>
-                    <td data-label="Aksi">${act}</td>`;
-                tbody.appendChild(tr);
-            });
-        }
-
-        /* =========================================
-           DATATABLES INIT
-        ========================================= */
-        function initDataTable() {
-            if ($.fn.DataTable.isDataTable('#tblFaktur')) {
-                $('#tblFaktur').DataTable().destroy();
-            }
-            table = $('#tblFaktur').DataTable({
-                language: {
-                    search: '',
-                    searchPlaceholder: 'Cari nomor faktur, pelanggan...',
-                    lengthMenu: '_MENU_ entri per halaman',
-                    info: 'Menampilkan _START_–_END_ dari _TOTAL_',
-                    paginate: { previous: '‹', next: '›' },
-                    zeroRecords: '<div style="text-align:center;padding:2rem;color:#adb5bd;"><i class="fa fa-inbox fa-2x mb-2"></i><br>Tidak ada data faktur</div>'
-                },
-                pageLength: 10,
-                order: [[1, 'desc']], // Sort by tanggal desc by default
-                columnDefs: [
-                    { orderable: false, targets: [0, 7, 8] },
-                    { type: 'num', targets: [5, 6] }
-                ],
-                dom: '<"d-flex align-items-center justify-content-between mb-3"l<"ms-auto"f>>rt<"d-flex align-items-center justify-content-between mt-3"i<"ms-auto"p>>'
-            });
-
-            // Column-level filter row
-            $('.filter-row input').on('keyup change', function () {
-                const colIdx = $(this).closest('th').index();
-                table.column(colIdx).search(this.value).draw();
-            });
-            $('.filter-row select').on('change', function () {
-                const colIdx = $(this).closest('th').index();
-                table.column(colIdx).search(this.value).draw();
-                // Sync status card
-                if (colIdx === 8) syncCardFromStatus(this.value);
-            });
-            $('.filter-row input, .filter-row select').on('click', e => e.stopPropagation());
-        }
-
-        /* =========================================
-           TOP-BAR FILTERS (date range, pelanggan, sales, status)
-        ========================================= */
-        function applyTopbarFilters() {
-            const tglMulai = document.getElementById('filterTglMulai').value;
-            const tglAkhir = document.getElementById('filterTglAkhir').value;
-            const pelanggan = document.getElementById('filterPelanggan').value;
-            const sales = document.getElementById('filterSales').value;
-            const status = document.getElementById('filterStatus').value;
-
-            const filtered = allData.filter(item => {
-                const tgl = item.tanggalFaktur ? item.tanggalFaktur.substring(0, 10) : '';
-                if (tglMulai && tgl < tglMulai) return false;
-                if (tglAkhir && tgl > tglAkhir) return false;
-                if (pelanggan && item.pelangganNama !== pelanggan) return false;
-                if (sales && item.salesNama !== sales) return false;
-                if (status && item.status !== status) return false;
-                return true;
-            });
-
-            renderTable(filtered);
-            initDataTable();
-            updateSummaryCards(filtered);
-
-            // Sync status card highlight
-            syncCardFromStatus(status);
-        }
-
-        function initSelect2() {
-            if ($.fn.select2) {
-                try {
-                    $('#filterPelanggan').select2('destroy');
-                    $('#filterSales').select2('destroy');
-                    $('#filterStatus').select2('destroy');
-                } catch(e) {}
-
-                $('#filterPelanggan').select2({
-                    placeholder: 'Pelanggan: Semua',
-                    allowClear: true
-                });
-                $('#filterSales').select2({
-                    placeholder: 'Sales: Semua',
-                    allowClear: true
-                });
-                $('#filterStatus').select2({
-                    placeholder: 'Status: Semua',
-                    allowClear: true,
-                    minimumResultsForSearch: Infinity
-                });
-
-                $('#filterPelanggan, #filterSales, #filterStatus').on('change.select2', () => {
-                    applyTopbarFilters();
-                });
-            }
-        }
-
-        ['filterTglMulai','filterTglAkhir'].forEach(id => {
-            document.getElementById(id).addEventListener('change', applyTopbarFilters);
+        fn._fk = true; $.fn.dataTable.ext.search.push(fn);
+        const hash = (location.hash || "").replace("#id=", "");
+        if (hash) open(hash);
+    }
+    function custOf(r) { return customers.find(c => String(c.id) === String(r.pelangganId)); }
+    function open(id) {
+        const r = rows.find(x => String(x.id) === String(id));
+        if (!r) return;
+        $("#dCust").text(r.pelangganNama || "");
+        $("#dAddr").text(r.pelangganAlamat || "");
+        $("#dSales").text(r.salesNama || "");
+        $("#dDate").text(PrototypeSpa.fmtDate(r.tanggalFaktur));
+        $("#dStat").html(r.status === "Paid" ? "<span class='badge bg-success'>Paid</span>" : "<span class='badge bg-warning text-dark'>" + (r.status || "") + "</span>");
+        $("#btnPrint").attr("href", "print.html?id=" + encodeURIComponent(r.id));
+        const items = $("#items").empty();
+        let sub = 0, ppn = 0;
+        (r.items || []).forEach(function (it) {
+            const line = Number(it.hargaUnit || 0) * Number(it.qty || 0);
+            sub += line;
+            if (it.pajak && it.pajak !== "NoPPN") ppn += line * 0.11;
+            items.append("<tr><td>" + (it.nama || "") + "</td><td class='text-end'>" + it.qty + " " + (it.satuan || "") + "</td><td class='text-end'>" + money(it.hargaUnit) + "</td><td class='text-end'>" + money(line) + "</td></tr>");
         });
-
-        if (!$.fn.select2) {
-            ['filterPelanggan','filterSales','filterStatus'].forEach(id => {
-                document.getElementById(id).addEventListener('change', applyTopbarFilters);
-            });
-        }
-
-        document.getElementById('btnResetFilter').addEventListener('click', () => {
-            document.getElementById('filterTglMulai').value = '2026-01-01';
-            document.getElementById('filterTglAkhir').value = '2026-12-31';
-            
-            if ($.fn.select2) {
-                $('#filterPelanggan').val('').trigger('change.select2');
-                $('#filterSales').val('').trigger('change.select2');
-                $('#filterStatus').val('').trigger('change.select2');
-            } else {
-                document.getElementById('filterPelanggan').value = '';
-                document.getElementById('filterSales').value = '';
-                document.getElementById('filterStatus').value = '';
-                applyTopbarFilters();
-            }
+        $("#sub").text(money(sub)); $("#ppn").text(money(Math.round(ppn))); $("#grand").text(money(r.jumlahTagihan || sub + ppn));
+        let koreksi = [];
+        try { koreksi = JSON.parse(localStorage.getItem("fprs_koreksi_v1") || "[]"); } catch (e) { koreksi = []; }
+        const linked = koreksi.filter(c => c.sourceType === "invoice" && String(c.sourceNo) === String(r.id));
+        const corr = $("#corr").empty();
+        if (!linked.length) corr.append("<tr><td colspan='5' class='text-center text-muted py-3'>no data available in table</td></tr>");
+        linked.forEach(function (c) {
+            const st = c.status === "Approved" ? "<span class='badge bg-success'>Approved</span>" : c.status === "Rejected" ? "<span class='badge bg-secondary'>Rejected</span>" : "<span class='badge bg-warning text-dark'>Waiting</span>";
+            const lines = Array.isArray(c.lines) && c.lines.length
+                ? c.lines
+                : (c.productName || c.deltaPcs != null ? [{ productName: c.productName, deltaPcs: c.deltaPcs, price: c.price, value: c.value }] : []);
+            const value = lines.reduce(function (s, ln) {
+                return s + Number(ln.value != null ? ln.value : Number(ln.deltaPcs || 0) * Number(ln.price || 0));
+            }, 0);
+            corr.append("<tr><td class='text-success fw-bold'>" + c.id + "</td><td>" + PrototypeSpa.fmtDate(c.createdAt) + "</td><td class='text-end'>" + lines.length + "</td><td class='text-end'>" + money(value) + "</td><td>" + st + "</td></tr>");
         });
-
-        /* =========================================
-           KPI CARD CLICK → FILTER TABLE BY STATUS
-        ========================================= */
-        function syncCardFromStatus(statusVal) {
-            document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
-                card.classList.toggle('active-filter', card.dataset.filter === statusVal);
-            });
-        }
-
-        document.querySelectorAll('.summary-card[data-filter]').forEach(card => {
-            card.addEventListener('click', () => {
-                const filterVal = card.dataset.filter;
-                const filterStatus = document.getElementById('filterStatus');
-                filterStatus.value = filterVal;
-                if ($.fn.select2) {
-                    $('#filterStatus').val(filterVal).trigger('change.select2');
-                } else {
-                    applyTopbarFilters();
-                }
-            });
-        });
-
-        /* =========================================
-           CETAK FAKTUR (Mock)
-        ========================================= */
-        window.cetakFaktur = function(id) {
-            window.open('print.html?id=' + encodeURIComponent(id), '_blank');
-        };
-
-        /* =========================================
-           EKSPOR (Mock)
-        ========================================= */
-        document.getElementById('btnEkspor').addEventListener('click', () => {
-            Swal.fire({
-                icon: 'success',
-                title: 'Ekspor Berhasil',
-                html: 'Data faktur telah diekspor ke <strong>Excel</strong>.<br><small class="text-muted">Fitur ini akan terintegrasi dengan API pada produksi.</small>',
-                confirmButtonColor: '#005d41',
-                timer: 3000,
-                timerProgressBar: true
-            });
-        });
-
-        /* =========================================
-           INIT
-        ========================================= */
-        function init() {
-            populateFilters(allData);
-            initSelect2();
-            renderTable(allData);
-            initDataTable();
-            updateSummaryCards(allData);
-        }
-
-        loadData();
-
+        if (map) { map.remove(); map = null; }
+        const c = custOf(r);
+        if (c && c.lat != null && c.lng != null && window.L) {
+            $("#map").removeClass("d-none"); $("#mapEmpty").addClass("d-none");
+            map = L.map("map").setView([Number(c.lat), Number(c.lng)], 14);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(map);
+            L.marker([Number(c.lat), Number(c.lng)]).addTo(map);
+            setTimeout(() => map.invalidateSize(), 200);
+        } else { $("#map").addClass("d-none"); $("#mapEmpty").removeClass("d-none"); }
+        $("#list").addClass("d-none"); $("#detail").removeClass("d-none"); $("#btnBack").removeClass("d-none");
+    }
+    $("#cards").on("click", ".mpg-stat-card[data-filter]", function () {
+        filter = $(this).data("filter") || "";
+        PrototypeSpa.setFilteredCard("#cards", filter);
+        if (table) table.draw();
+    });
+    $("#dFrom,#dTo").on("change", paint);
+    $("#tbl").on("click", ".open", function (e) { e.preventDefault(); open($(this).data("id")); });
+    $("#btnBack").on("click", function () { PrototypeSpa.confirm("Back to invoice list?", function () { if (map) { map.remove(); map = null; } $("#detail").addClass("d-none"); $("#list").removeClass("d-none"); $("#btnBack").addClass("d-none"); }); });
+    load();
     });
     </script>
-</body>
-</html>
+</body></html>

@@ -6,6 +6,7 @@ Dua FSD independen untuk proyek **Falcon FPRS Prototype**, mengikuti standar [FS
 |-----|--------|--------|-------|
 | **Web Admin** | `FalconWebPortal/` | `source/FSD_Falcon_Web_v1.0.md` | `py build.py` |
 | **Mobile SFA** | `FalconMobile/` | `source/FSD_Falcon_Mobile_v1.0.md` | `py build.py` |
+| **Koreksi Stok (Web + Mobile)** | `FalconKoreksi/` | `source/FSD_Falcon_Koreksi_Stok_v1.0.md` | `py build.py` |
 
 ## Build cepat
 
@@ -17,6 +18,10 @@ py build.py
 
 # FSD Mobile
 cd "D:\Work\Source\Comsup\falcon\Prototype\wwwroot\document\FSD\FalconMobile"
+py build.py
+
+# FSD Koreksi Stok (Web + Mobile)
+cd "D:\Work\Source\Comsup\falcon\Prototype\wwwroot\document\FSD\FalconKoreksi"
 py build.py
 ```
 

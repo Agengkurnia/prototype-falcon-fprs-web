@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../../MAVEN"
+		},
+		{
+			"path": "../../../TestCase_Generator"
 		}
 	],
 	"settings": {

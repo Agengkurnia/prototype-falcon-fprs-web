@@ -251,7 +251,7 @@ body {
             <table class="inv-meta-table">
                 <tr class="highlight"><td>FAKTUR #</td><td id="metaNoFaktur">—</td></tr>
                 <tr><td>TGL FAKTUR</td><td id="metaTglFaktur">—</td></tr>
-                <tr><td>WAKTU PEMBAYARAN</td><td id="metaJangka">—</td></tr>
+                <tr><td>PEMBAYARAN</td><td id="metaJangka">Tunai</td></tr>
                 <tr><td>STATUS</td><td id="metaStatus">—</td></tr>
             </table>
         </div>
@@ -264,15 +264,6 @@ body {
             <div class="cust-val" id="custBill">—</div>
             <div class="cust-addr" id="custBillAddr">—</div>
         </div>
-        <div class="cust-col">
-            <div class="cust-label">Dikirim Ke:</div>
-            <div class="cust-val" id="custShip">—</div>
-            <div class="cust-addr" id="custShipAddr">—</div>
-        </div>
-        <div class="cust-col" style="max-width:180px;">
-            <div class="cust-label">Kode Transaksi:</div>
-            <div style="font-size:9.5px; color:#333; line-height:1.4;" id="custKodeTrx">—</div>
-        </div>
     </div>
 
     <!-- Item Table -->
@@ -284,7 +275,6 @@ body {
                 <th>Produk</th>
                 <th class="text-right" style="width:90px;">Harga/Unit</th>
                 <th class="text-right" style="width:70px;">Kuantitas</th>
-                <th class="text-right" style="width:65px;">Diskon</th>
                 <th style="width:55px;">Pajak</th>
                 <th class="text-right" style="width:85px;">Nominal</th>
             </tr>
@@ -296,14 +286,12 @@ body {
     <!-- Footer: Bank + Totals -->
     <div class="inv-footer">
         <div class="bank-info">
-            <div class="bank-label">Untuk Pembayaran:</div>
-            <div class="bank-row">BCA No. 123.456.789.0 (PT Kalbe Nutritionals) a/n Kalbe Nutritionals</div>
-            <div class="bank-row">Mandiri No. 157.0000.12345 (PT Kalbe Nutritionals) a/n Kalbe Nutritionals</div>
+            <div class="bank-label">Pembayaran</div>
+            <div class="bank-row">Tunai</div>
         </div>
         <div class="total-block">
             <table class="total-table">
                 <tr><td>Sub Total</td><td id="totSubtotal">0,00</td></tr>
-                <tr><td>Diskon Order</td><td id="totDiskon">0,00</td></tr>
                 <tr><td>PPN</td><td id="totPpn">0,00</td></tr>
                 <tr class="grand-row"><td>Total</td><td id="totGrand">0,00</td></tr>
             </table>
@@ -315,7 +303,7 @@ body {
     <div class="signature-block">
         <div class="sig-col">
             <div class="sig-title">Hormat kami</div>
-            <div class="sig-line">PT Kalbe Nutritionals</div>
+            <div class="sig-line">PT Sanghiang Perkasa</div>
         </div>
         <div class="sig-col">
             <div class="sig-title">Dikirim oleh</div>
@@ -400,9 +388,7 @@ body {
         // Customer
         document.getElementById('custBill').textContent      = item.pelangganNama || '—';
         document.getElementById('custBillAddr').textContent  = item.pelangganAlamat || '—';
-        document.getElementById('custShip').textContent      = item.pelangganNama || '—';
-        document.getElementById('custShipAddr').textContent  = item.pelangganAlamat || '—';
-        document.getElementById('custKodeTrx').textContent   = item.kodeTransaksi || '—';
+        document.getElementById('metaJangka').textContent = 'Tunai';
         document.getElementById('sigSales').textContent      = item.salesNama || '—';
         document.getElementById('sigCust').textContent       = item.pelangganNama || '—';
 
@@ -415,8 +401,7 @@ body {
         items.forEach((it, idx) => {
             const qty       = it.qty || 0;
             const harga     = it.hargaUnit || 0;
-            const diskon    = it.diskon || 0;
-            const lineTotal = harga * qty - diskon;
+            const lineTotal = harga * qty;
             const isPpn     = it.pajak && it.pajak !== 'NoPPN';
             const ppn       = isPpn ? lineTotal * 0.11 : 0;
             subtotal   += lineTotal;
@@ -429,7 +414,6 @@ body {
                     <td class="prod-name">${it.nama || '—'}</td>
                     <td class="text-right">${fmtNum(harga)}/${it.satuan || 'PCS'}</td>
                     <td class="text-right">${qty} ${it.satuan || 'PCS'}</td>
-                    <td class="text-right">${fmtNum(diskon)}</td>
                     <td>${it.pajak || 'NoPPN'}</td>
                     <td class="text-right">${fmtNum(lineTotal)}</td>
                 </tr>`);
@@ -439,13 +423,12 @@ body {
         if (items.length < 5) {
             for (let i = items.length; i < 5; i++) {
                 tbody.insertAdjacentHTML('beforeend',
-                    `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`);
+                    `<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`);
             }
         }
 
         const grand = subtotal + Math.round(totalPpn);
         document.getElementById('totSubtotal').textContent = fmtNum(subtotal);
-        document.getElementById('totDiskon').textContent   = fmtNum(0);
         document.getElementById('totPpn').textContent      = fmtNum(Math.round(totalPpn));
         document.getElementById('totGrand').textContent    = fmtNum(grand);
         document.getElementById('terbilang').textContent   = '(' + terbilang(grand) + ')';

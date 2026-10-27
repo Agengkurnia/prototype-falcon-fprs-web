@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Persetujuan Koreksi - Falcon SFA Mobile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link rel="stylesheet" href="../../wwwroot/css/mobile.css"/>
+    <style>
+        body { background: #f7f9fa; }
+        .proto-chip {
+            margin: 10px 16px 0;
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .view-only-bar {
+            margin: 8px 16px 0;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: #FFF8E1;
+            border: 1px solid #FFE082;
+            color: #F57F17;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .seg {
+            display: flex;
+            gap: 8px;
+            margin: 10px 16px 8px;
+        }
+        .seg-btn {
+            flex: 1;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid #cfe8dc;
+            background: #fff;
+            color: #005D41;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .seg-btn.is-active { background: #005D41; color: #fff; border-color: #005D41; }
+        .list-count {
+            margin: 0 16px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+        }
+        .search-wrap {
+            margin: 0 16px 8px;
+            position: relative;
+        }
+        .search-wrap input {
+            height: 42px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            padding: 0 36px 0 12px;
+            font-size: 14px;
+            width: 100%;
+        }
+        .search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: #9ca3af;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: none;
+        }
+        .search-clear.is-on { display: inline-flex; align-items: center; justify-content: center; }
+        .corr-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin: 10px 16px;
+            padding: 14px;
+            cursor: pointer;
+        }
+        .corr-card:active { background: #f9fafb; }
+        .corr-no { font-weight: 700; color: #6b7280; font-size: 12px; }
+        .corr-motoris { font-size: 15px; font-weight: 800; color: #231F20; margin-top: 4px; }
+        .corr-meta { font-size: 12px; color: #6b7280; margin-top: 4px; }
+        .corr-net { font-size: 13px; font-weight: 800; color: #231F20; margin-top: 4px; }
+        .corr-reason {
+            font-size: 12px; color: #6b7280; margin-top: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .corr-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .corr-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .corr-actions .btn {
+            flex: 1;
+            font-weight: 700;
+            height: 44px;
+            font-size: 13px;
+        }
+        .empty-box { text-align: center; padding: 48px 24px; color: #6b7280; font-size: 14px; }
+        .empty-box i { font-size: 28px; color: #d1d5db; margin-bottom: 10px; display: block; }
+        .pill {
+            font-size: 11px; font-weight: 700; border-radius: 999px; padding: 2px 8px;
+        }
+        .pill-wait { background: #FFF3E0; color: #E65100; }
+        .pill-ok { background: #E8F5E9; color: #2E7D32; }
+        .pill-no { background: #FFEBEE; color: #C62828; }
+        .detail-card {
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin: 12px 16px;
+            padding: 14px;
+        }
+        .detail-label { font-size: 11px; color: #6b7280; margin-bottom: 2px; }
+        .detail-value { font-size: 14px; font-weight: 600; color: #231F20; margin-bottom: 10px; }
+        .impact-box {
+            background: #f3faf6;
+            border: 1px solid #cfe8dc;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #005D41;
+            margin-bottom: 4px;
+        }
+        .impact-box.is-minus { background: #FFF8E1; border-color: #FFE082; color: #E65100; }
+        .lines-scroll {
+            max-height: 40vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .line-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 0;
+            border-top: 1px solid #eef2f2;
+            font-size: 13px;
+        }
+        .line-row:first-child { border-top: 0; }
+        .line-name { font-weight: 700; color: #231F20; }
+        .line-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
+        .delta-plus { color: #2E7D32; font-weight: 700; }
+        .delta-minus { color: #E65100; font-weight: 700; }
+        #detailView.has-actions { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+        .detail-actions {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 40;
+            background: #fff;
+            border-top: 1px solid #E9EFEF;
+            padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+            display: flex;
+            gap: 8px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        .detail-actions .btn { flex: 1; font-weight: 700; height: 48px; }
+        .btn-approve { background: #005D41; color: #fff; border: 0; }
+        .btn-reject { background: #fff; color: #C62828; border: 1px solid #EF9A9A; }
+        .btn-approve:disabled, .btn-reject:disabled { opacity: 0.45; }
+    </style>
+</head>
+<body>
+<div class="mobile-wrapper">
+    <div class="mobile-header">
+        <button class="header-action" type="button" id="btnHeaderBack" aria-label="Kembali"><i class="fas fa-arrow-left"></i></button>
+        <span class="header-title" id="headerTitle">Persetujuan Koreksi</span>
+        <div style="width:36px;"></div>
+    </div>
+    <div class="mobile-content no-nav" id="listView" style="padding-bottom:24px;">
+        <div class="proto-chip">Prototipe — filter cabang menyusul.</div>
+        <div class="view-only-bar d-none" id="viewOnlyBar">Mode lihat saja — Setujui/Tolak hanya untuk ABM / BHO.</div>
+        <div class="seg">
+            <button type="button" class="seg-btn is-active" data-tab="waiting">Menunggu</button>
+            <button type="button" class="seg-btn" data-tab="history">Riwayat</button>
+        </div>
+        <div class="list-count" id="listCount">0 menunggu</div>
+        <div class="search-wrap">
+            <input type="search" id="searchInput" placeholder="Cari motoris, nomor, outlet…" autocomplete="off"/>
+            <button type="button" class="search-clear" id="searchClear" aria-label="Hapus pencarian"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="list"></div>
+    </div>
+    <div class="mobile-content no-nav d-none" id="detailView">
+        <div class="detail-card" id="detailHeader"></div>
+        <div class="detail-card">
+            <div id="impactBox" class="impact-box"></div>
+            <div class="form-label" style="font-size:12px;color:#6b7280;font-weight:600;margin:10px 0 4px;">Produk</div>
+            <div class="lines-scroll" id="detailLines"></div>
+        </div>
+    </div>
+    <div class="detail-actions d-none" id="detailActions">
+        <button type="button" class="btn btn-approve" id="btnApprove">Setujui</button>
+        <button type="button" class="btn btn-reject" id="btnReject">Tolak</button>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="../../wwwroot/js/sfa-store.js"></script>
+<script>
+    const user = SfaStore.getUser() || {};
+    const canDecide = !!(SfaStore.isCorrectionApprover && SfaStore.isCorrectionApprover(user));
+    let tab = 'waiting';
+    let currentId = null;
+    let deciding = false;
+    let searchQ = '';
+    let searchTimer = null;
+
+    function money(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+    function esc(s) {
+        return String(s ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+    function fmtDate(v) {
+        if (!v) return '—';
+        const d = new Date(v);
+        if (isNaN(d.getTime())) return String(v);
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        return String(d.getDate()).padStart(2, '0') + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function linesOf(c) {
+        if (Array.isArray(c.lines) && c.lines.length) return c.lines;
+        if (c.productName || c.deltaPcs != null) {
+            return [{
+                productName: c.productName,
+                deltaPcs: c.deltaPcs,
+                value: c.value,
+                price: c.price,
+                originalQty: c.originalQty
+            }];
+        }
+        return [];
+    }
+    function lineCount(c) { return linesOf(c).length; }
+    function docNet(c) {
+        return linesOf(c).reduce((s, ln) => s + Number(ln.value != null ? ln.value : Number(ln.deltaPcs || 0) * Number(ln.price || 0)), 0);
+    }
+    function totalDeltaPcs(c) {
+        return linesOf(c).reduce((s, ln) => s + Number(ln.deltaPcs || 0), 0);
+    }
+    function impactSentence(c) {
+        const pcs = totalDeltaPcs(c);
+        const net = docNet(c);
+        if (!pcs) return 'Tidak ada perubahan qty pcs.';
+        const sign = pcs > 0 ? '+' : '';
+        return 'Saldo motoris berubah ' + sign + pcs + ' pcs (nilai ' + money(net) + ').';
+    }
+    function statusPill(st) {
+        if (st === 'Approved') return '<span class="pill pill-ok">Disetujui</span>';
+        if (st === 'Rejected') return '<span class="pill pill-no">Ditolak</span>';
+        return '<span class="pill pill-wait">Menunggu</span>';
+    }
+    function motorisWaiting() {
+        return (SfaStore.listCorrections() || [])
+            .filter(c => c.requester === 'Motoris' && c.status === 'Waiting')
+            .slice()
+            .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    }
+    function motorisHistory() {
+        return (SfaStore.listCorrections() || [])
+            .filter(c => c.requester === 'Motoris' && (c.status === 'Approved' || c.status === 'Rejected'))
+            .slice()
+            .sort((a, b) => String(b.decidedAt || b.createdAt || '').localeCompare(String(a.decidedAt || a.createdAt || '')))
+            .slice(0, 20);
+    }
+    function matchesSearch(c, q) {
+        if (!q) return true;
+        const hay = [c.id, c.motoris, c.sourceNo, c.partyLabel, c.reason].join(' ').toLowerCase();
+        return hay.indexOf(q) >= 0;
+    }
+    function filteredRows() {
+        const base = tab === 'waiting' ? motorisWaiting() : motorisHistory();
+        return base.filter(c => matchesSearch(c, searchQ));
+    }
+    function paintCount(shown, totalWaiting) {
+        if (tab === 'waiting') {
+            if (searchQ) $('#listCount').text(shown + ' dari ' + totalWaiting + ' menunggu');
+            else $('#listCount').text(totalWaiting + ' menunggu');
+        } else {
+            $('#listCount').text(searchQ ? (shown + ' hasil riwayat') : 'Riwayat terbaru');
+        }
+    }
+    function paintList() {
+        const waitingAll = motorisWaiting();
+        const rows = filteredRows();
+        paintCount(rows.length, waitingAll.length);
+        const $list = $('#list').empty();
+        if (!rows.length) {
+            const msg = searchQ
+                ? 'Tidak ada hasil untuk pencarian ini.'
+                : (tab === 'waiting' ? 'Tidak ada koreksi menunggu.' : 'Belum ada riwayat putusan.');
+            $list.html('<div class="empty-box"><i class="fas fa-inbox"></i>' + msg + '</div>');
+            return;
+        }
+        rows.forEach(c => {
+            const reason = String(c.reason || '').trim();
+            const actions = (canDecide && c.status === 'Waiting')
+                ? '<div class="corr-actions">' +
+                  '<button type="button" class="btn btn-approve btn-card-approve">Setujui</button>' +
+                  '<button type="button" class="btn btn-reject btn-card-reject">Tolak</button>' +
+                  '</div>'
+                : '';
+            $list.append(
+                '<div class="corr-card" data-id="' + esc(c.id) + '">' +
+                '<div class="d-flex justify-content-between align-items-start">' +
+                '<span class="corr-no">' + esc(c.id) + '</span>' + statusPill(c.status) + '</div>' +
+                '<div class="corr-motoris">' + esc(c.motoris || '—') + '</div>' +
+                '<div class="corr-meta">' + esc(c.sourceNo || '') + ' · ' + esc(c.partyLabel || '—') + '</div>' +
+                '<div class="corr-net">' + lineCount(c) + ' produk · ' + money(docNet(c)) + '</div>' +
+                (reason ? '<div class="corr-reason">' + esc(reason) + '</div>' : '') +
+                '<div class="corr-hint">Ketuk kartu untuk detail ›</div>' +
+                actions +
+                '</div>'
+            );
+        });
+    }
+    function showList() {
+        currentId = null;
+        deciding = false;
+        $('#detailView, #detailActions').addClass('d-none');
+        $('#detailView').removeClass('has-actions');
+        $('#listView').removeClass('d-none');
+        $('#headerTitle').text('Persetujuan Koreksi');
+        paintList();
+    }
+    function showDetail(id) {
+        const rec = (SfaStore.listCorrections() || []).find(r => r.id === id);
+        if (!rec) {
+            Swal.fire({ icon: 'warning', text: 'Pengajuan tidak ditemukan.', confirmButtonColor: '#005D41' });
+            showList();
+            return;
+        }
+        currentId = id;
+        $('#listView').addClass('d-none');
+        $('#detailView').removeClass('d-none');
+        $('#headerTitle').text(rec.id);
+        const sourceType = rec.sourceType === 'kulakan' ? 'Kulakan' : 'Faktur';
+        let decidedHtml = '';
+        if (rec.decidedBy || rec.decidedAt) {
+            decidedHtml =
+                '<div class="detail-label">Diputuskan</div>' +
+                '<div class="detail-value mb-0">' + esc(rec.decidedBy || '—') +
+                (rec.decidedRole ? ' (' + esc(String(rec.decidedRole).toUpperCase()) + ')' : '') +
+                ' · ' + esc(fmtDate(rec.decidedAt)) + '</div>';
+        }
+        $('#detailHeader').html(
+            '<div class="d-flex justify-content-between align-items-center mb-3">' +
+            statusPill(rec.status) +
+            '<span class="corr-meta mb-0">' + esc(fmtDate(rec.createdAt)) + '</span></div>' +
+            '<div class="detail-label">Motoris</div><div class="detail-value">' + esc(rec.motoris || '—') + '</div>' +
+            '<div class="detail-label">Sumber</div><div class="detail-value">' + esc(sourceType) + ' · ' + esc(rec.sourceNo || '') + '</div>' +
+            '<div class="detail-label">Outlet / Stokis</div><div class="detail-value">' + esc(rec.partyLabel || '—') + '</div>' +
+            '<div class="detail-label">Alasan</div><div class="detail-value">' + esc(rec.reason || '—') + '</div>' +
+            '<div class="detail-label">Net value</div><div class="detail-value' + (decidedHtml ? '' : ' mb-0') + '">' + money(docNet(rec)) + '</div>' +
+            decidedHtml
+        );
+        const pcs = totalDeltaPcs(rec);
+        $('#impactBox')
+            .toggleClass('is-minus', pcs < 0)
+            .text(impactSentence(rec));
+        const $lines = $('#detailLines').empty();
+        const lines = linesOf(rec);
+        if (!lines.length) {
+            $lines.html('<div class="text-muted" style="font-size:13px;">Tidak ada baris produk.</div>');
+        } else {
+            lines.forEach(ln => {
+                const d = Number(ln.deltaPcs || 0);
+                const cls = d > 0 ? 'delta-plus' : 'delta-minus';
+                const sign = d > 0 ? '+' : '';
+                const val = ln.value != null ? Number(ln.value) : d * Number(ln.price || 0);
+                $lines.append(
+                    '<div class="line-row">' +
+                    '<div><div class="line-name">' + esc(ln.productName || '') + '</div>' +
+                    '<div class="line-sub">Asli: ' + Number(ln.originalQty || 0) + ' pcs</div></div>' +
+                    '<div class="text-end"><div class="' + cls + '">' + sign + d + ' pcs</div>' +
+                    '<div class="line-sub">' + money(val) + '</div></div></div>'
+                );
+            });
+        }
+        const showActions = canDecide && rec.status === 'Waiting';
+        $('#detailActions').toggleClass('d-none', !showActions);
+        $('#detailView').toggleClass('has-actions', showActions);
+        $('#btnApprove, #btnReject').prop('disabled', deciding);
+        window.scrollTo(0, 0);
+    }
+    function decide(status, idOverride) {
+        if (!canDecide || deciding) return;
+        const id = idOverride || currentId;
+        if (!id) return;
+        const list = SfaStore.listCorrections() || [];
+        const rec = list.find(r => r.id === id);
+        if (!rec || rec.status !== 'Waiting') {
+            Swal.fire({ icon: 'warning', text: 'Pengajuan ini sudah tidak menunggu.', confirmButtonColor: '#005D41' })
+                .then(showList);
+            return;
+        }
+        const msg = status === 'Approved'
+            ? 'Setujui koreksi ini? Saldo motoris akan diperbarui.'
+            : 'Tolak koreksi ini? Saldo tidak berubah.';
+        deciding = true;
+        currentId = id;
+        $('#btnApprove, #btnReject').prop('disabled', true);
+        $('.btn-card-approve, .btn-card-reject').prop('disabled', true);
+        Swal.fire({
+            icon: 'question',
+            text: msg,
+            showCancelButton: true,
+            confirmButtonText: status === 'Approved' ? 'Setujui' : 'Tolak',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: status === 'Approved' ? '#005D41' : '#C62828'
+        }).then(function (r) {
+            if (!r.isConfirmed) {
+                deciding = false;
+                $('#btnApprove, #btnReject').prop('disabled', false);
+                $('.btn-card-approve, .btn-card-reject').prop('disabled', false);
+                return;
+            }
+            rec.status = status;
+            rec.decidedBy = user.name || user.username || 'Approver';
+            rec.decidedRole = String(user.role || '').toLowerCase();
+            rec.decidedAt = new Date().toISOString().slice(0, 10);
+            SfaStore.writeCorrections(list);
+            const doneText = status === 'Approved' ? 'Koreksi disetujui.' : 'Koreksi ditolak.';
+            Swal.fire({
+                icon: 'success',
+                text: doneText,
+                timer: 1200,
+                showConfirmButton: false
+            }).then(function () {
+                deciding = false;
+                tab = 'waiting';
+                $('.seg-btn').removeClass('is-active');
+                $('.seg-btn[data-tab="waiting"]').addClass('is-active');
+                showList();
+            });
+        });
+    }
+
+    $(function () {
+        if (!canDecide) $('#viewOnlyBar').removeClass('d-none');
+        paintList();
+        $('.seg-btn').on('click', function () {
+            tab = $(this).data('tab');
+            $('.seg-btn').removeClass('is-active');
+            $(this).addClass('is-active');
+            paintList();
+        });
+        $('#searchInput').on('input', function () {
+            const val = String(this.value || '').trim().toLowerCase();
+            $('#searchClear').toggleClass('is-on', !!val);
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(function () {
+                searchQ = val;
+                paintList();
+            }, 150);
+        });
+        $('#searchClear').on('click', function () {
+            $('#searchInput').val('');
+            searchQ = '';
+            $(this).removeClass('is-on');
+            paintList();
+        });
+        $('#list').on('click', '.corr-card', function (e) {
+            if ($(e.target).closest('.corr-actions').length) return;
+            showDetail(String($(this).data('id')));
+        });
+        $('#list').on('click', '.btn-card-approve', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            decide('Approved', String($(this).closest('.corr-card').data('id')));
+        });
+        $('#list').on('click', '.btn-card-reject', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            decide('Rejected', String($(this).closest('.corr-card').data('id')));
+        });
+        $('#btnHeaderBack').on('click', function () {
+            if (!$('#detailView').hasClass('d-none')) showList();
+            else location.href = 'home.html';
+        });
+        $('#btnApprove').on('click', function () { decide('Approved'); });
+        $('#btnReject').on('click', function () { decide('Rejected'); });
+    });
+</script>
+</body>
+</html>
